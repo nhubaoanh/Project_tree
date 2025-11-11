@@ -20,12 +20,11 @@ export default function RootLayout({
               <div className="max-w-7xl mx-auto w-full">
                 <Header />
 
-                {/* <main className="h-screen p-4 bg-[#FCF9E3] shadow-[0 0 0 0.25] rounded-md">
+                <main className="h-screen p-4 bg-[#FCF9E3] shadow-[0 0 0 0.25] rounded-md">
                   {children}
-                </main> */}
+                </main>
                 {/* Main với nền trống đồng */}
-                <main className="relative flex-1 overflow-auto p-6">
-                  {/* Nền trống đồng – mờ, căn giữa */}
+                {/* <main className="relative flex-1 overflow-auto p-6">
                   <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
                     <Image
                       src="/images/trongdong.png"
@@ -40,7 +39,7 @@ export default function RootLayout({
                   <div className="relative z-10 max-w-7xl mx-auto bg-[#FCF9E3]/95 backdrop-blur-sm rounded-xl shadow-2xl p-6 border border-amber-200">
                     {children}
                   </div>
-                </main>
+                </main> */}
               </div>
             </div>
           </div>

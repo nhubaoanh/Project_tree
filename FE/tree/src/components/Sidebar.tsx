@@ -85,8 +85,8 @@ export default function Sidebar() {
           <div className="flex justify-start">
             <Image
               src="/images/phuong.png"
-              width={isSidebarOpen ? 350 : 40}
-              height={isSidebarOpen ? 350 : 40}
+              width={350}
+              height={350}
               alt="Phượng hoàng"
               className="object-contain drop-shadow-md"
               priority
@@ -97,8 +97,8 @@ export default function Sidebar() {
           <div className="flex justify-end">
             <Image
               src="/images/may.png"
-              width={isSidebarOpen ? 70 : 30}
-              height={isSidebarOpen ? 70 : 30}
+              width={50}
+              height={50}
               alt="Mây"
               className="object-contain drop-shadow-md"
               priority
