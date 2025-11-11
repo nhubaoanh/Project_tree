@@ -17,4 +17,13 @@ export class nguoiDungService {
         nguoiDung.matKhau = md5(nguoiDung.matKhau);
         return this.nguoidungResponsitory.logUpUser(nguoiDung);
     }
+
+    async searchUser(
+        pageIndex: number,
+        pageSize : number,
+        search_content: string,
+        dongHoId: string,
+    ): Promise<any[]> {
+        return this.nguoidungResponsitory.searchUser(pageIndex, pageSize, search_content, dongHoId);
+    }
 }

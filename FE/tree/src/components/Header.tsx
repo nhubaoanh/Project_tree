@@ -1,6 +1,4 @@
-// components/Header.tsx
 "use client";
-
 import React, { useState, useRef, useEffect } from "react";
 import { Menu, Bell, Settings, LogOut, User } from "lucide-react";
 import { Button } from "antd";
@@ -18,8 +16,6 @@ export default function Header() {
     localStorage.removeItem("access_token");
     router.push("/login");
   };
-
-  // Đóng dropdown khi click ngoài
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (
@@ -36,7 +32,6 @@ export default function Header() {
   return (
     <header className="bg-gradient-to-r from-[#A20105] to-[#8B0000] shadow-lg">
       <div className="max-w-7xl mx-auto py-4 px-6 flex items-center justify-between">
-        {/* Nút Menu */}
         <button
           onClick={toggleSidebar} // ← DÙNG TOGGLE TỪ CONTEXT
           className="p-2 rounded-full hover:bg-white/20 transition-all duration-200"
@@ -44,12 +39,10 @@ export default function Header() {
           <Menu size={24} className="text-white" />
         </button>
 
-        {/* Tiêu đề */}
         <h1 className="text-2xl md:text-3xl font-bold text-white tracking-wide">
           Gia Phả Việt
         </h1>
 
-        {/* Avatar + Dropdown */}
         <div className="relative" ref={dropdownRef}>
           <button
             onClick={() => setOpen(!open)}
@@ -62,7 +55,6 @@ export default function Header() {
             />
           </button>
 
-          {/* Dropdown */}
           {open && (
             <div className="absolute right-0 mt-3 w-56 bg-white rounded-xl shadow-2xl py-3 z-50 border border-gray-100">
               <div className="px-4 py-2 border-b border-gray-100">

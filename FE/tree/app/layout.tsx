@@ -19,27 +19,21 @@ export default function RootLayout({
             <div className="flex flex-col flex-1 overflow-hidden">
               <div className="max-w-7xl mx-auto w-full">
                 <Header />
-
-                <main className="h-screen p-4 bg-[#FCF9E3] shadow-[0 0 0 0.25] rounded-md">
-                  {children}
-                </main>
-                {/* Main với nền trống đồng */}
-                {/* <main className="relative flex-1 overflow-auto p-6">
+                <main className="relative h-screen p-4 bg-[#FCF9E3] shadow-[0_0_0_0.25] rounded-md overflow-auto">
+                  {/* Ảnh nền trống đồng căn giữa */}
                   <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
                     <Image
                       src="/images/trongdong.png"
-                      alt="Trống đồng văn hóa Đông Sơn"
-                      width={520}
-                      height={520}
-                      className="object-contain opacity-10 select-none"
-                      priority
-                      unoptimized
+                      alt="Trống đồng"
+                      width={700}
+                      height={700}
+                      className="object-contain opacity-70"
                     />
                   </div>
-                  <div className="relative z-10 max-w-7xl mx-auto bg-[#FCF9E3]/95 backdrop-blur-sm rounded-xl shadow-2xl p-6 border border-amber-200">
-                    {children}
-                  </div>
-                </main> */}
+
+                  {/* Nội dung chính */}
+                  <div className="">{children}</div>
+                </main>
               </div>
             </div>
           </div>
