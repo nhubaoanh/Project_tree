@@ -9,6 +9,7 @@ nguoiDungRouter.use((req, res, next) => {
 });
 
 const userController = container.resolve(NguoiDungController);
+nguoiDungRouter.post("/login", userController.loginUser.bind(userController));
 nguoiDungRouter.post('/signup', userController.createNguoiDung.bind(userController));
 nguoiDungRouter.post('/search', userController.searchUser.bind(userController));
 

@@ -21,39 +21,55 @@ export class nguoiDungReponsitory {
     }
   }
 
-  // async logInUser(nguoiDung: nguoiDung) : Promise<any> {
-  //     try{
-  //         const sql = "CALL SignIn (?, ?, @err_code, @err_msg)";
+  // async LoginUser(
+  //   tenDangNhap: string,
+  //   matKhau: string
+  // ):Promise<any>{
+  //   try{
+  //     const sql = "CALL LoginUserByAccount(? ,@err_code, @err_msg)";
+  //     const [results] = await this.db.query(sql, [
+  //       tenDangNhap
+  //     ])
+  //     console.log(JSON.stringify(results, null, 2));
 
-  //         await this.db.query(sql, [
-  //             nguoiDung.tenDangNhap,
-  //             nguoiDung.matKhau
-  //         ]);
-  //         return true;
-  //     }catch(error : any){
-  //         throw new Error(error)
+  //     console.log("Results from LoginUserByAccount:", results);
+  //     if(Array.isArray(results) && results.length > 0){
+  //       let user = results[0];
+  //       console.log("User fetched in repository:", user);
+  //       if(user){
+  //         if(user.matKhau === matKhau){
+  //           return user;
+  //         }else{
+  //           return null;
+  //         }
+  //       }
   //     }
+  //     return null;
+  //   }catch(error:any){
+  //     throw new Error(error.message);
+  //   }
   // }
 
-  // async searchUser(
-  //     pageIndex: number,
-  //     pageSize : number,
-  //     search_content: string,
-  //     dongHoId: string,
-  // ): Promise<any[]> {
-  //     try{
-  //         const sql = "CALL SearchNguoiDung(? ,? ,? ,? , @err_code, @err_msg)";
-  //         const [result] = await this.db.query(sql, [
-  //             pageIndex,
-  //             pageSize,
-  //             search_content,
-  //             dongHoId,
-  //         ])
-  //         return result[0] || [];
-  //     }catch(error : any){
-  //         throw new Error(error)
-  //     }
-  // }
+  async LoginUser(tenDangNhap: string): Promise<any> {
+    try {
+      const sql = "CALL LoginUserByAccount(? ,@err_code, @err_msg)";
+      const [results] = await this.db.query(sql, [tenDangNhap]);
+
+      console.log("Results from LoginUserByAccount:", results);
+
+      // Lấy object user trực tiếp từ mảng
+      if (Array.isArray(results) && results.length > 0) {
+        const user = results[0];
+        console.log("User fetched in repository:", user);
+
+        return user;
+      }
+      return null;
+    } catch (error: any) {
+      throw new Error(error.message);
+    }
+  }
+
   async searchUser(
     pageIndex: number,
     pageSize: number,

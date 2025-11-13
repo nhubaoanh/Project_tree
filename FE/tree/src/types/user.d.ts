@@ -1,4 +1,6 @@
-export default interface User {
+import { IBaseData } from "./base";
+
+export interface IUser extends IBaseData {
   nguoiDungId: string;
   dongHoId: string;
   tenDangNhap: string;
@@ -10,6 +12,11 @@ export default interface User {
   anhDaiDien: string;
   ngayTao: Date;
   nguoiTaoId: string;
-  active_flag: number;
-  lu_user_id: string;
+}
+
+export interface IUserSearch{
+  pageIndex?: number;
+  pageSize?: number;
+  search_content?: string;
+  dongHoId? :string;
 }

@@ -1,18 +1,3 @@
-// 'use client';
-// export default function AdminLayout({
-//   children,
-// }: {
-//   children: React.ReactNode;
-// }) {
-//   return (
-//       <div className="flex h-screen overflow-hidden bg-gradient-to-br from-amber-50 to-red-50">
-//           <main className="flex-1 overflow-auto bg-white/90 backdrop-blur-sm">
-//             <div className="mx-auto w-full">{children}</div>
-//           </main>
-//       </div>
-//   );
-// }
-
 'use client';
 import Sidebar from "@/src/components/Sidebar";
 import Header from "@/src/components/Header";

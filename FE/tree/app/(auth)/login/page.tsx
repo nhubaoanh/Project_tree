@@ -5,11 +5,39 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import Image from "next/image"
 import Link from "next/link"
+import { loginService } from "@/src/service/user.service"
+import { useState } from "react"
+import { useRouter } from "next/navigation"
+import storage from "@/src/utils/storage"
 
 export default function LoginPage() {
 
-  const handleButton = () => {
-    console.log("Button clicked");
+  const [tenDangNhap, setTenDangNhap] = useState("");
+  const [matKhau, setMatKhau] = useState("");
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+
+  const handleButton = async () => {
+    try{
+      setLoading(true);
+      console.log(tenDangNhap, matKhau);
+      const data = await loginService({
+        tenDangNhap: tenDangNhap,
+        matKhau: matKhau})
+        console.log("Sending login request:", {
+          user_name: tenDangNhap,
+          password: matKhau,
+        });
+
+      
+        if(data) {
+          storage.setToken(data.token);
+          alert("Đăng nhập thành công!");
+          router.push("/dashbrach");
+        }
+    }catch(err){
+      console.error("Login failed:", err);
+    }
   }
 
   return (
@@ -85,6 +113,8 @@ export default function LoginPage() {
                 type="text" 
                 placeholder="Nhập tên đăng nhập" 
                 className="h-12 text-base bg-white/90"
+                value={tenDangNhap}
+                onChange={(e) => setTenDangNhap(e.target.value)}
               />
             </div>
             <div className="grid gap-2">
@@ -100,12 +130,17 @@ export default function LoginPage() {
                 type="password" 
                 placeholder="Nhập mật khẩu" 
                 className="h-12 text-base bg-white/90"
+                value={matKhau}
+                onChange={(e) => setMatKhau(e.target.value)}
               />
             </div>
           </CardContent>
           <CardFooter className="flex flex-col space-y-4">
-            <Button className="w-full h-12 text-base font-medium cursor-pointe cursor-pointer hover:scale-105 active:scale-95 transition-transform duration-150 bg-red-600" onClick={handleButton} variant="destructive">
-              Đăng nhập
+            <Button 
+              disabled={loading}
+              onClick = {handleButton}
+              className="w-full h-12 text-base font-medium cursor-pointe cursor-pointer hover:scale-105 active:scale-95 transition-transform duration-150 bg-red-600" variant="destructive">
+              {loading ? "Đang đăng nhập..." : "Đăng nhập"}
             </Button>
             <p className="text-sm text-gray-600 text-center">
               Chưa có tài khoản?{" "}
