@@ -1,7 +1,7 @@
 'use client';
-import Sidebar from "@/src/components/Sidebar";
-import Header from "@/src/components/Header";
-import { SidebarProvider } from "@/src/context/SidebarContext";
+import Sidebar from "@/components/ui/Sidebar";
+import Header from "@/components/ui/Header";
+import { SidebarProvider } from "@/context/SidebarContext";
 import Image from "next/image";
 
 export default function AdminLayout({

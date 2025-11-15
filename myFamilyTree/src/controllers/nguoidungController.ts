@@ -31,7 +31,7 @@ export class NguoiDungController {
         console.log("Generated token:",user.token);
         res.json({...user, token: token, message: "Đăng nhập thành công!", success: true});
       }else{
-        res.status(401).json({message: "Đăng nhập thất bại. Vui lòng kiểm tra lại tài khoản hoặc mật khẩu!", success: false});
+        res.status(401).json({message: user.message, success: false});
       }
     }catch(error:any){
       console.error("Lỗi đăng nhập:", error);

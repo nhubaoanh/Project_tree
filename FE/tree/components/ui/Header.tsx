@@ -1,9 +1,7 @@
 "use client";
 import React, { useState, useRef, useEffect } from "react";
 import { Menu, Bell, Settings, LogOut, User } from "lucide-react";
-import { Button } from "antd";
-// import { useSidebar } from "../srt/context/SidebarContext"; // ← DÙNG CONTEXT
-import { useSidebar } from "../context/SidebarContext";
+import { useSidebar } from "@/context/SidebarContext";
 import { useRouter } from "next/navigation";
 
 export default function Header() {

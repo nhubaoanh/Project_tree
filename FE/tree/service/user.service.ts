@@ -1,6 +1,6 @@
 import { API_CORE } from "../constant/config";
-import { apiClient } from "../lib/api";
-import { IUser, IUserSearch } from "../types/user";
+import { apiClient } from "@/lib/api";
+import { IUser, IUserSearch } from "@/types/user";
 
 const prefix = `${API_CORE}/users`;
 

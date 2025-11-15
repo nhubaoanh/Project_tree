@@ -1,3 +1,4 @@
+import { ToastProvider } from "@/service/useToas";
 import "./globals.css";
 
 export default function RootLayout({
@@ -8,7 +9,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="bg-[#FCF9E3] h-screen">
-        {children}
+        <ToastProvider>{children}</ToastProvider>
       </body>
     </html>
   );

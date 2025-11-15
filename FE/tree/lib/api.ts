@@ -1,7 +1,7 @@
 import axios from "axios";
-import { BASE_URL } from "../constant/config";
-import { LOGIN_URL } from "../urls";
-import storage from "../utils/storage";
+import { BASE_URL } from "@/constant/config";
+import { LOGIN_URL } from "@/urls";
+import storage from "@/utils/storage";
 
 export const apiClient = axios.create({
     baseURL: BASE_URL,

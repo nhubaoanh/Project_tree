@@ -5,8 +5,18 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import Image from "next/image"
 import Link from "next/link"
+import { useToast } from "@/service/useToas"
+import { validateEmail, validatePassword, validateName } from "@/lib/validator"
+
+interface FormData {
+  email: string;
+  password: string;
+  fullName: string;
+}
 
 export default function LoginPage() {
+
+  const { showError, showSuccess, showInfo, showWarning } = useToast();
 
   const handleButton = () => {
     console.log("Button clicked");

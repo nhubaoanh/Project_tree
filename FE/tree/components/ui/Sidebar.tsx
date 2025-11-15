@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { useSidebar } from "../context/SidebarContext"; // ✅ dùng context để đồng bộ toggle
+import { useSidebar } from "@/context/SidebarContext"; // ✅ dùng context để đồng bộ toggle
 import Image from "next/image";
 
 type SidebarItem = {

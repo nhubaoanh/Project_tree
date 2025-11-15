@@ -1,107 +1,59 @@
 // "use client";
+
 // import { useState } from "react";
 // import Image from "next/image";
-// // import FamilyTree from "react-family-tree";
-// import type { Gender, RelType, Node } from "react-family-tree";
+// import dynamic from "next/dynamic";
+// import { FamilyNode } from "./components/FamilyNode";
 
-// import FamilyNode from "./components/FamilyNode"; // import component node
+// const DynamicFamilyTreeChart = dynamic(
+//   () => import("./components/FamilyNode"),
+//   { ssr: false }
+// );
 
-// // Dữ liệu mẫu cho sơ đồ gia phả
-// type Gender = "male" | "female" | "other";
+// // ==================
+// // MOCK DATA
+// // ==================
+// const mockTreeData: FamilyNode = {
+//   id: "TV001",
+//   name: "Nguyễn Văn A (Ông)",
+//   avatar: "/images/ong.png",
+//   children: [
+//     {
+//       id: "TV002",
+//       name: "Trần Thị B (Bà)",
+//       avatar: "/images/ba.png",
+//       children: [
+//         {
+//           id: "TV003",
+//           name: "Nguyễn Văn C (Cha)",
+//           children: [
+//             {
+//               id: "TV004",
+//               name: "Lê Thị D (Mẹ)",
+//               children: [{ id: "TV005", name: "Nguyễn Văn E (Con)" }],
+//             },
+//           ],
+//         },
+//       ],
+//     },
+//   ],
+// };
 
-// type RelationType = "father" | "mother" | "child" | "spouse";
+// export default function GenealogyPage() {
+//   const [activeSection, setActiveSection] = useState("diagram");
 
-// interface Relation {
-//   id: string;
-//   type: RelationType;
-// }
+//   const navButtons = [
+//     { key: "add", label: "Thêm thành viên" },
+//     { key: "diagram", label: "Sơ đồ gia phả" },
+//     { key: "history", label: "Lịch sử" },
+//     { key: "settings", label: "Cài đặt" },
+//   ];
 
-// interface FamilyNodeData {
-//   readonly id: string;
-//   readonly name: string;
-//   readonly gender: Gender;
-//   readonly parents: readonly Relation[];
-//   readonly children: readonly Relation[];
-//   readonly siblings: readonly { id: string }[];
-//   readonly spouses: readonly { id: string }[];
-// }
-
-// const familyData: readonly FamilyNodeData[] = [
-//   {
-//     id: "1",
-//     name: "Ông A",
-//     gender: "male",
-//     parents: [],
-//     children: [{ id: "3", type: "child" }],
-//     siblings: [],
-//     spouses: [{ id: "2" }],
-//   },
-//   {
-//     id: "2",
-//     name: "Bà B",
-//     gender: "female",
-//     parents: [],
-//     children: [{ id: "3", type: "child" }],
-//     siblings: [],
-//     spouses: [{ id: "1" }],
-//   },
-//   {
-//     id: "3",
-//     name: "Con trai C",
-//     gender: "male",
-//     parents: [
-//       { id: "1", type: "father" },
-//       { id: "2", type: "mother" },
-//     ],
-//     children: [{ id: "5", type: "child" }],
-//     siblings: [],
-//     spouses: [{ id: "4" }]
-//   },
-//   {
-//     id: "4",
-//     name: "Vợ C",
-//     gender: "female",
-//     parents: [],
-//     children: [{ id: "5", type: "child" }],
-//     siblings: [],
-//     spouses: [{ id: "3" }]
-//   },
-//   {
-//     id: "5",
-//     name: "Cháu D",
-//     gender: "male",
-//     parents: [
-//       { id: "3", type: "father" },
-//       { id: "4", type: "mother" },
-//     ],
-//     children: [],
-//     siblings: [],
-//     spouses: []
-//   },
-// ] as const;
-
-
-
-// // Component hiển thị sơ đồ gia phả
-// function DiagramSection() {
-//   return (
-//     <div className="h-[600px] bg-white rounded-xl shadow-md flex items-center justify-center overflow-auto p-6">
-//       <FamilyTree
-//         nodes={familyData}
-//         rootId="1"
-//         width={140}
-//         height={110}
-//         renderNode={(node) => <FamilyNode node={node} />}
-//       />
-//     </div>
-//   );
-// }
-
-// // Component form thêm thành viên
-// function AddMemberForm() {
-//   return (
+//   const AddMemberForm = () => (
 //     <div className="bg-white rounded-xl shadow-md p-6 max-w-lg mx-auto">
-//       <h2 className="text-2xl font-semibold mb-4 text-center">Thêm thành viên</h2>
+//       <h2 className="text-2xl font-semibold mb-4 text-center">
+//         Thêm thành viên
+//       </h2>
 //       <form className="space-y-4">
 //         <input
 //           type="text"
@@ -122,36 +74,33 @@
 //       </form>
 //     </div>
 //   );
-// }
 
-// // Component chính
-// export default function GenealogyPage() {
-//   const [activeSection, setActiveSection] = useState("diagram");
-
-//   const navButtons = [
-//     { key: "add", label: "Thêm thành viên" },
-//     { key: "diagram", label: "Sơ đồ gia phả" },
-//     { key: "history", label: "Lịch sử" },
-//     { key: "settings", label: "Cài đặt" },
-//   ];
+//   const DiagramSection = () => (
+//     <div className="h-[600px] bg-white rounded-xl shadow-md flex items-center justify-center overflow-auto p-6">
+//       <DynamicFamilyTreeChart data={mockTreeData} />
+//     </div>
+//   );
 
 //   return (
 //     <div className="min-h-screen relative bg-[#FCF9E3]">
-//       {/* HEADER */}
 //       <header className="sticky top-0 left-0 right-0 backdrop-blur-sm z-50 bg-[#FCF9E3]">
 //         <div className="grid grid-cols-3 gap-4 items-center p-4">
 //           <div className="flex justify-start">
-//             <Image src="/images/dao.png" alt="Dao" width={200} height={200} className="object-contain" />
+//             <Image src="/images/dao.png" alt="Dao" width={200} height={200} />
 //           </div>
 //           <div className="flex justify-center">
-//             <Image src="/images/logo1.png" alt="Logo" width={300} height={300} className="object-contain" />
+//             <Image
+//               src="/images/logo1.png"
+//               alt="Logo"
+//               width={300}
+//               height={300}
+//             />
 //           </div>
 //           <div className="flex justify-end">
-//             <Image src="/images/mai.png" alt="Mai" width={200} height={200} className="object-contain" />
+//             <Image src="/images/mai.png" alt="Mai" width={200} height={200} />
 //           </div>
 //         </div>
 
-//         {/* Navigation Buttons */}
 //         <div className="flex flex-wrap justify-center gap-4 mb-6">
 //           {navButtons.map((btn) => (
 //             <button
@@ -169,7 +118,6 @@
 //         </div>
 //       </header>
 
-//       {/* MAIN CONTENT */}
 //       <main className="p-6">
 //         {activeSection === "diagram" && <DiagramSection />}
 //         {activeSection === "add" && <AddMemberForm />}

@@ -1,5 +1,5 @@
 import { clear } from "console";
-import { LOGIN_URL } from "../urls";
+import { LOGIN_URL } from "@/urls";
 
 
 const storagePrefix = "BA_";
