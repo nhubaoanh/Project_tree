@@ -1,24 +1,38 @@
-// import { useState } from "react";
 import { Button } from "@/components/ui/button";
-// import { UserTable } from "./components/userTable";
-import User from "@/types/user";
+import { DataTableDemo } from "./components/userTable";
+import { IUser } from "@/types/user";
 
 // app/(admin)/page.tsx
 export default function userPage() {
-
-  // const [data, setData] = useState<User[]>([])
+  // Dữ liệu mẫu - bạn sẽ thay thế bằng API call sau
+  const mockData: IUser[] = [
+    {
+      nguoiDungId: "user001",
+      dongHoId: "dongho001",
+      tenDangNhap: "admin",
+      matKhau: "123456",
+      hoTen: "Nguyễn Văn Admin",
+      email: "admin@example.com",
+      soDienThoai: "0123456789",
+      vaiTro: "admin",
+      anhDaiDien: "",
+      ngayTao: new Date(),
+      nguoiTaoId: "system",
+      active_flag: 1,
+      lu_user_id: "system"
+    }
+  ];
 
   return (
     <div className="scrollbar">
       <div className="flex justify-between item-center mb-4">
         <h1 className="text-xl font-bold">Quan ly nguoi dung</h1>
-        <Button variant="destructive" className="rounded-xs text-red-200">
+        <Button variant="default" className="rounded-xs text-red-200 bg-red-700 hover:bg-red-600 cursor-pointer">
           Them nguoi dung
         </Button>
       </div>
-      <div>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Hic ad vel magnam quod temporibus non cupiditate asperiores maiores. Ducimus non pariatur veniam soluta earum animi enim odio veritatis consequatur consequuntur!</div>
-
-      {/* <UserTable data={data} onEdit={handleEdit} onDelete={handleEdit} /> */}
+      
+      <DataTableDemo data={mockData} />
     </div>
   );
 }
