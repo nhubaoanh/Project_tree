@@ -176,9 +176,9 @@ export function DataTableDemo({ data, onEdit, onDelete }: UserTableProps) {
       <div className="flex items-center py-4">
         <Input
           placeholder="Tìm kiếm người dùng..."
-          value={(table.getColumn("tenDangNhap")?.getFilterValue() as string) ?? ""}
+          value={(table.getColumn("hoTen")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
-            table.getColumn("tenDangNhap")?.setFilterValue(event.target.value)
+            table.getColumn("hoTen")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />

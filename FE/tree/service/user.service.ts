@@ -20,3 +20,9 @@ export const autherization = async() : Promise<any> => {
 
     return res?.data;
 }
+
+export const getUsers = async() : Promise<any> => {
+    const res =  await apiClient.get(`${prefix}`);
+
+    return res?.data;
+}
