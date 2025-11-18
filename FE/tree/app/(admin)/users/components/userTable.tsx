@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import * as React from "react"
+import * as React from "react";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -12,11 +12,17 @@ import {
   SortingState,
   useReactTable,
   VisibilityState,
-} from "@tanstack/react-table"
-import { ArrowUpDown, ChevronDown, MoreHorizontal, Edit, Trash } from "lucide-react"
+} from "@tanstack/react-table";
+import {
+  ArrowUpDown,
+  ChevronDown,
+  MoreHorizontal,
+  Edit,
+  Trash,
+} from "lucide-react";
 
-import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -25,8 +31,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Input } from "@/components/ui/input"
+} from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -34,16 +40,39 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-import User, { IUser } from "@/types/user";
+} from "@/components/ui/table";
+import { IUser, IUserSearch } from "@/types/user"; // Đảm bảo import này đúng
+import { useSearchParams } from "next/navigation";
+import { SEARCH_CONTENT, SEARCH_PAGE, SEARCH_SIZE, SEARCH_DONGHOID, ERROR_TIMEOUT } from "@/constant/config";
+// quan ly state
+import { useRecoilState, useRecoilValue } from "recoil";
+import { userSearchUser } from "@/loader/user.loader";
+import { useEffect } from "react";
+import { queryClient } from "@/lib/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { getUsers } from "@/service/user.service";
 
+// Khai báo lại props để truyền các hàm xử lý xuống cột
 interface UserTableProps {
   data: IUser[];
-  onEdit?: (user: IUser) => void;
-  onDelete?: (user: IUser) => void;
+  onEdit: (user: IUser) => void; // Bắt buộc phải có
+  onDelete: (user: IUser) => void; // Bắt buộc phải có
 }
 
-export const columns: ColumnDef<IUser>[] = [
+// Định nghĩa props mới cho các cột hành động
+interface ActionCellProps {
+  onEdit: (user: IUser) => void;
+  onDelete: (user: IUser) => void;
+}
+// ----------------------------------------------------
+// ĐỊNH NGHĨA CỘT (COLUMNS)
+// ----------------------------------------------------
+
+// Sử dụng Factory Pattern để tạo cột Actions, truyền các handler vào
+const createColumns = ({
+  onEdit,
+  onDelete,
+}: ActionCellProps): ColumnDef<IUser>[] => [
   {
     id: "select",
     header: ({ table }) => (
@@ -69,7 +98,9 @@ export const columns: ColumnDef<IUser>[] = [
   {
     accessorKey: "nguoiDungId",
     header: "Mã người dùng",
-    cell: ({ row }) => <div>{row.getValue("nguoiDungId")}</div>,
+    cell: ({ row }) => (
+      <div className="font-mono text-xs">{row.getValue("nguoiDungId")}</div>
+    ), // Tối ưu: Dùng font-mono cho ID
   },
   {
     accessorKey: "tenDangNhap",
@@ -80,21 +111,27 @@ export const columns: ColumnDef<IUser>[] = [
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
           Tên đăng nhập
-          <ArrowUpDown />
+          <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
-      )
+      );
     },
-    cell: ({ row }) => <div>{row.getValue("tenDangNhap")}</div>,
+    cell: ({ row }) => (
+      <div className="capitalize">{row.getValue("tenDangNhap")}</div>
+    ), // Tối ưu: Thêm capitalize
   },
   {
     accessorKey: "hoTen",
     header: "Họ tên",
-    cell: ({ row }) => <div>{row.getValue("hoTen")}</div>,
+    cell: ({ row }) => (
+      <div className="font-medium">{row.getValue("hoTen")}</div>
+    ), // Tối ưu: In đậm nhẹ tên
   },
   {
     accessorKey: "email",
     header: "Email",
-    cell: ({ row }) => <div>{row.getValue("email")}</div>,
+    cell: ({ row }) => (
+      <div className="text-muted-foreground">{row.getValue("email")}</div>
+    ), // Tối ưu: Giảm độ sáng cho email
   },
   {
     accessorKey: "soDienThoai",
@@ -104,57 +141,123 @@ export const columns: ColumnDef<IUser>[] = [
   {
     accessorKey: "vaiTro",
     header: "Vai trò",
-    cell: ({ row }) => <div>{row.getValue("vaiTro")}</div>,
+    cell: ({ row }) => {
+      const vaiTro = row.getValue("vaiTro");
+      // Tối ưu: Hiển thị vai trò dạng chữ thay vì số (Giả sử 0: User, 1: Admin)
+      const displayVaiTro = vaiTro === 1 ? "Quản trị viên" : "Người dùng";
+      return <div className="text-right font-semibold">{displayVaiTro}</div>;
+    },
   },
   {
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const user = row.original
+      const user = row.original;
 
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal />
+              <span className="sr-only">Mở menu hành động</span>
+              <MoreHorizontal className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuLabel>Hành động</DropdownMenuLabel>
             <DropdownMenuItem
               onClick={() => navigator.clipboard.writeText(user.nguoiDungId)}
             >
               Copy user ID
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+
+            {/* Tích hợp hàm onEdit */}
+            <DropdownMenuItem onClick={() => onEdit(user)}>
               <Edit className="mr-2 h-4 w-4" />
               Sửa
             </DropdownMenuItem>
-            <DropdownMenuItem>
+
+            {/* Tích hợp hàm onDelete */}
+            <DropdownMenuItem
+              onClick={() => onDelete(user)}
+              className="text-red-600 focus:text-red-700"
+            >
               <Trash className="mr-2 h-4 w-4" />
               Xóa
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-      )
+      );
     },
   },
-]
+];
 
-export function DataTableDemo({ data, onEdit, onDelete }: UserTableProps) {
-  const [sorting, setSorting] = React.useState<SortingState>([])
+// ----------------------------------------------------
+// COMPONENT CHÍNH
+// ----------------------------------------------------
+
+export function useUsers(params: IUserSearch){
+  return useQuery({
+    queryKey: ['users', params],
+    queryFn: () => getUsers(params),
+  })
+}
+
+export function DataTableDemo({onEdit, onDelete }: UserTableProps) {
+  const searchParams = useSearchParams();
+  const page = searchParams.get(SEARCH_PAGE) || "1";
+  const pageSize = searchParams.get(SEARCH_SIZE) || "10";
+  const searchContent = searchParams.get(SEARCH_CONTENT) || "";
+  const dongHoId = searchParams.get(SEARCH_DONGHOID) || "";
+  const usersQuery = useUsers({
+    search_content: searchContent?.toLowerCase()?.trim(),
+    pageIndex: +page,
+    pageSize: +pageSize,
+    dongHoId: dongHoId || undefined,
+  });
+
+  const userData = usersQuery.data?.data ?? [];
+
+  // const searchParams = useSearchParams();
+  // const page = searchParams.get(SEARCH_PAGE) || "1";
+  // const pageSize = searchParams.get(SEARCH_SIZE) || "10";
+  // const searchContent = searchParams.get(SEARCH_CONTENT) || "";
+  // const dongHoId = searchParams.get(SEARCH_DONGHOID) || "";
+
+  // const queryClient = useQueryClient()
+  // const userRecoil = useRecoilValue(Usa);
+
+  // const usersQuery = userSearchUser({
+  //   params: {
+  //     search_content: searchContent?.toLowerCase()?.trim(),
+  //     pageIndex: +page,
+  //     pageSize: +pageSize,
+  //     dongHoId: isEmpty(dongHoId) ? undefined : dongHoId,
+  //   },
+  //   config:{
+  //   }
+  // });
+
+  // const userQuery = useQuery({});
+
+  // const userData = usersQuery.data?.data || [];
+  console.log("usersQuery.data", usersQuery.data);
+  const columns = React.useMemo(
+    () => createColumns({ onEdit, onDelete }),
+    [onEdit, onDelete]
+  );
+
+  const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
-  )
+  );
   const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({})
-  const [rowSelection, setRowSelection] = React.useState({})
+    React.useState<VisibilityState>({});
+  const [rowSelection, setRowSelection] = React.useState({});
 
   const table = useReactTable({
-    data,
-    columns,
+    data: userData,
+    columns, // Sử dụng columns đã tạo trong useMemo
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
@@ -169,13 +272,19 @@ export function DataTableDemo({ data, onEdit, onDelete }: UserTableProps) {
       columnVisibility,
       rowSelection,
     },
-  })
+    // Tối ưu: Thiết lập bộ lọc mặc định là 'hoTen'
+    initialState: {
+      pagination: {
+        pageSize: 10, // Mặc định 10 dòng
+      },
+    },
+  });
 
   return (
     <div className="w-full">
       <div className="flex items-center py-4">
         <Input
-          placeholder="Tìm kiếm người dùng..."
+          placeholder="Tìm kiếm theo Họ tên..."
           value={(table.getColumn("hoTen")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
             table.getColumn("hoTen")?.setFilterValue(event.target.value)
@@ -185,7 +294,7 @@ export function DataTableDemo({ data, onEdit, onDelete }: UserTableProps) {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">
-              Columns <ChevronDown />
+              Ẩn/Hiện Cột <ChevronDown className="ml-2 h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
@@ -204,7 +313,7 @@ export function DataTableDemo({ data, onEdit, onDelete }: UserTableProps) {
                   >
                     {column.id}
                   </DropdownMenuCheckboxItem>
-                )
+                );
               })}
           </DropdownMenuContent>
         </DropdownMenu>
@@ -224,7 +333,7 @@ export function DataTableDemo({ data, onEdit, onDelete }: UserTableProps) {
                             header.getContext()
                           )}
                     </TableHead>
-                  )
+                  );
                 })}
               </TableRow>
             ))}
@@ -250,7 +359,7 @@ export function DataTableDemo({ data, onEdit, onDelete }: UserTableProps) {
               <TableRow>
                 <TableCell
                   colSpan={columns.length}
-                  className="h-24 text-center"
+                  className="h-24 text-center text-gray-500 italic" // Thêm style cho rõ ràng hơn
                 >
                   Không có dữ liệu.
                 </TableCell>
@@ -284,5 +393,5 @@ export function DataTableDemo({ data, onEdit, onDelete }: UserTableProps) {
         </div>
       </div>
     </div>
-  )
+  );
 }

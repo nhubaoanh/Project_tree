@@ -21,8 +21,14 @@ export const autherization = async() : Promise<any> => {
     return res?.data;
 }
 
-export const getUsers = async() : Promise<any> => {
-    const res =  await apiClient.get(`${prefix}`);
+export const getUsers = async(data: IUserSearch) : Promise<any> => {
+    const res =  await apiClient.post(`${prefix}/search`, data);
 
     return res?.data;
+}
+
+export const sighInService = async (data: Props) : Promise<any> => {
+    const res = await apiClient.post(`${prefix}/signup`, data);
+
+    return res.data;
 }

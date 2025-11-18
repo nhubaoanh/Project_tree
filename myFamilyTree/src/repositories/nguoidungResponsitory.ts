@@ -57,9 +57,8 @@ export class nguoiDungReponsitory {
         dongHoId || null,
       ]);
 
-      // results[0] là các row
-      // Nếu RecordCount nằm trong mỗi row, lấy từ row đầu tiên
-      return results[0] || [];
+      // tra ra toan bo mang object
+      return results;
     } catch (error: any) {
       throw new Error(error);
     }

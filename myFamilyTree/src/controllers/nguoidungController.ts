@@ -44,7 +44,7 @@ export class NguoiDungController {
     try {
       const nguoiDung = req.body as nguoiDung;
       const results = await this.nguoiDungService.createNguoiDung(nguoiDung);
-      res.json({ message: "Dang ky thanh cong.", succes: true, data: results });
+      res.json({ message: "Dang ky thanh cong.", success: true, data: results });
       console.log(results);
     } catch (error: any) {
       // res.json({ message: error.message, success: false });
@@ -59,28 +59,36 @@ export class NguoiDungController {
 
   async searchUser(req: Request, res: Response): Promise<void> {
     try {
-      const { pageIndex, pageSize, search_content, dongHoId } = req.body;
+      const object = req.body as {
+        pageIndex:number,
+        pageSize:number,
+        search_content: string,
+        dongHoId: string
+      };
 
-      const rows: any[] = await this.nguoiDungService.searchUser(
-        pageIndex,
-        pageSize,
-        search_content,
-        dongHoId
+      const data: any = await this.nguoiDungService.searchUser(
+        object.pageIndex,
+        object.pageSize,
+        object.search_content,
+        object.dongHoId
       );
-
-      const totalItems =
-        rows.length > 0 ? Number(rows[0]?.RecordCount || rows.length) : 0;
-      const pageCount = Math.ceil(totalItems / (pageSize || 1));
-
-      res.json({
-        totalItems,
-        page: pageIndex,
-        pageSize,
-        pageCount,
-        data: rows, // trả về **mảng tất cả user**
-      });
+      if (data) {
+        res.json({
+          totalItems: Math.ceil(
+            data && data.length > 0 ? data[0].RecordCount : 0
+          ),
+          page: object.pageIndex,
+          pageSize: object.pageSize,
+          data: data,
+          pageCount: Math.ceil(
+            (data && data.length > 0 ? data[0].RecordCount : 0) /
+              (object.pageSize ? object.pageSize : 1)
+          ),
+        });
+      } else {
+        res.json({ message: "Không tồn tại kết quả tìm kiếm.", success: true });
+      }
     } catch (error: any) {
-      console.error("Lỗi searchUser:", error);
       res
         .status(500)
         .json({ message: "Không tồn tại kết quả tìm kiếm.", success: false });

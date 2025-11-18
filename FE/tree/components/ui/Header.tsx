@@ -3,6 +3,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { Menu, Bell, Settings, LogOut, User } from "lucide-react";
 import { useSidebar } from "@/context/SidebarContext";
 import { useRouter } from "next/navigation";
+import storage from "@/utils/storage";
 
 export default function Header() {
   const [open, setOpen] = useState(false);
@@ -11,7 +12,7 @@ export default function Header() {
   const router = useRouter();
 
   const handleLogout = () => {
-    localStorage.removeItem("access_token");
+    storage.clearToken();
     router.push("/login");
   };
   useEffect(() => {
@@ -70,15 +71,6 @@ export default function Header() {
                 Cài đặt
               </button>
 
-              <div className="border-t border-gray-100 mt-1 pt-1">
-                <button
-                  onClick={handleLogout}
-                  className="w-full flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50 transition-colors"
-                >
-                  <LogOut size={18} />
-                  Đăng xuất
-                </button>
-              </div>
               <div className="border-t border-gray-100 mt-1 pt-1">
                 <button
                   onClick={handleLogout}

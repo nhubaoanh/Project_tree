@@ -1,8 +1,6 @@
 
 "use client"
 
-// ... (các imports khác)
-
 import { useState, useCallback } from "react" // Thêm useCallback
 import { useRouter } from "next/navigation"
 import storage from "@/utils/storage"
@@ -63,6 +61,7 @@ export default function LoginPage() {
   const handleButton = async () => {
     setLoading(true);
 
+    console.log("Form Data:", formData);
     // 1. VALIDATION: Nếu form không hợp lệ, dừng lại
     if (!validateForm()) {
         setLoading(false);
@@ -78,8 +77,9 @@ export default function LoginPage() {
 
       if (result.success) {
         // THÀNH CÔNG
-        storage.setToken(result.data.token);
-        console.log("Token stored:", storage.setToken(result.data.token));
+        storage.setToken(result.token);
+        console.log("Token stored:", storage.setToken(result.token));
+        console.log("res.token:", result.token);
         showSuccess("Đăng nhập thành công!");
         router.push("/dashbrach");
       } else {

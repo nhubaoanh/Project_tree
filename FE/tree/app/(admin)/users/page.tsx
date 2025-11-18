@@ -1,3 +1,4 @@
+"use client";
 import { Button } from "@/components/ui/button";
 import { DataTableDemo } from "./components/userTable";
 import { IUser } from "@/types/user";
@@ -452,17 +453,31 @@ export default function userPage() {
     }
     
   ];
+  const handleEdit = (userId: IUser) => {
+    console.log("Edit user with ID:", userId);
+  }
+
+  const handleDelete = (userId: IUser) => {
+    console.log("Edit user with ID:", userId);
+  };
 
   return (
     <div className="scrollbar">
       <div className="flex justify-between item-center mb-4">
         <h1 className="text-xl font-bold">Quan ly nguoi dung</h1>
-        <Button variant="default" className="rounded-xs text-red-200 bg-red-700 hover:bg-red-600 cursor-pointer">
+        <Button
+          variant="default"
+          className="rounded-xs text-red-200 bg-red-700 hover:bg-red-600 cursor-pointer"
+        >
           Them nguoi dung
         </Button>
       </div>
-      
-      <DataTableDemo data={mockData} />
+
+      <DataTableDemo
+        data={mockData}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+      />
     </div>
   );
 }

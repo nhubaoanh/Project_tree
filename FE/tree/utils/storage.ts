@@ -4,22 +4,31 @@ import { LOGIN_URL } from "@/urls";
 
 const storagePrefix = "BA_";
 const storage = {
-    getToken: () => {
-        return JSON.parse(
-            window.localStorage.getItem(`${storagePrefix}token`) as string,
-        );
-    },
+  getToken: () => {
+    return JSON.parse(
+      window.localStorage.getItem(`${storagePrefix}token`) as string
+    );
+  },
 
-    setToken: (token: string) => {
-        window.localStorage.setItem(`${storagePrefix}token`, JSON.stringify(token));
-    },
+//   getToken: () => {
+//     if (typeof window === "undefined") return null;
+//     return window.localStorage.getItem(`${storagePrefix}token`) as string;
+//   },
 
-    clearToken: () => {
-        window.localStorage.removeItem(`${storagePrefix}token`);
-    }
+  setToken: (token: string) => {
+    window.localStorage.setItem(`${storagePrefix}token`, JSON.stringify(token));
+  },
+
+  clearToken: () => {
+    window.localStorage.removeItem(`${storagePrefix}token`);
+  },
 };
 
 export default storage;
+
+export const clearLogout = () => {
+    storage.clearToken();
+}
 
 // researching after
 // export const clearLogout = () => {
