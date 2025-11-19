@@ -34,6 +34,7 @@ export default function Sidebar() {
       },
       { name: "Assets", href: "/assets", icon: "/icon/time.png" },
       { name: "users", href: "/users", icon: "/icon/iconmember.png" },
+      // { name: "reports", href: "/reports", icon: "/icon/iconmember.png" },
     ]);
   }, []);
 

@@ -8,9 +8,9 @@ export interface IUser extends IBaseData {
   hoTen: string;
   email: string;
   soDienThoai: string;
-  vaiTro: string;
+  roleId: string;
   anhDaiDien: string;
-  ngayTao: Date;
+  ngayTao: Date | null;
   nguoiTaoId: string;
 }
 

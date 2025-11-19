@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { DataTableDemo } from "./components/userTable";
+import { QuanLyThanhVienPage } from "./components/userTable";
 import { IUser } from "@/types/user";
 
 // app/(admin)/page.tsx
@@ -15,7 +15,7 @@ export default function userPage() {
       hoTen: "Nguyễn Văn Admin",
       email: "admin@example.com",
       soDienThoai: "0123456789",
-      vaiTro: "admin",
+      roleId: "admin",
       anhDaiDien: "",
       ngayTao: new Date(),
       nguoiTaoId: "system",
@@ -23,14 +23,14 @@ export default function userPage() {
       lu_user_id: "system"
     },
     {
-      nguoiDungId: "user001",
+      nguoiDungId: "user002",
       dongHoId: "dongho001",
       tenDangNhap: "admin",
       matKhau: "123456",
       hoTen: "Nguyễn Văn Admin",
       email: "admin@example.com",
       soDienThoai: "0123456789",
-      vaiTro: "admin",
+      roleId: "admin",
       anhDaiDien: "",
       ngayTao: new Date(),
       nguoiTaoId: "system",
@@ -38,14 +38,14 @@ export default function userPage() {
       lu_user_id: "system"
     }
     ,{
-      nguoiDungId: "user001",
+      nguoiDungId: "user003",
       dongHoId: "dongho001",
       tenDangNhap: "admin",
       matKhau: "123456",
       hoTen: "Nguyễn Văn Admin",
       email: "admin@example.com",
       soDienThoai: "0123456789",
-      vaiTro: "admin",
+      roleId: "admin",
       anhDaiDien: "",
       ngayTao: new Date(),
       nguoiTaoId: "system",
@@ -53,14 +53,14 @@ export default function userPage() {
       lu_user_id: "system"
     }
     ,{
-      nguoiDungId: "user001",
+      nguoiDungId: "user004",
       dongHoId: "dongho001",
       tenDangNhap: "admin",
       matKhau: "123456",
       hoTen: "Nguyễn Văn Admin",
       email: "admin@example.com",
       soDienThoai: "0123456789",
-      vaiTro: "admin",
+      roleId: "admin",
       anhDaiDien: "",
       ngayTao: new Date(),
       nguoiTaoId: "system",
@@ -68,390 +68,20 @@ export default function userPage() {
       lu_user_id: "system"
     }
     ,{
-      nguoiDungId: "user001",
+      nguoiDungId: "user005",
       dongHoId: "dongho001",
       tenDangNhap: "admin",
       matKhau: "123456",
       hoTen: "Nguyễn Văn Admin",
       email: "admin@example.com",
       soDienThoai: "0123456789",
-      vaiTro: "admin",
+      roleId: "admin",
       anhDaiDien: "",
       ngayTao: new Date(),
       nguoiTaoId: "system",
       active_flag: 1,
       lu_user_id: "system"
     }
-    ,{
-      nguoiDungId: "user001",
-      dongHoId: "dongho001",
-      tenDangNhap: "admin",
-      matKhau: "123456",
-      hoTen: "Nguyễn Văn Admin",
-      email: "admin@example.com",
-      soDienThoai: "0123456789",
-      vaiTro: "admin",
-      anhDaiDien: "",
-      ngayTao: new Date(),
-      nguoiTaoId: "system",
-      active_flag: 1,
-      lu_user_id: "system"
-    }
-    ,{
-      nguoiDungId: "user001",
-      dongHoId: "dongho001",
-      tenDangNhap: "admin",
-      matKhau: "123456",
-      hoTen: "Nguyễn Văn Admin",
-      email: "admin@example.com",
-      soDienThoai: "0123456789",
-      vaiTro: "admin",
-      anhDaiDien: "",
-      ngayTao: new Date(),
-      nguoiTaoId: "system",
-      active_flag: 1,
-      lu_user_id: "system"
-    }
-    ,{
-      nguoiDungId: "user001",
-      dongHoId: "dongho001",
-      tenDangNhap: "admin",
-      matKhau: "123456",
-      hoTen: "Nguyễn Văn Admin",
-      email: "admin@example.com",
-      soDienThoai: "0123456789",
-      vaiTro: "admin",
-      anhDaiDien: "",
-      ngayTao: new Date(),
-      nguoiTaoId: "system",
-      active_flag: 1,
-      lu_user_id: "system"
-    }
-    ,{
-      nguoiDungId: "user001",
-      dongHoId: "dongho001",
-      tenDangNhap: "admin",
-      matKhau: "123456",
-      hoTen: "Nguyễn Văn Admin",
-      email: "admin@example.com",
-      soDienThoai: "0123456789",
-      vaiTro: "admin",
-      anhDaiDien: "",
-      ngayTao: new Date(),
-      nguoiTaoId: "system",
-      active_flag: 1,
-      lu_user_id: "system"
-    }
-    ,{
-      nguoiDungId: "user001",
-      dongHoId: "dongho001",
-      tenDangNhap: "admin",
-      matKhau: "123456",
-      hoTen: "Nguyễn Văn Admin",
-      email: "admin@example.com",
-      soDienThoai: "0123456789",
-      vaiTro: "admin",
-      anhDaiDien: "",
-      ngayTao: new Date(),
-      nguoiTaoId: "system",
-      active_flag: 1,
-      lu_user_id: "system"
-    } ,{
-      nguoiDungId: "user001",
-      dongHoId: "dongho001",
-      tenDangNhap: "admin",
-      matKhau: "123456",
-      hoTen: "Nguyễn Văn Admin",
-      email: "admin@example.com",
-      soDienThoai: "0123456789",
-      vaiTro: "admin",
-      anhDaiDien: "",
-      ngayTao: new Date(),
-      nguoiTaoId: "system",
-      active_flag: 1,
-      lu_user_id: "system"
-    } ,{
-      nguoiDungId: "user001",
-      dongHoId: "dongho001",
-      tenDangNhap: "admin",
-      matKhau: "123456",
-      hoTen: "Nguyễn Văn Admin",
-      email: "admin@example.com",
-      soDienThoai: "0123456789",
-      vaiTro: "admin",
-      anhDaiDien: "",
-      ngayTao: new Date(),
-      nguoiTaoId: "system",
-      active_flag: 1,
-      lu_user_id: "system"
-    } ,{
-      nguoiDungId: "user001",
-      dongHoId: "dongho001",
-      tenDangNhap: "admin",
-      matKhau: "123456",
-      hoTen: "Nguyễn Văn Admin",
-      email: "admin@example.com",
-      soDienThoai: "0123456789",
-      vaiTro: "admin",
-      anhDaiDien: "",
-      ngayTao: new Date(),
-      nguoiTaoId: "system",
-      active_flag: 1,
-      lu_user_id: "system"
-    } ,{
-      nguoiDungId: "user001",
-      dongHoId: "dongho001",
-      tenDangNhap: "admin",
-      matKhau: "123456",
-      hoTen: "Nguyễn Văn Admin",
-      email: "admin@example.com",
-      soDienThoai: "0123456789",
-      vaiTro: "admin",
-      anhDaiDien: "",
-      ngayTao: new Date(),
-      nguoiTaoId: "system",
-      active_flag: 1,
-      lu_user_id: "system"
-    } ,{
-      nguoiDungId: "user001",
-      dongHoId: "dongho001",
-      tenDangNhap: "admin",
-      matKhau: "123456",
-      hoTen: "Nguyễn Văn Admin",
-      email: "admin@example.com",
-      soDienThoai: "0123456789",
-      vaiTro: "admin",
-      anhDaiDien: "",
-      ngayTao: new Date(),
-      nguoiTaoId: "system",
-      active_flag: 1,
-      lu_user_id: "system"
-    } ,{
-      nguoiDungId: "user001",
-      dongHoId: "dongho001",
-      tenDangNhap: "admin",
-      matKhau: "123456",
-      hoTen: "Nguyễn Văn Admin",
-      email: "admin@example.com",
-      soDienThoai: "0123456789",
-      vaiTro: "admin",
-      anhDaiDien: "",
-      ngayTao: new Date(),
-      nguoiTaoId: "system",
-      active_flag: 1,
-      lu_user_id: "system"
-    } ,{
-      nguoiDungId: "user001",
-      dongHoId: "dongho001",
-      tenDangNhap: "admin",
-      matKhau: "123456",
-      hoTen: "Nguyễn Văn Admin",
-      email: "admin@example.com",
-      soDienThoai: "0123456789",
-      vaiTro: "admin",
-      anhDaiDien: "",
-      ngayTao: new Date(),
-      nguoiTaoId: "system",
-      active_flag: 1,
-      lu_user_id: "system"
-    } ,{
-      nguoiDungId: "user001",
-      dongHoId: "dongho001",
-      tenDangNhap: "admin",
-      matKhau: "123456",
-      hoTen: "Nguyễn Văn Admin",
-      email: "admin@example.com",
-      soDienThoai: "0123456789",
-      vaiTro: "admin",
-      anhDaiDien: "",
-      ngayTao: new Date(),
-      nguoiTaoId: "system",
-      active_flag: 1,
-      lu_user_id: "system"
-    } ,{
-      nguoiDungId: "user001",
-      dongHoId: "dongho001",
-      tenDangNhap: "admin",
-      matKhau: "123456",
-      hoTen: "Nguyễn Văn Admin",
-      email: "admin@example.com",
-      soDienThoai: "0123456789",
-      vaiTro: "admin",
-      anhDaiDien: "",
-      ngayTao: new Date(),
-      nguoiTaoId: "system",
-      active_flag: 1,
-      lu_user_id: "system"
-    } ,{
-      nguoiDungId: "user001",
-      dongHoId: "dongho001",
-      tenDangNhap: "admin",
-      matKhau: "123456",
-      hoTen: "Nguyễn Văn Admin",
-      email: "admin@example.com",
-      soDienThoai: "0123456789",
-      vaiTro: "admin",
-      anhDaiDien: "",
-      ngayTao: new Date(),
-      nguoiTaoId: "system",
-      active_flag: 1,
-      lu_user_id: "system"
-    } ,{
-      nguoiDungId: "user001",
-      dongHoId: "dongho001",
-      tenDangNhap: "admin",
-      matKhau: "123456",
-      hoTen: "Nguyễn Văn Admin",
-      email: "admin@example.com",
-      soDienThoai: "0123456789",
-      vaiTro: "admin",
-      anhDaiDien: "",
-      ngayTao: new Date(),
-      nguoiTaoId: "system",
-      active_flag: 1,
-      lu_user_id: "system"
-    } ,{
-      nguoiDungId: "user001",
-      dongHoId: "dongho001",
-      tenDangNhap: "admin",
-      matKhau: "123456",
-      hoTen: "Nguyễn Văn Admin",
-      email: "admin@example.com",
-      soDienThoai: "0123456789",
-      vaiTro: "admin",
-      anhDaiDien: "",
-      ngayTao: new Date(),
-      nguoiTaoId: "system",
-      active_flag: 1,
-      lu_user_id: "system"
-    } ,{
-      nguoiDungId: "user001",
-      dongHoId: "dongho001",
-      tenDangNhap: "admin",
-      matKhau: "123456",
-      hoTen: "Nguyễn Văn Admin",
-      email: "admin@example.com",
-      soDienThoai: "0123456789",
-      vaiTro: "admin",
-      anhDaiDien: "",
-      ngayTao: new Date(),
-      nguoiTaoId: "system",
-      active_flag: 1,
-      lu_user_id: "system"
-    } ,{
-      nguoiDungId: "user001",
-      dongHoId: "dongho001",
-      tenDangNhap: "admin",
-      matKhau: "123456",
-      hoTen: "Nguyễn Văn Admin",
-      email: "admin@example.com",
-      soDienThoai: "0123456789",
-      vaiTro: "admin",
-      anhDaiDien: "",
-      ngayTao: new Date(),
-      nguoiTaoId: "system",
-      active_flag: 1,
-      lu_user_id: "system"
-    } ,{
-      nguoiDungId: "user001",
-      dongHoId: "dongho001",
-      tenDangNhap: "admin",
-      matKhau: "123456",
-      hoTen: "Nguyễn Văn Admin",
-      email: "admin@example.com",
-      soDienThoai: "0123456789",
-      vaiTro: "admin",
-      anhDaiDien: "",
-      ngayTao: new Date(),
-      nguoiTaoId: "system",
-      active_flag: 1,
-      lu_user_id: "system"
-    } ,{
-      nguoiDungId: "user001",
-      dongHoId: "dongho001",
-      tenDangNhap: "admin",
-      matKhau: "123456",
-      hoTen: "Nguyễn Văn Admin",
-      email: "admin@example.com",
-      soDienThoai: "0123456789",
-      vaiTro: "admin",
-      anhDaiDien: "",
-      ngayTao: new Date(),
-      nguoiTaoId: "system",
-      active_flag: 1,
-      lu_user_id: "system"
-    } ,{
-      nguoiDungId: "user001",
-      dongHoId: "dongho001",
-      tenDangNhap: "admin",
-      matKhau: "123456",
-      hoTen: "Nguyễn Văn Admin",
-      email: "admin@example.com",
-      soDienThoai: "0123456789",
-      vaiTro: "admin",
-      anhDaiDien: "",
-      ngayTao: new Date(),
-      nguoiTaoId: "system",
-      active_flag: 1,
-      lu_user_id: "system"
-    } ,{
-      nguoiDungId: "user001",
-      dongHoId: "dongho001",
-      tenDangNhap: "admin",
-      matKhau: "123456",
-      hoTen: "Nguyễn Văn Admin",
-      email: "admin@example.com",
-      soDienThoai: "0123456789",
-      vaiTro: "admin",
-      anhDaiDien: "",
-      ngayTao: new Date(),
-      nguoiTaoId: "system",
-      active_flag: 1,
-      lu_user_id: "system"
-    } ,{
-      nguoiDungId: "user001",
-      dongHoId: "dongho001",
-      tenDangNhap: "admin",
-      matKhau: "123456",
-      hoTen: "Nguyễn Văn Admin",
-      email: "admin@example.com",
-      soDienThoai: "0123456789",
-      vaiTro: "admin",
-      anhDaiDien: "",
-      ngayTao: new Date(),
-      nguoiTaoId: "system",
-      active_flag: 1,
-      lu_user_id: "system"
-    } ,{
-      nguoiDungId: "user001",
-      dongHoId: "dongho001",
-      tenDangNhap: "admin",
-      matKhau: "123456",
-      hoTen: "nhữ bảo anh",
-      email: "admin@example.com",
-      soDienThoai: "0123456789",
-      vaiTro: "admin",
-      anhDaiDien: "",
-      ngayTao: new Date(),
-      nguoiTaoId: "system",
-      active_flag: 1,
-      lu_user_id: "system"
-    } ,{
-      nguoiDungId: "user001",
-      dongHoId: "dongho001",
-      tenDangNhap: "admin",
-      matKhau: "123456",
-      hoTen: "Nguyễn Văn Admin",
-      email: "admin@example.com",
-      soDienThoai: "0123456789",
-      vaiTro: "admin",
-      anhDaiDien: "",
-      ngayTao: new Date(),
-      nguoiTaoId: "system",
-      active_flag: 1,
-      lu_user_id: "system"
-    }
-    
   ];
   const handleEdit = (userId: IUser) => {
     console.log("Edit user with ID:", userId);
@@ -473,10 +103,11 @@ export default function userPage() {
         </Button>
       </div>
 
-      <DataTableDemo
+      {/* <DataTableDemo
         onEdit={handleEdit}
         onDelete={handleDelete}
-      />
+      /> */}
+      <QuanLyThanhVienPage />
     </div>
   );
 }
