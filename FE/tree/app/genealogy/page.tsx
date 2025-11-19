@@ -5,6 +5,7 @@ import Image from "next/image";
 import dynamic from "next/dynamic";
 import { hierarchicalData } from '@/app/genealogy/components/familyData';
 import MyFamilyTree from "./components/tree";
+import { HeaderSub } from "@/components/ui/HeaderSub";
 export default function GenealogyPage() {
   const [activeSection, setActiveSection] = useState("diagram");
 
@@ -53,40 +54,18 @@ export default function GenealogyPage() {
   };
 
   return (
-    <div className="min-h-screen relative bg-[#FCF9E3]">
-      <header className="sticky top-0 left-0 right-0 backdrop-blur-sm z-50 bg-[#FCF9E3]">
-        <div className="grid grid-cols-3 gap-2 items-center p-2">
-          <div className="flex justify-start">
-            <Image src="/images/dao.png" alt="Dao" width={200} height={200} />
-          </div>
-          <div className="flex justify-center">
-            <Image
-              src="/images/logo1.png"
-              alt="Logo"
-              width={350}
-              height={350}
-            />
-          </div>
-          <div className="flex justify-end">
-            <Image src="/images/mai.png" alt="Mai" width={200} height={200} />
-          </div>
-        </div>
-        <div className="flex flex-wrap justify-center gap-4 mb-2">
-          {navButtons.map((btn) => (
-            <button
-              key={btn.key}
-              onClick={() => setActiveSection(btn.key)}
-              className={`py-2 px-6 rounded-full font-medium shadow-md transition-all duration-300 transform hover:scale-105 ${
-                activeSection === btn.key
-                  ? "bg-red-600 text-white"
-                  : "bg-white text-red-600 border border-red-600 hover:bg-gray-100"
-              }`}
-            >
-              {btn.label}
-            </button>
-          ))}
-        </div>
-      </header>
+    <div className="min-h-screen relative">
+      <div className="z-0 fixed inset-0">
+        <Image
+          src="/images/backgroud.jpg"
+          fill
+          alt="backgroud"
+          style={{ objectFit: "cover" }}
+          quality={80} // Tối ưu hóa chất lượng ảnh
+          priority
+        />
+      </div>
+      <HeaderSub />
 
       <main className="">
         {activeSection === "diagram" && <DiagramSection />}

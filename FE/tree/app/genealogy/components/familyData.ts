@@ -13,6 +13,7 @@ export const hierarchicalData = {
         {
           id: "3",
           name: "Phạm Văn Dần (65 mồ)",
+          gender: "female",
           children: [
             // ĐỜI 3
             {
@@ -20,6 +21,7 @@ export const hierarchicalData = {
               name: "Đỗ Thị Ngọc (58 mồ)",
               birth: "01/10/1944",
               death: "01/10/2020",
+              gender: "female",
               children: [
                 // ĐỜI 4
                 {
@@ -27,6 +29,7 @@ export const hierarchicalData = {
                   name: "Phạm Văn Thắng",
                   birth: "01/10/1944",
                   death: "01/10/2020",
+                  gender: "female",
                   children: [
                     // ĐỜI 5
                     {
@@ -34,6 +37,7 @@ export const hierarchicalData = {
                       name: "Phạm Văn An",
                       birth: "01/10/1944",
                       death: "01/10/2020",
+                      gender: "female",
                       children: [
                         // ĐỜI 6
                         {
@@ -41,6 +45,7 @@ export const hierarchicalData = {
                           name: "Phạm Văn A",
                           birth: "01/10/1944",
                           death: "01/10/2020",
+                          gender: "female",
                           children: [
                             // ĐỜI 7
                             {
@@ -48,6 +53,7 @@ export const hierarchicalData = {
                               name: "Phạm Văn CX",
                               birth: "01/10/1944",
                               death: "01/10/2020",
+                              gender: "male",
                               children: [
                                 // ĐỜI 8
                                 { id: "284", name: "Phạm Văn FZ" },

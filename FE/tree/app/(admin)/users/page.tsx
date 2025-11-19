@@ -474,7 +474,6 @@ export default function userPage() {
       </div>
 
       <DataTableDemo
-        data={mockData}
         onEdit={handleEdit}
         onDelete={handleDelete}
       />

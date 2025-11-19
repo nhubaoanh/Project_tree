@@ -29,7 +29,7 @@ export default function Header() {
   }, []);
 
   return (
-    <header className="bg-gradient-to-r from-[#A20105] to-[#8B0000] shadow-lg">
+    <header className="bg-[#A20105] shadow-lg">
       <div className="max-w-7xl mx-auto py-4 px-6 flex items-center justify-between">
         <button
           onClick={toggleSidebar} // ← DÙNG TOGGLE TỪ CONTEXT

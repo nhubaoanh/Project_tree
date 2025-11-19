@@ -1,6 +1,6 @@
 "use client";
 
-import * as React from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -47,14 +47,13 @@ import { SEARCH_CONTENT, SEARCH_PAGE, SEARCH_SIZE, SEARCH_DONGHOID, ERROR_TIMEOU
 // quan ly state
 import { useRecoilState, useRecoilValue } from "recoil";
 import { userSearchUser } from "@/loader/user.loader";
-import { useEffect } from "react";
-import { queryClient } from "@/lib/react-query";
+// import { queryClient } from "@/lib/react-query";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getUsers } from "@/service/user.service";
+import { useToast } from "@/service/useToas";
 
 // Khai báo lại props để truyền các hàm xử lý xuống cột
 interface UserTableProps {
-  data: IUser[];
   onEdit: (user: IUser) => void; // Bắt buộc phải có
   onDelete: (user: IUser) => void; // Bắt buộc phải có
 }
@@ -198,9 +197,9 @@ const createColumns = ({
 
 export function useUsers(params: IUserSearch){
   return useQuery({
-    queryKey: ['users', params],
+    queryKey: ["users", params],
     queryFn: () => getUsers(params),
-  })
+  });
 }
 
 export function DataTableDemo({onEdit, onDelete }: UserTableProps) {
@@ -209,6 +208,11 @@ export function DataTableDemo({onEdit, onDelete }: UserTableProps) {
   const pageSize = searchParams.get(SEARCH_SIZE) || "10";
   const searchContent = searchParams.get(SEARCH_CONTENT) || "";
   const dongHoId = searchParams.get(SEARCH_DONGHOID) || "";
+
+  
+  // 1. Lấy hàm Toast từ Hook
+  const { showSuccess, showError } = useToast();
+
   const usersQuery = useUsers({
     search_content: searchContent?.toLowerCase()?.trim(),
     pageIndex: +page,
@@ -216,44 +220,35 @@ export function DataTableDemo({onEdit, onDelete }: UserTableProps) {
     dongHoId: dongHoId || undefined,
   });
 
+  const isLoading = usersQuery.isLoading;
+
   const userData = usersQuery.data?.data ?? [];
 
-  // const searchParams = useSearchParams();
-  // const page = searchParams.get(SEARCH_PAGE) || "1";
-  // const pageSize = searchParams.get(SEARCH_SIZE) || "10";
-  // const searchContent = searchParams.get(SEARCH_CONTENT) || "";
-  // const dongHoId = searchParams.get(SEARCH_DONGHOID) || "";
+  // 2. Sử dụng useEffect để theo dõi lỗi
+  useEffect(() => {
+    // Kiểm tra nếu query thất bại
+    if (usersQuery.isError) {
+      // ✅ Báo lỗi tổng quát
+      showError();
+      // Ghi log để debug
+      console.error("React Query Error:", usersQuery.error);
+    }
+  }, [usersQuery.isError, usersQuery.error, showError]); // Dependencies quan trọng!
 
-  // const queryClient = useQueryClient()
-  // const userRecoil = useRecoilValue(Usa);
+  // Xử lý trạng thái tải dữ liệu
 
-  // const usersQuery = userSearchUser({
-  //   params: {
-  //     search_content: searchContent?.toLowerCase()?.trim(),
-  //     pageIndex: +page,
-  //     pageSize: +pageSize,
-  //     dongHoId: isEmpty(dongHoId) ? undefined : dongHoId,
-  //   },
-  //   config:{
-  //   }
-  // });
-
-  // const userQuery = useQuery({});
-
-  // const userData = usersQuery.data?.data || [];
-  console.log("usersQuery.data", usersQuery.data);
-  const columns = React.useMemo(
+  const columns = useMemo(
     () => createColumns({ onEdit, onDelete }),
     [onEdit, onDelete]
   );
 
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(
     []
   );
   const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
-  const [rowSelection, setRowSelection] = React.useState({});
+    useState<VisibilityState>({});
+  const [rowSelection, setRowSelection] = useState({});
 
   const table = useReactTable({
     data: userData,
@@ -281,117 +276,125 @@ export function DataTableDemo({onEdit, onDelete }: UserTableProps) {
   });
 
   return (
-    <div className="w-full">
-      <div className="flex items-center py-4">
-        <Input
-          placeholder="Tìm kiếm theo Họ tên..."
-          value={(table.getColumn("hoTen")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("hoTen")?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm"
-        />
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
-              Ẩn/Hiện Cột <ChevronDown className="ml-2 h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {table
-              .getAllColumns()
-              .filter((column) => column.getCanHide())
-              .map((column) => {
-                return (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    className="capitalize"
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value) =>
-                      column.toggleVisibility(!!value)
-                    }
-                  >
-                    {column.id}
-                  </DropdownMenuCheckboxItem>
-                );
-              })}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-      <div className="overflow-hidden rounded-md border">
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
+    <>
+      {isLoading ? (
+        <div>Đang tải dữ liệu ...</div>
+      ) : (
+        <div className="w-full">
+          <div className="flex items-center py-4">
+            <Input
+              placeholder="Tìm kiếm theo Họ tên..."
+              value={
+                (table.getColumn("hoTen")?.getFilterValue() as string) ?? ""
+              }
+              onChange={(event) =>
+                table.getColumn("hoTen")?.setFilterValue(event.target.value)
+              }
+              className="max-w-sm"
+            />
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="ml-auto">
+                  Ẩn/Hiện Cột <ChevronDown className="ml-2 h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                {table
+                  .getAllColumns()
+                  .filter((column) => column.getCanHide())
+                  .map((column) => {
+                    return (
+                      <DropdownMenuCheckboxItem
+                        key={column.id}
+                        className="capitalize"
+                        checked={column.getIsVisible()}
+                        onCheckedChange={(value) =>
+                          column.toggleVisibility(!!value)
+                        }
+                      >
+                        {column.id}
+                      </DropdownMenuCheckboxItem>
+                    );
+                  })}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+          <div className="overflow-hidden rounded-md border">
+            <Table>
+              <TableHeader>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <TableRow key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => {
+                      return (
+                        <TableHead key={header.id}>
+                          {header.isPlaceholder
+                            ? null
+                            : flexRender(
+                                header.column.columnDef.header,
+                                header.getContext()
+                              )}
+                        </TableHead>
+                      );
+                    })}
+                  </TableRow>
+                ))}
+              </TableHeader>
+              <TableBody>
+                {table.getRowModel().rows?.length ? (
+                  table.getRowModel().rows.map((row) => (
+                    <TableRow
+                      key={row.id}
+                      data-state={row.getIsSelected() && "selected"}
+                    >
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell key={cell.id}>
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
                           )}
-                    </TableHead>
-                  );
-                })}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell
+                      colSpan={columns.length}
+                      className="h-24 text-center text-gray-500 italic" // Thêm style cho rõ ràng hơn
+                    >
+                      Không có dữ liệu.
                     </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center text-gray-500 italic" // Thêm style cho rõ ràng hơn
-                >
-                  Không có dữ liệu.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
-      <div className="flex items-center justify-end space-x-2 py-4">
-        <div className="text-muted-foreground flex-1 text-sm">
-          {table.getFilteredSelectedRowModel().rows.length} của{" "}
-          {table.getFilteredRowModel().rows.length} dòng được chọn.
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
+          <div className="flex items-center justify-end space-x-2 py-4">
+            <div className="text-muted-foreground flex-1 text-sm">
+              {table.getFilteredSelectedRowModel().rows.length} của{" "}
+              {table.getFilteredRowModel().rows.length} dòng được chọn.
+            </div>
+            <div className="space-x-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => table.previousPage()}
+                disabled={!table.getCanPreviousPage()}
+              >
+                Trước
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => table.nextPage()}
+                disabled={!table.getCanNextPage()}
+              >
+                Sau
+              </Button>
+            </div>
+          </div>
         </div>
-        <div className="space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            Trước
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            Sau
-          </Button>
-        </div>
-      </div>
-    </div>
+      )}
+    </>
   );
 }

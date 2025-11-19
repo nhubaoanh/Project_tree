@@ -10,11 +10,6 @@ const storage = {
     );
   },
 
-//   getToken: () => {
-//     if (typeof window === "undefined") return null;
-//     return window.localStorage.getItem(`${storagePrefix}token`) as string;
-//   },
-
   setToken: (token: string) => {
     window.localStorage.setItem(`${storagePrefix}token`, JSON.stringify(token));
   },
@@ -29,8 +24,3 @@ export default storage;
 export const clearLogout = () => {
     storage.clearToken();
 }
-
-// researching after
-// export const clearLogout = () => {
-//     storage
-// }
