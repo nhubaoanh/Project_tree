@@ -279,7 +279,7 @@ export default function Home() {
                     福
                   </div>
                   <h3 className="text-2xl font-bold uppercase mb-2">
-                    Gia Tộc <br /> Nguyễn Văn
+                    Gia Tộc <br /> Nhữ Văn
                   </h3>
                   <div className="w-16 h-0.5 bg-[#b91c1c] my-4"></div>
                   <p className="italic text-sm">"Phúc ấm ngàn đời"</p>

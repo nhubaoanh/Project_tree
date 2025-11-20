@@ -1,146 +1,159 @@
-// "use client";
+import React from "react";
+import { X, Check, Loader2 } from "lucide-react";
+import { IUser } from "@/types/user";
 
-// import { Button, Col, Form, Input, message, Row, Select, Typography } from "antd";
-// import { useEffect, useState } from "react";
-// import User from "@/src/types/user";
-// // import Role from "@/app/types/role";
-// // import userService from "@/app/services/user.service";
+interface UserModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSubmit: (user: Partial<IUser>) => void;
+  initialData?: IUser | null;
+  isLoading: boolean;
+}
 
-// interface UserModalProps {
-//     isOpen: boolean;
-//     onClose : () => void;
-//     user? : User | null;
-//     onSave : (values : User) => void;
-//     loading?: boolean;
-// }
+export const UserModal: React.FC<UserModalProps> = ({
+  isOpen,
+  onClose,
+  onSubmit,
+  initialData,
+  isLoading,
+}) => {
+  if (!isOpen) return null;
 
-// export const UserModal = ({
-//     isOpen,
-//     onClose,
-//     user,
-//     onSave,
-//     loading = false
-// }: UserModalProps) =>{
-//   const [form] = Form.useForm<User>();
-//   const [roles, setRoles] = useState<Role[]>([]); // 👈 danh sách vai trò
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const formData = new FormData(e.target as HTMLFormElement);
+    const user: any = {
+      hoTen: formData.get("hoTen"),
+      tenDangNhap: formData.get("tenDangNhap"),
+      email: formData.get("email"),
+      soDienThoai: formData.get("soDienThoai"),
+      roleId: Number(formData.get("roleId")),
+    };
 
-//   const handleSubmit = (values: User) => {
-//     if (!values) {
-//       message.error("Không có dữ liệu người dùng!");
-//       return;
-//     }
-//     onSave(values);
-//   };
-//   useEffect(() => {
-//     if (user) {
-//       form.setFieldsValue({
-//         ...user,
-//         manv: user.manv,
-//         hoten: user.hoten,
-//         mavt: user.mavt,
-//         sdt: user.sdt,
-//         email: user.email,
-//         lichlv: user.lichlv,
-//         matkhau: user.matkhau,
-//       } as any);
-//     } else {
-//       form.resetFields();
-//     }
-//     const fetchRoles = async () => {
-//       try {
-//         const res = await userService.getVaiTro();
-//         setRoles(res.data || []);
-//       } catch (err) {
-//         console.error("Lỗi khi lấy vai trò:", err);
-//       }
-//     };
-//     fetchRoles();
-//   }, [user, form, isOpen]);
+    // If editing, preserve ID (handled by parent usually, but good for object consistency)
+    if (initialData?.nguoiDungId) {
+      user.nguoiDungId = initialData.nguoiDungId;
+    }
 
-//   return (
-//     <div
-//       className={`fixed inset-0 bg-black/50 flex items-center justify-center z-50 ${
-//         isOpen ? "block" : "hidden"
-//       }`}
-//     >
-//       <div className="bg-white p-6 rounded-lg w-2/3">
-//         <Typography.Title level={4} className="mb-4">
-//           {user ? "Cập nhật nhan vien" : "Thêm nhan vien"}
-//         </Typography.Title>
+    onSubmit(user);
+  };
 
-//         <Form form={form} layout="vertical" onFinish={handleSubmit}>
-//           {/* cái này nhớ phải nhét thêm mã vào không thì khoogn update được */}
-//           <Row gutter={16}>
-//             <Col>
-//               <Form.Item
-//                 name="manv"
-//                 // rules={[{ required: true }]}
-//                 style={{ display: "none" }}
-//               >
-//                 <Input type="hidden" />
-//               </Form.Item>
-//             </Col>
-//             <Col span={12}>
-//               <Form.Item
-//                 name="hoten"
-//                 label="Họ tên"
-//                 rules={[{ required: true }]}
-//               >
-//                 <Input placeholder="Nhập tên Nhân viên" />
-//               </Form.Item>
-//             </Col>
-//             <Col span={12}>
-//               <Form.Item name="sdt" label="Số điện thoại">
-//                 <Input placeholder="Nhập số điện thoại" />
-//               </Form.Item>
-//             </Col>
-//           </Row>
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm animate-fadeIn">
+      <div className="bg-[#fffdf5] w-full max-w-2xl p-0 rounded-lg shadow-2xl border border-[#d4af37] overflow-hidden flex flex-col max-h-[90vh]">
+        {/* Header */}
+        <div className="bg-[#b91c1c] text-yellow-400 px-6 py-4 flex justify-between items-center">
+          <h3 className="text-xl font-bold font-display uppercase tracking-wider">
+            {initialData ? "Chỉnh sửa thông tin" : "Thêm thành viên mới"}
+          </h3>
+          <button
+            onClick={onClose}
+            disabled={isLoading}
+            className="hover:text-white transition-colors disabled:opacity-50"
+          >
+            <X size={24} />
+          </button>
+        </div>
 
-//           <Row gutter={16}>
-//             <Col span={12}>
-//               <Form.Item name="email" label="Email">
-//                 <Input type="email" placeholder="Nhập email" />
-//               </Form.Item>
-//             </Col>
-//             <Col span={12}>
-//               <Form.Item name="lichlv" label="lịch nhân viên">
-//                 <Input placeholder="Nhập lịch nhân viên" />
-//               </Form.Item>
-//             </Col>
+        {/* Body */}
+        <form
+          id="userForm"
+          onSubmit={handleSubmit}
+          className="p-8 overflow-y-auto custom-scrollbar flex-1 space-y-6"
+        >
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <label className="text-sm font-bold text-[#8b5e3c] uppercase">
+                Họ và tên <span className="text-red-500">*</span>
+              </label>
+              <input
+                required
+                name="hoTen"
+                defaultValue={initialData?.hoTen}
+                className="w-full p-3 bg-white border border-[#d4af37]/50 rounded focus:border-[#b91c1c] focus:outline-none shadow-inner"
+                placeholder="Nguyễn Văn A"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-bold text-[#8b5e3c] uppercase">
+                Tên đăng nhập <span className="text-red-500">*</span>
+              </label>
+              <input
+                required
+                name="tenDangNhap"
+                defaultValue={initialData?.tenDangNhap}
+                readOnly={!!initialData}
+                className={`w-full p-3 bg-white border border-[#d4af37]/50 rounded focus:border-[#b91c1c] focus:outline-none shadow-inner ${
+                  initialData ? "bg-gray-100 text-gray-500" : ""
+                }`}
+                placeholder="nguyenvana"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-bold text-[#8b5e3c] uppercase">
+                Email
+              </label>
+              <input
+                type="email"
+                name="email"
+                defaultValue={initialData?.email}
+                className="w-full p-3 bg-white border border-[#d4af37]/50 rounded focus:border-[#b91c1c] focus:outline-none shadow-inner"
+                placeholder="example@email.com"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-bold text-[#8b5e3c] uppercase">
+                Số điện thoại
+              </label>
+              <input
+                name="soDienThoai"
+                defaultValue={initialData?.soDienThoai}
+                className="w-full p-3 bg-white border border-[#d4af37]/50 rounded focus:border-[#b91c1c] focus:outline-none shadow-inner"
+                placeholder="0987654321"
+              />
+            </div>
+            <div className="space-y-2 md:col-span-2">
+              <label className="text-sm font-bold text-[#8b5e3c] uppercase">
+                Vai trò
+              </label>
+              <select
+                name="roleId"
+                defaultValue={initialData?.roleId ?? 0}
+                className="w-full p-3 bg-white border border-[#d4af37]/50 rounded focus:border-[#b91c1c] focus:outline-none shadow-inner"
+              >
+                <option value={0}>Thành viên (Xem và đóng góp)</option>
+                <option value={1}>Quản Trị Viên (Toàn quyền)</option>
+                <option value={2}>Thư ký (Biên tập nội dung)</option>
+              </select>
+            </div>
+          </div>
+        </form>
 
-//             <Col span={12}>
-//               <Form.Item
-//                 name="mavt"
-//                 label="Vị trí / Vai trò"
-//                 rules={[{ required: true, message: "Vui lòng chọn vai trò" }]}
-//               >
-//                 <Select placeholder="Chọn vai trò">
-//                   {roles.map((r) => (
-//                     <Select.Option key={r.mavt} value={r.mavt}>
-//                       {r.tenvt}
-//                     </Select.Option>
-//                   ))}
-//                 </Select>
-//               </Form.Item>
-//             </Col>
-//           </Row>
-
-//           <Row gutter={16}>
-//             <Col span={12}>
-//               <Form.Item name="matkhau" label="mật khẩu">
-//                 <Input placeholder="Nhập mật khẩu" />
-//               </Form.Item>
-//             </Col>
-//           </Row>
-
-//           <div className="flex justify-end gap-2 mt-4">
-//             <Button onClick={onClose}>Hủy</Button>
-//             <Button type="primary" htmlType="submit" loading={loading}>
-//               Lưu
-//             </Button>
-//           </div>
-//         </Form>
-//       </div>
-//     </div>
-//   );
-// }
+        {/* Footer */}
+        <div className="p-6 bg-[#fdf6e3] border-t border-[#d4af37]/30 flex justify-end gap-4">
+          <button
+            type="button"
+            onClick={onClose}
+            disabled={isLoading}
+            className="px-6 py-2 text-[#5d4037] font-bold hover:text-[#b91c1c] transition-colors disabled:opacity-50"
+          >
+            Đóng lại
+          </button>
+          <button
+            type="submit"
+            form="userForm"
+            disabled={isLoading}
+            className="px-8 py-2 bg-[#b91c1c] text-white font-bold rounded shadow hover:bg-[#991b1b] flex items-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isLoading ? (
+              <Loader2 className="animate-spin" size={18} />
+            ) : (
+              <Check size={18} />
+            )}
+            {isLoading ? "Đang lưu..." : "Lưu Thông Tin"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};

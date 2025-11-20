@@ -11,6 +11,7 @@ import { SuKienPage } from "../events/page";
 import { TinTucPage } from "../news/page";
 import { PhaKyPage } from "../pen/page";
 import { BaoCaoPage } from "../reports/page";
+import { GenealogyChatPage } from "../../(users)/genAI/page";
 
 function App() {
   const [activeView, setActiveView] = useState<ViewMode>(ViewMode.DIAGRAM);
@@ -21,7 +22,7 @@ function App() {
         flex-none: Forces the header to respect its intrinsic height and not shrink.
         z-50: Ensures it stays on top of the scrolling content.
       */}
-      <div className="flex-none z-50 shadow-xl relative">
+      <div className="flex-none z-50 shadow-md relative">
         <Header activeView={activeView} onNavigate={setActiveView} />
       </div>
 
@@ -29,8 +30,8 @@ function App() {
         flex-1: Takes up all remaining vertical space after the header.
         relative: Establishes a positioning context for children.
       */}
-      <main className="flex-1 relative w-full bg-stone-50 bg-[#ede5b7]">
-        <Image
+      <main className="flex-1 relative w-full bg-stone-50">
+        {/* <Image
           src="/images/backgroud.jpg" // Đảm bảo đường dẫn này đúng
           fill
           alt="Họa tiết nền truyền thống"
@@ -38,15 +39,16 @@ function App() {
           quality={80} // Tối ưu hóa chất lượng ảnh
           priority // Ưu tiên tải ảnh này sớm
           className="z-0 opacity-5" // Giữ nguyên opacity và z-index
-        />
+        /> */}
 
         {/* Content Container - Đảm bảo z-index của nó cao hơn Image */}
-        <div className="absolute inset-0 w-full h-full z-10">
+        <div className="absolute inset-0 w-full h-full z-10 bg-[#ede5b7]">
           {" "}
           {/* Thêm z-10 */}
           {activeView === ViewMode.DIAGRAM && (
             <div className="w-full h-full">
               <MyFamilyTree data={FAMILY_DATA} />
+              {/* <GenealogyChatPage /> */}
             </div>
           )}
           {activeView === ViewMode.PHA_KY && (
