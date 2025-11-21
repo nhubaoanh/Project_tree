@@ -56,6 +56,19 @@ export class NguoiDungController {
     }
   }
 
+  async resetPassword(req: Request, res:Response): Promise<void> {
+    try{
+      var userName = req.body.tenDangNhap;
+      // console.log("userName123", userName);
+      // var matKhaunew = req.body.matKhaunew;
+      console.log("userName",userName);
+      await this.nguoiDungService.resetPassword(userName);
+      res.json({ message: "Reset password thanh cong. Vui long check email.", success: true });
+    }catch(err: any){
+      res.json({ message: err.message, success: false });
+    }
+  }
+
 
   async searchUser(req: Request, res: Response): Promise<void> {
     try {

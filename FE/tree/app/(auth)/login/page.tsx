@@ -182,7 +182,7 @@ export default function LoginPage() {
                    Mật khẩu
                  </label>
                  <Link
-                   href="#"
+                   href="/forgotPass"
                    className="text-sm text-blue-600 hover:underline"
                  >
                    Quên mật khẩu?

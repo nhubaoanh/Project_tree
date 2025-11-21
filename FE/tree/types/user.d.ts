@@ -20,3 +20,8 @@ export interface IUserSearch{
   search_content?: string;
   dongHoId? :string;
 }
+
+export interface IUserResetPassword{
+  tenDangNhap: string;
+  // matKhauMoi: string;
+}

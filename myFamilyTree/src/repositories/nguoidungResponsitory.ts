@@ -42,6 +42,19 @@ export class nguoiDungReponsitory {
     }
   }
 
+  async resetPassword(tenDangNhap: string, matKhauMoi: string) : Promise<any> {
+    try{
+      const sql = "CALL ResetPassWord(? ,?, @err_code, @err_msg)";
+      console.log("sql", sql);
+      console.log("tenDangNhap", tenDangNhap);
+      console.log("matKhauMoi", matKhauMoi);
+      await this.db.query(sql, [tenDangNhap, matKhauMoi]);
+      return true;
+    }catch(error: any){
+      throw new Error(error.message);
+    }
+  }
+
   async searchUser(
     pageIndex: number,
     pageSize: number,

@@ -1,6 +1,6 @@
 import { API_CORE } from "../constant/config";
 import { apiClient } from "@/lib/api";
-import { IUser, IUserSearch } from "@/types/user";
+import { IUser, IUserResetPassword, IUserSearch } from "@/types/user";
 
 const prefix = `${API_CORE}/users`;
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -113,3 +113,10 @@ export const sighInService = async (data: Props): Promise<any> => {
 
   return res.data;
 };
+
+export const resetPasswordUser = async(
+  data: IUserResetPassword,
+): Promise<any> => {
+  const res = await apiClient?.post(`${prefix}/reset-password`, data);
+  return res?.data
+}
