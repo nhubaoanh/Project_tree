@@ -2,6 +2,7 @@ export const validateEmail = (email: string): string | null => {
     // regex
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email){
+        console.log("email", email);
         return "Email không được để trống."; 
     }
     if(!emailRegex.test(email)) {

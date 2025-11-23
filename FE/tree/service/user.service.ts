@@ -118,5 +118,5 @@ export const resetPasswordUser = async(
   data: IUserResetPassword,
 ): Promise<any> => {
   const res = await apiClient?.post(`${prefix}/reset-password`, data);
-  return res?.data
+  return res?.data;
 }

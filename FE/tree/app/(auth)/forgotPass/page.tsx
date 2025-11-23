@@ -58,18 +58,20 @@ const ForgotPassword = () => {
 
     try {
       const response = await resetPasswordUser(formData);
-      const data = await response.json();
       setIsLoading(false);
 
-      if (response.ok) {
+      if (response.success) {
         setMessage("✅ Email reset mật khẩu đã được gửi.");
+        showSuccess("Vui lòng kiểm tra email.");
         setFormData({ tenDangNhap: "" });
       } else {
-        setMessage(`❌ Lỗi: ${data.message || "Không gửi được email."}`);
+        showError(response.message);
       }
-    } catch (error) {
+    } catch (error : any) {
+      showError(" Lỗi kết nối. Vui, thử lập sau.");
+      console.error("reset:", error);
+    }finally {
       setIsLoading(false);
-      setMessage("❌ Lỗi kết nối. Vui lòng thử lại sau.");
     }
   };
 

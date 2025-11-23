@@ -23,5 +23,4 @@ export interface IUserSearch{
 
 export interface IUserResetPassword{
   tenDangNhap: string;
-  // matKhauMoi: string;
 }
