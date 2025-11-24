@@ -76,7 +76,7 @@ export default function LoginPage() {
 
       console.log("Login response:", result);
 
-      if (result.success) {
+      if (result) {
         // THÀNH CÔNG
         storage.setToken(result.token);
         console.log("Token stored:", storage.setToken(result.token));

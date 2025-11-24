@@ -4,6 +4,7 @@ import { nguoiDungService } from "../services/nguoidungService";
 import { nguoiDung } from "../models/nguoidung";
 import { generateToken } from "../config/jwt";
 import { callbackify } from "util";
+import { Action } from "../models/Actions";
 
 @injectable()
 export class NguoiDungController {
@@ -14,24 +15,29 @@ export class NguoiDungController {
       const { tenDangNhap, matKhau } = req.body;
       console.log("Login request received:", { tenDangNhap, matKhau });
       const user = await this.nguoiDungService.loginUser(tenDangNhap, matKhau);
-
-      console.log("User in controller after service call:", user);
-      if(user.success){
-
+      if(user) {
         let obj: any = {};
         obj.user_id = user.nguoiDungId,
         obj.full_name = user.hoTen,
         obj.user_name = user.tenDangNhap,
-        obj.role = user.vaiTro,
-        obj.dongHoId = user.dongHoId
-        const token = generateToken(obj);
+        obj.role = user.roleCode,
+        obj.role_name = user.roleName,
+        obj.dongHoId = user.dongHoId;
 
-        console.log("acđ", token)
-        user.token = token;
-        console.log("Generated token:",user.token);
-        res.json({...user, token: token, message: "Đăng nhập thành công!", success: true});
+        let action_resulta = [];
+        for(let row of user.actions) {
+          let row_data = row as Action;
+          action_resulta.push({actionCode: row_data.action_code, action_api_url: row_data.action_api_url})
+        }
+        obj.actions = action_resulta;
+        const token = generateToken(obj);
+        user.token =token;
+        res.json(user);
       }else{
-        res.status(401).json({message: user.message, success: false});
+        res.json({
+          message: "Sai mật tài khoản hoặc mật khẩu.",
+          success: false,
+        });
       }
     }catch(error:any){
       console.error("Lỗi đăng nhập:", error);
@@ -105,6 +111,22 @@ export class NguoiDungController {
       res
         .status(500)
         .json({ message: "Không tồn tại kết quả tìm kiếm.", success: false });
+    }
+  }
+
+  async authorize(req: Request, res: Response): Promise<void>{
+    try{
+      let token = req.params.token;
+      console.log("token",token);
+      let result = await this.nguoiDungService.authrize(token);
+      console.log(result);
+      if(result) {
+        res.json(result);
+      }else{
+        res.json({ message: "Bản ghi không tồn tại.", success: true });
+      }
+    }catch(error: any){
+      res.json({message: error.message, success: false});
     }
   }
 }

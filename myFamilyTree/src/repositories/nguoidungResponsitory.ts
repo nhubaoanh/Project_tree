@@ -76,4 +76,24 @@ export class nguoiDungReponsitory {
       throw new Error(error);
     }
   }
+
+  async getActionByUserId(id: string) : Promise<any[]> {
+    try{
+      const sql = 'CALL GetActionByUserId(?, @err_code, @err_msg)';
+      const [results] = await this.db.query(sql, [id]);
+      return results;
+    }catch(error : any){
+      throw new Error(error.message);
+    }
+  }
+
+  async getFunctionByUserId(id: string) : Promise<any[]>{
+    try{
+      const sql = "CALL GetFunctionsByUserId(?, @err_code, @err_msg)";
+      const [result] = await this.db.query(sql, [id]);
+      return result;
+    }catch(error :any){
+      throw new Error(error.message);
+    }
+  }
 }

@@ -16,7 +16,7 @@ export const validatePassword = (password: string): string | null => {
     if (!password) {
         return "Mật khẩu không được để trống.";
     }
-    if (password.length < 5) {
+    if (password.length < 4) {
         return "Mật khẩu phải có ít nhất 8 ký tự.";
     }
     // Phải có ít nhất 1 chữ hoa, 1 chữ thường, 1 số, và 1 ký tự đặc biệt
@@ -31,9 +31,9 @@ export const validatePassword = (password: string): string | null => {
     if (!lowercaseRegex.test(password)) {
         return "Mật khẩu phải có ít nhất 1 chữ cái viết thường.";
     }
-    if (!numberRegex.test(password)) {
-        return "Mật khẩu phải có ít nhất 1 chữ số.";
-    }
+    // if (!numberRegex.test(password)) {
+    //     return "Mật khẩu phải có ít nhất 1 chữ số.";
+    // }
     // if (!specialCharRegex.test(password)) {
     //     return "Mật khẩu phải có ít nhất 1 ký tự đặc biệt.";
     // }

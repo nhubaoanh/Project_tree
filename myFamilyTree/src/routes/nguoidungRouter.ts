@@ -9,10 +9,16 @@ nguoiDungRouter.use((req, res, next) => {
 });
 
 const userController = container.resolve(NguoiDungController);
+
+nguoiDungRouter.get(
+  "/authorize/:token",
+  userController.authorize.bind(userController)
+);
 nguoiDungRouter.post("/login", userController.loginUser.bind(userController));
 nguoiDungRouter.post('/signup', userController.createNguoiDung.bind(userController));
 nguoiDungRouter.post('/search', userController.searchUser.bind(userController));
 nguoiDungRouter.post('/reset-password', userController.resetPassword.bind(userController));
+
 
 
 export default nguoiDungRouter;
