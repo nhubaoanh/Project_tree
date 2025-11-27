@@ -8,7 +8,7 @@ import {
   User,
 } from "lucide-react";
 
-export const BaoCaoPage: React.FC = () => {
+export default function BaoCaoPage(){
   // --- Dữ liệu giả lập (Mock Data) ---
   const memberStats = {
     total: 452,

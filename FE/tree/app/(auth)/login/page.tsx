@@ -1,31 +1,31 @@
 
 "use client"
 
-import { useState, useCallback } from "react" // Thêm useCallback
+import { useState, useCallback } from "react" 
 import { useRouter } from "next/navigation"
 import storage from "@/utils/storage"
-import { useToast } from "@/service/useToas" // Giả sử đây là file Toast Context của bạn
-import { validateEmail, validatePassword } from "@/lib/validator" // Import hàm Validation
+import { useToast } from "@/service/useToas" 
+import { validateEmail, validatePassword } from "@/lib/validator"
 import Link from "next/link"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import Image from "next/image"
-import { loginService } from "@/service/user.service"
+import { autherization, loginService } from "@/service/user.service"
 
 interface FormData {
   tenDangNhap: string;
   matKhau: string;
 }
 
-interface FormErrors { // Định nghĩa Type cho lỗi
+interface FormErrors {
     tenDangNhap?: string;
     matKhau?: string;
 }
 
 export default function LoginPage() {
   const [formData, setFormData] = useState<FormData>({ tenDangNhap: "", matKhau: ""});
-  const [errors, setErrors] = useState<FormErrors>({}); // State để lưu lỗi validation
+  const [errors, setErrors] = useState<FormErrors>({});
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const { showError, showSuccess } = useToast();
@@ -61,37 +61,40 @@ export default function LoginPage() {
   // --- HÀM XỬ LÝ ĐĂNG NHẬP CHÍNH ---
   const handleButton = async () => {
     setLoading(true);
-
-    console.log("Form Data:", formData);
-    // 1. VALIDATION: Nếu form không hợp lệ, dừng lại
     if (!validateForm()) {
         setLoading(false);
         showError("Vui lòng kiểm tra lại định dạng thông tin đăng nhập!");
         return; 
     }
-
-    // 2. GỌI API LOGIN
     try {
-      const result = await loginService(formData); // Truyền trực tiếp formData
+      const result = await loginService(formData); 
 
-      console.log("Login response:", result);
-
-      if (result) {
-        // THÀNH CÔNG
+      if (result && result.token) {
         storage.setToken(result.token);
-        console.log("Token stored:", storage.setToken(result.token));
-        console.log("res.token:", result.token);
         showSuccess("Đăng nhập thành công!");
+
+        const userData = await autherization(result.token);
+
+        if(userData) {
+          storage.setUser({
+            nguoiDungId: userData.nguoiDungId,
+            hoTen: userData.hoTen,
+            email: userData.email,
+            dongHoId: userData.dongHoId,
+            roleId: userData.roleId,
+            roleCode: userData.roleCode,
+            functions: userData.functions, // Cây menu
+            actions: userData.actions,
+          });
+        }
+        showSuccess("Đăng nhập thanh cong!");
         router.push("/dashbrach");
       } else {
-        // THẤT BẠI TỪ SERVER (Mật khẩu sai, TK không tồn tại, v.v.)
         showError(result.message || "Đăng nhập thất bại. Vui lòng thử lại.");
       }
 
     } catch(err: any) {
-      // LỖI MẠNG hoặc lỗi không mong muốn khác
       showError("Kết nối thất bại. Vui lòng kiểm tra kết nối mạng.");
-      console.error("Login error:", err);
     } finally {
       setLoading(false);
     }

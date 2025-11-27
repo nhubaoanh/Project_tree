@@ -1,10 +1,15 @@
-'use client';
+"use client";
 import Sidebar from "@/components/ui/Sidebar";
 import Header from "@/components/ui/Header";
 import { SidebarProvider } from "@/context/SidebarContext";
 import Image from "next/image";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "@/lib/react-query";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import storage from "@/utils/storage";
+import { read } from "fs";
+import { RouteGuard } from "@/components/RouteGuard";
 
 export default function AdminLayout({
   children,

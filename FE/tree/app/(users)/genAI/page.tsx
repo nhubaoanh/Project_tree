@@ -1,7 +1,4 @@
-
 "use client";
-
-
 import React, { useState, useEffect, useRef } from "react";
 import { GoogleGenAI, Chat, GenerateContentResponse } from "@google/genai";
 import { Send, Bot, User, Sparkles, Loader2, Info } from "lucide-react";
@@ -13,7 +10,7 @@ interface ChatMessage {
   text: string;
 }
 
-export const GenealogyChatPage: React.FC = () => {
+export default function GenealogyChatPage(){
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       role: "model",

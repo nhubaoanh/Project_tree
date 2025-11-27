@@ -1,6 +1,6 @@
 import React from "react";
 
-export const TinTucPage: React.FC = () => {
+export default function TinTucPage(){
   // Dữ liệu giả lập cho danh sách tin tức
   const newsItems = Array(4).fill({
     title: "Họp họ ngày tết vui vẻ",

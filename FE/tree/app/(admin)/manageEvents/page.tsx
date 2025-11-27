@@ -17,9 +17,10 @@ import {
   updateUser,
   deleteUser,
 } from "@/service/user.service";
-import { MemberTable } from "./components/userTable";
-import { UserModal } from "./components/userModal";
-import { ConfirmDeleteModal } from "./components/userDelete";
+import { MemberTable } from "./components/memberTable";
+import { IMember } from "@/types/member";
+// import { UserModal } from "./components/memberModal";
+// import { ConfirmDeleteModal } from "./components/memberDelete";
 
 // --- MAIN PAGE COMPONENT ---
 
@@ -35,9 +36,9 @@ export default function QuanLyThanhVienPage() {
 
   // --- MODAL STATES ---
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingUser, setEditingUser] = useState<IUser | null>(null);
+  const [editingUser, setEditingUser] = useState<IMember | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [userToDelete, setUserToDelete] = useState<IUser | null>(null);
+  const [userToDelete, setUserToDelete] = useState<IMember | null>(null);
 
   // --- DEBOUNCE SEARCH ---
   React.useEffect(() => {
@@ -117,25 +118,25 @@ export default function QuanLyThanhVienPage() {
     setIsModalOpen(true);
   };
 
-  const handleEdit = (user: IUser) => {
+  const handleEdit = (user: IMember) => {
     setEditingUser(user);
     setIsModalOpen(true);
   };
 
-  const handleDeleteClick = (user: IUser) => {
+  const handleDeleteClick = (user: IMember) => {
     setUserToDelete(user);
     setIsDeleteModalOpen(true);
   };
 
   const handleConfirmDelete = () => {
     if (userToDelete) {
-      deleteMutation.mutate(userToDelete.nguoiDungId);
+      deleteMutation.mutate(userToDelete.thanhVienId);
     }
   };
 
   const handleSaveUser = (user: Partial<IUser>) => {
     if (editingUser) {
-      updateMutation.mutate({ id: editingUser.nguoiDungId, user });
+      updateMutation.mutate({ id: editingUser.thanhVienId, user });
     } else {
       createMutation.mutate(user);
     }
@@ -205,7 +206,7 @@ export default function QuanLyThanhVienPage() {
       <div className="flex flex-col md:flex-row justify-between items-end md:items-center mb-8 gap-4 border-b border-[#d4af37] pb-4">
         <div>
           <h2 className="text-3xl font-display font-bold text-[#b91c1c] uppercase drop-shadow-sm">
-            Quản Lý Người Dùng
+            Quản Lý Su kien
           </h2>
           <p className="text-[#8b5e3c] italic text-sm">
             Danh sách nhân đinh và tài khoản truy cập hệ thống
@@ -284,7 +285,7 @@ export default function QuanLyThanhVienPage() {
       />
 
       {/* Modals */}
-      <UserModal
+      {/* <UserModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSubmit={handleSaveUser}
@@ -298,8 +299,7 @@ export default function QuanLyThanhVienPage() {
         onConfirm={handleConfirmDelete}
         itemName={userToDelete?.hoTen || ""}
         isLoading={isDeleting}
-      />
+      /> */}
     </div>
   );
-};
-
+}

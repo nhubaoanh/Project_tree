@@ -41,12 +41,13 @@ export class nguoiDungService {
         user.nguoiDungId
       );
       return {
-        user_id: user.nguoiDungId,
+        nguoiDungId: user.nguoiDungId,
         dongHoId: user.dongHoId,
         hoTen: user.hoTen,
         email: user.email,
         soDienThoai: user.soDienThoai,
         roleId: user.roleId,
+        roleCode : user.roleCode,
         anhDaiDien: user.anhDaiDien,
         ngayTao: user.ngayTao,
         online_flag: user.online_flag,
@@ -128,15 +129,15 @@ export class nguoiDungService {
   }
 
   async authrize(token: string){
-    let user_data = verifyToken(token);
-    console.log(user_data);
-    
+    let user_data = verifyToken(token);    
     if(user_data == null) throw new Error("Phien dang nhap het han.");
-    let functions = await this.nguoidungResponsitory.getFunctionByUserId(user_data.nguoiDungId);
-
-    console.log("functions",functions);
+    let functions = await this.nguoidungResponsitory.getFunctionByUserId(
+      user_data.nguoiDungId
+    );
     let functionTree = this.treeUltility.getFunctionTree(functions, 1, "0");
-    let actions = await this.nguoidungResponsitory.getActionByUserId(user_data.nguoiDungId);
+    let actions = await this.nguoidungResponsitory.getActionByUserId(
+      user_data.nguoiDungId
+    );
 
     let action_result = [];
     for(let row of actions) {
@@ -144,17 +145,18 @@ export class nguoiDungService {
       action_result.push(row_data.action_code);
     }
     let data = {
-      user_id : user_data.nguoiDungId,
-      dongHoId : user_data.dongHoId,
+      nguoiDungId: user_data.nguoiDungId,
+      dongHoId: user_data.dongHoId,
       hoTen: user_data.hoTen,
       email: user_data.email,
       soDienThoai: user_data.soDienThoai,
       roleId: user_data.roleId,
+      roleCode : user_data.roleCode,
       anhDaiDien: user_data.anhDaiDien,
       ngayTao: user_data.ngayTao,
       online_flag: user_data.online_flag,
       functions: functionTree,
-      actions: action_result,      
+      actions: action_result,
     };
     return data;
   }

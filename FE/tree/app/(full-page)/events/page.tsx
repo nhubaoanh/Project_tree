@@ -1,7 +1,7 @@
 import React from "react";
 import { Clock } from "lucide-react";
 
-export const SuKienPage: React.FC = () => {
+export default function SuKienPage (){
   const events = [
     {
       year: "2024",

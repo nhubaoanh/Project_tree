@@ -1,6 +1,6 @@
 import React from "react";
 
-export const PhaKyPage: React.FC = () => {
+export default function PhaKyPage() {
   return (
     <div className="prose prose-stone prose-lg text-justify leading-relaxed text-[#2d2d2d] max-w-none animate-fadeIn">
       {/* Container hình ảnh dùng Float Left để chữ chảy bao quanh */}

@@ -26,10 +26,6 @@ export class nguoiDungReponsitory {
     try {
       const sql = "CALL LoginUserByAccount(? ,@err_code, @err_msg)";
       const [results] = await this.db.query(sql, [tenDangNhap]);
-
-      console.log("Results from LoginUserByAccount:", results);
-
-      // Lấy object user trực tiếp từ mảng
       if (Array.isArray(results) && results.length > 0) {
         const user = results[0];
         console.log("User fetched in repository:", user);

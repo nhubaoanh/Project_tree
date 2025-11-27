@@ -2,8 +2,9 @@
 import React, { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { useSidebar } from "@/context/SidebarContext"; // ✅ dùng context để đồng bộ toggle
+import { useSidebar } from "@/context/SidebarContext";
 import Image from "next/image";
+import storage from "@/utils/storage"; // 👉 nhớ import
 
 type SidebarItem = {
   name: string;
@@ -12,21 +13,26 @@ type SidebarItem = {
 };
 
 export default function Sidebar() {
-  const { isSidebarOpen, toggleSidebar } = useSidebar(); // ✅ lấy từ context
+  const { isSidebarOpen } = useSidebar();
   const pathname = usePathname();
   const [sidebarItems, setSidebarItems] = useState<SidebarItem[]>([]);
 
   useEffect(() => {
-    setSidebarItems([
-      { name: "Dashboard", href: "/Overview", icon: "/icon/iconmember.png" },
+    const user = storage.getUser();
+    const roleCode = user?.roleCode;
+
+    console.log("Role ID:", roleCode);
+    console.log("User:", user);
+
+    // ================================
+    // 🔥 MENU THEO ROLE
+    // ================================
+    const menuAdmin: SidebarItem[] = [
+      { name: "Dashboard", href: "/dashboard", icon: "/icon/iconmember.png" },
       { name: "Members", href: "/members", icon: "/icon/iconmember.png" },
       { name: "Genealogy", href: "/genealogy", icon: "/icon/pen.png" },
       { name: "Events", href: "/events", icon: "/icon/calendar.png" },
-      {
-        name: "Notifications",
-        href: "/notifications",
-        icon: "/icon/bell.png",
-      },
+      { name: "Notifications", href: "/notifications", icon: "/icon/bell.png" },
       {
         name: "Contributions",
         href: "/contributions",
@@ -34,8 +40,30 @@ export default function Sidebar() {
       },
       { name: "Assets", href: "/assets", icon: "/icon/time.png" },
       { name: "users", href: "/users", icon: "/icon/iconmember.png" },
-      // { name: "reports", href: "/reports", icon: "/icon/iconmember.png" },
-    ]);
+    ];
+
+    const menuManager: SidebarItem[] = [
+      { name: "Dashboard", href: "/Overview", icon: "/icon/iconmember.png" },
+      { name: "Members", href: "/members", icon: "/icon/iconmember.png" },
+      { name: "Events", href: "/events", icon: "/icon/calendar.png" },
+      {
+        name: "Contributions",
+        href: "/contributions",
+        icon: "/icon/dollar.png",
+      },
+    ];
+
+    const menuUser: SidebarItem[] = [
+      { name: "Dashboard", href: "/Overview", icon: "/icon/iconmember.png" },
+      { name: "Events", href: "/events", icon: "/icon/calendar.png" },
+    ];
+
+    // ================================
+    // 🔥 CHỌN MENU TƯƠNG ỨNG
+    // ================================
+    if (roleCode === "sa") setSidebarItems(menuAdmin);
+    else if (roleCode === "thanhvien") setSidebarItems(menuManager);
+    else setSidebarItems(menuUser);
   }, []);
 
   return (
@@ -48,6 +76,7 @@ export default function Sidebar() {
         {/* Logo */}
         <div>
           <Image src="/images/logo1.png" width={300} height={50} alt="logo" />
+
           <nav className="flex flex-col space-y-2 mt-4">
             {sidebarItems.map((item) => (
               <Link
@@ -73,6 +102,7 @@ export default function Sidebar() {
             ))}
           </nav>
         </div>
+
         <div className="relative mt-4 w-full h-32 overflow-visible">
           <Image
             src="/images/phuong.png"
@@ -82,6 +112,7 @@ export default function Sidebar() {
             className="absolute bottom-0 left-0 object-contain drop-shadow-md transition-all duration-300"
             priority
           />
+
           <Image
             src="/images/may.png"
             width={isSidebarOpen ? 70 : 40}

@@ -1,0 +1,24 @@
+export interface IMember {
+  thanhVienId: string;
+  dongHoId: string;
+  cayId: string;
+  hoTen: string;
+  gioiTinh: string;
+  ngaySinh: Date;
+  ngayMat: Date;
+  noiSinh: string;
+  noiMat: string;
+  ngheNghiep: string;
+  trinhDoHocVan: string;
+  diaChiHienTai: string;
+  tieuSu: string;
+  anhChanDung: string;
+  doiThuoc: number;
+  chaId: string;
+  meId: string;
+  voChongId: string;
+  ngayTao: Date;
+  trangthai: number;
+  active_flag: number;
+  lu_user_id: string;
+}

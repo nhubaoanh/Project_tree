@@ -41,16 +41,22 @@ let MOCK_USERS: IUser[] = Array.from({ length: 25 }).map((_, i) => {
     nguoiTaoId: "user001", // Add this line to include the missing property
   };
 });
+
 export const loginService = async (data: Props): Promise<any> => {
   const res = await apiClient.post(`${prefix}/login`, data);
 
   return res.data;
 };
 
-export const autherization = async (): Promise<any> => {
-  const res = await apiClient.get(`${prefix}/me`);
+export const autherization = async (token: string): Promise<any> => {
+  try{
+    const res = await apiClient.get(`${prefix}/authorize/${token}`);
 
-  return res?.data;
+    return res?.data;
+  }catch(error : any){
+    console.error("Authorize service error:", error);
+    throw error;
+  }
 };
 
 export const getUsers = async (
