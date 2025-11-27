@@ -11,7 +11,7 @@
 ### Frontend
 - **Framework**: Next.js 14 - Framework React giúp tối ưu hiệu năng
 - **Thư viện UI**: React 19 - Thư viện JavaScript để xây dựng giao diện người dùng
-- **Component UI**: Ant Design 5 - Thư viện component UI đẹp mắt
+- **Component UI**: Shadcn - Thư viện component UI đẹp mắt
 - **Giao diện**: Tailwind CSS - Framework CSS tiện lợi
 - **Biểu tượng**: Lucide Icons - Bộ icon hiện đại
 
@@ -28,7 +28,7 @@
 code/
 ├── FE/                      # Frontend code
 │   └── tree/                # Next.js application
-│       ├── pages/           # Application pages
+│       ├── app/             # Application pages
 │       ├── public/          # Static files
 │       ├── styles/          # Global styles
 │       └── components/      # Reusable components
@@ -52,6 +52,7 @@ code/
 1. Truy cập [https://nodejs.org/](https://nodejs.org/)
 2. Tải bản LTS (Recommended)
 3. Chạy file cài đặt và làm theo hướng dẫn
+   - kéo dự án về và truy cập đúng thư mục myFamily -> sau đó gõ npm install: để cài nodeModule và các pack 
 4. Kiểm tra cài đặt thành công bằng cách mở Command Prompt (Windows) hoặc Terminal (Mac/Linux) và gõ:
    ```bash
    node -v
@@ -160,8 +161,6 @@ Mở trình duyệt và truy cập: [http://localhost:3000](http://localhost:300
    ```
 5. Tạo Pull Request về nhánh chính của dự án
 
-## 📄 Giấy phép
-Dự án này được cấp phép theo giấy phép MIT - xem file [LICENSE](LICENSE) để biết thêm chi tiết.
 
 ## 👨‍💻 Tác giả
 [Nhữ Bảo Anh] - [nhubaoanh111@gmail.com]
@@ -174,8 +173,12 @@ Nếu gặp khó khăn trong quá trình cài đặt hoặc sử dụng, vui lò
 4. Tạo issue mới trên GitHub nếu vẫn chưa giải quyết được
 
 ## 🙏 Lời cảm ơn
-- [Ant Design](https://ant.design/) - Thư viện component UI
+- [Hadcn](https://ui.shadcn.com/) - Thư viện component UI
 - [Next.js](https://nextjs.org/) - Framework React
 - [Express](https://expressjs.com/) - Backend server
 - [MySQL](https://www.mysql.com/) - Cơ sở dữ liệu
+- [lucide-react] - Thư viện icon
+- [tanstack/react-query] - Thư viện gen giao diện cây
+- [recharts] - Thư viện gen biểu đồ
+- [react] - ui
 - Tất cả các thư viện mã nguồn mở đã được sử dụng trong dự án
