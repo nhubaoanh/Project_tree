@@ -132,4 +132,34 @@ export class NguoiDungController {
       res.json({ message: error.message, success: false });
     }
   }
+
+  async insertUser(req: Request, res: Response) : Promise<void> {
+    try {
+      const nguoiDung = req.body as nguoiDung;
+      const results = await this.nguoiDungService.insertUser(nguoiDung);
+      res.json({
+        message : 'Them nguoi dung thanh cong',
+        success : true,
+        data : results
+      })
+    }catch (error: any) {
+      console.log("error",error);
+      res.status(500).json({ message: "Them nguoi dung that bai", success: false });
+    }
+  }
+
+  async updateUser(req: Request, res: Response) : Promise<void> {
+    try {
+      const nguoiDung = req.body as nguoiDung;
+      const results = await this.nguoiDungService.updateUser(nguoiDung);
+      res.json({
+        message : 'Cap nhat nguoi dung thanh cong',
+        success : true,
+        data : results
+      })
+    }catch (error: any) {
+      console.log("error",error);
+      res.status(500).json({ message: "Cap nhat nguoi dung that bai", success: false });
+    }
+  }
 }

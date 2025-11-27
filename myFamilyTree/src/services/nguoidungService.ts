@@ -160,4 +160,18 @@ export class nguoiDungService {
     };
     return data;
   }
+
+  async insertUser(nguoidung: nguoiDung) : Promise<any>{
+    nguoidung.nguoiDungId = uuidv4();
+    nguoidung.tenDangNhap= nguoidung.tenDangNhap.toLowerCase();
+    nguoidung.matKhau = md5(nguoidung.matKhau);
+    return this.nguoidungResponsitory.insertUser(nguoidung);
+  }
+
+  async updateUser(nguoidung: nguoiDung) : Promise<any>{
+    nguoidung.matKhau = md5(nguoidung.matKhau);
+    return this.nguoidungResponsitory.updateUser(nguoidung);
+  }
+
+
 }

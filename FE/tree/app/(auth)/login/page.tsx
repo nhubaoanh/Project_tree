@@ -88,7 +88,7 @@ export default function LoginPage() {
           });
         }
         showSuccess("Đăng nhập thanh cong!");
-        router.push("/dashbrach");
+        router.push("/dashboard");
       } else {
         showError(result.message || "Đăng nhập thất bại. Vui lòng thử lại.");
       }
