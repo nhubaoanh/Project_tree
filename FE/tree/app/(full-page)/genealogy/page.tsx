@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Header } from "@/components/ui/HeaderSub";
 import { MyFamilyTree } from "@/components/ui/tree";
 import { generateFamilyData } from "@/utils/familyData"; // Sử dụng hàm generate
@@ -10,15 +10,30 @@ import  SuKienPage  from "../events/page";
 import  TinTucPage  from "../news/page";
 import  PhaKyPage  from "../pen/page";
 import NotificationPage from "@/app/(admin)/notifications/page";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { getMembers } from "@/service/member.service";
+import { ITreeNode } from "@/types/tree";
+import { buildTree } from "@/utils/treeUtils";
 
 export default function App() {
   const [activeView, setActiveView] = useState<ViewMode>(ViewMode.DIAGRAM);
    const [familyData, setFamilyData] = useState<FamilyMember[]>([]);
 
+   const membersQuery = useQuery({
+     queryKey: ["member"],
+     queryFn: () => getMembers(),
+     placeholderData: keepPreviousData,
+   });
 
-  useEffect(() => {
-    setFamilyData(generateFamilyData());
-  }, []);
+   const data = membersQuery?.data?.data[0] || [];
+   console.log("data", data);
+
+  const treeData = useMemo<ITreeNode[]> (() => {
+    if(!data || data.length === 0) return [];
+    return buildTree(data);
+  }, [data]);
+
+  console.log("treeData", treeData);
 
   return (
     <div className="flex flex-col h-screen w-full bg-stone-100 font-serif overflow-hidden">
@@ -29,23 +44,12 @@ export default function App() {
 
       {/* MAIN */}
       <main className="flex-1 relative w-full bg-stone-50">
-        {/* BACKGROUND IMAGE */}
-        {/* <Image
-          src="/images/background.jpg"
-          fill
-          alt="Background"
-          style={{ objectFit: "cover" }}
-          quality={80}
-          priority
-          className="z-0 opacity-5"
-        /> */}
-
         {/* CONTENT */}
         <div className="absolute inset-0 w-full h-full z-10 bg-[#ede5b7]">
           {activeView === ViewMode.DIAGRAM && (
             <div className="w-full h-full overflow-auto">
-              {familyData.length > 0 ? (
-                <MyFamilyTree data={familyData} />
+              {treeData.length > 0 ? (
+                <MyFamilyTree data={treeData} />
               ) : (
                 <div className="flex items-center justify-center h-full">
                   Đang tải cây gia phả...

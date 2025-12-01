@@ -162,4 +162,6 @@ export class NguoiDungController {
       res.status(500).json({ message: "Cap nhat nguoi dung that bai", success: false });
     }
   }
+
 }
+    

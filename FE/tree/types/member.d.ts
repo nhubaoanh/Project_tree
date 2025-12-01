@@ -1,9 +1,8 @@
 export interface IMember {
-  thanhVienId: string;
+  thanhVienId: number;
   dongHoId: string;
-  cayId: string;
   hoTen: string;
-  gioiTinh: string;
+  gioiTinh: number;
   ngaySinh: Date;
   ngayMat: Date;
   noiSinh: string;
@@ -14,9 +13,10 @@ export interface IMember {
   tieuSu: string;
   anhChanDung: string;
   doiThuoc: number;
-  chaId: string;
-  meId: string;
-  voChongId: string;
+  chaId: number;
+  meId: number;
+  voId: number;
+  chongId: number;
   ngayTao: Date;
   trangthai: number;
   active_flag: number;
