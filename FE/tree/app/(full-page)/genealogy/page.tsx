@@ -26,14 +26,12 @@ export default function App() {
    });
 
    const data = membersQuery?.data?.data[0] || [];
-   console.log("data", data);
 
   const treeData = useMemo<ITreeNode[]> (() => {
     if(!data || data.length === 0) return [];
     return buildTree(data);
   }, [data]);
 
-  console.log("treeData", treeData);
 
   return (
     <div className="flex flex-col h-screen w-full bg-stone-100 font-serif overflow-hidden">

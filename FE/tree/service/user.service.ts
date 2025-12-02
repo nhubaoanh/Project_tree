@@ -48,7 +48,7 @@ export const createUser = async (
   data: IUserSearch,
 ): Promise<any> => {
   try {
-    const res = await apiClient.post(`${prefix}/search`, data);
+    const res = await apiClient.post(`${prefix}/insert-user`, data);
     return res?.data;
   } catch (err) {
     console.error("Lỗi khi lấy dữ liệu người dùng:", err);
@@ -61,7 +61,7 @@ export const updateUser = async (
   data: IUserSearch,
 ): Promise<any> => {
   try {
-    const res = await apiClient.post(`${prefix}/search`, data);
+    const res = await apiClient.post(`${prefix}/update-user`, data);
     return res?.data;
   } catch (err) {
     console.error("Lỗi khi lấy dữ liệu người dùng:", err);

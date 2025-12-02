@@ -51,7 +51,6 @@ export default function LoginPage() {
     // Kiểm tra mật khẩu (Sử dụng hàm mạnh hơn)
     newErrors.matKhau = validatePassword(formData.matKhau) ?? undefined;
 
-    console.log("newErrors", newErrors);
     setErrors(newErrors);
 
     // Kiểm tra xem có lỗi nào không

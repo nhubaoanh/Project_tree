@@ -1,6 +1,10 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { X, Check, Loader2 } from "lucide-react";
 import { IUser } from "@/types/user";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { getAllDongHo } from "@/service/lineage.service";
+import { getAllRole } from "@/service/role.service";
+import { useToast } from "@/service/useToas";
 
 interface UserModalProps {
   isOpen: boolean;
@@ -17,6 +21,56 @@ export const UserModal: React.FC<UserModalProps> = ({
   initialData,
   isLoading,
 }) => {
+
+  const { showError, showSuccess } = useToast();
+
+  const [dongHoList, setDongHoList] = useState<any[]>([]);
+
+  const { data: dongHoData, isError } = useQuery({
+    queryKey: ["Lineage"],
+    queryFn: getAllDongHo,
+    placeholderData: keepPreviousData,
+  });
+
+  // Khi API trả dữ liệu → set vào state (chỉ chạy khi data thay đổi)
+  useEffect(() => {
+    if (dongHoData) {
+      // Bảo vệ: luôn đảm bảo là array
+      const list = Array.isArray(dongHoData)
+        ? dongHoData
+        : dongHoData?.data || dongHoData?.data || [];
+      
+      setDongHoList(list);
+    }
+  }, [dongHoData]);
+
+
+
+  // lay role ====================
+
+  const [roleList, setRoleList] = useState<any[]>([]);
+
+  const { data: roleData } = useQuery({
+    queryKey: ["role"],
+    queryFn: getAllRole,
+    placeholderData: keepPreviousData,
+  });
+
+  // Khi API trả dữ liệu → set vào state (chỉ chạy khi data thay đổi)
+  useEffect(() => {
+    if (roleData) {
+      // Bảo vệ: luôn đảm bảo là array
+      const list = Array.isArray(roleData)
+        ? roleData
+        : roleData?.data || roleData?.data || [];
+
+      setRoleList(list);
+    }
+  }, [roleData]);
+
+  //=========================
+
+  // const data = dongHoQuery?.data || [];
   if (!isOpen) return null;
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -27,8 +81,15 @@ export const UserModal: React.FC<UserModalProps> = ({
       tenDangNhap: formData.get("tenDangNhap"),
       email: formData.get("email"),
       soDienThoai: formData.get("soDienThoai"),
-      roleId: Number(formData.get("roleId")),
+      roleId: (formData.get("roleId")),
+      matKhau: formData.get("matKhau"),
+      dongHoId: formData.get("dongHoId"),
+      nguoiDungId: formData.get("nguoiDungId"),
+      nguoiTaoId: formData.get("nguoiTaoId")
     };
+
+
+    console.log("formData",formData)
 
     // If editing, preserve ID (handled by parent usually, but good for object consistency)
     if (initialData?.nguoiDungId) {
@@ -36,6 +97,8 @@ export const UserModal: React.FC<UserModalProps> = ({
     }
 
     onSubmit(user);
+
+    showSuccess("thêm thành viên thành công")
   };
 
   return (
@@ -76,6 +139,27 @@ export const UserModal: React.FC<UserModalProps> = ({
             </div>
             <div className="space-y-2">
               <label className="text-sm font-bold text-[#8b5e3c] uppercase">
+                Dòng họ <span className="text-red-500">*</span>
+              </label>
+              <select
+                name="dongHoId"
+                defaultValue={initialData?.dongHoId ?? ""}
+                required
+                className="w-full p-3 bg-white border border-[#d4af37]/50 rounded focus:border-[#b91c1c] focus:outline-none shadow-inner disabled:bg-gray-100"
+                disabled={isLoading}
+              >
+                <option value="">Chọn dòng họ</option>
+                {/* {dongHoList.isLoading && <option>Đang tải...</option>} */}
+                {/* {dongHoQuery.isError && <option>Lỗi tải dữ liệu</option>} */}
+                {dongHoList.map((dongHo: any) => (
+                  <option key={dongHo.dongHoId} value={dongHo.dongHoId}>
+                    {dongHo.tenDongHo}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-bold text-[#8b5e3c] uppercase">
                 Tên đăng nhập <span className="text-red-500">*</span>
               </label>
               <input
@@ -87,6 +171,22 @@ export const UserModal: React.FC<UserModalProps> = ({
                   initialData ? "bg-gray-100 text-gray-500" : ""
                 }`}
                 placeholder="nguyenvana"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-bold text-[#8b5e3c] uppercase">
+                Mật khẩu <span className="text-red-500">*</span>
+              </label>
+              <input
+                required
+                name="matKhau"
+                defaultValue={initialData?.matKhau}
+                readOnly={!!initialData}
+                className={`w-full p-3 bg-white border border-[#d4af37]/50 rounded focus:border-[#b91c1c] focus:outline-none shadow-inner ${
+                  initialData ? "bg-gray-100 text-gray-500" : ""
+                }`}
+                placeholder="baoanh133"
               />
             </div>
             <div className="space-y-2">
@@ -118,12 +218,15 @@ export const UserModal: React.FC<UserModalProps> = ({
               </label>
               <select
                 name="roleId"
-                defaultValue={initialData?.roleId ?? 0}
+                defaultValue={initialData?.roleId ?? ""}
                 className="w-full p-3 bg-white border border-[#d4af37]/50 rounded focus:border-[#b91c1c] focus:outline-none shadow-inner"
               >
-                <option value={0}>Thành viên (Xem và đóng góp)</option>
-                <option value={1}>Quản Trị Viên (Toàn quyền)</option>
-                <option value={2}>Thư ký (Biên tập nội dung)</option>
+                <option value="">Chọn quyền</option>
+                {roleList.map((role: any) => (
+                  <option key={role.roleId} value={role.roleId}>
+                    {role.roleName}
+                  </option>
+                ))}
               </select>
             </div>
           </div>

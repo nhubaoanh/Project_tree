@@ -1,11 +1,10 @@
 import { Router } from "express";
 import { container } from "tsyringe";
 import { thanhVienController } from "../controllers/thanhVienController";
-import nguoiDungRouter from "./nguoidungRouter";
 
 const thanhVienRouter = Router();
 
-nguoiDungRouter.use((req, res, next) => {
+thanhVienRouter.use((req, res, next) => {
     next();
 });
 

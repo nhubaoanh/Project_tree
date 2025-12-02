@@ -66,10 +66,6 @@ export default function QuanLyThanhVienPage() {
   const totalPages = usersQuery.data?.pageCount || 0;
   const isLoading = usersQuery.isLoading;
 
-  console.log("userData", userData);
-  console.log("totalRecords", totalRecords);
-  console.log("totalPages", totalPages);
-  console.log("loading", isLoading);
 
   // --- MUTATIONS - CRUD ---
   const createMutation = useMutation({
