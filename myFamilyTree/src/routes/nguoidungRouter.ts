@@ -13,6 +13,7 @@ nguoiDungRouter.get(
   "/authorize/:token",
   userController.authorize.bind(userController)
 );
+nguoiDungRouter.post("/checkuser", userController.checkUser.bind(userController));
 nguoiDungRouter.post("/login", userController.loginUser.bind(userController));
 nguoiDungRouter.post('/signup', userController.createNguoiDung.bind(userController));
 nguoiDungRouter.post('/search', userController.searchUser.bind(userController));
@@ -22,6 +23,12 @@ nguoiDungRouter.post(
   "/update-user",
   userController.updateUser.bind(userController)
 );
+
+nguoiDungRouter.post(
+  "/delete",
+  userController.deleteUser.bind(userController)
+);
+
 
 
 

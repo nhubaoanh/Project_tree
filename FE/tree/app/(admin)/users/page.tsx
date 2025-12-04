@@ -20,6 +20,7 @@ import {
 import { MemberTable } from "./components/userTable";
 import { UserModal } from "./components/userModal";
 import { ConfirmDeleteModal } from "./components/userDelete";
+import { useToast } from "@/service/useToas";
 
 // --- MAIN PAGE COMPONENT ---
 
@@ -38,6 +39,8 @@ export default function QuanLyThanhVienPage() {
   const [editingUser, setEditingUser] = useState<IUser | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<IUser | null>(null);
+
+  const {showSuccess, showError} = useToast();
 
   // --- DEBOUNCE SEARCH ---
   React.useEffect(() => {
@@ -72,11 +75,13 @@ export default function QuanLyThanhVienPage() {
     mutationFn: createUser,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
-      toast.success("Thêm thành viên thành công!");
+      // toast.success("Thêm thành viên thành công!");
+      showSuccess("Thêm thành viên thành công!");
       setIsModalOpen(false);
     },
     onError: () => {
-      toast.error("Có lỗi xảy ra khi thêm thành viên.");
+      // toast.error("Có lỗi xảy ra khi thêm thành viên.");
+      showError("Có lỗi xảy ra khi thêm thành viên.");
     },
   });
 
@@ -85,11 +90,13 @@ export default function QuanLyThanhVienPage() {
       updateUser(vars.id, vars.user),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
-      toast.success("Cập nhật thông tin thành công!");
+      // toast.success("Cập nhật thông tin thành công!");
+      showSuccess("Cập nhật thông tin thành công!")
       setIsModalOpen(false);
     },
     onError: () => {
-      toast.error("Có lỗi xảy ra khi cập nhật.");
+      // toast.error("Có lỗi xảy ra khi cập nhật.");
+      showError("Có lỗi xảy ra khi cập nhật.");
     },
   });
 

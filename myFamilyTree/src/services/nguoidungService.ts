@@ -173,5 +173,11 @@ export class nguoiDungService {
     return this.nguoidungResponsitory.updateUser(nguoidung);
   }
 
+  async checkUser(userName: string): Promise<any> {
+    return this.nguoidungResponsitory.checkUser(userName);
+  }
 
+  async deleteUser(list_json:any, updated_by_id: string) : Promise<any>{
+    return this.nguoidungResponsitory.deleteUser(list_json, updated_by_id);
+  }
 }

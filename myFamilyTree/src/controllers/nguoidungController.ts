@@ -163,5 +163,38 @@ export class NguoiDungController {
     }
   }
 
+  async checkUser(req: Request, res: Response) : Promise<void> {
+    try{
+      const userName = req.body.userName;
+
+      console.log("uss", userName);
+
+      if(!userName) {
+            res.status(400).json({ message: "userName is required", success: false });
+            return;
+        }
+      const results = await this.nguoiDungService.checkUser(userName);
+      console.log("results", results);
+
+      res.json({
+        message : 'check nguoi dung thanh cong',
+        success : true,
+        exists : results
+      })
+    }catch(error: any){
+      res.status(500).json({ message: "check nguoi dung that bai.", success: false });
+    }
+  }
+
+  async deleteUser(req: Request, res: Response):Promise<void>{
+    try{
+      const object = req.body as {list_json: any; updated_by_id: string};
+      const results = await this.nguoiDungService.deleteUser(object.list_json, object.updated_by_id);
+      res.json({message: "Đã xóa thành công.", success: true});
+    }catch(error: any){
+      res.status(500).json({ message: "Xoa nguoi dung that bai.", success: false });
+    }
+  }
+
 }
     

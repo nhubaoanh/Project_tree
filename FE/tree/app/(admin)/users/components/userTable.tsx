@@ -62,7 +62,7 @@ export const MemberTable: React.FC<MemberTableProps> = ({
               <th className="p-4 text-center min-w-[120px]">Số điện thoại</th>
               <th className="p-4 text-center min-w-[150px]">Tên Đăng Nhập</th>
               {/* <th className="p-4 text-center min-w-[120px]">Mật khẩu</th> */}
-              <th className="p-4 text-center min-w-[120px]">Ảnh đại diện</th>
+              {/* <th className="p-4 text-center min-w-[120px]">Ảnh đại diện</th> */}
               
               {/* Cột Vai Trò cố định để vừa badge */}
               <th className="p-4 text-center w-32">Vai Trò</th>
@@ -104,9 +104,9 @@ export const MemberTable: React.FC<MemberTableProps> = ({
                     {/* <td className="p-4 text-center font-bold text-[#5d4037] group-hover:text-[#b91c1c] min-w-[120px]">
                       {user.matKhau}
                     </td> */}
-                    <td className="p-4 text-center font-bold text-[#5d4037] group-hover:text-[#b91c1c] min-w-[120px]">
+                    {/* <td className="p-4 text-center font-bold text-[#5d4037] group-hover:text-[#b91c1c] min-w-[120px]">
                       {user.anhDaiDien}
-                    </td>
+                    </td> */}
                     
                     {/* Cột Vai Trò cố định */}
                     <td className="p-4 text-center min-w-[200px] hidden md:table-cell">

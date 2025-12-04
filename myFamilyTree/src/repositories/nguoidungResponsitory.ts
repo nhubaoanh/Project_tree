@@ -21,6 +21,16 @@ export class nguoiDungReponsitory {
     }
   }
 
+  async checkUser(userName: string): Promise<any> {
+    try {
+      const sql = "CALL checkUsernameExist(?, @err_code, @err_msg)";
+      const [rows] = await this.db.query(sql, [userName]);
+      return rows[0].exist; // 0 hoặc 1
+    } catch (error: any) {
+      console.log(error);
+      throw new Error(error.message);
+    }
+  }
 
   async LoginUser(tenDangNhap: string): Promise<any> {
     try {
@@ -38,15 +48,15 @@ export class nguoiDungReponsitory {
     }
   }
 
-  async resetPassword(tenDangNhap: string, matKhauMoi: string) : Promise<any> {
-    try{
+  async resetPassword(tenDangNhap: string, matKhauMoi: string): Promise<any> {
+    try {
       const sql = "CALL ResetPassWord(? ,?, @err_code, @err_msg)";
       console.log("sql", sql);
       console.log("tenDangNhap", tenDangNhap);
       console.log("matKhauMoi", matKhauMoi);
       await this.db.query(sql, [tenDangNhap, matKhauMoi]);
       return true;
-    }catch(error: any){
+    } catch (error: any) {
       throw new Error(error.message);
     }
   }
@@ -73,29 +83,29 @@ export class nguoiDungReponsitory {
     }
   }
 
-  async getActionByUserId(id: string) : Promise<any[]> {
-    try{
-      const sql = 'CALL GetActionByUserId(?, @err_code, @err_msg)';
+  async getActionByUserId(id: string): Promise<any[]> {
+    try {
+      const sql = "CALL GetActionByUserId(?, @err_code, @err_msg)";
       const [results] = await this.db.query(sql, [id]);
       return results;
-    }catch(error : any){
+    } catch (error: any) {
       throw new Error(error.message);
     }
   }
 
-  async getFunctionByUserId(id: string) : Promise<any[]>{
-    try{
+  async getFunctionByUserId(id: string): Promise<any[]> {
+    try {
       const sql = "CALL GetFunctionsByUserId(?, @err_code, @err_msg)";
       const [result] = await this.db.query(sql, [id]);
       return result;
-    }catch(error :any){
+    } catch (error: any) {
       throw new Error(error.message);
     }
   }
 
-  async insertUser(nguoidung : nguoiDung): Promise<any> {
-    try{
-      const sql = 'CALL InsertUser(?,?,?,?,?,?,?,?, @err_code, @err_msg)';
+  async insertUser(nguoidung: nguoiDung): Promise<any> {
+    try {
+      const sql = "CALL InsertUser(?,?,?,?,?,?,?,?, @err_code, @err_msg)";
       await this.db.query(sql, [
         nguoidung.nguoiDungId,
         nguoidung.dongHoId,
@@ -104,12 +114,12 @@ export class nguoiDungReponsitory {
         nguoidung.matKhau,
         nguoidung.hoTen,
         nguoidung.soDienThoai,
-        nguoidung.nguoiTaoId
+        nguoidung.nguoiTaoId,
       ]);
 
       console.log("sql", sql);
       return true;
-    }catch(error : any) {
+    } catch (error: any) {
       throw new Error(error.message);
     }
   }
@@ -129,6 +139,16 @@ export class nguoiDungReponsitory {
       ]);
       return true;
     } catch (error: any) {
+      throw new Error(error.message);
+    }
+  }
+
+  async deleteUser(list_json: any, updated_by_id: string) : Promise<any>{
+    try{
+      const sql = "CALL DeleteUser(?, ?, @err_code, @err_msg)";
+      await this.db.query(sql, [JSON.stringify(list_json), updated_by_id]);
+      return true;
+    }catch(error: any) {
       throw new Error(error.message);
     }
   }
