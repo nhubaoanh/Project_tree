@@ -29,6 +29,8 @@ export type PromiseValue<
 export type ExtractFnReturnType<FnType extends (...args: any) => any> =
   PromiseValue<ReturnType<FnType>>;
 
+
+  // chỉ dùng cho get reac-query có tác dụng khi quản lý trạng thái succcess và error mà ta khong cần quản lý 
 export type QueryConfig<QueryFnType extends (...args: any) => any> = Omit<
   UseQueryOptions<ExtractFnReturnType<QueryFnType>>,
   "queryKey" | "queryFn"

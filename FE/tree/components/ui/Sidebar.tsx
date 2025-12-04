@@ -43,7 +43,7 @@ export default function Sidebar() {
     ];
 
     const menuManager: SidebarItem[] = [
-      { name: "Dashboard", href: "/Overview", icon: "/icon/iconmember.png" },
+      { name: "Dashboard", href: "/dashboard", icon: "/icon/iconmember.png" },
       { name: "Members", href: "/members", icon: "/icon/iconmember.png" },
       { name: "Events", href: "/events", icon: "/icon/calendar.png" },
       {
@@ -54,7 +54,7 @@ export default function Sidebar() {
     ];
 
     const menuUser: SidebarItem[] = [
-      { name: "Dashboard", href: "/Overview", icon: "/icon/iconmember.png" },
+      { name: "Dashboard", href: "/dashboard", icon: "/icon/iconmember.png" },
       { name: "Events", href: "/events", icon: "/icon/calendar.png" },
     ];
 

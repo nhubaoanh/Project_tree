@@ -9,8 +9,6 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import storage from "@/utils/storage";
 import { read } from "fs";
-import { RouteGuard } from "@/components/RouteGuard";
-
 export default function AdminLayout({
   children,
 }: {

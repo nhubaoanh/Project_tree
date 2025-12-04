@@ -132,4 +132,72 @@ export class NguoiDungController {
       res.json({ message: error.message, success: false });
     }
   }
+
+  async insertUser(req: Request, res: Response) : Promise<void> {
+    try {
+      const nguoiDung = req.body as nguoiDung;
+      const results = await this.nguoiDungService.insertUser(nguoiDung);
+      res.json({
+        message : 'Them nguoi dung thanh cong',
+        success : true,
+        data : results
+      })
+    }catch (error: any) {
+      console.log("error",error);
+      res.status(500).json({ message: "Them nguoi dung that bai", success: false });
+    }
+  }
+
+  async updateUser(req: Request, res: Response) : Promise<void> {
+    try {
+      const nguoiDung = req.body as nguoiDung;
+      const results = await this.nguoiDungService.updateUser(nguoiDung);
+      console.log("results", results.data);
+      
+      res.json({
+        message : 'Cap nhat nguoi dung thanh cong',
+        success : true,
+        data : results
+      })
+    }catch (error: any) {
+      console.log("error",error);
+      res.status(500).json({ message: "Cap nhat nguoi dung that bai", success: false });
+    }
+  }
+
+  async checkUser(req: Request, res: Response) : Promise<void> {
+    try{
+      const userName = req.body.userName;
+
+      console.log("uss", userName);
+
+      if(!userName) {
+            res.status(400).json({ message: "userName is required", success: false });
+            return;
+        }
+      const results = await this.nguoiDungService.checkUser(userName);
+      console.log("results", results);
+
+      res.json({
+        message : 'check nguoi dung thanh cong',
+        success : true,
+        exists : results
+      })
+    }catch(error: any){
+      res.status(500).json({ message: "check nguoi dung that bai.", success: false });
+    }
+  }
+
+  async deleteUser(req: Request, res: Response):Promise<void>{
+    try{
+      const object = req.body as {list_json: any; updated_by_id: string};
+      const results = await this.nguoiDungService.deleteUser(object.list_json, object.updated_by_id);
+      console.log("results", results);
+      res.json({message: "Đã xóa thành công.", success: true});
+    }catch(error: any){
+      res.status(500).json({ message: "Xoa nguoi dung that bai.", success: false });
+    }
+  }
+
 }
+    

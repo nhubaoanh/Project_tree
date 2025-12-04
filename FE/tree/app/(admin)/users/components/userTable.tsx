@@ -53,12 +53,24 @@ export const MemberTable: React.FC<MemberTableProps> = ({
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-[#fdf6e3] border-b-2 border-[#d4af37] text-[#8b5e3c] text-sm uppercase font-bold">
-              <th className="p-4 w-12 text-center">#</th>
-              <th className="p-4">Họ và Tên</th>
-              <th className="p-4">Tên Đăng Nhập</th>
-              <th className="p-4 hidden md:table-cell">Email</th>
-              <th className="p-4 hidden md:table-cell">Vai Trò</th>
-              <th className="p-4 text-center">Hành Động</th>
+              {/* Cột cố định nhỏ */}
+              <th className="p-4 w-12 text-center">#</th> 
+              
+              <th className="p-4 text-center min-w-[150px]">Họ và Tên</th>
+              <th className="p-4 text-center min-w-[120px]">Dòng Họ</th>
+              <th className="p-4 text-center hidden md:table-cell min-w-[180px]">Email</th>
+              <th className="p-4 text-center min-w-[120px]">Số điện thoại</th>
+              <th className="p-4 text-center min-w-[150px]">Tên Đăng Nhập</th>
+              {/* <th className="p-4 text-center min-w-[120px]">Mật khẩu</th> */}
+              {/* <th className="p-4 text-center min-w-[120px]">Ảnh đại diện</th> */}
+              
+              {/* Cột Vai Trò cố định để vừa badge */}
+              <th className="p-4 text-center w-32">Vai Trò</th>
+              
+              <th className="p-4 text-center min-w-[120px]">Ngày tạo</th>
+              
+              {/* Cột Hành Động cố định nhỏ */}
+              <th className="p-4 text-center min-w-[120px]">Hành Động</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-[#eaddcf]">
@@ -68,39 +80,58 @@ export const MemberTable: React.FC<MemberTableProps> = ({
                     key={user.nguoiDungId}
                     className="hover:bg-[#fffdf5] transition-colors group"
                   >
-                    <td className="p-4 text-center text-stone-400 font-mono text-xs">
+                    {/* Cột # cố định */}
+                    <td className="p-4 w-12 text-center text-stone-400 font-mono text-xs">
                       {(pageIndex - 1) * pageSize + index + 1}
                     </td>
-                    <td className="p-4 font-bold text-[#5d4037] group-hover:text-[#b91c1c]">
+                    
+                    {/* THAY ĐỔI: Thêm min-w tương ứng, bỏ truncate */}
+                    <td className="p-4 text-center font-bold text-[#5d4037] group-hover:text-[#b91c1c] min-w-[150px]">
                       {user.hoTen}
                     </td>
-                    <td className="p-4 font-mono text-sm text-slate-600">
-                      {user.tenDangNhap}
+                    <td className="p-4 text-center font-bold text-[#5d4037] group-hover:text-[#b91c1c] min-w-[120px]">
+                      {user.tenDongHo}
                     </td>
-                    <td className="p-4 text-stone-500 hidden md:table-cell text-sm">
+                    <td className="p-4 text-center font-bold text-[#5d4037] hidden md:table-cell text-sm min-w-[180px]">
                       {user.email || "-"}
                     </td>
-                    {/* <td className="p-4 hidden md:table-cell">
+                    <td className="p-4 text-center font-bold text-[#5d4037] group-hover:text-[#b91c1c] min-w-[120px]">
+                      {user.soDienThoai}
+                    </td>
+                    <td className="p-4 text-center font-bold text-sm text-[#5d4037] min-w-[150px]">
+                      {user.tenDangNhap}
+                    </td>
+                    {/* <td className="p-4 text-center font-bold text-[#5d4037] group-hover:text-[#b91c1c] min-w-[120px]">
+                      {user.matKhau}
+                    </td> */}
+                    {/* <td className="p-4 text-center font-bold text-[#5d4037] group-hover:text-[#b91c1c] min-w-[120px]">
+                      {user.anhDaiDien}
+                    </td> */}
+                    
+                    {/* Cột Vai Trò cố định */}
+                    <td className="p-4 text-center min-w-[200px] hidden md:table-cell">
                       <span
                         className={`px-3 py-1 rounded-full text-xs font-bold border ${
-                          user.roleId === 1
+                          user.roleCode === "sa"
                             ? "bg-red-100 text-red-800 border-red-200"
-                            : user.roleId === 2
+                            : user.roleCode === "thanhvien"
                             ? "bg-blue-100 text-blue-800 border-blue-200"
                             : "bg-green-100 text-green-800 border-green-200"
                         }`}
                       >
-                        {user.roleId === 1
+                        {user.roleCode === "sa"
                           ? "Quản Trị Viên"
-                          : user.roleId === 2
-                          ? "Thư Ký"
-                          : "Thành Viên"}
+                          : user.roleCode === "thanhvien"
+                          ? "Thành Viên"
+                          : "Thư đồ"}
                       </span>
-                    </td> */}
-                    <td className="p-4 text-center">
-
                     </td>
-                    <td className="p-4 text-center">
+                    <td className="p-4 font-bold text-[#5d4037] group-hover:text-[#b91c1c] min-w-[120px]">
+                      {user.ngayTao ? new Date(user.ngayTao).toLocaleDateString() : 'N/A'}
+                    </td>
+                    
+                    {/* Cột Hành Động cố định */}
+                    <td className="p-4 min-w-[120px] text-center">
                       <div className="flex justify-center gap-2 opacity-80 group-hover:opacity-100 transition-opacity">
                         <button
                           onClick={() => onEdit(user)}
@@ -123,7 +154,7 @@ export const MemberTable: React.FC<MemberTableProps> = ({
               : !isLoading && (
                   <tr>
                     <td
-                      colSpan={7}
+                      colSpan={11}
                       className="p-12 text-center text-stone-500 italic"
                     >
                       <div className="flex flex-col items-center">

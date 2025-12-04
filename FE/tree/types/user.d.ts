@@ -9,7 +9,9 @@ export interface IUser extends IBaseData {
   email: string;
   soDienThoai: string;
   roleId: string;
+  roleCode: string;
   anhDaiDien: string;
+  tenDongHo: string;
   ngayTao: Date | null;
   nguoiTaoId: string;
 }

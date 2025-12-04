@@ -65,7 +65,7 @@ export const MemberTable: React.FC<MemberTableProps> = ({
             {data.length > 0
               ? data.map((user, index) => (
                   <tr
-                    key={user.thanhVienId}
+                    key={index}
                     className="hover:bg-[#fffdf5] transition-colors group"
                   >
                     <td className="p-4 text-center text-stone-400 font-mono text-xs">

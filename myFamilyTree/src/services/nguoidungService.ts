@@ -160,4 +160,24 @@ export class nguoiDungService {
     };
     return data;
   }
+
+  async insertUser(nguoidung: nguoiDung) : Promise<any>{
+    nguoidung.nguoiDungId = uuidv4();
+    nguoidung.tenDangNhap= nguoidung.tenDangNhap.toLowerCase();
+    nguoidung.matKhau = md5(nguoidung.matKhau);
+    return this.nguoidungResponsitory.insertUser(nguoidung);
+  }
+
+  async updateUser(nguoidung: nguoiDung) : Promise<any>{
+    nguoidung.matKhau = md5(nguoidung.matKhau);
+    return this.nguoidungResponsitory.updateUser(nguoidung);
+  }
+
+  async checkUser(userName: string): Promise<any> {
+    return this.nguoidungResponsitory.checkUser(userName);
+  }
+
+  async deleteUser(list_json:any, updated_by_id: string) : Promise<any>{
+    return this.nguoidungResponsitory.deleteUser(list_json, updated_by_id);
+  }
 }

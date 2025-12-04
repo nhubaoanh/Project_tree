@@ -1,12 +1,12 @@
 export interface nguoiDung {
     nguoiDungId: string,
+    roleId: string,
     dongHoId: string,
     tenDangNhap: string,
     matKhau: string,
     hoTen: string,
     email: string,
     soDienThoai: string,
-    vaiTro: string,
     anhDaiDien: string,
     ngayTao: Date,  
     nguoiTaoId: string,
