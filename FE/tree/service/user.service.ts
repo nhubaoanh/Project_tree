@@ -73,7 +73,7 @@ export const deleteUser = async (
   data: string,
 ): Promise<any> => {
   try {
-    const res = await apiClient.post(`${prefix}/search`, data);
+    const res = await apiClient.post(`${prefix}/delete`, {data});
     return res?.data;
   } catch (err) {
     console.error("Lỗi khi lấy dữ liệu người dùng:", err);
@@ -93,3 +93,11 @@ export const resetPasswordUser = async(
   const res = await apiClient?.post(`${prefix}/reset-password`, data);
   return res?.data;
 }
+
+export const checkUsernameExist = async (value: string): Promise<any> => {
+  const res = await apiClient.post(`${prefix}/checkuser`, {
+    userName: value,
+  });
+  console.log("API RAW RESULT:", res);
+  return res.data;
+};

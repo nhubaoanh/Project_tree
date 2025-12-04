@@ -190,6 +190,7 @@ export class NguoiDungController {
     try{
       const object = req.body as {list_json: any; updated_by_id: string};
       const results = await this.nguoiDungService.deleteUser(object.list_json, object.updated_by_id);
+      console.log("results", results);
       res.json({message: "Đã xóa thành công.", success: true});
     }catch(error: any){
       res.status(500).json({ message: "Xoa nguoi dung that bai.", success: false });
