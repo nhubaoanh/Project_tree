@@ -152,6 +152,8 @@ export class NguoiDungController {
     try {
       const nguoiDung = req.body as nguoiDung;
       const results = await this.nguoiDungService.updateUser(nguoiDung);
+      console.log("results", results.data);
+      
       res.json({
         message : 'Cap nhat nguoi dung thanh cong',
         success : true,

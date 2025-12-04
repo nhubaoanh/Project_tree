@@ -11,7 +11,7 @@ export const searchLineage = async(
         const res = await apiClient.post(`${prefix}/search`, data);
         return res?.data;
     } catch (err) {
-        console.error("Lỗi khi lấy dữ liệu người dùng:", err);
+        console.error("Lỗi khi lấy dữ liệu dòng họ:", err);
         return null;
     }
 }

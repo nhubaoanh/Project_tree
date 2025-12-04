@@ -123,7 +123,7 @@ export const MemberTable: React.FC<MemberTableProps> = ({
                           ? "Quản Trị Viên"
                           : user.roleCode === "thanhvien"
                           ? "Thành Viên"
-                          : "Thư ký"}
+                          : "Thư đồ"}
                       </span>
                     </td>
                     <td className="p-4 font-bold text-[#5d4037] group-hover:text-[#b91c1c] min-w-[120px]">

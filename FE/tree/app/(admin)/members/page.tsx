@@ -8,19 +8,10 @@ import {
   useQueryClient,
   keepPreviousData,
 } from "@tanstack/react-query";
-import { toast } from "react-hot-toast";
-
-import { IUser, IUserSearch } from "@/types/user";
-import {
-  getUsers,
-  createUser,
-  updateUser,
-  deleteUser,
-} from "@/service/user.service";
-import { MemberTable } from "./components/memberTable";
 import { IMember } from "@/types/member";
-// import { UserModal } from "./components/memberModal";
-// import { ConfirmDeleteModal } from "./components/memberDelete";
+import { useToast } from "@/service/useToas";
+import { MemberTable } from "./components/memberTable";
+import { getMembers } from "@/service/member.service";
 
 // --- MAIN PAGE COMPONENT ---
 
@@ -40,76 +31,90 @@ export default function QuanLyThanhVienPage() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<IMember | null>(null);
 
-  // --- DEBOUNCE SEARCH ---
-  React.useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearch(searchTerm);
-      setPageIndex(1); // Reset to page 1 on new search
-    }, 500);
-    return () => clearTimeout(timer);
-  }, [searchTerm]);
+  const {showSuccess, showError} = useToast();
+
+  // // --- DEBOUNCE SEARCH ---
+  // React.useEffect(() => {
+  //   const timer = setTimeout(() => {
+  //     setDebouncedSearch(searchTerm);
+  //     setPageIndex(1); // Reset to page 1 on new search
+  //   }, 500);
+  //   return () => clearTimeout(timer);
+  // }, [searchTerm]);
 
   // --- FETCHING DATA ---
-  const searchParams: IUserSearch = {
-    pageIndex,
-    pageSize,
-    search_content: debouncedSearch,
-  };
+  // const searchParams: IUserSearch = {
+  //   pageIndex,
+  //   pageSize,
+  //   search_content: debouncedSearch,
+  // };
 
-  const usersQuery = useQuery({
-    queryKey: ["users", searchParams],
-    queryFn: () => getUsers(searchParams),
-    placeholderData: keepPreviousData,
-  });
+  const memberQuery = useQuery({
+    queryKey: ["member"],
+    queryFn: () => getMembers(),
+  })
 
-  const userData = usersQuery.data?.data || [];
-  const totalRecords = usersQuery.data?.totalItems || 0;
-  const totalPages = usersQuery.data?.pageCount || 0;
-  const isLoading = usersQuery.isLoading;
+  const memberData = memberQuery.data?.data[0] || [];
 
-  console.log("userData", userData);
-  console.log("totalRecords", totalRecords);
-  console.log("totalPages", totalPages);
-  console.log("loading", isLoading);
+  console.log("memberData", memberData);
+  const totalRecords = memberQuery.data?.totalItems || 0;
+  const totalPages = memberQuery.data?.pageCount || 0;
+  const isLoading = memberQuery.isLoading;
+
+  // const usersQuery = useQuery({
+  //   queryKey: ["users", searchParams],
+  //   queryFn: () => getUsers(searchParams),
+  //   placeholderData: keepPreviousData,
+  // });
+
+  // const userData = usersQuery.data?.data || [];
+  // const totalRecords = usersQuery.data?.totalItems || 0;
+  // const totalPages = usersQuery.data?.pageCount || 0;
+  // const isLoading = usersQuery.isLoading;
+
 
   // --- MUTATIONS - CRUD ---
-  const createMutation = useMutation({
-    mutationFn: createUser,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["users"] });
-      toast.success("Thêm thành viên thành công!");
-      setIsModalOpen(false);
-    },
-    onError: () => {
-      toast.error("Có lỗi xảy ra khi thêm thành viên.");
-    },
-  });
+  // const createMutation = useMutation({
+  //   mutationFn: createUser,
+  //   onSuccess: () => {
+  //     queryClient.invalidateQueries({ queryKey: ["users"] });
+  //     // toast.success("Thêm thành viên thành công!");
+  //     showSuccess("Thêm thành viên thành công!");
+  //     setIsModalOpen(false);
+  //   },
+  //   onError: () => {
+  //     // toast.error("Có lỗi xảy ra khi thêm thành viên.");
+  //     showError("Có lỗi xảy ra khi thêm thành viên.");
+  //   },
+  // });
 
-  const updateMutation = useMutation({
-    mutationFn: (vars: { id: string; user: Partial<IUser> }) =>
-      updateUser(vars.id, vars.user),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["users"] });
-      toast.success("Cập nhật thông tin thành công!");
-      setIsModalOpen(false);
-    },
-    onError: () => {
-      toast.error("Có lỗi xảy ra khi cập nhật.");
-    },
-  });
+  // const updateMutation = useMutation({
+  //   mutationFn: (vars: { id: string; user: Partial<IUser> }) =>
+  //     updateUser(vars.id, vars.user),
+  //   onSuccess: () => {
+  //     queryClient.invalidateQueries({ queryKey: ["users"] });
+  //     // toast.success("Cập nhật thông tin thành công!");
+  //     showSuccess("Cập nhật thông tin thành công!")
+  //     setIsModalOpen(false);
+  //   },
+  //   onError: () => {
+  //     // toast.error("Có lỗi xảy ra khi cập nhật.");
+  //     showError("Có lỗi xảy ra khi cập nhật.");
+  //   },
+  // });
 
-  const deleteMutation = useMutation({
-    mutationFn: deleteUser,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["users"] });
-      toast.success("Đã xóa thành viên.");
-      setIsDeleteModalOpen(false);
-      setUserToDelete(null);
-    },
-    onError: () => {
-      toast.error("Không thể xóa thành viên này.");
-    },
-  });
+  // const deleteMutation = useMutation({
+  //   mutationFn: deleteUser,
+  //   onSuccess: () => {
+  //     queryClient.invalidateQueries({ queryKey: ["users"] });
+  //     toast.success("Đã xóa thành viên.");
+  //     setIsDeleteModalOpen(false);
+  //     setUserToDelete(null);
+  //   },
+  //   onError: () => {
+  //     toast.error("Không thể xóa thành viên này.");
+  //   },
+  // });
 
   // --- EVENT HANDLERS ---
 
@@ -128,19 +133,19 @@ export default function QuanLyThanhVienPage() {
     setIsDeleteModalOpen(true);
   };
 
-  const handleConfirmDelete = () => {
-    if (userToDelete) {
-      deleteMutation.mutate(userToDelete.thanhVienId);
-    }
-  };
+  // const handleConfirmDelete = () => {
+  //   if (userToDelete) {
+  //     deleteMutation.mutate(userToDelete.nguoiDungId);
+  //   }
+  // };
 
-  const handleSaveUser = (user: Partial<IUser>) => {
-    if (editingUser) {
-      updateMutation.mutate({ id: editingUser.thanhVienId, user });
-    } else {
-      createMutation.mutate(user);
-    }
-  };
+  // const handleSaveUser = (user: Partial<IUser>) => {
+  //   if (editingUser) {
+  //     updateMutation.mutate({ id: editingUser.nguoiDungId, user });
+  //   } else {
+  //     createMutation.mutate(user);
+  //   }
+  // };
 
   const handlePageSizeChange = (newSize: number) => {
     setPageSize(newSize);
@@ -149,55 +154,55 @@ export default function QuanLyThanhVienPage() {
 
   // --- EXCEL HANDLERS ---
 
-  const handleExportExcel = () => {
-    if (userData.length === 0) {
-      toast("Không có dữ liệu để xuất");
-      return;
-    }
-    const worksheet = XLSX.utils.json_to_sheet(userData);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "DanhSachThanhVien");
-    XLSX.writeFile(workbook, `DanhSachThanhVien_Trang${pageIndex}.xlsx`);
-  };
+  // const handleExportExcel = () => {
+  //   if (userData.length === 0) {
+  //     toast("Không có dữ liệu để xuất");
+  //     return;
+  //   }
+  //   const worksheet = XLSX.utils.json_to_sheet(userData);
+  //   const workbook = XLSX.utils.book_new();
+  //   XLSX.utils.book_append_sheet(workbook, worksheet, "DanhSachThanhVien");
+  //   XLSX.writeFile(workbook, `DanhSachThanhVien_Trang${pageIndex}.xlsx`);
+  // };
 
-  const handleImportExcel = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (evt) => {
-        const bstr = evt.target?.result;
-        const wb = XLSX.read(bstr, { type: "binary" });
-        const wsname = wb.SheetNames[0];
-        const ws = wb.Sheets[wsname];
-        const dataParsed = XLSX.utils.sheet_to_json(ws) as IUser[];
+  // const handleImportExcel = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const file = e.target.files?.[0];
+  //   if (file) {
+  //     const reader = new FileReader();
+  //     reader.onload = (evt) => {
+  //       const bstr = evt.target?.result;
+  //       const wb = XLSX.read(bstr, { type: "binary" });
+  //       const wsname = wb.SheetNames[0];
+  //       const ws = wb.Sheets[wsname];
+  //       const dataParsed = XLSX.utils.sheet_to_json(ws) as IUser[];
 
-        console.log("Imported Data:", dataParsed);
+  //       console.log("Imported Data:", dataParsed);
 
-        if (dataParsed.length > 0) {
-          let successCount = 0;
-          const promises = dataParsed.map(async (u) => {
-            try {
-              const res = await createUser(u);
-              console.log("Import result:", res);
-              successCount++;
-            } catch (err) {
-              console.error("Import error for row", u);
-            }
-          });
+  //       if (dataParsed.length > 0) {
+  //         let successCount = 0;
+  //         const promises = dataParsed.map(async (u) => {
+  //           try {
+  //             const res = await createUser(u);
+  //             console.log("Import result:", res);
+  //             successCount++;
+  //           } catch (err) {
+  //             console.error("Import error for row", u);
+  //           }
+  //         });
 
-          Promise.all(promises).then(() => {
-            queryClient.invalidateQueries({ queryKey: ["users"] });
-            toast.success(`Đã xử lý nhập ${dataParsed.length} dòng.`);
-            if (fileInputRef.current) fileInputRef.current.value = "";
-          });
-        }
-      };
-      reader.readAsBinaryString(file);
-    }
-  };
+  //         Promise.all(promises).then(() => {
+  //           queryClient.invalidateQueries({ queryKey: ["users"] });
+  //           toast.success(`Đã xử lý nhập ${dataParsed.length} dòng.`);
+  //           if (fileInputRef.current) fileInputRef.current.value = "";
+  //         });
+  //       }
+  //     };
+  //     reader.readAsBinaryString(file);
+  //   }
+  // };
 
-  const isSaving = createMutation.isPending || updateMutation.isPending;
-  const isDeleting = deleteMutation.isPending;
+  // const isSaving = createMutation.isPending || updateMutation.isPending;
+  // const isDeleting = deleteMutation.isPending;
 
   // --- RENDER UI ---
   return (
@@ -215,7 +220,7 @@ export default function QuanLyThanhVienPage() {
 
         <div className="flex gap-2 flex-wrap justify-end">
           <button
-            onClick={handleExportExcel}
+            // onClick={handleExportExcel}
             className="flex items-center gap-2 px-4 py-2 bg-[#2c5282] text-white rounded shadow hover:bg-[#2a4365] transition-all text-sm font-bold"
           >
             <Download size={16} />{" "}
@@ -231,7 +236,7 @@ export default function QuanLyThanhVienPage() {
               ref={fileInputRef}
               type="file"
               accept=".xlsx, .xls"
-              onChange={handleImportExcel}
+              // onChange={handleImportExcel}
               className="absolute inset-0 opacity-0 cursor-pointer"
             />
           </button>
@@ -248,11 +253,11 @@ export default function QuanLyThanhVienPage() {
       {/* Search Bar */}
       <div className="mb-6 flex items-center bg-white border border-[#d4af37] rounded-lg p-1 shadow-sm w-full md:w-1/2 transition-all focus-within:ring-2 ring-[#d4af37]/50">
         <div className="p-2 text-stone-400">
-          {isLoading ? (
+          {/* {isLoading ? (
             <Loader2 className="animate-spin" size={20} />
           ) : (
             <Search size={20} />
-          )}
+          )} */}
         </div>
         <input
           value={searchTerm}
@@ -272,7 +277,7 @@ export default function QuanLyThanhVienPage() {
 
       {/* Table Component */}
       <MemberTable
-        data={userData}
+        data={memberData}
         isLoading={isLoading}
         pageIndex={pageIndex}
         pageSize={pageSize}
@@ -284,8 +289,7 @@ export default function QuanLyThanhVienPage() {
         onDelete={handleDeleteClick}
       />
 
-      {/* Modals */}
-      {/* <UserModal
+      {/*<UserModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSubmit={handleSaveUser}
@@ -302,8 +306,5 @@ export default function QuanLyThanhVienPage() {
       /> */}
     </div>
   );
-}
+};
 
-
-
-   

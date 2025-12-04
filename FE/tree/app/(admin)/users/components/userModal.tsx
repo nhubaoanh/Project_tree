@@ -27,9 +27,12 @@ export const UserModal: React.FC<UserModalProps> = ({
   const [checking, setChecking] = useState(false);
   const [usernameError, setUsernameError] = useState<string | null>(null);
 
-const handleCheckUsername = async (value: string) => {
-  console.log("CHECK USERNAME RUN WITH:", value); 
-  if (!value) return;
+const handleCheckUsername = async (value: string, currentUsername?: string) => {
+  // console.log("CHECK USERNAME RUN WITH:", value);
+  if (currentUsername && value === currentUsername) {
+    setUsernameError(null); // Đảm bảo lỗi cũ được xóa nếu người dùng quay lại tên cũ
+    return;
+  }
 
   try {
     setChecking(true);
@@ -72,25 +75,26 @@ const handleCheckUsername = async (value: string) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const form = new FormData(e.target as HTMLFormElement);
-
+    const newUsername = form.get("tenDangNhap");
     if (checking) {
       showError("Đang kiểm tra tên đăng nhập...");
       return;
     }
-    if (usernameError) {
+
+    if (usernameError && newUsername !== initialData?.tenDangNhap) {
       showError("Không thể lưu: Tên đăng nhập đã tồn tại");
       return;
     }
 
     const user: any = {
       hoTen: form.get("hoTen"),
-      tenDangNhap: form.get("tenDangNhap"),
+      tenDangNhap: form.get("tenDangNhap"), 
       email: form.get("email"),
       soDienThoai: form.get("soDienThoai"),
 
       // Fallback giữ nguyên giá trị cũ khi EDIT
-      dongHoId: Number(form.get("dongHoId")) || Number(initialData?.dongHoId),
-      roleId: Number(form.get("roleId")) || Number(initialData?.roleId),
+      dongHoId: (form.get("dongHoId")),
+      roleId: (form.get("roleId")),
 
 
       matKhau: form.get("matKhau"),
@@ -98,48 +102,11 @@ const handleCheckUsername = async (value: string) => {
       nguoiTaoId: initialData?.nguoiTaoId,
     };
 
+    console.log("user", user);
     onSubmit(user);
     showSuccess("Lưu thông tin thành công");
   };
 
-  // const handleSubmit = async (e: React.FormEvent) => {
-  //   e.preventDefault();
-  //   const form = new FormData(e.target as HTMLFormElement);
-
-  //   const username = form.get("tenDangNhap") as string;
-
-  //   // Nếu đang ADD → kiểm tra lại username khi submit
-  //   if (!initialData) {
-  //     const check = await checkUsernameExist(username);
-
-  //     if (check?.exists === 1 || check?.exists === true) {
-  //       showError("Không thể lưu: Tên đăng nhập đã tồn tại!");
-  //       setUsernameError("Tên đăng nhập đã tồn tại!");
-  //       return; // ⛔ NGĂN SUBMIT
-  //     }
-  //   }
-
-  //   // Nếu đã blur trước đó và có lỗi → cũng chặn
-  //   if (usernameError) {
-  //     showError("Không thể lưu: Tên đăng nhập đã tồn tại!");
-  //     return; // ⛔ NGĂN SUBMIT
-  //   }
-
-  //   const user: any = {
-  //     hoTen: form.get("hoTen"),
-  //     tenDangNhap: username,
-  //     email: form.get("email"),
-  //     soDienThoai: form.get("soDienThoai"),
-  //     dongHoId: Number(form.get("dongHoId")) || Number(initialData?.dongHoId),
-  //     roleId: Number(form.get("roleId")) || Number(initialData?.roleId),
-  //     matKhau: form.get("matKhau"),
-  //     nguoiDungId: initialData?.nguoiDungId,
-  //     nguoiTaoId: initialData?.nguoiTaoId,
-  //   };
-
-  //   onSubmit(user);
-  //   showSuccess("Lưu thông tin thành công");
-  // };
 
 
   return (
@@ -186,23 +153,14 @@ const handleCheckUsername = async (value: string) => {
               optionValue="dongHoId"
             />
 
-            {/* Username */}
-            {/* <InputField
-              label="Tên đăng nhập"
-              name="tenDangNhap"
-              required
-              readOnly={!!initialData}
-              defaultValue={initialData?.tenDangNhap}
-            /> */}
-
             <InputField
               label="Tên đăng nhập"
               name="tenDangNhap"
               required
-              readOnly={!!initialData}
+              // readOnly={!!initialData}
               defaultValue={initialData?.tenDangNhap}
               onBlur={(e: React.FocusEvent<HTMLInputElement>) =>
-                handleCheckUsername(e.target.value)
+                handleCheckUsername(e.target.value, initialData?.tenDangNhap)
               }
             />
 
@@ -218,7 +176,7 @@ const handleCheckUsername = async (value: string) => {
               label="Mật khẩu"
               name="matKhau"
               required
-              readOnly={!!initialData}
+              // readOnly={!!initialData}
               defaultValue={initialData?.matKhau}
             />
 
