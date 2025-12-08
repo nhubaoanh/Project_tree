@@ -73,13 +73,36 @@ export class thanhVienRespository {
     await this.db.query(sql, [voId, chongId, thanhVienId]);
   }
 
-  async getAllThanhVien() : Promise<any>{
-    try{
+  async getAllThanhVien(): Promise<any> {
+    try {
       const sql = "CALL getAllMember(@err_code, @err_msg)";
       const result = await this.db.query(sql, []);
       return result;
-    }catch(error : any){
+    } catch (error: any) {
       throw new Error(error.message);
+    }
+  }
+
+  async searchThanhVien(
+    pageIndex: number,
+    pageSize: number,
+    search_content: string,
+    dongHoId: string,
+    thanhVienId: number
+  ): Promise<any[]> {
+    try {
+      const sql = "CALL SearchThanhVien(?,?,?,?,?, @err_code, @err_msg)";
+      const [result] = await this.db.query(sql, [
+        pageIndex,
+        pageSize,
+        search_content || null,
+        dongHoId || null,
+        thanhVienId || null,
+      ]);
+
+      return result;
+    } catch (error: any) {
+      throw new Error(error);
     }
   }
 }

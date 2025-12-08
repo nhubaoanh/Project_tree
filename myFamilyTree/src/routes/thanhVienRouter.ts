@@ -8,13 +8,14 @@ thanhVienRouter.use((req, res, next) => {
     next();
 });
 
-const thanhvienController = container.resolve(thanhVienController);
+const thanhviencontroller = container.resolve(thanhVienController);
 
-thanhVienRouter.get("/getAllMember", thanhvienController.getAllThanhVien.bind(thanhvienController));
-thanhVienRouter.post("/create", thanhvienController.createThanhVien.bind(thanhvienController));
+thanhVienRouter.get("/getAllMember", thanhviencontroller.getAllThanhVien.bind(thanhviencontroller));
+thanhVienRouter.post("/create", thanhviencontroller.createThanhVien.bind(thanhviencontroller));
 thanhVienRouter.post(
   "/createMultiple",
-  thanhvienController.createMultipleThanhVien.bind(thanhvienController)
+  thanhviencontroller.createMultipleThanhVien.bind(thanhviencontroller)
 );
+thanhVienRouter.post('/search', thanhviencontroller.searchThanhVien.bind(thanhviencontroller));
 
 export default thanhVienRouter;

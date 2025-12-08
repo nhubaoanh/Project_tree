@@ -18,4 +18,20 @@ export class thanhVienService {
   async getAllThanhVien(): Promise<any> {
     return await this.thanhvienRespository.getAllThanhVien();
   }
+
+  async searchThanhVien(
+    pageIndex: number,
+    pageSize: number,
+    search_content: string,
+    dongHoId: string,
+    thanhVienId: number
+  ): Promise<any> {
+    return await this.thanhvienRespository.searchThanhVien(
+      pageIndex,
+      pageSize,
+      search_content,
+      dongHoId,
+      thanhVienId
+    );
+  }
 }

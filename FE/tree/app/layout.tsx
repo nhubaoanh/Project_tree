@@ -9,10 +9,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="bg-[#FCF9E3] h-screen">
-        <ToastProvider>
-          {children}
-        </ToastProvider>
+      <body className="bg-[#FCF9E3] h-screen family-tree-title">
+        <ToastProvider>{children}</ToastProvider>
       </body>
     </html>
   );
