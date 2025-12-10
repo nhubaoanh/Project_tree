@@ -105,5 +105,87 @@ export class thanhVienRespository {
       throw new Error(error);
     }
   }
+
+  // async importFromExcel(thanhViens: any[]): Promise<number> {
+  //   try {
+  //     // Sử dụng transaction để đảm bảo tính toàn vẹn dữ liệu
+  //     // await this.db.beginTransaction();
+
+  //     let successCount = 0;
+
+  //     for (const tv of thanhViens) {
+  //       try {
+  //         await this.createThanhVien({
+  //           ...tv,
+  //           voId: null,  // Xử lý sau
+  //           chongId: null // Xử lý sau
+  //         });
+  //         successCount++;
+  //       } catch (error) {
+  //         console.error(`Lỗi khi thêm thành viên ${tv.hoTen}:`, error);
+  //         // Bỏ qua lỗi và tiếp tục với thành viên tiếp theo
+  //       }
+  //     }
+
+  //     // await this.db.commit();
+  //     return successCount;
+  //   } catch (error) {
+  //     // await this.db.rollback();
+  //     throw error;
+  //   }
+  // }
+  // Trong thanhVienRespository.ts:
+
+  async importFromExcel(thanhViens: any[]): Promise<number> {
+    const membersToUpdate = []; // Dùng để lưu voId/chongId
+    let successCount = 0;
+
+    // --- 1. THÊM TẤT CẢ THÀNH VIÊN (Kể cả cha mẹ) ---
+    for (const tv of thanhViens) {
+      try {
+        const originalVoId = tv.voId;
+        const originalChongId = tv.chongId;
+
+        await this.createThanhVien({
+          ...tv,
+          // GIỮ NGUYÊN chaId và meId (đã được sắp xếp)
+          voId: null, // BẮT BUỘC NULL cho Vợ/Chồng lần đầu
+          chongId: null, // BẮT BUỘC NULL cho Vợ/Chồng lần đầu
+        });
+
+        // Lưu lại Vợ/Chồng để cập nhật sau
+        membersToUpdate.push({
+          thanhVienId: tv.thanhVienId,
+          voId: originalVoId,
+          chongId: originalChongId,
+        });
+
+        successCount++;
+      } catch (error) {
+        console.error(`Lỗi khi thêm thành viên ${tv.hoTen}:`, error);
+        // Bỏ qua lỗi và tiếp tục
+      }
+    }
+
+    // --- 2. CẬP NHẬT LẠI ID VỢ/CHỒNG ---
+    for (const member of membersToUpdate) {
+      if (member.voId || member.chongId) {
+        try {
+          await this.updateVoChong(
+            member.thanhVienId,
+            member.voId,
+            member.chongId
+          );
+        } catch (error) {
+          console.error(
+            `Lỗi khi cập nhật quan hệ Vợ/Chồng cho ID ${member.thanhVienId}:`,
+            error
+          );
+        }
+      }
+    }
+
+    return successCount;
+  }
 }
 

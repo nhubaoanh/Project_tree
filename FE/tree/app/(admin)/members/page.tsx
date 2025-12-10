@@ -8,10 +8,12 @@ import {
   useQueryClient,
   keepPreviousData,
 } from "@tanstack/react-query";
-import { IMember } from "@/types/member";
+import { IMember, IMemberSearch } from "@/types/member";
 import { useToast } from "@/service/useToas";
 import { MemberTable } from "./components/memberTable";
-import { getMembers } from "@/service/member.service";
+import { getMembers, importExcel, searchMember } from "@/service/member.service";
+import toast from "react-hot-toast";
+import { ExcelTemplateButton } from "./components/ExcelTemplateButton";
 
 // --- MAIN PAGE COMPONENT ---
 
@@ -31,46 +33,36 @@ export default function QuanLyThanhVienPage() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<IMember | null>(null);
 
-  const {showSuccess, showError} = useToast();
+  const { showSuccess, showError } = useToast();
 
-  // // --- DEBOUNCE SEARCH ---
-  // React.useEffect(() => {
-  //   const timer = setTimeout(() => {
-  //     setDebouncedSearch(searchTerm);
-  //     setPageIndex(1); // Reset to page 1 on new search
-  //   }, 500);
-  //   return () => clearTimeout(timer);
-  // }, [searchTerm]);
+  // --- DEBOUNCE SEARCH ---
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchTerm);
+      setPageIndex(1); // Reset to page 1 on new search
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
 
-  // --- FETCHING DATA ---
-  // const searchParams: IUserSearch = {
-  //   pageIndex,
-  //   pageSize,
-  //   search_content: debouncedSearch,
-  // };
+  // // --- FETCHING DATA ---
+  const searchParams: IMemberSearch = {
+    pageIndex,
+    pageSize,
+    search_content: debouncedSearch,
+  };
 
   const memberQuery = useQuery({
-    queryKey: ["member"],
-    queryFn: () => getMembers(),
-  })
+    queryKey: ["member", searchParams],
+    queryFn: () => searchMember(searchParams),
+    placeholderData: keepPreviousData,
+  });
 
-  const memberData = memberQuery.data?.data[0] || [];
-
+  const memberData = memberQuery.data?.data || [];
+  // showSuccess("lay du lieu len thanh cong!")
   console.log("memberData", memberData);
   const totalRecords = memberQuery.data?.totalItems || 0;
   const totalPages = memberQuery.data?.pageCount || 0;
   const isLoading = memberQuery.isLoading;
-
-  // const usersQuery = useQuery({
-  //   queryKey: ["users", searchParams],
-  //   queryFn: () => getUsers(searchParams),
-  //   placeholderData: keepPreviousData,
-  // });
-
-  // const userData = usersQuery.data?.data || [];
-  // const totalRecords = usersQuery.data?.totalItems || 0;
-  // const totalPages = usersQuery.data?.pageCount || 0;
-  // const isLoading = usersQuery.isLoading;
 
 
   // --- MUTATIONS - CRUD ---
@@ -154,16 +146,51 @@ export default function QuanLyThanhVienPage() {
 
   // --- EXCEL HANDLERS ---
 
-  // const handleExportExcel = () => {
-  //   if (userData.length === 0) {
-  //     toast("Không có dữ liệu để xuất");
-  //     return;
-  //   }
-  //   const worksheet = XLSX.utils.json_to_sheet(userData);
-  //   const workbook = XLSX.utils.book_new();
-  //   XLSX.utils.book_append_sheet(workbook, worksheet, "DanhSachThanhVien");
-  //   XLSX.writeFile(workbook, `DanhSachThanhVien_Trang${pageIndex}.xlsx`);
-  // };
+  const handleExportExcel = () => {
+    if (memberData.length === 0) {
+      showError("Không có dữ liệu để xuất");
+      return;
+    }
+    const worksheet = XLSX.utils.json_to_sheet(memberData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "DanhSachThanhVien");
+    XLSX.writeFile(workbook, `DanhSachThanhVien_Trang${pageIndex}.xlsx`);
+  };
+
+  const handleImportExcel = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    console.log("file", file)
+    if (!file) {
+      alert("Vui lòng chọn file Excel");
+      return;
+    }
+
+    try {
+      // Kiểm tra định dạng file
+      if (!file.name.match(/\.(xlsx|xls)$/)) {
+        alert('Vui lòng chọn file Excel (.xlsx hoặc .xls)');
+        return;
+      }
+
+      // Gọi API import
+      const result = await importExcel(file);
+      console.log('Import thành công:', result);
+
+      // Hiển thị thông báo thành công
+      alert('Nhập dữ liệu thành công!');
+
+      // Làm mới dữ liệu nếu cần
+      // await fetchData();
+
+      // Reset input file
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    } catch (error) {
+      console.error('Lỗi khi import file:', error);
+      alert('Có lỗi xảy ra khi nhập dữ liệu. Vui lòng thử lại.');
+    }
+  };
 
   // const handleImportExcel = (e: React.ChangeEvent<HTMLInputElement>) => {
   //   const file = e.target.files?.[0];
@@ -204,9 +231,34 @@ export default function QuanLyThanhVienPage() {
   // const isSaving = createMutation.isPending || updateMutation.isPending;
   // const isDeleting = deleteMutation.isPending;
 
+  // Handle loading state
+  if (memberQuery.isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#d4af37]"></div>
+      </div>
+    );
+  }
+
+  // Handle error state
+  if (memberQuery.isError) {
+    return (
+      <div className="p-4 mb-4 text-red-600 bg-red-100 rounded flex justify-between items-center">
+        <span>Lỗi khi tải dữ liệu. Vui lòng thử lại sau.</span>
+        <button
+          onClick={() => memberQuery.refetch()}
+          className="px-3 py-1 bg-[#d4af37] text-white rounded hover:bg-[#b8962a]"
+        >
+          Thử lại
+        </button>
+      </div>
+    );
+  }
+
+
   // --- RENDER UI ---
   return (
-    <div className="max-w-6xl mx-auto font-serif text-[#4a4a4a] pb-20 animate-fadeIn">
+    <div className="max-w-6xl mx-auto font-dancing text-[#4a4a4a] pb-20 animate-fadeIn">
       {/* Header & Toolbar */}
       <div className="flex flex-col md:flex-row justify-between items-end md:items-center mb-8 gap-4 border-b border-[#d4af37] pb-4">
         <div>
@@ -226,6 +278,7 @@ export default function QuanLyThanhVienPage() {
             <Download size={16} />{" "}
             <span className="hidden sm:inline">Xuất Excel</span>
           </button>
+          <ExcelTemplateButton />
           <button
             onClick={() => fileInputRef.current?.click()}
             className="flex items-center gap-2 px-4 py-2 bg-[#276749] text-white rounded shadow hover:bg-[#22543d] transition-all text-sm font-bold relative overflow-hidden"
@@ -236,7 +289,7 @@ export default function QuanLyThanhVienPage() {
               ref={fileInputRef}
               type="file"
               accept=".xlsx, .xls"
-              // onChange={handleImportExcel}
+              onChange={handleImportExcel}
               className="absolute inset-0 opacity-0 cursor-pointer"
             />
           </button>
@@ -253,11 +306,11 @@ export default function QuanLyThanhVienPage() {
       {/* Search Bar */}
       <div className="mb-6 flex items-center bg-white border border-[#d4af37] rounded-lg p-1 shadow-sm w-full md:w-1/2 transition-all focus-within:ring-2 ring-[#d4af37]/50">
         <div className="p-2 text-stone-400">
-          {/* {isLoading ? (
+          {isLoading ? (
             <Loader2 className="animate-spin" size={20} />
           ) : (
             <Search size={20} />
-          )} */}
+          )}
         </div>
         <input
           value={searchTerm}

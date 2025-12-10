@@ -34,7 +34,7 @@ export default function App() {
 
 
   return (
-    <div className="flex flex-col h-screen w-full bg-stone-100 font-serif overflow-hidden">
+    <div className="flex flex-col h-screen w-full bg-stone-100 font-dancing overflow-hidden">
       {/* HEADER */}
       <div className="flex-none z-50 shadow-md relative">
         <Header activeView={activeView} onNavigate={setActiveView} />

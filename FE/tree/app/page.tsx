@@ -47,7 +47,7 @@ export default function Home() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#fdf6e3] font-serif text-[#4a4a4a] relative selection:bg-[#b91c1c] selection:text-white">
+    <div className="min-h-screen bg-[#fdf6e3] font-italianno  text-[#4a4a4a] relative selection:bg-[#b91c1c] selection:text-white">
       {/* Họa tiết nền chìm */}
       <div
         className="fixed inset-0 pointer-events-none opacity-10 z-0"

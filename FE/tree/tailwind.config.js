@@ -10,25 +10,10 @@ module.exports = {
       ringColor: {
         ring: "var(--ring)",
       },
-    },
-  },
-  theme: {
-    fontFamily: {
-      sans: [
-        "system-ui",
-        "-apple-system",
-        "Segoe UI",
-        "Roboto",
-        "Helvetica Neue",
-        "Arial",
-        "Noto Sans",
-        "Liberation Sans",
-        "sans-serif",
-        "Apple Color Emoji",
-        "Segoe UI Emoji",
-        "Segoe UI Symbol",
-        "Noto Color Emoji",
-      ],
+      fontFamily: {
+        // sans: ['var(--font-dancing)', 'cursive'],
+        allura: ["var(--font-allura)", "cursive"],
+      },
     },
   },
   plugins: [require("tailwindcss-animate")],
