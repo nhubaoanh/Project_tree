@@ -19,11 +19,17 @@ export const MyFamilyTree = ({ data }: { data: ITreeNode[] }) => {
       pids: node.pids ?? [],
       fid: node.fid,
       mid: node.mid,
+    //   id: node.thanhVienId,
+    //   pids: node.voId || node.chongId 
+    // ? [node.voId || node.chongId] 
+    // : [],
+    //   fid: node.chaId,
+    //   mid: node.meId,
 
       // Dữ liệu hiển thị
       field_0: node.hoTen || "Chưa rõ",
-      field_1: node.ngaySinh
-        ? new Date(node.ngaySinh).toLocaleDateString("vi-VN")
+      field_1: node.ngayMat
+        ? new Date(node.ngayMat).toLocaleDateString("vi-VN")
         : "Chưa rõ",
       field_2: node.ngheNghiep || "Chưa rõ",
       img_0: node.anhChanDung

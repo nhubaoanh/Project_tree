@@ -31,7 +31,7 @@ export default function Sidebar() {
       { name: "Dashboard", href: "/dashboard", icon: "/icon/iconmember.png" },
       { name: "Members", href: "/members", icon: "/icon/iconmember.png" },
       { name: "Genealogy", href: "/genealogy", icon: "/icon/pen.png" },
-      { name: "Events", href: "/events", icon: "/icon/calendar.png" },
+      { name: "Events", href: "/manageEvents", icon: "/icon/calendar.png" },
       { name: "Notifications", href: "/notifications", icon: "/icon/bell.png" },
       {
         name: "Contributions",
@@ -45,7 +45,7 @@ export default function Sidebar() {
     const menuManager: SidebarItem[] = [
       { name: "Dashboard", href: "/dashboard", icon: "/icon/iconmember.png" },
       { name: "Members", href: "/members", icon: "/icon/iconmember.png" },
-      { name: "Events", href: "/events", icon: "/icon/calendar.png" },
+      { name: "Events", href: "/manageEvents", icon: "/icon/calendar.png" },
       {
         name: "Contributions",
         href: "/contributions",
@@ -55,7 +55,7 @@ export default function Sidebar() {
 
     const menuUser: SidebarItem[] = [
       { name: "Dashboard", href: "/dashboard", icon: "/icon/iconmember.png" },
-      { name: "Events", href: "/events", icon: "/icon/calendar.png" },
+      { name: "Events", href: "/manageEvents", icon: "/icon/calendar.png" },
     ];
 
     // ================================

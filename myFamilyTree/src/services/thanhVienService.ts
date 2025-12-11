@@ -16,6 +16,10 @@ export class thanhVienService {
     return await this.thanhvienRespository.createMultipleThanhVien(thanhViens);
   }
 
+  async updateMultipleThanhVien(thanhVien: thanhVien): Promise<any> {
+    return await this.thanhvienRespository.updateMultipleThanhVien(thanhVien);
+  }
+
   async getAllThanhVien(): Promise<any> {
     return await this.thanhvienRespository.getAllThanhVien();
   }
@@ -85,6 +89,10 @@ export class thanhVienService {
 
       // In the mapping section:
       const thanhViens = data.map((row: any) => {
+        const gioiTinh = toIntOrNull(row["Giới tính"]);
+        const importedVoId = toIntOrNull(row["ID Vợ"]);
+        const importedChongId = toIntOrNull(row["ID Chồng"]);
+
         const item = {
           thanhVienId: toIntOrNull(row["STT"]),
           hoTen: row["Họ và tên"] || "",
@@ -100,13 +108,16 @@ export class thanhVienService {
           doiThuoc: toIntOrNull(row["Đời thứ"], 1),
           chaId: toIntOrNull(row["ID Cha"]),
           meId: toIntOrNull(row["ID Mẹ"]),
-          voId: toIntOrNull(row["ID Vợ"]),
-          chongId: toIntOrNull(row["ID Chồng"]), // Make sure this matches Excel column name exactly
+          // voId: toIntOrNull(row["ID Vợ"]),
+          // chongId: toIntOrNull(row["ID Chồng"]),
+          // Nếu là NAM (1) -> gán voId, chongId = null
+          voId: gioiTinh === 1 ? importedVoId : null,
+          // Nếu là NỮ (0) -> gán chongId, voId = null
+          chongId: gioiTinh === 0 ? importedChongId : null,
           dongHoId: dongHoId,
           nguoiTaoId: toIntOrNull(row["Người tạo ID"], 1),
         };
 
-        console.log("Processed row:", JSON.stringify(item, null, 2));
         return item;
       });
 
@@ -115,12 +126,6 @@ export class thanhVienService {
         const doiThuocB = b.doiThuoc !== null ? b.doiThuoc : Infinity;
         return doiThuocA - doiThuocB;
       });
-
-      console.log(
-        "Danh sách thành viên sau khi sắp xếp theo Đời thứ:",
-        thanhViens
-      );
-      console.log(thanhViens);
 
       // gọi res
 
@@ -135,7 +140,6 @@ export class thanhVienService {
         result: importedData,
       };
     } catch (err: any) {
-      console.error("Lỗi khi import từ Excel:", err);
       return {
         success: false,
         message: `Lỗi khi nhập dữ liệu: ${err.message}`,

@@ -7,7 +7,7 @@ const prefix = `${API_CORE}/member`;
 export const getMembers = async (): Promise<any> => {
     try {
         const res = await apiClient.get(`${prefix}/getAllMember`);
-
+        console.log(res);
         return res?.data;
     } catch (error: any) {
         throw error;

@@ -12,34 +12,36 @@ const connectionConfig = {
 };
 
 @injectable()
-
 export class Database {
-    private pool: Pool;
-    constructor() {
-        this.pool = createPool(connectionConfig);
-        console.log("connect_database success");
+  private pool: Pool;
+  constructor() {
+    this.pool = createPool(connectionConfig);
+    console.log("connect_database success");
+  }
+
+  public async getRawConnection(): Promise<PoolConnection> {
+    return await this.pool.getConnection();
+  }
+
+  public async query(sql: string, values: any[]): Promise<any> {
+    let connection: PoolConnection | null = null;
+
+    try {
+      connection = await this.pool.getConnection();
+      const [results] = await connection.query(sql, values);
+      const [outParams] = await connection.query("SELECT @err_code, @err_msg");
+      let err: any = outParams;
+      if (err[0]["@err_code"] === 0) {
+        return results;
+      } else {
+        throw new Error(err[0]["@err_msg"]);
+      }
+    } catch (error) {
+      throw error;
+    } finally {
+      if (connection) {
+        connection.release();
+      }
     }
-
-    public async query(sql: string, values: any[]) : Promise<any>{
-        let connection: PoolConnection | null = null;
-
-        try{
-            connection = await this.pool.getConnection();
-            const [results] = await connection.query(sql, values);
-            const [outParams] = await connection.query('SELECT @err_code, @err_msg');
-            let err: any = outParams;
-            if(err[0]['@err_code'] === 0){
-                return results;
-            }  else{
-                throw new Error(err[0]['@err_msg'])
-            }
-
-        }catch (error){
-            throw error;
-        } finally {
-            if(connection) {
-                connection.release();
-            }
-        }
-    }
+  }
 }

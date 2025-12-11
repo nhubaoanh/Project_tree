@@ -177,7 +177,9 @@ export default function QuanLyThanhVienPage() {
       console.log('Import thành công:', result);
 
       // Hiển thị thông báo thành công
-      alert('Nhập dữ liệu thành công!');
+      showSuccess('Nhập dữ liệu thành công!');
+      await queryClient.invalidateQueries({ queryKey: ["member"] });
+
 
       // Làm mới dữ liệu nếu cần
       // await fetchData();

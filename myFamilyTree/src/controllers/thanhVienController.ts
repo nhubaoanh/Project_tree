@@ -64,6 +64,20 @@ export class thanhVienController {
     }
   }
 
+  async updateMultipleThanhVien(req: Request, res:Response) : Promise<void>{
+    try{
+      const thanhViens = req.body as thanhVien;
+      const results = await this.thanhvienService.updateMultipleThanhVien(thanhViens);
+      res.status(200).json({
+        message: "cap nhat nhiều thanh vien thanh cong",
+        success: true,
+        data: results,
+      });
+    }catch(error: any){
+      res.status(500).json({message: "cap nhat nhiều thanh vien that bai", success: false})
+    }
+  }
+
   async getAllThanhVien(req: Request, res: Response): Promise<void> {
     try {
       const results = await this.thanhvienService.getAllThanhVien();
