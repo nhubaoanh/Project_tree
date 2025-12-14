@@ -48,7 +48,7 @@ export default function Header() {
             className="flex items-center gap-2 hover:opacity-80 transition-opacity"
           >
             <img
-              src="https://via.placeholder.com/40"
+              src="\images\vangoc.jpg"
               alt="avatar"
               className="w-10 h-10 rounded-full ring-2 ring-white/50 shadow-md"
             />

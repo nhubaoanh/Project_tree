@@ -92,13 +92,13 @@ export const MemberTable: React.FC<MemberTableProps> = ({
                     <td className="p-4 text-center font-bold text-[#5d4037] group-hover:text-[#b91c1c] min-w-[120px]">
                       {user.tenDongHo}
                     </td>
-                    <td className="p-4 text-center font-bold text-[#5d4037] hidden md:table-cell text-sm min-w-[180px]">
+                    <td className="p-4 text-center font-bold text-[#5d4037] hidden md:table-cell min-w-[180px]">
                       {user.email || "-"}
                     </td>
                     <td className="p-4 text-center font-bold text-[#5d4037] group-hover:text-[#b91c1c] min-w-[120px]">
                       {user.soDienThoai}
                     </td>
-                    <td className="p-4 text-center font-bold text-sm text-[#5d4037] min-w-[150px]">
+                    <td className="p-4 text-center font-bold text-[#5d4037] min-w-[150px]">
                       {user.tenDangNhap}
                     </td>
                     {/* <td className="p-4 text-center font-bold text-[#5d4037] group-hover:text-[#b91c1c] min-w-[120px]">

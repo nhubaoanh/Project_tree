@@ -3,11 +3,13 @@ import nguoiDungRouter from "./nguoidungRouter";
 import thanhVienRouter from "./thanhVienRouter";
 import donghoRouter from "./dongHoRouter";
 import roleRouter from "./roleRouter";
+import suKienRouter from "./suKienRouter";
 
 const router = Router();
 router.use('/users', nguoiDungRouter);
 router.use('/member', thanhVienRouter);
 router.use('/lineage', donghoRouter);
 router.use('/role', roleRouter);
+router.use("/event", suKienRouter);
 
 export default router;

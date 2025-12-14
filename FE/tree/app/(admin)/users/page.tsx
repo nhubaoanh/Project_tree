@@ -203,7 +203,7 @@ export default function QuanLyThanhVienPage() {
 
   // --- RENDER UI ---
   return (
-    <div className="max-w-6xl mx-auto font-serif text-[#4a4a4a] pb-20 animate-fadeIn">
+    <div className="max-w-6xl mx-auto font-dancing text-[#4a4a4a] pb-20 animate-fadeIn">
       {/* Header & Toolbar */}
       <div className="flex flex-col md:flex-row justify-between items-end md:items-center mb-8 gap-4 border-b border-[#d4af37] pb-4">
         <div>

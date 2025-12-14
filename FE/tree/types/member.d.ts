@@ -22,3 +22,11 @@ export interface IMember {
   active_flag: number;
   lu_user_id: string;
 }
+
+export interface IMemberSearch {
+  pageIndex?: number;
+  pageSize?: number;
+  search_content?: string;
+  dongHoId?: string;
+  thanhVienId?: number;
+}

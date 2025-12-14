@@ -4,17 +4,24 @@ import { thanhVienController } from "../controllers/thanhVienController";
 
 const thanhVienRouter = Router();
 
-thanhVienRouter.use((req, res, next) => {
+thanhVienRouter.use((err: any, req: any, res: any, next: any) => {
+  if (err) {
+    return res.status(400).json({
+      success: false,
+      message: err.message || 'Có lỗi xảy ra khi xử lý yêu cầu'
+    });
+  }
     next();
 });
 
-const thanhvienController = container.resolve(thanhVienController);
+thanhVienRouter.use((req, res, next) => {
+  next();
+});
+const thanhviencontroller = container.resolve(thanhVienController);
 
-thanhVienRouter.get("/getAllMember", thanhvienController.getAllThanhVien.bind(thanhvienController));
-thanhVienRouter.post("/create", thanhvienController.createThanhVien.bind(thanhvienController));
-thanhVienRouter.post(
-  "/createMultiple",
-  thanhvienController.createMultipleThanhVien.bind(thanhvienController)
-);
-
+thanhVienRouter.get("/getAllMember", thanhviencontroller.getAllThanhVien.bind(thanhviencontroller));
+thanhVienRouter.get('/export-template', thanhviencontroller.exportTemplate.bind(thanhviencontroller))
+thanhVienRouter.post("/create", thanhviencontroller.createThanhVien.bind(thanhviencontroller));
+thanhVienRouter.post('/search', thanhviencontroller.searchThanhVien.bind(thanhviencontroller));
+thanhVienRouter.post('/import-json', thanhviencontroller.importFromJson.bind(thanhviencontroller))
 export default thanhVienRouter;

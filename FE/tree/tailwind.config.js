@@ -1,10 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   darkMode: "class",
-  content: [
-    "./app/**/*.{ts,tsx}",
-    "./components/**/*.{ts,tsx}",
-  ],
+  content: ["./app/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}"],
   theme: {
     extend: {
       borderColor: {
@@ -12,6 +9,10 @@ module.exports = {
       },
       ringColor: {
         ring: "var(--ring)",
+      },
+      fontFamily: {
+        // sans: ['var(--font-dancing)', 'cursive'],
+        allura: ["var(--font-allura)", "cursive"],
       },
     },
   },

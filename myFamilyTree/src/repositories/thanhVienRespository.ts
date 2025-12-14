@@ -38,24 +38,31 @@ export class thanhVienRespository {
     }
   }
 
-  async createMultipleThanhVien(thanhViens: thanhVien[]): Promise<any> {
+  async updateMultipleThanhVien(thanhVien: thanhVien): Promise<any> {
     try {
-      // 1. Insert tất cả thành viên tạm thời voId/chongId = null
-      for (const tv of thanhViens) {
-        await this.createThanhVien({
-          ...tv,
-          voId: null,
-          chongId: null,
-        });
-      }
-
-      // 2. Cập nhật lại voId, chongId
-      for (const tv of thanhViens) {
-        if (tv.voId || tv.chongId) {
-          await this.updateVoChong(tv.thanhVienId, tv.voId, tv.chongId);
-        }
-      }
-
+      const sql =
+        "CALL updateMember(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?, @err_code, @err_msg)";
+      await this.db.query(sql, [
+        thanhVien.thanhVienId,
+        thanhVien.dongHoId,
+        thanhVien.hoTen,
+        thanhVien.gioiTinh,
+        thanhVien.ngaySinh,
+        thanhVien.ngayMat,
+        thanhVien.noiSinh,
+        thanhVien.noiMat,
+        thanhVien.ngheNghiep,
+        thanhVien.trinhDoHocVan,
+        thanhVien.diaChiHienTai,
+        thanhVien.tieuSu,
+        thanhVien.anhChanDung,
+        thanhVien.doiThuoc,
+        thanhVien.chaId,
+        thanhVien.meId,
+        thanhVien.voId,
+        thanhVien.chongId,
+        thanhVien.lu_user_id,
+      ]);
       return true;
     } catch (error: any) {
       console.log("error database => ", error);
@@ -63,24 +70,89 @@ export class thanhVienRespository {
     }
   }
 
-  // Hàm update vợ/chồng
-  async updateVoChong(
-    thanhVienId: number,
-    voId: number | null,
-    chongId: number | null
-  ) {
-    const sql = "UPDATE thanhvien SET voId=?, chongId=? WHERE thanhVienId=?";
-    await this.db.query(sql, [voId, chongId, thanhVienId]);
-  }
-
-  async getAllThanhVien() : Promise<any>{
-    try{
-      const sql = "CALL getAllMember(@err_code, @err_msg)";
-      const result = await this.db.query(sql, []);
-      return result;
-    }catch(error : any){
+  async getThanhVienById(thanhVienId: number): Promise<any> {
+    try {
+      const sql = "CALL GetThanhVienById(?, @err_code, @err_msg)";
+      const [result] = await this.db.query(sql, [thanhVienId]);
+      return result[0];
+    } catch (error: any) {
       throw new Error(error.message);
     }
   }
-}
 
+
+  async getAllThanhVien(): Promise<any> {
+    try {
+      const sql = "CALL getAllMember(@err_code, @err_msg)";
+      const result = await this.db.query(sql, []);
+      return result;
+    } catch (error: any) {
+      throw new Error(error.message);
+    }
+  }
+
+  async searchThanhVien(
+    pageIndex: number,
+    pageSize: number,
+    search_content: string,
+    dongHoId: string,
+    thanhVienId: number
+  ): Promise<any[]> {
+    try {
+      const sql = "CALL SearchThanhVien(?,?,?,?,?, @err_code, @err_msg)";
+      const [result] = await this.db.query(sql, [
+        pageIndex,
+        pageSize,
+        search_content || null,
+        dongHoId || null,
+        thanhVienId || null,
+      ]);
+
+      return result;
+    } catch (error: any) {
+      throw new Error(error);
+    }
+  }
+
+  // Import từ JSON - gọi stored procedure
+  async importFromJson(
+    thanhviens: any[],
+    dongHoId: string,
+    nguoiTaoId: string
+  ): Promise<any> {
+    const connection = await this.db.getRawConnection();
+    try {
+      const jsonData = JSON.stringify(thanhviens);
+      console.log("📦 Import JSON data length:", thanhviens.length);
+      console.log("📦 dongHoId:", dongHoId);
+      
+      // Gọi stored procedure
+      await connection.query(
+        'CALL ImportThanhVienFromJson(?, ?, ?, @err_code, @err_msg)',
+        [jsonData, dongHoId, nguoiTaoId]
+      );
+
+      // Lấy output params
+      const [outParams]: any = await connection.query(
+        'SELECT @err_code AS err_code, @err_msg AS err_msg'
+      );
+      
+      console.log("📦 Stored procedure result:", outParams[0]);
+
+      if (outParams[0].err_code !== 0 && outParams[0].err_code !== null) {
+        throw new Error(outParams[0].err_msg || 'Lỗi khi import dữ liệu');
+      }
+
+      return { 
+        success: true, 
+        count: thanhviens.length,
+        message: outParams[0].err_msg 
+      };
+    } catch (error: any) {
+      console.error("❌ Import error:", error.message);
+      throw error;
+    } finally {
+      connection.release();
+    }
+  }
+}

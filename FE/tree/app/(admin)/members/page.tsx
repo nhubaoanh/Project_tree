@@ -8,10 +8,12 @@ import {
   useQueryClient,
   keepPreviousData,
 } from "@tanstack/react-query";
-import { IMember } from "@/types/member";
+import { IMember, IMemberSearch } from "@/types/member";
 import { useToast } from "@/service/useToas";
 import { MemberTable } from "./components/memberTable";
-import { getMembers } from "@/service/member.service";
+import { getMembers, importExcel, searchMember, importMembersJson, IMemberImport } from "@/service/member.service";
+import toast from "react-hot-toast";
+import { ExcelTemplateButton } from "./components/ExcelTemplateButton";
 
 // --- MAIN PAGE COMPONENT ---
 
@@ -31,46 +33,36 @@ export default function QuanLyThanhVienPage() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<IMember | null>(null);
 
-  const {showSuccess, showError} = useToast();
+  const { showSuccess, showError } = useToast();
 
-  // // --- DEBOUNCE SEARCH ---
-  // React.useEffect(() => {
-  //   const timer = setTimeout(() => {
-  //     setDebouncedSearch(searchTerm);
-  //     setPageIndex(1); // Reset to page 1 on new search
-  //   }, 500);
-  //   return () => clearTimeout(timer);
-  // }, [searchTerm]);
+  // --- DEBOUNCE SEARCH ---
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchTerm);
+      setPageIndex(1); // Reset to page 1 on new search
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
 
-  // --- FETCHING DATA ---
-  // const searchParams: IUserSearch = {
-  //   pageIndex,
-  //   pageSize,
-  //   search_content: debouncedSearch,
-  // };
+  // // --- FETCHING DATA ---
+  const searchParams: IMemberSearch = {
+    pageIndex,
+    pageSize,
+    search_content: debouncedSearch,
+  };
 
   const memberQuery = useQuery({
-    queryKey: ["member"],
-    queryFn: () => getMembers(),
-  })
+    queryKey: ["member", searchParams],
+    queryFn: () => searchMember(searchParams),
+    placeholderData: keepPreviousData,
+  });
 
-  const memberData = memberQuery.data?.data[0] || [];
-
+  const memberData = memberQuery.data?.data || [];
+  // showSuccess("lay du lieu len thanh cong!")
   console.log("memberData", memberData);
   const totalRecords = memberQuery.data?.totalItems || 0;
   const totalPages = memberQuery.data?.pageCount || 0;
   const isLoading = memberQuery.isLoading;
-
-  // const usersQuery = useQuery({
-  //   queryKey: ["users", searchParams],
-  //   queryFn: () => getUsers(searchParams),
-  //   placeholderData: keepPreviousData,
-  // });
-
-  // const userData = usersQuery.data?.data || [];
-  // const totalRecords = usersQuery.data?.totalItems || 0;
-  // const totalPages = usersQuery.data?.pageCount || 0;
-  // const isLoading = usersQuery.isLoading;
 
 
   // --- MUTATIONS - CRUD ---
@@ -154,16 +146,179 @@ export default function QuanLyThanhVienPage() {
 
   // --- EXCEL HANDLERS ---
 
-  // const handleExportExcel = () => {
-  //   if (userData.length === 0) {
-  //     toast("Không có dữ liệu để xuất");
-  //     return;
-  //   }
-  //   const worksheet = XLSX.utils.json_to_sheet(userData);
-  //   const workbook = XLSX.utils.book_new();
-  //   XLSX.utils.book_append_sheet(workbook, worksheet, "DanhSachThanhVien");
-  //   XLSX.writeFile(workbook, `DanhSachThanhVien_Trang${pageIndex}.xlsx`);
-  // };
+  const handleExportExcel = () => {
+    if (memberData.length === 0) {
+      showError("Không có dữ liệu để xuất");
+      return;
+    }
+    const worksheet = XLSX.utils.json_to_sheet(memberData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "DanhSachThanhVien");
+    XLSX.writeFile(workbook, `DanhSachThanhVien_Trang${pageIndex}.xlsx`);
+  };
+
+  const handleImportExcel = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) {
+      alert("Vui lòng chọn file Excel");
+      return;
+    }
+
+    try {
+      // Kiểm tra định dạng file
+      if (!file.name.match(/\.(xlsx|xls)$/)) {
+        alert('Vui lòng chọn file Excel (.xlsx hoặc .xls)');
+        return;
+      }
+
+      // Đọc file Excel và parse thành JSON
+      const members = await parseExcelToJson(file);
+      
+      if (members.length === 0) {
+        showError('File Excel không có dữ liệu');
+        return;
+      }
+
+      console.log('Parsed members:', members);
+
+      // Gọi API import JSON (thay vì gửi file)
+      const result = await importMembersJson(members);
+      console.log('Import thành công:', result);
+
+      showSuccess(`Nhập thành công ${members.length} thành viên!`);
+      await queryClient.invalidateQueries({ queryKey: ["member"] });
+
+      // Reset input file
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    } catch (error: any) {
+      console.error('Lỗi khi import file:', error);
+      showError(error?.response?.data?.message || 'Có lỗi xảy ra khi nhập dữ liệu');
+    }
+  };
+
+  // Helper: Parse Excel file thành JSON array
+  const parseExcelToJson = (file: File): Promise<IMemberImport[]> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      
+      reader.onload = (e) => {
+        try {
+          const data = e.target?.result;
+          const workbook = XLSX.read(data, { type: 'binary' });
+          const sheetName = workbook.SheetNames[0];
+          const worksheet = workbook.Sheets[sheetName];
+          const rawData = XLSX.utils.sheet_to_json(worksheet);
+
+          // Map dữ liệu Excel sang format chuẩn
+          // Bỏ qua dòng hướng dẫn (STT không phải số hoặc null)
+          const members: IMemberImport[] = rawData
+            .filter((row: any) => {
+              const stt = row["STT"];
+              // Bỏ qua dòng hướng dẫn (STT = "Số thứ tự" hoặc không phải số)
+              if (stt === undefined || stt === null) return false;
+              if (typeof stt === "string" && isNaN(Number(stt))) return false;
+              return true;
+            })
+            .map((row: any) => ({
+              stt: toIntOrNull(row["STT"]),
+              hoTen: row["Họ và tên"] || "",
+              gioiTinh: parseGioiTinh(row["Giới tính"]),
+              ngaySinh: parseExcelDate(row["Ngày sinh"]),
+              ngayMat: parseExcelDate(row["Ngày mất"]),
+              noiSinh: row["Nơi sinh"] || "",
+              noiMat: row["Nơi mất"] || "",
+              ngheNghiep: row["Nghề nghiệp"] || "",
+              trinhDoHocVan: row["Trình độ học vấn"] || "",
+              diaChiHienTai: row["Địa chỉ"] || "",
+              tieuSu: row["Tiểu sử"] || "",
+              doiThuoc: toIntOrNull(row["Đời thứ"], 1) ?? 1,
+              chaId: toIntOrNull(row["ID Cha"]),
+              meId: toIntOrNull(row["ID Mẹ"]),
+              voId: toIntOrNull(row["ID Vợ"]),
+              chongId: toIntOrNull(row["ID Chồng"]),
+            }));
+
+          resolve(members);
+        } catch (err) {
+          reject(err);
+        }
+      };
+
+      reader.onerror = () => reject(new Error('Không thể đọc file'));
+      reader.readAsBinaryString(file);
+    });
+  };
+
+  // Helper functions
+  const toIntOrNull = (v: any, defaultValue: number | null = null): number | null => {
+    if (v === undefined || v === null || v === "") return defaultValue;
+    if (typeof v === "number") return Math.round(v);
+    const num = Number(String(v).trim());
+    return isNaN(num) ? defaultValue : Math.round(num);
+  };
+
+  const parseGioiTinh = (v: any): number => {
+    if (typeof v === "number") return v === 1 ? 1 : 0;
+    const str = String(v || "").toLowerCase().trim();
+    if (str === "nam" || str === "1") return 1;
+    return 0;
+  };
+
+  // Xử lý ngày linh hoạt: chỉ năm, tháng/năm, hoặc đầy đủ
+  const parseExcelDate = (excelDate: any): string | null => {
+    if (!excelDate && excelDate !== 0) return null;
+    
+    // Nếu là số (Excel date serial hoặc chỉ năm)
+    if (typeof excelDate === "number") {
+      // Nếu là năm (1800-2100)
+      if (excelDate >= 1800 && excelDate <= 2100) {
+        return `${excelDate}-01-01`; // Chỉ năm -> 01/01/năm
+      }
+      // Excel date serial number
+      const date = new Date((excelDate - 25569) * 86400 * 1000);
+      return date.toISOString().split("T")[0];
+    }
+    
+    const str = String(excelDate).trim();
+    if (!str) return null;
+    
+    // Chỉ năm: "1950"
+    if (/^\d{4}$/.test(str)) {
+      return `${str}-01-01`;
+    }
+    
+    // Tháng/Năm: "03/1950" hoặc "3/1950"
+    const monthYearMatch = str.match(/^(\d{1,2})\/(\d{4})$/);
+    if (monthYearMatch) {
+      const month = monthYearMatch[1].padStart(2, '0');
+      return `${monthYearMatch[2]}-${month}-01`;
+    }
+    
+    // Năm-Tháng: "1950-03"
+    const yearMonthMatch = str.match(/^(\d{4})-(\d{1,2})$/);
+    if (yearMonthMatch) {
+      const month = yearMonthMatch[2].padStart(2, '0');
+      return `${yearMonthMatch[1]}-${month}-01`;
+    }
+    
+    // Ngày/Tháng/Năm: "15/03/1950"
+    const dmyMatch = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+    if (dmyMatch) {
+      const day = dmyMatch[1].padStart(2, '0');
+      const month = dmyMatch[2].padStart(2, '0');
+      return `${dmyMatch[3]}-${month}-${day}`;
+    }
+    
+    // Năm-Tháng-Ngày: "1950-03-15" (ISO format)
+    if (/^\d{4}-\d{2}-\d{2}$/.test(str)) {
+      return str;
+    }
+    
+    // Trả về nguyên bản nếu không match pattern nào
+    return str;
+  };
 
   // const handleImportExcel = (e: React.ChangeEvent<HTMLInputElement>) => {
   //   const file = e.target.files?.[0];
@@ -204,9 +359,34 @@ export default function QuanLyThanhVienPage() {
   // const isSaving = createMutation.isPending || updateMutation.isPending;
   // const isDeleting = deleteMutation.isPending;
 
+  // Handle loading state
+  if (memberQuery.isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#d4af37]"></div>
+      </div>
+    );
+  }
+
+  // Handle error state
+  if (memberQuery.isError) {
+    return (
+      <div className="p-4 mb-4 text-red-600 bg-red-100 rounded flex justify-between items-center">
+        <span>Lỗi khi tải dữ liệu. Vui lòng thử lại sau.</span>
+        <button
+          onClick={() => memberQuery.refetch()}
+          className="px-3 py-1 bg-[#d4af37] text-white rounded hover:bg-[#b8962a]"
+        >
+          Thử lại
+        </button>
+      </div>
+    );
+  }
+
+
   // --- RENDER UI ---
   return (
-    <div className="max-w-6xl mx-auto font-serif text-[#4a4a4a] pb-20 animate-fadeIn">
+    <div className="max-w-6xl mx-auto font-dancing text-[#4a4a4a] pb-20 animate-fadeIn">
       {/* Header & Toolbar */}
       <div className="flex flex-col md:flex-row justify-between items-end md:items-center mb-8 gap-4 border-b border-[#d4af37] pb-4">
         <div>
@@ -226,6 +406,7 @@ export default function QuanLyThanhVienPage() {
             <Download size={16} />{" "}
             <span className="hidden sm:inline">Xuất Excel</span>
           </button>
+          <ExcelTemplateButton />
           <button
             onClick={() => fileInputRef.current?.click()}
             className="flex items-center gap-2 px-4 py-2 bg-[#276749] text-white rounded shadow hover:bg-[#22543d] transition-all text-sm font-bold relative overflow-hidden"
@@ -236,7 +417,7 @@ export default function QuanLyThanhVienPage() {
               ref={fileInputRef}
               type="file"
               accept=".xlsx, .xls"
-              // onChange={handleImportExcel}
+              onChange={handleImportExcel}
               className="absolute inset-0 opacity-0 cursor-pointer"
             />
           </button>
@@ -253,11 +434,11 @@ export default function QuanLyThanhVienPage() {
       {/* Search Bar */}
       <div className="mb-6 flex items-center bg-white border border-[#d4af37] rounded-lg p-1 shadow-sm w-full md:w-1/2 transition-all focus-within:ring-2 ring-[#d4af37]/50">
         <div className="p-2 text-stone-400">
-          {/* {isLoading ? (
+          {isLoading ? (
             <Loader2 className="animate-spin" size={20} />
           ) : (
             <Search size={20} />
-          )} */}
+          )}
         </div>
         <input
           value={searchTerm}
