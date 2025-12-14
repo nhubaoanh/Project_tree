@@ -1,13 +1,19 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import FamilyTree from "@balkangraph/familytree.js";
 import { ITreeNode } from "@/types/tree";
 
 let initialized = false;
 
-export const MyFamilyTree = ({ data }: { data: ITreeNode[] }) => {
+interface MyFamilyTreeProps {
+  data: ITreeNode[];
+}
+
+export const MyFamilyTree = ({ data }: MyFamilyTreeProps) => {
   const divRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   useEffect(() => {
     if (!divRef.current || data.length === 0 || initialized) return;
@@ -19,12 +25,8 @@ export const MyFamilyTree = ({ data }: { data: ITreeNode[] }) => {
       pids: node.pids ?? [],
       fid: node.fid,
       mid: node.mid,
-    //   id: node.thanhVienId,
-    //   pids: node.voId || node.chongId 
-    // ? [node.voId || node.chongId] 
-    // : [],
-    //   fid: node.chaId,
-    //   mid: node.meId,
+      // Lưu thêm thanhVienId để dùng cho navigation
+      thanhVienId: node.thanhVienId,
 
       // Dữ liệu hiển thị
       field_0: node.hoTen || "Chưa rõ",
@@ -34,14 +36,27 @@ export const MyFamilyTree = ({ data }: { data: ITreeNode[] }) => {
       field_2: node.ngheNghiep || "Chưa rõ",
       img_0: node.anhChanDung
         ? `/uploads/${node.anhChanDung}`
-        // : `https://via.placeholder.com/120?text=${node.hoTen?.[0] || "?"}`,
         : `/images/vangoc.jpg`,
 
       tags: [node.gioiTinh === 1 ? "male" : "female"],
     }));
 
+    // Helper function để tìm tên theo ID
+    const getNameById = (id: number | undefined): string => {
+      if (!id) return "Không có";
+      const node = allNodes.find((n) => n.id === id);
+      return node?.field_0 || "Không có";
+    };
+
+    // Helper function để tìm danh sách con
+    const getChildren = (parentId: number): string[] => {
+      return allNodes
+        .filter((n) => n.fid === parentId || n.mid === parentId)
+        .map((n) => n.field_0);
+    };
+
     // Khởi tạo tree với template john (FREE, nhiều field)
-    new FamilyTree(divRef.current!, {
+    const family = new FamilyTree(divRef.current!, {
       nodes: allNodes,
       template: "john",
       scaleInitial: FamilyTree.match.boundary,
@@ -56,11 +71,56 @@ export const MyFamilyTree = ({ data }: { data: ITreeNode[] }) => {
       },
       nodeMenu: {
         details: {
-          text: "Chi tiết",
-          onClick: (sender :any , args: any) => {
-            const node = sender.get(args.node.id);
+          text: "📋 Xem chi tiết",
+          onClick: (sender: any, args: any) => {
+            const nodeId = args?.node?.id ?? args;
+            const node = sender.get(nodeId);
+            if (!node) return;
+            const memberId = node.thanhVienId || node.id;
+            router.push(`/member/${memberId}`);
+          },
+        },
+        viewParents: {
+          text: "👨‍👩‍👦 Xem cha mẹ",
+          onClick: (sender: any, args: any) => {
+            const nodeId = args?.node?.id ?? args;
+            const node = sender.get(nodeId);
+            if (!node) return;
+            const fatherName = getNameById(node.fid);
+            const motherName = getNameById(node.mid);
+            alert(`👨 Cha: ${fatherName}\n👩 Mẹ: ${motherName}`);
+          },
+        },
+        viewSpouse: {
+          text: "💑 Xem vợ/chồng",
+          onClick: (sender: any, args: any) => {
+            const nodeId = args?.node?.id ?? args;
+            const node = sender.get(nodeId);
+            if (!node) return;
+            const spouseIds: number[] = node.pids || [];
+            if (spouseIds.length === 0) {
+              alert("Chưa có thông tin vợ/chồng");
+              return;
+            }
+            const spouseNames = spouseIds
+              .map((id: number) => getNameById(id))
+              .join(", ");
+            alert(`💑 Vợ/Chồng: ${spouseNames}`);
+          },
+        },
+        viewChildren: {
+          text: "👶 Xem con",
+          onClick: (sender: any, args: any) => {
+            const nodeId = args?.node?.id ?? args;
+            const node = sender.get(nodeId);
+            if (!node) return;
+            const children = getChildren(node.id);
+            if (children.length === 0) {
+              alert("Chưa có thông tin con cái");
+              return;
+            }
             alert(
-              `Họ tên: ${node.field_0}\nNgày sinh: ${node.field_1}\nNghề nghiệp: ${node.field_2}`
+              `👶 Các con:\n${children.map((name, i) => `${i + 1}. ${name}`).join("\n")}`
             );
           },
         },
@@ -80,7 +140,7 @@ export const MyFamilyTree = ({ data }: { data: ITreeNode[] }) => {
       if (divRef.current) divRef.current.innerHTML = "";
       initialized = false;
     };
-  }, [data]);
+  }, [data, router]);
 
   return (
     <div

@@ -10,23 +10,6 @@ import { Readable } from "stream";
 @injectable()
 export class thanhVienController {
   constructor(private thanhvienService: thanhVienService) {}
-
-  private upload = multer({
-    storage: multer.memoryStorage(),
-    limits: { fieldSize: 5 * 1024 * 1024 }, // 5mb
-    fileFilter: (req, file, cb) => {
-      if (
-        file.mimetype ===
-          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
-        file.mimetype === "application/vnd.ms-excel"
-      ) {
-        cb(null, true);
-      } else {
-        cb(new Error("chỉ nhận file Excel (.xlsx, .xls)"));
-      }
-    },
-  }).single("file");
-
   async createThanhVien(req: Request, res: Response): Promise<void> {
     try {
       const thanhvien = req.body as thanhVien;
@@ -41,40 +24,6 @@ export class thanhVienController {
       res
         .status(500)
         .json({ message: "Them thanh vien that bai", success: false });
-    }
-  }
-
-  // Tạo nhiều thành viên
-  async createMultipleThanhVien(req: Request, res: Response): Promise<void> {
-    try {
-      const thanhViens = req.body as thanhVien[];
-      const results = await this.thanhvienService.createMultipleThanhVien(
-        thanhViens
-      );
-      res.status(200).json({
-        message: "Thêm nhiều thành viên thành công",
-        success: true,
-        data: results,
-      });
-    } catch (error: any) {
-      console.log("error", error);
-      res
-        .status(500)
-        .json({ message: "Thêm nhiều thành viên thất bại", success: false });
-    }
-  }
-
-  async updateMultipleThanhVien(req: Request, res:Response) : Promise<void>{
-    try{
-      const thanhViens = req.body as thanhVien;
-      const results = await this.thanhvienService.updateMultipleThanhVien(thanhViens);
-      res.status(200).json({
-        message: "cap nhat nhiều thanh vien thanh cong",
-        success: true,
-        data: results,
-      });
-    }catch(error: any){
-      res.status(500).json({message: "cap nhat nhiều thanh vien that bai", success: false})
     }
   }
 
@@ -135,74 +84,52 @@ export class thanhVienController {
     }
   }
 
-  async importFromExcel(req: Request, res: Response): Promise<void> {
-    this.upload(req, res, async (err: any) => {
-      try {
-        if (err) {
-          return res.status(400).json({
-            success: false,
-            message: err.message || "Đã xảy ra lỗi khi nhập dữ liệu từ Excel",
-          });
-        }
+  // Import từ JSON (giải pháp mới - 1 transaction)
+  async importFromJson(req: Request, res: Response): Promise<void> {
+    try {
+      const { members, dongHoId } = req.body;
 
-        if (!req.file) {
-          return res.status(400).json({
-            success: false,
-            message: "vui lòng chọn file excel để nhập dữ liệu",
-          });
-        }
-
-        // đọc file
-        const workbook = new ExcelJS.Workbook();
-
-        // Tạo stream từ buffer multer
-        const stream = new Readable();
-        stream.push(req.file!.buffer);
-        stream.push(null);
-
-        // Đọc excel từ stream
-        await workbook.xlsx.read(stream);
-        const worksheet = workbook.worksheets[0];
-
-        // Lấy dữ liệu từ sheet
-        const data: any[] = [];
-        worksheet.eachRow({ includeEmpty: false }, (row, rowNumber) => {
-          // Bỏ qua dòng tiêu đề (hàng đầu tiên)
-          if (rowNumber === 1) return;
-
-          const rowData: any = {};
-          row.eachCell((cell, colNumber) => {
-            const header =
-              worksheet.getRow(1).getCell(colNumber).value?.toString() || "";
-            rowData[header] = cell.value;
-          });
-
-          if (Object.keys(rowData).length > 0) {
-            data.push(rowData);
-          }
-        });
-
-        // Gọi service để xử lý dữ liệu
-        const result = await this.thanhvienService.importFromExcel(data);
-
-        res.status(200).json({
-          success: true,
-          message: "Nhập dữ liệu thành công",
-          data: result,
-        });
-      } catch (error: any) {
-        res.status(500).json({
+      if (!members || !Array.isArray(members) || members.length === 0) {
+        res.status(400).json({
           success: false,
-          message: error.message || "đã xảy ra lỗi khi nhập dữ liệu từ Excel",
+          message: "Dữ liệu không hợp lệ hoặc rỗng",
         });
+        return;
       }
-    });
+
+      // Lấy dongHoId từ request hoặc user context
+      // TODO: Sau này lấy từ user đang đăng nhập
+      const finalDongHoId = dongHoId || (req as any).user?.dongHoId || "e9022e64-cbae-11f0-8020-a8934a9bae74";
+      const nguoiTaoId = (req as any).user?.userId || "1";
+
+      const result = await this.thanhvienService.importFromJson(
+        members, 
+        finalDongHoId,
+        nguoiTaoId
+      );
+
+      res.status(200).json({
+        success: true,
+        message: `Nhập thành công ${members.length} thành viên`,
+        data: result,
+      });
+    } catch (error: any) {
+      console.error("Import JSON error:", error);
+      res.status(500).json({
+        success: false,
+        message: error.message || "Lỗi khi nhập dữ liệu",
+      });
+    }
   }
 
   async exportTemplate(req: Request, res: Response): Promise<void> {
     try {
       const workbook = new ExcelJS.Workbook();
-      const sheet = workbook.addWorksheet("Mẫu nhập liệu");
+      
+      // ========== SHEET 1: Mẫu nhập liệu ==========
+      const sheet = workbook.addWorksheet("Nhập liệu");
+      
+      // Headers - bỏ Dòng họ ID và Người tạo ID (sẽ tự động gán)
       const headers = [
         "STT",
         "Họ và tên",
@@ -220,21 +147,77 @@ export class thanhVienController {
         "ID Mẹ",
         "ID Vợ",
         "ID Chồng",
-        "Dòng họ ID",
-        "Người tạo ID",
       ];
 
+      // Row 1: Tiêu đề chính
       sheet.addRow(headers);
       const headerRow = sheet.getRow(1);
-      headerRow.height = 22;
-
+      headerRow.height = 28;
       headerRow.eachCell((cell) => {
-        cell.fill = {
-          type: "pattern",
-          pattern: "solid",
-          fgColor: { argb: "C6E0B4" },
+        cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "4472C4" } };
+        cell.font = { bold: true, color: { argb: "FFFFFF" }, size: 11 };
+        cell.alignment = { horizontal: "center", vertical: "middle", wrapText: true };
+        cell.border = {
+          top: { style: "thin" },
+          bottom: { style: "thin" },
+          left: { style: "thin" },
+          right: { style: "thin" },
         };
-        cell.font = { bold: true };
+      });
+
+      // Row 2: Hướng dẫn nhập
+      const guideRow = sheet.addRow([
+        "Số thứ tự",
+        "Bắt buộc",
+        "1=Nam, 0=Nữ",
+        "Năm hoặc DD/MM/YYYY",
+        "Năm hoặc DD/MM/YYYY",
+        "Tùy chọn",
+        "Tùy chọn",
+        "Tùy chọn",
+        "Tùy chọn",
+        "Tùy chọn",
+        "Tùy chọn",
+        "Số (1,2,3...)",
+        "STT của cha",
+        "STT của mẹ",
+        "STT của vợ (nếu Nam)",
+        "STT của chồng (nếu Nữ)",
+      ]);
+      guideRow.height = 35;
+      guideRow.eachCell((cell) => {
+        cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFF2CC" } };
+        cell.font = { italic: true, size: 9, color: { argb: "806000" } };
+        cell.alignment = { horizontal: "center", vertical: "middle", wrapText: true };
+        cell.border = {
+          top: { style: "thin" },
+          bottom: { style: "thin" },
+          left: { style: "thin" },
+          right: { style: "thin" },
+        };
+      });
+
+      // Row 3: Dữ liệu mẫu
+      const sampleRow = sheet.addRow([
+        1,
+        "Nguyễn Văn A",
+        1,
+        "1950",
+        "2020",
+        "Hà Nội",
+        "Hà Nội",
+        "Nông dân",
+        "Cấp 3",
+        "Hà Nội, Việt Nam",
+        "Người sáng lập dòng họ",
+        1,
+        "",
+        "",
+        2,
+        "",
+      ]);
+      sampleRow.height = 22;
+      sampleRow.eachCell((cell) => {
         cell.alignment = { horizontal: "center", vertical: "middle" };
         cell.border = {
           top: { style: "thin" },
@@ -244,82 +227,142 @@ export class thanhVienController {
         };
       });
 
-      const row = sheet.addRow([
-        "1",
-        "Nguyễn Văn A",
-        1,
-        new Date(),
+      // Row 4: Dữ liệu mẫu 2 (vợ)
+      const sampleRow2 = sheet.addRow([
+        2,
+        "Trần Thị B",
+        0,
+        "1955",
         "",
-        "Hà Nội",
         "Hải Dương",
-        "Kỹ sư",
-        "Đại học",
+        "",
+        "Nội trợ",
+        "Cấp 2",
         "Hà Nội, Việt Nam",
-        "Nông dân",
+        "",
         1,
         "",
         "",
         "",
-        "",
-        "1",
-        "1",
+        1,
       ]);
-      row.height = 20;
-
-      // Border for all sample row cells
-      row.eachCell((cell) => {
+      sampleRow2.height = 22;
+      sampleRow2.eachCell((cell) => {
         cell.alignment = { horizontal: "center", vertical: "middle" };
+        cell.border = {
+          top: { style: "thin" },
+          bottom: { style: "thin" },
+          left: { style: "thin" },
+          right: { style: "thin" },
+        };
       });
 
-      sheet.getColumn(4).numFmt = "yyyy-mm-dd";
-      sheet.getColumn(5).numFmt = "yyyy-mm-dd";
-
-      // Giới tính dropdown
-      sheet.getCell("C2").dataValidation = {
-        type: "list",
-        allowBlank: true,
-        formulae: ['"0,1"'],
-      };
-
-      // Ngày sinh: chỉ cho nhập đúng ngày
-      sheet.getCell("D2").dataValidation = {
-        type: "date",
-        allowBlank: true,
-        operator: "greaterThan",
-        formulae: [new Date(1900, 0, 1)],
-      };
-
-      // Ngày mất
-      sheet.getCell("E2").dataValidation = {
-        type: "date",
-        allowBlank: true,
-        operator: "greaterThan",
-        formulae: [new Date(1900, 0, 1)],
-      };
+      // Cột width
       sheet.columns = [
-        { width: 5, alignment: { horizontal: "center" } },
-        { width: 20 },
-        { width: 10, alignment: { horizontal: "center" } },
-        { width: 12, alignment: { horizontal: "center" } },
-        { width: 12, alignment: { horizontal: "center" } },
-        { width: 15, alignment: { horizontal: "center" } },
-        { width: 15, alignment: { horizontal: "center" } },
-        { width: 12, alignment: { horizontal: "center" } },
-        { width: 15, alignment: { horizontal: "center" } },
-        { width: 20, alignment: { horizontal: "center" } },
-        { width: 20, alignment: { horizontal: "center" } },
-        { width: 8, alignment: { horizontal: "center" } },
-        { width: 8, alignment: { horizontal: "center" } },
-        { width: 8, alignment: { horizontal: "center" } },
-        { width: 8, alignment: { horizontal: "center" } },
-        { width: 8, alignment: { horizontal: "center" } },
-        { width: 10, alignment: { horizontal: "center" } },
-        { width: 10, alignment: { horizontal: "center" } },
+        { width: 6 },   // STT
+        { width: 22 },  // Họ tên
+        { width: 12 },  // Giới tính
+        { width: 18 },  // Ngày sinh
+        { width: 18 },  // Ngày mất
+        { width: 15 },  // Nơi sinh
+        { width: 15 },  // Nơi mất
+        { width: 14 },  // Nghề nghiệp
+        { width: 16 },  // Trình độ
+        { width: 20 },  // Địa chỉ
+        { width: 25 },  // Tiểu sử
+        { width: 10 },  // Đời thứ
+        { width: 10 },  // ID Cha
+        { width: 10 },  // ID Mẹ
+        { width: 10 },  // ID Vợ
+        { width: 12 },  // ID Chồng
       ];
 
+      // Data validation cho nhiều dòng (3-1000)
+      for (let i = 3; i <= 1000; i++) {
+        // Giới tính: dropdown 0 hoặc 1
+        sheet.getCell(`C${i}`).dataValidation = {
+          type: "list",
+          allowBlank: false,
+          formulae: ['"1,0"'],
+          showErrorMessage: true,
+          errorTitle: "Lỗi giới tính",
+          error: "Chỉ được nhập 1 (Nam) hoặc 0 (Nữ)",
+        };
+
+        // Đời thứ: số nguyên dương
+        sheet.getCell(`L${i}`).dataValidation = {
+          type: "whole",
+          allowBlank: true,
+          operator: "greaterThan",
+          formulae: [0],
+          showErrorMessage: true,
+          errorTitle: "Lỗi đời thứ",
+          error: "Đời thứ phải là số nguyên dương (1, 2, 3...)",
+        };
+      }
+
+      // Format cột ngày là text để cho phép nhập linh hoạt
+      sheet.getColumn(4).numFmt = "@"; // Ngày sinh - text
+      sheet.getColumn(5).numFmt = "@"; // Ngày mất - text
+
+      // ========== SHEET 2: Hướng dẫn ==========
+      const guideSheet = workbook.addWorksheet("Hướng dẫn");
+      
+      const instructions = [
+        ["HƯỚNG DẪN NHẬP DỮ LIỆU GIA PHẢ"],
+        [""],
+        ["1. CỘT STT (Bắt buộc)"],
+        ["   - Số thứ tự duy nhất cho mỗi thành viên"],
+        ["   - Dùng để tham chiếu quan hệ cha/mẹ/vợ/chồng"],
+        [""],
+        ["2. CỘT GIỚI TÍNH (Bắt buộc)"],
+        ["   - Nhập 1 = Nam"],
+        ["   - Nhập 0 = Nữ"],
+        [""],
+        ["3. CỘT NGÀY SINH / NGÀY MẤT"],
+        ["   - Có thể nhập linh hoạt:"],
+        ["     + Chỉ năm: 1950"],
+        ["     + Tháng/Năm: 03/1950 hoặc 1950-03"],
+        ["     + Đầy đủ: 15/03/1950 hoặc 1950-03-15"],
+        ["   - Để trống nếu không biết"],
+        [""],
+        ["4. CỘT ĐỜI THỨ"],
+        ["   - Đời 1: Tổ tiên đầu tiên"],
+        ["   - Đời 2: Con của đời 1"],
+        ["   - Đời 3: Cháu của đời 1..."],
+        [""],
+        ["5. CỘT ID CHA / ID MẸ / ID VỢ / ID CHỒNG"],
+        ["   - Nhập STT của người tương ứng"],
+        ["   - Ví dụ: Ông A có STT=1, con trai B có STT=3"],
+        ["     → Ở dòng B, cột ID Cha nhập 1"],
+        [""],
+        ["6. LƯU Ý QUAN HỆ VỢ CHỒNG"],
+        ["   - Nam (giới tính=1): Nhập ID Vợ, để trống ID Chồng"],
+        ["   - Nữ (giới tính=0): Nhập ID Chồng, để trống ID Vợ"],
+        [""],
+        ["7. THỨ TỰ NHẬP"],
+        ["   - Nên nhập theo thứ tự đời (đời 1 trước, đời 2 sau...)"],
+        ["   - Đảm bảo cha/mẹ có STT nhỏ hơn con"],
+      ];
+
+      instructions.forEach((row, index) => {
+        const r = guideSheet.addRow(row);
+        if (index === 0) {
+          r.font = { bold: true, size: 16, color: { argb: "4472C4" } };
+          r.height = 30;
+        } else if (row[0]?.startsWith("   -")) {
+          r.font = { size: 11 };
+        } else if (row[0]?.match(/^\d\./)) {
+          r.font = { bold: true, size: 12 };
+        }
+      });
+
+      guideSheet.getColumn(1).width = 60;
+
+      // Response
       res.setHeader(
         "Content-Disposition",
-        'attachment; filename="Mau_nhap_du_lieu_thanh_vien.xlsx"'
+        'attachment; filename="Mau_nhap_gia_pha.xlsx"'
       );
       res.setHeader(
         "Content-Type",
@@ -333,4 +376,5 @@ export class thanhVienController {
       res.status(500).json({ success: false, message: "Lỗi tạo Excel" });
     }
   }
+  
 }

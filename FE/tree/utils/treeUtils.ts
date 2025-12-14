@@ -18,7 +18,6 @@ export function buildTree(members: IMember[]): ITreeNode[] {
             pids: [],
             fid: member.chaId || undefined,
             mid: member.meId || undefined,
-            children: [],
         };
         memberMap.set(member.thanhVienId, node);
         allNodes.push(node); // Thêm TẤT CẢ node vào mảng

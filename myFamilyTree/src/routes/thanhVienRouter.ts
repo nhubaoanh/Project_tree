@@ -22,12 +22,6 @@ const thanhviencontroller = container.resolve(thanhVienController);
 thanhVienRouter.get("/getAllMember", thanhviencontroller.getAllThanhVien.bind(thanhviencontroller));
 thanhVienRouter.get('/export-template', thanhviencontroller.exportTemplate.bind(thanhviencontroller))
 thanhVienRouter.post("/create", thanhviencontroller.createThanhVien.bind(thanhviencontroller));
-thanhVienRouter.post(
-  "/createMultiple",
-  thanhviencontroller.createMultipleThanhVien.bind(thanhviencontroller)
-);
 thanhVienRouter.post('/search', thanhviencontroller.searchThanhVien.bind(thanhviencontroller));
-
-thanhVienRouter.post('/import-excel', thanhviencontroller.importFromExcel.bind(thanhviencontroller))
-thanhVienRouter.post('/update', thanhviencontroller.updateMultipleThanhVien.bind(thanhviencontroller))
+thanhVienRouter.post('/import-json', thanhviencontroller.importFromJson.bind(thanhviencontroller))
 export default thanhVienRouter;

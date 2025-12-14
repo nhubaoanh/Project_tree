@@ -2,14 +2,11 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Header } from "@/components/ui/HeaderSub";
 import { MyFamilyTree } from "@/components/ui/tree";
-import { generateFamilyData } from "@/utils/familyData"; // Sử dụng hàm generate
 import { ViewMode } from "@/types/familytree";
 import { BookOpen, Settings } from "lucide-react";
-import { FamilyMember } from "@/types/familytree";
 import {NotificationPage} from "../events/page";
 import  TinTucPage  from "../news/page";
 import  PhaKyPage  from "../pen/page";
-// import NotificationPage from "@/app/(admin)/notifications/page";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { getMembers } from "@/service/member.service";
 import { ITreeNode } from "@/types/tree";
@@ -17,8 +14,6 @@ import { buildTree } from "@/utils/treeUtils";
 
 export default function App() {
   const [activeView, setActiveView] = useState<ViewMode>(ViewMode.DIAGRAM);
-   const [familyData, setFamilyData] = useState<FamilyMember[]>([]);
-
    const membersQuery = useQuery({
      queryKey: ["member"],
      queryFn: () => getMembers(),

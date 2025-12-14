@@ -1,49 +1,105 @@
 import { API_CORE } from "@/constant/config";
 import { apiClient } from "@/lib/api";
-import { IMember, IMemberSearch } from "@/types/member";
+import { IMemberSearch } from "@/types/member";
+import { parseApiError } from "@/lib/apiError";
 
 const prefix = `${API_CORE}/member`;
 
 export const getMembers = async (): Promise<any> => {
     try {
         const res = await apiClient.get(`${prefix}/getAllMember`);
-        console.log(res);
         return res?.data;
     } catch (error: any) {
-        throw error;
+        const err = parseApiError(error);
+        console.error(`[getMembers] ${err.message}`);
+        return { success: false, data: [], message: err.message };
+    }
+}
+
+export const getMemberById = async (id: number): Promise<any> => {
+    try {
+        const res = await apiClient.get(`${prefix}/${id}`);
+        return res?.data;
+    } catch (error: any) {
+        const err = parseApiError(error);
+        console.error(`[getMemberById] ${err.message}`);
+        return { success: false, data: null, message: err.message };
     }
 }
 
 export const searchMember = async (data: IMemberSearch): Promise<any> => {
     try {
         const res = await apiClient.post(`${prefix}/search`, data);
-
         return res?.data;
     } catch (error: any) {
-        throw error;
+        const err = parseApiError(error);
+        console.error(`[searchMember] ${err.message}`);
+        return { success: false, data: [], message: err.message, totalItems: 0, pageCount: 0 };
     }
 }
 
-export const dowExcelTemple = async (): Promise<Blob> => {
+export const dowExcelTemple = async (): Promise<Blob | null> => {
     try {
         const res = await apiClient.get(`${prefix}/export-template`, {
             responseType: 'blob'
         });
-        console.log(res)
         return res?.data;
     } catch (error: any) {
-        console.error('Lỗi khi tải file mẫu:', error);
-        throw error;
+        const err = parseApiError(error);
+        console.error(`[dowExcelTemple] ${err.message}`);
+        return null;
     }
 }
 
-export const importExcel = async(file: File): Promise<any>=> {
-    try{
+export const importExcel = async(file: File): Promise<any> => {
+    try {
         const formData = new FormData();
         formData.append('file', file);
         const res = await apiClient.post(`${prefix}/import-excel`, formData);
         return res?.data;
-    }catch(err: any){
-        throw err;
+    } catch (error: any) {
+        const err = parseApiError(error);
+        console.error(`[importExcel] ${err.message}`);
+        // Throw với message đẹp để UI hiển thị
+        throw new Error(err.message);
     }
+}
+
+// Import từ JSON (giải pháp mới - xử lý quan hệ cha/mẹ/vợ/chồng trong 1 transaction)
+export const importMembersJson = async (
+    members: IMemberImport[], 
+    dongHoId?: string
+): Promise<any> => {
+    try {
+        const res = await apiClient.post(`${prefix}/import-json`, { 
+            members,
+            dongHoId
+        });
+        return res?.data;
+    } catch (error: any) {
+        const err = parseApiError(error);
+        console.error(`[importMembersJson] ${err.message}`);
+        // Throw với message đẹp để UI hiển thị
+        throw new Error(err.message);
+    }
+}
+
+// Interface cho import
+export interface IMemberImport {
+    stt: number | null;
+    hoTen: string;
+    gioiTinh: number;
+    ngaySinh: string | null;
+    ngayMat: string | null;
+    noiSinh: string;
+    noiMat: string;
+    ngheNghiep: string;
+    trinhDoHocVan: string;
+    diaChiHienTai: string;
+    tieuSu: string;
+    doiThuoc: number;
+    chaId: number | null;
+    meId: number | null;
+    voId: number | null;
+    chongId: number | null;
 }

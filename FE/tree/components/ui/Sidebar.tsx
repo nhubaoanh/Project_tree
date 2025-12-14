@@ -1,69 +1,23 @@
 "use client";
-import React, { useEffect, useState } from "react";
+
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { useSidebar } from "@/context/SidebarContext";
 import Image from "next/image";
-import storage from "@/utils/storage"; // 👉 nhớ import
-
-type SidebarItem = {
-  name: string;
-  href: string;
-  icon: string;
-};
+import storage from "@/utils/storage";
+import { getMenuByRole, MenuItem } from "@/lib/auth";
 
 export default function Sidebar() {
   const { isSidebarOpen } = useSidebar();
   const pathname = usePathname();
-  const [sidebarItems, setSidebarItems] = useState<SidebarItem[]>([]);
+  const [sidebarItems, setSidebarItems] = useState<MenuItem[]>([]);
 
   useEffect(() => {
     const user = storage.getUser();
-    const roleCode = user?.roleCode;
-
-    console.log("Role ID:", roleCode);
-    console.log("User:", user);
-
-    // ================================
-    // 🔥 MENU THEO ROLE
-    // ================================
-    const menuAdmin: SidebarItem[] = [
-      { name: "Dashboard", href: "/dashboard", icon: "/icon/iconmember.png" },
-      { name: "Members", href: "/members", icon: "/icon/iconmember.png" },
-      { name: "Genealogy", href: "/genealogy", icon: "/icon/pen.png" },
-      { name: "Events", href: "/manageEvents", icon: "/icon/calendar.png" },
-      { name: "Notifications", href: "/notifications", icon: "/icon/bell.png" },
-      {
-        name: "Contributions",
-        href: "/contributions",
-        icon: "/icon/dollar.png",
-      },
-      { name: "Assets", href: "/assets", icon: "/icon/time.png" },
-      { name: "users", href: "/users", icon: "/icon/iconmember.png" },
-    ];
-
-    const menuManager: SidebarItem[] = [
-      { name: "Dashboard", href: "/dashboard", icon: "/icon/iconmember.png" },
-      { name: "Members", href: "/members", icon: "/icon/iconmember.png" },
-      { name: "Events", href: "/manageEvents", icon: "/icon/calendar.png" },
-      {
-        name: "Contributions",
-        href: "/contributions",
-        icon: "/icon/dollar.png",
-      },
-    ];
-
-    const menuUser: SidebarItem[] = [
-      { name: "Dashboard", href: "/dashboard", icon: "/icon/iconmember.png" },
-      { name: "Events", href: "/manageEvents", icon: "/icon/calendar.png" },
-    ];
-
-    // ================================
-    // 🔥 CHỌN MENU TƯƠNG ỨNG
-    // ================================
-    if (roleCode === "sa") setSidebarItems(menuAdmin);
-    else if (roleCode === "thanhvien") setSidebarItems(menuManager);
-    else setSidebarItems(menuUser);
+    // Lấy menu theo role từ config tập trung
+    const menuItems = getMenuByRole(user?.roleCode);
+    setSidebarItems(menuItems);
   }, []);
 
   return (

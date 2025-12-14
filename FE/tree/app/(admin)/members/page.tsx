@@ -11,7 +11,7 @@ import {
 import { IMember, IMemberSearch } from "@/types/member";
 import { useToast } from "@/service/useToas";
 import { MemberTable } from "./components/memberTable";
-import { getMembers, importExcel, searchMember } from "@/service/member.service";
+import { getMembers, importExcel, searchMember, importMembersJson, IMemberImport } from "@/service/member.service";
 import toast from "react-hot-toast";
 import { ExcelTemplateButton } from "./components/ExcelTemplateButton";
 
@@ -159,7 +159,6 @@ export default function QuanLyThanhVienPage() {
 
   const handleImportExcel = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    console.log("file", file)
     if (!file) {
       alert("Vui lòng chọn file Excel");
       return;
@@ -172,26 +171,153 @@ export default function QuanLyThanhVienPage() {
         return;
       }
 
-      // Gọi API import
-      const result = await importExcel(file);
+      // Đọc file Excel và parse thành JSON
+      const members = await parseExcelToJson(file);
+      
+      if (members.length === 0) {
+        showError('File Excel không có dữ liệu');
+        return;
+      }
+
+      console.log('Parsed members:', members);
+
+      // Gọi API import JSON (thay vì gửi file)
+      const result = await importMembersJson(members);
       console.log('Import thành công:', result);
 
-      // Hiển thị thông báo thành công
-      showSuccess('Nhập dữ liệu thành công!');
+      showSuccess(`Nhập thành công ${members.length} thành viên!`);
       await queryClient.invalidateQueries({ queryKey: ["member"] });
-
-
-      // Làm mới dữ liệu nếu cần
-      // await fetchData();
 
       // Reset input file
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Lỗi khi import file:', error);
-      alert('Có lỗi xảy ra khi nhập dữ liệu. Vui lòng thử lại.');
+      showError(error?.response?.data?.message || 'Có lỗi xảy ra khi nhập dữ liệu');
     }
+  };
+
+  // Helper: Parse Excel file thành JSON array
+  const parseExcelToJson = (file: File): Promise<IMemberImport[]> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      
+      reader.onload = (e) => {
+        try {
+          const data = e.target?.result;
+          const workbook = XLSX.read(data, { type: 'binary' });
+          const sheetName = workbook.SheetNames[0];
+          const worksheet = workbook.Sheets[sheetName];
+          const rawData = XLSX.utils.sheet_to_json(worksheet);
+
+          // Map dữ liệu Excel sang format chuẩn
+          // Bỏ qua dòng hướng dẫn (STT không phải số hoặc null)
+          const members: IMemberImport[] = rawData
+            .filter((row: any) => {
+              const stt = row["STT"];
+              // Bỏ qua dòng hướng dẫn (STT = "Số thứ tự" hoặc không phải số)
+              if (stt === undefined || stt === null) return false;
+              if (typeof stt === "string" && isNaN(Number(stt))) return false;
+              return true;
+            })
+            .map((row: any) => ({
+              stt: toIntOrNull(row["STT"]),
+              hoTen: row["Họ và tên"] || "",
+              gioiTinh: parseGioiTinh(row["Giới tính"]),
+              ngaySinh: parseExcelDate(row["Ngày sinh"]),
+              ngayMat: parseExcelDate(row["Ngày mất"]),
+              noiSinh: row["Nơi sinh"] || "",
+              noiMat: row["Nơi mất"] || "",
+              ngheNghiep: row["Nghề nghiệp"] || "",
+              trinhDoHocVan: row["Trình độ học vấn"] || "",
+              diaChiHienTai: row["Địa chỉ"] || "",
+              tieuSu: row["Tiểu sử"] || "",
+              doiThuoc: toIntOrNull(row["Đời thứ"], 1) ?? 1,
+              chaId: toIntOrNull(row["ID Cha"]),
+              meId: toIntOrNull(row["ID Mẹ"]),
+              voId: toIntOrNull(row["ID Vợ"]),
+              chongId: toIntOrNull(row["ID Chồng"]),
+            }));
+
+          resolve(members);
+        } catch (err) {
+          reject(err);
+        }
+      };
+
+      reader.onerror = () => reject(new Error('Không thể đọc file'));
+      reader.readAsBinaryString(file);
+    });
+  };
+
+  // Helper functions
+  const toIntOrNull = (v: any, defaultValue: number | null = null): number | null => {
+    if (v === undefined || v === null || v === "") return defaultValue;
+    if (typeof v === "number") return Math.round(v);
+    const num = Number(String(v).trim());
+    return isNaN(num) ? defaultValue : Math.round(num);
+  };
+
+  const parseGioiTinh = (v: any): number => {
+    if (typeof v === "number") return v === 1 ? 1 : 0;
+    const str = String(v || "").toLowerCase().trim();
+    if (str === "nam" || str === "1") return 1;
+    return 0;
+  };
+
+  // Xử lý ngày linh hoạt: chỉ năm, tháng/năm, hoặc đầy đủ
+  const parseExcelDate = (excelDate: any): string | null => {
+    if (!excelDate && excelDate !== 0) return null;
+    
+    // Nếu là số (Excel date serial hoặc chỉ năm)
+    if (typeof excelDate === "number") {
+      // Nếu là năm (1800-2100)
+      if (excelDate >= 1800 && excelDate <= 2100) {
+        return `${excelDate}-01-01`; // Chỉ năm -> 01/01/năm
+      }
+      // Excel date serial number
+      const date = new Date((excelDate - 25569) * 86400 * 1000);
+      return date.toISOString().split("T")[0];
+    }
+    
+    const str = String(excelDate).trim();
+    if (!str) return null;
+    
+    // Chỉ năm: "1950"
+    if (/^\d{4}$/.test(str)) {
+      return `${str}-01-01`;
+    }
+    
+    // Tháng/Năm: "03/1950" hoặc "3/1950"
+    const monthYearMatch = str.match(/^(\d{1,2})\/(\d{4})$/);
+    if (monthYearMatch) {
+      const month = monthYearMatch[1].padStart(2, '0');
+      return `${monthYearMatch[2]}-${month}-01`;
+    }
+    
+    // Năm-Tháng: "1950-03"
+    const yearMonthMatch = str.match(/^(\d{4})-(\d{1,2})$/);
+    if (yearMonthMatch) {
+      const month = yearMonthMatch[2].padStart(2, '0');
+      return `${yearMonthMatch[1]}-${month}-01`;
+    }
+    
+    // Ngày/Tháng/Năm: "15/03/1950"
+    const dmyMatch = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+    if (dmyMatch) {
+      const day = dmyMatch[1].padStart(2, '0');
+      const month = dmyMatch[2].padStart(2, '0');
+      return `${dmyMatch[3]}-${month}-${day}`;
+    }
+    
+    // Năm-Tháng-Ngày: "1950-03-15" (ISO format)
+    if (/^\d{4}-\d{2}-\d{2}$/.test(str)) {
+      return str;
+    }
+    
+    // Trả về nguyên bản nếu không match pattern nào
+    return str;
   };
 
   // const handleImportExcel = (e: React.ChangeEvent<HTMLInputElement>) => {
