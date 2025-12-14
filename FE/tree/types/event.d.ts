@@ -12,6 +12,10 @@ export interface IEvent {
   nguoiTaoId: string;
   active_flag: number;
   lu_user_id: string;
+  tenLoaiSuKien: string;
+  loaiSuKien: number;
+  hoTen: string;
+  uuTien: number;
 }
 
 export interface IsearchEvent {

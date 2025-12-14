@@ -6,10 +6,10 @@ import { generateFamilyData } from "@/utils/familyData"; // Sử dụng hàm gen
 import { ViewMode } from "@/types/familytree";
 import { BookOpen, Settings } from "lucide-react";
 import { FamilyMember } from "@/types/familytree";
-import  SuKienPage  from "../events/page";
+import {NotificationPage} from "../events/page";
 import  TinTucPage  from "../news/page";
 import  PhaKyPage  from "../pen/page";
-import NotificationPage from "@/app/(admin)/notifications/page";
+// import NotificationPage from "@/app/(admin)/notifications/page";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { getMembers } from "@/service/member.service";
 import { ITreeNode } from "@/types/tree";
@@ -41,7 +41,7 @@ export default function App() {
       </div>
 
       {/* MAIN */}
-      <main className="flex-1 relative w-full bg-stone-50">
+      <main className="flex-1 relative w-full bg-stone-50 bg-[#ede5b7]">
         {/* CONTENT */}
         <div className="absolute inset-0 w-full h-full z-10 bg-[#ede5b7]">
           {activeView === ViewMode.DIAGRAM && (
@@ -64,7 +64,7 @@ export default function App() {
 
           {activeView === ViewMode.HISTORY && (
             <div className="w-full h-full overflow-y-auto">
-              <SuKienPage />
+              <NotificationPage />
             </div>
           )}
 

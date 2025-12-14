@@ -1,17 +1,17 @@
 import React from "react";
 
-export default function TinTucPage(){
+export default function TinTucPage() {
   // Dữ liệu giả lập cho danh sách tin tức
   const newsItems = Array(4).fill({
     title: "Họp họ ngày tết vui vẻ",
     desc: "Mô tả ngắn gọn về sự kiện",
     date: "15/11/2025",
-    image: "https://cdn.balkan.app/shared/m60/1.jpg", // Placeholder ảnh
+    image: "images/xumvay.jpg",
   });
 
   const NewsItem = ({ item }: { item: any }) => (
-    <div className="flex gap-4 group cursor-pointer">
-      <div className="w-32 h-24 flex-shrink-0 overflow-hidden rounded border border-[#d4af37]/50">
+    <div className="flex gap-3 group cursor-pointer bg-white/60 p-3 rounded-lg transition-all border border-[#d4af37]/20">
+      <div className="w-24 h-20 flex-shrink-0 overflow-hidden rounded border border-[#d4af37]/50">
         <img
           src={item.image}
           alt={item.title}
@@ -19,10 +19,10 @@ export default function TinTucPage(){
         />
       </div>
       <div className="flex flex-col justify-center">
-        <h4 className="font-display text-lg font-bold text-[#2d2d2d] group-hover:text-[#8b0000] transition-colors">
+        <h4 className="font-display text-base font-bold text-[#2d2d2d] group-hover:text-[#8b0000] transition-colors leading-tight mb-1">
           {item.title}
         </h4>
-        <p className="text-sm text-stone-500 italic mb-1">{item.desc}</p>
+        <p className="text-xs text-stone-500 mb-1">{item.desc}</p>
         <span className="text-xs text-[#8b5e3c] font-semibold">
           Ngày tạo: {item.date}
         </span>
@@ -31,101 +31,135 @@ export default function TinTucPage(){
   );
 
   return (
-    <div className="max-w-6xl mx-auto pb-12 font-serif text-[#4a4a4a]">
-      {/* --- PHẦN TRÊN: BÀI VIẾT NỔI BẬT --- */}
-      <div className="flex flex-col lg:flex-row gap-8 mb-12">
-        {/* Cột trái: Hình ảnh */}
-        <div className="lg:w-1/2">
-          <div className="relative p-2 border border-[#d4af37] bg-white/50 shadow-md rotate-[-1deg] hover:rotate-0 transition-transform duration-500">
-            <img
-              src="https://img.freepik.com/premium-vector/vietnamese-traditional-family-reunion-tet-holiday-lunar-new-year-vector-flat-illustration_1068304-19.jpg"
-              alt="Tết sum vầy"
-              className="w-full h-auto object-cover"
-            />
+    <div className="min-h-screen py-8 px-4 font-serif text-[#4a4a4a]">
+      <div className="max-w-7xl mx-auto">
+        {/* --- PHẦN TRÊN: BÀI VIẾT NỔI BẬT --- */}
+        <div className="flex flex-col lg:flex-row gap-8 mb-12">
+          {/* Cột trái: Hình ảnh */}
+          <div className="lg:w-1/2">
+            <div className="relative p-3 bg-white shadow-xl">
+              <img
+                src="\images\phuc.jpg"
+                alt="Tết sum vầy"
+                className="w-full h-auto object-cover"
+              />
+            </div>
+            <p className="text-center font-display italic text-lg mt-4 text-[#2d2d2d]">
+              Hình ảnh con cháu sum vầy ngày tết
+            </p>
           </div>
-          <p className="text-center font-display italic text-xl mt-3 text-[#2d2d2d]">
-            Hình ảnh con cháu sum vầy ngày tết
-          </p>
+
+          {/* Cột phải: Nội dung văn bản */}
+          <div className="lg:w-1/2 space-y-4 text-justify leading-relaxed text-[#2d2d2d]">
+            <p className="text-base">
+              Tết sum vầy con cháu là dịp để mọi thành viên trong gia đình quây
+              quần, đoàn tụ bên nhau sau một năm làm việc vất vả, thể hiện
+              truyền thống văn hóa Việt. Đây là thời điểm con cháu thể hiện lòng
+              biết ơn, báo hiếu ông bà, cha mẹ và cùng nhau tạo nên những kỷ
+              niệm ấm áp thông qua các hoạt động như gói bánh chưng, trang trí
+              nhà cửa, chúc Tết đầu năm.
+            </p>
+
+            <div>
+              <h3 className="font-bold text-[#8b0000] mb-3 text-lg">
+                Ý nghĩa và giá trị
+              </h3>
+              <ul className="space-y-2 text-sm">
+                <li className="flex items-start gap-2">
+                  <span className="text-[#d4af37] mt-1">•</span>
+                  <span>
+                    <strong>Đoàn tụ gia đình:</strong> Tết là dịp để con cháu
+                    phương xa trở về với cội nguồn, gác lại bộn bề cuộc sống để
+                    sum họp bên gia đình.
+                  </span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-[#d4af37] mt-1">•</span>
+                  <span>
+                    <strong>Bày tỏ lòng thành kính:</strong> Con cháu dâng quà,
+                    chúc Tết ông bà, cha mẹ, thể hiện lòng biết ơn và mong ước
+                    về sức khỏe, bình an cho cả gia đình.
+                  </span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-[#d4af37] mt-1">•</span>
+                  <span>
+                    <strong>Giữ gìn nét đẹp truyền thống:</strong> Các hoạt động
+                    như gói bánh chưng, trông nồi bánh, hái lộc đầu xuân không
+                    chỉ là nghi lễ mà còn là cách gìn giữ hồn cốt văn hóa dân
+                    tộc.
+                  </span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-[#d4af37] mt-1">•</span>
+                  <span>
+                    <strong>Tạo dựng kỷ niệm:</strong> Những khoảnh khắc quây
+                    quần, trò chuyện, cùng nhau thưởng thức mứt Tết, nhấp một
+                    chút rượu vang là những kỷ niệm quý giá và thiêng liêng
+                    nhất.
+                  </span>
+                </li>
+              </ul>
+            </div>
+          </div>
         </div>
 
-        {/* Cột phải: Nội dung văn bản */}
-        <div className="lg:w-1/2 space-y-4 text-justify leading-relaxed">
-          <p>
-            Tết sum vầy con cháu là dịp để mọi thành viên trong gia đình quây
-            quần, đoàn tụ bên nhau sau một năm làm việc vất vả, thể hiện truyền
-            thống văn hóa Việt. Đây là thời điểm con cháu thể hiện lòng biết ơn,
-            báo hiếu ông bà, cha mẹ và cùng nhau tạo nên những kỷ niệm ấm áp
-            thông qua các hoạt động như gói bánh chưng, trang trí nhà cửa, chúc
-            Tết đầu năm.
-          </p>
+        {/* --- PHẦN DƯỚI: DANH SÁCH TIN TỨC --- */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 relative mt-16">
+          {/* Đường kẻ dọc phân cách ở giữa (chỉ hiện trên màn hình lớn) */}
+          <div className="hidden lg:block absolute left-1/2 top-12 bottom-0 w-px bg-[#d4af37]/40 -translate-x-1/2"></div>
 
-          <div>
-            <h3 className="font-bold text-[#2d2d2d] mb-2">
-              Ý nghĩa và giá trị
+          {/* Cột 1: Các tin tức mới nhất */}
+          <div className="pr-0 lg:pr-6">
+            <h3 className="font-display text-2xl text-[#2d2d2d] italic mb-6 pb-2 relative inline-block">
+              Các tin tức mới nhất
+              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-[#d4af37] to-transparent"></div>
             </h3>
-            <ul className="list-disc pl-5 space-y-2">
-              <li>
-                Đoàn tụ gia đình: Tết là dịp để con cháu phương xa trở về với
-                cội nguồn, gác lại bộn bề cuộc sống để sum họp bên gia đình.
-              </li>
-              <li>
-                Bày tỏ lòng thành kính: Con cháu dâng quà, chúc Tết ông bà, cha
-                mẹ, thể hiện lòng biết ơn và mong ước về sức khỏe, bình an cho
-                cả gia đình.
-              </li>
-              <li>
-                Giữ gìn nét đẹp truyền thống: Các hoạt động như gói bánh chưng,
-                trông nồi bánh, hái lộc đầu xuân không chỉ là nghi lễ mà còn là
-                cách gìn giữ hồn cốt văn hóa dân tộc.
-              </li>
-              <li>
-                Tạo dựng kỷ niệm: Những khoảnh khắc quây quần, trò chuyện, cùng
-                nhau thưởng thức mứt Tết, nhấp một chút rượu vang là những kỷ
-                niệm quý giá và thiêng liêng nhất.
-              </li>
-            </ul>
+            <div className="space-y-4">
+              {newsItems.map((item, idx) => (
+                <NewsItem key={`latest-${idx}`} item={item} />
+              ))}
+            </div>
           </div>
-        </div>
-      </div>
 
-      {/* --- PHẦN DƯỚI: DANH SÁCH TIN TỨC --- */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 relative mt-16">
-        {/* Đường kẻ dọc phân cách ở giữa (chỉ hiện trên màn hình lớn) */}
-        <div className="hidden lg:block absolute left-1/2 top-0 bottom-0 w-px bg-[#d4af37]/50 -translate-x-1/2"></div>
-
-        {/* Cột 1: Các tin tức mới nhất */}
-        <div className="pr-0 lg:pr-8">
-          <h3 className="font-display text-2xl text-[#2d2d2d] italic border-b-2 border-[#d4af37] inline-block mb-8 pb-1">
-            Các tin tức mới nhất
-          </h3>
-          <div className="space-y-6">
-            {newsItems.map((item, idx) => (
-              <NewsItem key={`latest-${idx}`} item={item} />
-            ))}
+          {/* Cột 2: Xem thêm */}
+          <div className="pl-0 lg:pl-6">
+            <h3 className="font-display text-2xl text-[#2d2d2d] italic mb-6 pb-2 relative inline-block">
+              Xem thêm
+              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-[#d4af37] to-transparent"></div>
+            </h3>
+            <div className="space-y-4">
+              {newsItems.map((item, idx) => (
+                <NewsItem key={`more-${idx}`} item={item} />
+              ))}
+            </div>
           </div>
         </div>
 
-        {/* Cột 2: Xem thêm */}
-        <div className="pl-0 lg:pl-8">
-          <h3 className="font-display text-2xl text-[#2d2d2d] italic border-b-2 border-[#d4af37] inline-block mb-8 pb-1">
-            Xem thêm
-          </h3>
-          <div className="space-y-6">
-            {newsItems.map((item, idx) => (
-              <NewsItem key={`more-${idx}`} item={item} />
-            ))}
-          </div>
+        {/* Họa tiết trang trí chân trang */}
+        <div className="mt-16 flex justify-center opacity-40">
+          <svg className="w-64 h-12" viewBox="0 0 256 48" fill="none">
+            <path
+              d="M 8 24 L 64 24 M 72 24 Q 88 16 104 24 Q 120 32 128 24 Q 136 16 152 24 Q 168 32 184 24 M 192 24 L 248 24"
+              stroke="#c9a961"
+              strokeWidth="2"
+            />
+            <circle cx="128" cy="24" r="6" fill="#c9a961" />
+            <path
+              d="M 120 16 L 128 8 L 136 16"
+              stroke="#c9a961"
+              strokeWidth="2"
+              fill="none"
+            />
+            <path
+              d="M 120 32 L 128 40 L 136 32"
+              stroke="#c9a961"
+              strokeWidth="2"
+              fill="none"
+            />
+          </svg>
         </div>
-      </div>
-
-      {/* Họa tiết trang trí chân trang */}
-      <div className="mt-16 flex justify-center opacity-50">
-        <img
-          src="https://cdn.balkan.app/shared/f1.png"
-          alt="decoration"
-          className="w-64"
-        />
       </div>
     </div>
   );
-};
+}

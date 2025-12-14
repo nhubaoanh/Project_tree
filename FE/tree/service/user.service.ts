@@ -39,10 +39,10 @@ export const getUsers = async (
 };
 
 // // Hàm lấy toàn bộ dữ liệu để nạp context cho AI
-// export const getAllUsersForAI = async (): Promise<IUser[]> => {
-//     await delay(100);
-//     return MOCK_USERS;
-// };
+export const getAllUsersForAI = async (): Promise<IUser[]> => {
+    await delay(100);
+    return MOCK_USERS;
+};
 // not finish
 export const createUser = async (
   data: IUserSearch,

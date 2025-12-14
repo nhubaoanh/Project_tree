@@ -34,7 +34,8 @@ export const MyFamilyTree = ({ data }: { data: ITreeNode[] }) => {
       field_2: node.ngheNghiep || "Chưa rõ",
       img_0: node.anhChanDung
         ? `/uploads/${node.anhChanDung}`
-        : `https://via.placeholder.com/120?text=${node.hoTen?.[0] || "?"}`,
+        // : `https://via.placeholder.com/120?text=${node.hoTen?.[0] || "?"}`,
+        : `/images/vangoc.jpg`,
 
       tags: [node.gioiTinh === 1 ? "male" : "female"],
     }));
@@ -84,7 +85,7 @@ export const MyFamilyTree = ({ data }: { data: ITreeNode[] }) => {
   return (
     <div
       ref={divRef}
-      className="w-full h-screen bg-gradient-to-b from-amber-50 to-stone-100"
+      className="w-full h-screen bg-gradient-to-b from-amber-50 to-stone-100 bg-[#ede5b7]"
     />
   );
 };
