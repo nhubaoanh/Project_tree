@@ -27,6 +27,39 @@ export const getMemberById = async (id: number): Promise<any> => {
     }
 }
 
+export const createMember = async (data: any): Promise<any> => {
+    try {
+        const res = await apiClient.post(`${prefix}`, data);
+        return res?.data;
+    } catch (error: any) {
+        const err = parseApiError(error);
+        console.error(`[createMember] ${err.message}`);
+        throw new Error(err.message);
+    }
+}
+
+export const updateMember = async (id: number, data: any): Promise<any> => {
+    try {
+        const res = await apiClient.put(`${prefix}/${id}`, data);
+        return res?.data;
+    } catch (error: any) {
+        const err = parseApiError(error);
+        console.error(`[updateMember] ${err.message}`);
+        throw new Error(err.message);
+    }
+}
+
+export const deleteMember = async (id: number): Promise<any> => {
+    try {
+        const res = await apiClient.delete(`${prefix}/${id}`);
+        return res?.data;
+    } catch (error: any) {
+        const err = parseApiError(error);
+        console.error(`[deleteMember] ${err.message}`);
+        throw new Error(err.message);
+    }
+}
+
 export const searchMember = async (data: IMemberSearch): Promise<any> => {
     try {
         const res = await apiClient.post(`${prefix}/search`, data);

@@ -13,9 +13,13 @@ export class thanhVienController {
   async createThanhVien(req: Request, res: Response): Promise<void> {
     try {
       const thanhvien = req.body as thanhVien;
+      // Gán dongHoId mặc định nếu chưa có
+      if (!thanhvien.dongHoId) {
+        thanhvien.dongHoId = "e9022e64-cbae-11f0-8020-a8934a9bae74";
+      }
       const results = await this.thanhvienService.createThanhVien(thanhvien);
       res.status(200).json({
-        message: "Them thanh vien thanh cong",
+        message: "Thêm thành viên thành công",
         success: true,
         data: results,
       });
@@ -23,7 +27,54 @@ export class thanhVienController {
       console.log("error", error);
       res
         .status(500)
-        .json({ message: "Them thanh vien that bai", success: false });
+        .json({ message: "Thêm thành viên thất bại", success: false });
+    }
+  }
+
+  async getThanhVienById(req: Request, res: Response): Promise<void> {
+    try {
+      const id = parseInt(req.params.id);
+      const result = await this.thanhvienService.getThanhVienById(id);
+      if (result) {
+        res.status(200).json({ success: true, data: result });
+      } else {
+        res.status(404).json({ success: false, message: "Không tìm thấy thành viên" });
+      }
+    } catch (error: any) {
+      console.log("error", error);
+      res.status(500).json({ message: "Lỗi khi lấy thông tin thành viên", success: false });
+    }
+  }
+
+  async updateThanhVien(req: Request, res: Response): Promise<void> {
+    try {
+      const id = parseInt(req.params.id);
+      const thanhvien = req.body as thanhVien;
+      thanhvien.thanhVienId = id;
+      const results = await this.thanhvienService.updateThanhVien(thanhvien);
+      res.status(200).json({
+        message: "Cập nhật thành viên thành công",
+        success: true,
+        data: results,
+      });
+    } catch (error: any) {
+      console.log("error", error);
+      res.status(500).json({ message: "Cập nhật thành viên thất bại", success: false });
+    }
+  }
+
+  async deleteThanhVien(req: Request, res: Response): Promise<void> {
+    try {
+      const id = parseInt(req.params.id);
+      const results = await this.thanhvienService.deleteThanhVien(id);
+      res.status(200).json({
+        message: "Xóa thành viên thành công",
+        success: true,
+        data: results,
+      });
+    } catch (error: any) {
+      console.log("error", error);
+      res.status(500).json({ message: "Xóa thành viên thất bại", success: false });
     }
   }
 

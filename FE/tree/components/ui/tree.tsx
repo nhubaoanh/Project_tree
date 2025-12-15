@@ -7,9 +7,29 @@ import { ITreeNode } from "@/types/tree";
 
 let initialized = false;
 
+// URL backend để lấy ảnh
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:6001";
+const DEFAULT_AVATAR = "/images/vangoc.jpg";
+
 interface MyFamilyTreeProps {
   data: ITreeNode[];
 }
+
+// Helper: Tạo URL ảnh từ path
+const getImageUrl = (anhChanDung: string | null | undefined): string => {
+  if (!anhChanDung || anhChanDung.trim() === "") {
+    return DEFAULT_AVATAR;
+  }
+  // Nếu đã là URL đầy đủ
+  if (anhChanDung.startsWith("http")) {
+    return anhChanDung;
+  }
+  // Nếu là relative path từ backend (vd: "uploads/2025/12/15/abc.jpg" hoặc "2025/12/15/abc.jpg")
+  const cleanPath = anhChanDung.startsWith("uploads/") 
+    ? anhChanDung 
+    : `uploads/${anhChanDung}`;
+  return `${API_BASE_URL}/${cleanPath}`;
+};
 
 export const MyFamilyTree = ({ data }: MyFamilyTreeProps) => {
   const divRef = useRef<HTMLDivElement>(null);
@@ -34,9 +54,7 @@ export const MyFamilyTree = ({ data }: MyFamilyTreeProps) => {
         ? new Date(node.ngayMat).toLocaleDateString("vi-VN")
         : "Chưa rõ",
       field_2: node.ngheNghiep || "Chưa rõ",
-      img_0: node.anhChanDung
-        ? `/uploads/${node.anhChanDung}`
-        : `/images/vangoc.jpg`,
+      img_0: getImageUrl(node.anhChanDung),
 
       tags: [node.gioiTinh === 1 ? "male" : "female"],
     }));

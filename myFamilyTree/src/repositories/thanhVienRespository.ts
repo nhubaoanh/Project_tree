@@ -2,6 +2,18 @@ import { injectable } from "tsyringe";
 import { thanhVien } from "../models/thanhvien";
 import { Database } from "../config/database";
 
+// Helper: Format date cho MySQL (YYYY-MM-DD)
+const formatDateForMySQL = (date: any): string | null => {
+  if (!date) return null;
+  try {
+    const d = new Date(date);
+    if (isNaN(d.getTime())) return null;
+    return d.toISOString().split("T")[0]; // "2022-12-31"
+  } catch {
+    return null;
+  }
+};
+
 @injectable()
 export class thanhVienRespository {
   constructor(private db: Database) {}
@@ -15,8 +27,8 @@ export class thanhVienRespository {
         thanhvien.dongHoId,
         thanhvien.hoTen,
         thanhvien.gioiTinh,
-        thanhvien.ngaySinh,
-        thanhvien.ngayMat,
+        formatDateForMySQL(thanhvien.ngaySinh),
+        formatDateForMySQL(thanhvien.ngayMat),
         thanhvien.noiSinh,
         thanhvien.noiMat,
         thanhvien.ngheNghiep,
@@ -47,8 +59,8 @@ export class thanhVienRespository {
         thanhVien.dongHoId,
         thanhVien.hoTen,
         thanhVien.gioiTinh,
-        thanhVien.ngaySinh,
-        thanhVien.ngayMat,
+        formatDateForMySQL(thanhVien.ngaySinh),
+        formatDateForMySQL(thanhVien.ngayMat),
         thanhVien.noiSinh,
         thanhVien.noiMat,
         thanhVien.ngheNghiep,
@@ -76,6 +88,17 @@ export class thanhVienRespository {
       const [result] = await this.db.query(sql, [thanhVienId]);
       return result[0];
     } catch (error: any) {
+      throw new Error(error.message);
+    }
+  }
+
+  async deleteThanhVien(thanhVienId: number): Promise<any> {
+    try {
+      const sql = "UPDATE thanhvien SET active_flag = 0 WHERE thanhVienId = ?";
+      await this.db.query(sql, [thanhVienId]);
+      return true;
+    } catch (error: any) {
+      console.log("error database => ", error);
       throw new Error(error.message);
     }
   }

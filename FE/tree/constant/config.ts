@@ -2,7 +2,7 @@ export const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 export const API_CORE = "api-core";
 
 export const ERROR_TIMEOUT = "read ECONNRESET";
-
+export const API_DOWNLOAD = "api-core";
 export const SEARCH_PAGE = "page";
 export const SEARCH_SIZE = "size";
 export const SEARCH_CONTENT = "s";

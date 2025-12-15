@@ -15,6 +15,18 @@ export class thanhVienService {
     return await this.thanhvienRespository.createThanhVien(thanhvien);
   }
 
+  async getThanhVienById(id: number): Promise<any> {
+    return await this.thanhvienRespository.getThanhVienById(id);
+  }
+
+  async updateThanhVien(thanhvien: thanhVien): Promise<any> {
+    return await this.thanhvienRespository.updateMultipleThanhVien(thanhvien);
+  }
+
+  async deleteThanhVien(id: number): Promise<any> {
+    return await this.thanhvienRespository.deleteThanhVien(id);
+  }
+
   async getAllThanhVien(): Promise<any> {
     return await this.thanhvienRespository.getAllThanhVien();
   }

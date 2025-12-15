@@ -11,7 +11,15 @@ import {
 import { IMember, IMemberSearch } from "@/types/member";
 import { useToast } from "@/service/useToas";
 import { MemberTable } from "./components/memberTable";
-import { getMembers, importExcel, searchMember, importMembersJson, IMemberImport } from "@/service/member.service";
+import {
+  searchMember,
+  importMembersJson,
+  IMemberImport,
+  createMember,
+  updateMember,
+  deleteMember,
+} from "@/service/member.service";
+import { MemberModal } from "./components/memberModal";
 import toast from "react-hot-toast";
 import { ExcelTemplateButton } from "./components/ExcelTemplateButton";
 
@@ -64,49 +72,44 @@ export default function QuanLyThanhVienPage() {
   const totalPages = memberQuery.data?.pageCount || 0;
   const isLoading = memberQuery.isLoading;
 
-
   // --- MUTATIONS - CRUD ---
-  // const createMutation = useMutation({
-  //   mutationFn: createUser,
-  //   onSuccess: () => {
-  //     queryClient.invalidateQueries({ queryKey: ["users"] });
-  //     // toast.success("Thêm thành viên thành công!");
-  //     showSuccess("Thêm thành viên thành công!");
-  //     setIsModalOpen(false);
-  //   },
-  //   onError: () => {
-  //     // toast.error("Có lỗi xảy ra khi thêm thành viên.");
-  //     showError("Có lỗi xảy ra khi thêm thành viên.");
-  //   },
-  // });
+  const createMutation = useMutation({
+    mutationFn: createMember,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["member"] });
+      showSuccess("Thêm thành viên thành công!");
+      setIsModalOpen(false);
+    },
+    onError: (error: any) => {
+      showError(error.message || "Có lỗi xảy ra khi thêm thành viên.");
+    },
+  });
 
-  // const updateMutation = useMutation({
-  //   mutationFn: (vars: { id: string; user: Partial<IUser> }) =>
-  //     updateUser(vars.id, vars.user),
-  //   onSuccess: () => {
-  //     queryClient.invalidateQueries({ queryKey: ["users"] });
-  //     // toast.success("Cập nhật thông tin thành công!");
-  //     showSuccess("Cập nhật thông tin thành công!")
-  //     setIsModalOpen(false);
-  //   },
-  //   onError: () => {
-  //     // toast.error("Có lỗi xảy ra khi cập nhật.");
-  //     showError("Có lỗi xảy ra khi cập nhật.");
-  //   },
-  // });
+  const updateMutation = useMutation({
+    mutationFn: (vars: { id: number; data: Partial<IMember> }) =>
+      updateMember(vars.id, vars.data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["member"] });
+      showSuccess("Cập nhật thông tin thành công!");
+      setIsModalOpen(false);
+    },
+    onError: (error: any) => {
+      showError(error.message || "Có lỗi xảy ra khi cập nhật.");
+    },
+  });
 
-  // const deleteMutation = useMutation({
-  //   mutationFn: deleteUser,
-  //   onSuccess: () => {
-  //     queryClient.invalidateQueries({ queryKey: ["users"] });
-  //     toast.success("Đã xóa thành viên.");
-  //     setIsDeleteModalOpen(false);
-  //     setUserToDelete(null);
-  //   },
-  //   onError: () => {
-  //     toast.error("Không thể xóa thành viên này.");
-  //   },
-  // });
+  const deleteMutation = useMutation({
+    mutationFn: deleteMember,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["member"] });
+      showSuccess("Đã xóa thành viên.");
+      setIsDeleteModalOpen(false);
+      setUserToDelete(null);
+    },
+    onError: (error: any) => {
+      showError(error.message || "Không thể xóa thành viên này.");
+    },
+  });
 
   // --- EVENT HANDLERS ---
 
@@ -125,19 +128,19 @@ export default function QuanLyThanhVienPage() {
     setIsDeleteModalOpen(true);
   };
 
-  // const handleConfirmDelete = () => {
-  //   if (userToDelete) {
-  //     deleteMutation.mutate(userToDelete.nguoiDungId);
-  //   }
-  // };
+  const handleConfirmDelete = () => {
+    if (userToDelete) {
+      deleteMutation.mutate(userToDelete.thanhVienId);
+    }
+  };
 
-  // const handleSaveUser = (user: Partial<IUser>) => {
-  //   if (editingUser) {
-  //     updateMutation.mutate({ id: editingUser.nguoiDungId, user });
-  //   } else {
-  //     createMutation.mutate(user);
-  //   }
-  // };
+  const handleSaveMember = (member: Partial<IMember>) => {
+    if (editingUser) {
+      updateMutation.mutate({ id: editingUser.thanhVienId, data: member });
+    } else {
+      createMutation.mutate(member);
+    }
+  };
 
   const handlePageSizeChange = (newSize: number) => {
     setPageSize(newSize);
@@ -157,7 +160,9 @@ export default function QuanLyThanhVienPage() {
     XLSX.writeFile(workbook, `DanhSachThanhVien_Trang${pageIndex}.xlsx`);
   };
 
-  const handleImportExcel = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImportExcel = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = event.target.files?.[0];
     if (!file) {
       alert("Vui lòng chọn file Excel");
@@ -167,34 +172,36 @@ export default function QuanLyThanhVienPage() {
     try {
       // Kiểm tra định dạng file
       if (!file.name.match(/\.(xlsx|xls)$/)) {
-        alert('Vui lòng chọn file Excel (.xlsx hoặc .xls)');
+        alert("Vui lòng chọn file Excel (.xlsx hoặc .xls)");
         return;
       }
 
       // Đọc file Excel và parse thành JSON
       const members = await parseExcelToJson(file);
-      
+
       if (members.length === 0) {
-        showError('File Excel không có dữ liệu');
+        showError("File Excel không có dữ liệu");
         return;
       }
 
-      console.log('Parsed members:', members);
+      console.log("Parsed members:", members);
 
       // Gọi API import JSON (thay vì gửi file)
       const result = await importMembersJson(members);
-      console.log('Import thành công:', result);
+      console.log("Import thành công:", result);
 
       showSuccess(`Nhập thành công ${members.length} thành viên!`);
       await queryClient.invalidateQueries({ queryKey: ["member"] });
 
       // Reset input file
       if (fileInputRef.current) {
-        fileInputRef.current.value = '';
+        fileInputRef.current.value = "";
       }
     } catch (error: any) {
-      console.error('Lỗi khi import file:', error);
-      showError(error?.response?.data?.message || 'Có lỗi xảy ra khi nhập dữ liệu');
+      console.error("Lỗi khi import file:", error);
+      showError(
+        error?.response?.data?.message || "Có lỗi xảy ra khi nhập dữ liệu"
+      );
     }
   };
 
@@ -202,11 +209,11 @@ export default function QuanLyThanhVienPage() {
   const parseExcelToJson = (file: File): Promise<IMemberImport[]> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      
+
       reader.onload = (e) => {
         try {
           const data = e.target?.result;
-          const workbook = XLSX.read(data, { type: 'binary' });
+          const workbook = XLSX.read(data, { type: "binary" });
           const sheetName = workbook.SheetNames[0];
           const worksheet = workbook.Sheets[sheetName];
           const rawData = XLSX.utils.sheet_to_json(worksheet);
@@ -246,13 +253,16 @@ export default function QuanLyThanhVienPage() {
         }
       };
 
-      reader.onerror = () => reject(new Error('Không thể đọc file'));
+      reader.onerror = () => reject(new Error("Không thể đọc file"));
       reader.readAsBinaryString(file);
     });
   };
 
   // Helper functions
-  const toIntOrNull = (v: any, defaultValue: number | null = null): number | null => {
+  const toIntOrNull = (
+    v: any,
+    defaultValue: number | null = null
+  ): number | null => {
     if (v === undefined || v === null || v === "") return defaultValue;
     if (typeof v === "number") return Math.round(v);
     const num = Number(String(v).trim());
@@ -261,7 +271,9 @@ export default function QuanLyThanhVienPage() {
 
   const parseGioiTinh = (v: any): number => {
     if (typeof v === "number") return v === 1 ? 1 : 0;
-    const str = String(v || "").toLowerCase().trim();
+    const str = String(v || "")
+      .toLowerCase()
+      .trim();
     if (str === "nam" || str === "1") return 1;
     return 0;
   };
@@ -269,7 +281,7 @@ export default function QuanLyThanhVienPage() {
   // Xử lý ngày linh hoạt: chỉ năm, tháng/năm, hoặc đầy đủ
   const parseExcelDate = (excelDate: any): string | null => {
     if (!excelDate && excelDate !== 0) return null;
-    
+
     // Nếu là số (Excel date serial hoặc chỉ năm)
     if (typeof excelDate === "number") {
       // Nếu là năm (1800-2100)
@@ -280,42 +292,42 @@ export default function QuanLyThanhVienPage() {
       const date = new Date((excelDate - 25569) * 86400 * 1000);
       return date.toISOString().split("T")[0];
     }
-    
+
     const str = String(excelDate).trim();
     if (!str) return null;
-    
+
     // Chỉ năm: "1950"
     if (/^\d{4}$/.test(str)) {
       return `${str}-01-01`;
     }
-    
+
     // Tháng/Năm: "03/1950" hoặc "3/1950"
     const monthYearMatch = str.match(/^(\d{1,2})\/(\d{4})$/);
     if (monthYearMatch) {
-      const month = monthYearMatch[1].padStart(2, '0');
+      const month = monthYearMatch[1].padStart(2, "0");
       return `${monthYearMatch[2]}-${month}-01`;
     }
-    
+
     // Năm-Tháng: "1950-03"
     const yearMonthMatch = str.match(/^(\d{4})-(\d{1,2})$/);
     if (yearMonthMatch) {
-      const month = yearMonthMatch[2].padStart(2, '0');
+      const month = yearMonthMatch[2].padStart(2, "0");
       return `${yearMonthMatch[1]}-${month}-01`;
     }
-    
+
     // Ngày/Tháng/Năm: "15/03/1950"
     const dmyMatch = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
     if (dmyMatch) {
-      const day = dmyMatch[1].padStart(2, '0');
-      const month = dmyMatch[2].padStart(2, '0');
+      const day = dmyMatch[1].padStart(2, "0");
+      const month = dmyMatch[2].padStart(2, "0");
       return `${dmyMatch[3]}-${month}-${day}`;
     }
-    
+
     // Năm-Tháng-Ngày: "1950-03-15" (ISO format)
     if (/^\d{4}-\d{2}-\d{2}$/.test(str)) {
       return str;
     }
-    
+
     // Trả về nguyên bản nếu không match pattern nào
     return str;
   };
@@ -382,7 +394,6 @@ export default function QuanLyThanhVienPage() {
       </div>
     );
   }
-
 
   // --- RENDER UI ---
   return (
@@ -470,22 +481,47 @@ export default function QuanLyThanhVienPage() {
         onDelete={handleDeleteClick}
       />
 
-      {/*<UserModal
+      {/* Member Modal */}
+      <MemberModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onSubmit={handleSaveUser}
-        initialData={editingUser}
-        isLoading={isSaving}
+        onSave={handleSaveMember}
+        member={editingUser}
+        isLoading={createMutation.isPending || updateMutation.isPending}
       />
 
-      <ConfirmDeleteModal
-        isOpen={isDeleteModalOpen}
-        onClose={() => setIsDeleteModalOpen(false)}
-        onConfirm={handleConfirmDelete}
-        itemName={userToDelete?.hoTen || ""}
-        isLoading={isDeleting}
-      /> */}
+      {/* Delete Confirmation Modal */}
+      {isDeleteModalOpen && userToDelete && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full">
+            <h3 className="text-lg font-bold text-[#5d4037] mb-4">
+              Xác nhận xóa
+            </h3>
+            <p className="text-gray-600 mb-6">
+              Bạn có chắc chắn muốn xóa thành viên{" "}
+              <strong>{userToDelete.hoTen}</strong>?
+            </p>
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => {
+                  setIsDeleteModalOpen(false);
+                  setUserToDelete(null);
+                }}
+                className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-50"
+              >
+                Hủy
+              </button>
+              <button
+                onClick={handleConfirmDelete}
+                disabled={deleteMutation.isPending}
+                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50"
+              >
+                {deleteMutation.isPending ? "Đang xóa..." : "Xóa"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
-};
-
+}

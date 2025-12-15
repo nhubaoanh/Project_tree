@@ -20,8 +20,13 @@ thanhVienRouter.use((req, res, next) => {
 const thanhviencontroller = container.resolve(thanhVienController);
 
 thanhVienRouter.get("/getAllMember", thanhviencontroller.getAllThanhVien.bind(thanhviencontroller));
-thanhVienRouter.get('/export-template', thanhviencontroller.exportTemplate.bind(thanhviencontroller))
+thanhVienRouter.get('/export-template', thanhviencontroller.exportTemplate.bind(thanhviencontroller));
+thanhVienRouter.get('/:id', thanhviencontroller.getThanhVienById.bind(thanhviencontroller));
+thanhVienRouter.post("", thanhviencontroller.createThanhVien.bind(thanhviencontroller));
 thanhVienRouter.post("/create", thanhviencontroller.createThanhVien.bind(thanhviencontroller));
 thanhVienRouter.post('/search', thanhviencontroller.searchThanhVien.bind(thanhviencontroller));
-thanhVienRouter.post('/import-json', thanhviencontroller.importFromJson.bind(thanhviencontroller))
+thanhVienRouter.post('/import-json', thanhviencontroller.importFromJson.bind(thanhviencontroller));
+thanhVienRouter.put('/:id', thanhviencontroller.updateThanhVien.bind(thanhviencontroller));
+thanhVienRouter.delete('/:id', thanhviencontroller.deleteThanhVien.bind(thanhviencontroller));
+
 export default thanhVienRouter;
