@@ -413,7 +413,7 @@ export class thanhVienController {
       // Response
       res.setHeader(
         "Content-Disposition",
-        'attachment; filename="Mau_nhap_gia_pha.xlsx"'
+        'attachment; filename="MauNhap_GP.xlsx"'
       );
       res.setHeader(
         "Content-Type",

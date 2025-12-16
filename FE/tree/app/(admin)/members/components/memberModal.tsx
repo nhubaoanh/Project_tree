@@ -40,6 +40,7 @@ export const MemberModal: React.FC<MemberModalProps> = ({
     if (isOpen) {
       setFormData({
         hoTen: member?.hoTen || "",
+        dongHoId: member?.dongHoId || "",
         gioiTinh: member?.gioiTinh ?? 1,
         ngaySinh: member?.ngaySinh,
         ngayMat: member?.ngayMat,
@@ -202,7 +203,11 @@ export const MemberModal: React.FC<MemberModalProps> = ({
                 {uploading ? (
                   <Loader2 className="w-8 h-8 animate-spin text-[#d4af37]" />
                 ) : previewUrl ? (
-                  <img src={previewUrl} alt="Preview" className="w-full h-full object-cover" />
+                  <img
+                    src={previewUrl}
+                    alt="Preview"
+                    className="w-full h-full object-cover"
+                  />
                 ) : (
                   <ImageIcon className="w-12 h-12 text-[#d4af37] opacity-50" />
                 )}
@@ -262,18 +267,24 @@ export const MemberModal: React.FC<MemberModalProps> = ({
                   </button>
                 </div>
               ))}
-              
+
               {/* Nút thêm ảnh */}
               <div
-                onClick={() => !uploadingMulti && multiFileInputRef.current?.click()}
-                className={`w-24 h-24 border-2 border-dashed border-[#d4af37] rounded-lg flex flex-col items-center justify-center cursor-pointer hover:bg-[#fdf6e3] transition-colors ${uploadingMulti ? "opacity-50 cursor-not-allowed" : ""}`}
+                onClick={() =>
+                  !uploadingMulti && multiFileInputRef.current?.click()
+                }
+                className={`w-24 h-24 border-2 border-dashed border-[#d4af37] rounded-lg flex flex-col items-center justify-center cursor-pointer hover:bg-[#fdf6e3] transition-colors ${
+                  uploadingMulti ? "opacity-50 cursor-not-allowed" : ""
+                }`}
               >
                 {uploadingMulti ? (
                   <Loader2 className="w-6 h-6 animate-spin text-[#d4af37]" />
                 ) : (
                   <>
                     <Plus size={24} className="text-[#d4af37]" />
-                    <span className="text-xs text-[#d4af37] mt-1">Thêm ảnh</span>
+                    <span className="text-xs text-[#d4af37] mt-1">
+                      Thêm ảnh
+                    </span>
                   </>
                 )}
               </div>
@@ -286,7 +297,9 @@ export const MemberModal: React.FC<MemberModalProps> = ({
                 className="hidden"
               />
             </div>
-            <p className="text-xs text-gray-500">Có thể chọn nhiều ảnh cùng lúc</p>
+            <p className="text-xs text-gray-500">
+              Có thể chọn nhiều ảnh cùng lúc
+            </p>
           </div>
 
           {/* Form Fields */}
@@ -299,17 +312,37 @@ export const MemberModal: React.FC<MemberModalProps> = ({
               <input
                 type="text"
                 value={formData.hoTen || ""}
-                onChange={(e) => setFormData({ ...formData, hoTen: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, hoTen: e.target.value })
+                }
+                className="w-full px-3 py-2 border border-[#d4af37] rounded focus:outline-none focus:border-[#b91c1c]"
+              />
+            </div>
+            {/* Dòng họ */}
+            <div>
+              <label className="block text-sm font-medium text-[#5d4037] mb-1">
+                Dòng họ <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                value={formData.dongHoId || ""}
+                onChange={(e) =>
+                  setFormData({ ...formData, dongHoId: e.target.value })
+                }
                 className="w-full px-3 py-2 border border-[#d4af37] rounded focus:outline-none focus:border-[#b91c1c]"
               />
             </div>
 
             {/* Giới tính */}
             <div>
-              <label className="block text-sm font-medium text-[#5d4037] mb-1">Giới tính</label>
+              <label className="block text-sm font-medium text-[#5d4037] mb-1">
+                Giới tính
+              </label>
               <select
                 value={formData.gioiTinh ?? 1}
-                onChange={(e) => setFormData({ ...formData, gioiTinh: Number(e.target.value) })}
+                onChange={(e) =>
+                  setFormData({ ...formData, gioiTinh: Number(e.target.value) })
+                }
                 className="w-full px-3 py-2 border border-[#d4af37] rounded focus:outline-none focus:border-[#b91c1c]"
               >
                 <option value={1}>Nam</option>
@@ -319,100 +352,146 @@ export const MemberModal: React.FC<MemberModalProps> = ({
 
             {/* Ngày sinh */}
             <div>
-              <label className="block text-sm font-medium text-[#5d4037] mb-1">Ngày sinh</label>
+              <label className="block text-sm font-medium text-[#5d4037] mb-1">
+                Ngày sinh
+              </label>
               <input
                 type="date"
                 value={formatDateForInput(formData.ngaySinh)}
-                onChange={(e) => setFormData({ ...formData, ngaySinh: e.target.value ? new Date(e.target.value) : undefined })}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    ngaySinh: e.target.value
+                      ? new Date(e.target.value)
+                      : undefined,
+                  })
+                }
                 className="w-full px-3 py-2 border border-[#d4af37] rounded focus:outline-none focus:border-[#b91c1c]"
               />
             </div>
 
             {/* Ngày mất */}
             <div>
-              <label className="block text-sm font-medium text-[#5d4037] mb-1">Ngày mất</label>
+              <label className="block text-sm font-medium text-[#5d4037] mb-1">
+                Ngày mất
+              </label>
               <input
                 type="date"
                 value={formatDateForInput(formData.ngayMat)}
-                onChange={(e) => setFormData({ ...formData, ngayMat: e.target.value ? new Date(e.target.value) : undefined })}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    ngayMat: e.target.value
+                      ? new Date(e.target.value)
+                      : undefined,
+                  })
+                }
                 className="w-full px-3 py-2 border border-[#d4af37] rounded focus:outline-none focus:border-[#b91c1c]"
               />
             </div>
 
             {/* Nơi sinh */}
             <div>
-              <label className="block text-sm font-medium text-[#5d4037] mb-1">Nơi sinh</label>
+              <label className="block text-sm font-medium text-[#5d4037] mb-1">
+                Nơi sinh
+              </label>
               <input
                 type="text"
                 value={formData.noiSinh || ""}
-                onChange={(e) => setFormData({ ...formData, noiSinh: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, noiSinh: e.target.value })
+                }
                 className="w-full px-3 py-2 border border-[#d4af37] rounded focus:outline-none focus:border-[#b91c1c]"
               />
             </div>
 
             {/* Nơi mất */}
             <div>
-              <label className="block text-sm font-medium text-[#5d4037] mb-1">Nơi mất</label>
+              <label className="block text-sm font-medium text-[#5d4037] mb-1">
+                Nơi mất
+              </label>
               <input
                 type="text"
                 value={formData.noiMat || ""}
-                onChange={(e) => setFormData({ ...formData, noiMat: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, noiMat: e.target.value })
+                }
                 className="w-full px-3 py-2 border border-[#d4af37] rounded focus:outline-none focus:border-[#b91c1c]"
               />
             </div>
 
             {/* Nghề nghiệp */}
             <div>
-              <label className="block text-sm font-medium text-[#5d4037] mb-1">Nghề nghiệp</label>
+              <label className="block text-sm font-medium text-[#5d4037] mb-1">
+                Nghề nghiệp
+              </label>
               <input
                 type="text"
                 value={formData.ngheNghiep || ""}
-                onChange={(e) => setFormData({ ...formData, ngheNghiep: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, ngheNghiep: e.target.value })
+                }
                 className="w-full px-3 py-2 border border-[#d4af37] rounded focus:outline-none focus:border-[#b91c1c]"
               />
             </div>
 
             {/* Trình độ học vấn */}
             <div>
-              <label className="block text-sm font-medium text-[#5d4037] mb-1">Trình độ học vấn</label>
+              <label className="block text-sm font-medium text-[#5d4037] mb-1">
+                Trình độ học vấn
+              </label>
               <input
                 type="text"
                 value={formData.trinhDoHocVan || ""}
-                onChange={(e) => setFormData({ ...formData, trinhDoHocVan: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, trinhDoHocVan: e.target.value })
+                }
                 className="w-full px-3 py-2 border border-[#d4af37] rounded focus:outline-none focus:border-[#b91c1c]"
               />
             </div>
 
             {/* Đời thuộc */}
             <div>
-              <label className="block text-sm font-medium text-[#5d4037] mb-1">Đời thứ</label>
+              <label className="block text-sm font-medium text-[#5d4037] mb-1">
+                Đời thứ
+              </label>
               <input
                 type="number"
                 min={1}
                 value={formData.doiThuoc ?? 1}
-                onChange={(e) => setFormData({ ...formData, doiThuoc: Number(e.target.value) })}
+                onChange={(e) =>
+                  setFormData({ ...formData, doiThuoc: Number(e.target.value) })
+                }
                 className="w-full px-3 py-2 border border-[#d4af37] rounded focus:outline-none focus:border-[#b91c1c]"
               />
             </div>
 
             {/* Địa chỉ hiện tại */}
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-[#5d4037] mb-1">Địa chỉ hiện tại</label>
+              <label className="block text-sm font-medium text-[#5d4037] mb-1">
+                Địa chỉ hiện tại
+              </label>
               <input
                 type="text"
                 value={formData.diaChiHienTai || ""}
-                onChange={(e) => setFormData({ ...formData, diaChiHienTai: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, diaChiHienTai: e.target.value })
+                }
                 className="w-full px-3 py-2 border border-[#d4af37] rounded focus:outline-none focus:border-[#b91c1c]"
               />
             </div>
 
             {/* Tiểu sử */}
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-[#5d4037] mb-1">Tiểu sử</label>
+              <label className="block text-sm font-medium text-[#5d4037] mb-1">
+                Tiểu sử
+              </label>
               <textarea
                 rows={3}
                 value={formData.tieuSu || ""}
-                onChange={(e) => setFormData({ ...formData, tieuSu: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, tieuSu: e.target.value })
+                }
                 className="w-full px-3 py-2 border border-[#d4af37] rounded focus:outline-none focus:border-[#b91c1c] resize-none"
               />
             </div>
