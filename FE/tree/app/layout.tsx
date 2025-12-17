@@ -3,6 +3,7 @@ import "./globals.css";
 import { ToastProvider } from "@/service/useToas";
 import { Dancing_Script } from "next/font/google";
 import { Allura  } from "next/font/google";
+import Providers from "@/utils/providers";
 
 const dancing = Dancing_Script({
   subsets: ["vietnamese", "latin"],
@@ -25,10 +26,9 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${dancing.className} text-xl`}>
         <ToastProvider>
-          <div className="fixed top-4 right-4 z-50">
-            {/* <Toaster richColors position="top-right" /> */}
-          </div>
-          {children}
+          <Providers>
+            {children}
+          </Providers>
         </ToastProvider>
       </body>
     </html>

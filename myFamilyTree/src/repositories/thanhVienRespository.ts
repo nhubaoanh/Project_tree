@@ -146,9 +146,6 @@ export class thanhVienRespository {
     const connection = await this.db.getRawConnection();
     try {
       const jsonData = JSON.stringify(thanhviens);
-      console.log("📦 Import JSON data length:", thanhviens.length);
-      console.log("📦 dongHoId:", dongHoId);
-      
       // Gọi stored procedure
       await connection.query(
         'CALL ImportThanhVienFromJson(?, ?, ?, @err_code, @err_msg)',
@@ -160,7 +157,6 @@ export class thanhVienRespository {
         'SELECT @err_code AS err_code, @err_msg AS err_msg'
       );
       
-      console.log("📦 Stored procedure result:", outParams[0]);
 
       if (outParams[0].err_code !== 0 && outParams[0].err_code !== null) {
         throw new Error(outParams[0].err_msg || 'Lỗi khi import dữ liệu');

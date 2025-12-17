@@ -26,16 +26,11 @@ export class nguoiDungService {
 
   async loginUser(tenDangNhap: string, matKhau: string): Promise<any> {
     const md5_pass = md5(matKhau);
-    console.log("password: ", md5_pass);
-
     const user = await this.nguoidungResponsitory.LoginUser(tenDangNhap);
     if(user) {
       let functions = await this.nguoidungResponsitory.getFunctionByUserId(
         user.nguoiDungId
       );
-      
-
-      console.log("functions", functions);
       let functionTree = this.treeUltility.getFunctionTree(functions, 1, "0");
       let actions = await this.nguoidungResponsitory.getActionByUserId(
         user.nguoiDungId

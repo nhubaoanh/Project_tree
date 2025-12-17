@@ -1,5 +1,4 @@
 // utils/treeUtils.ts
-
 import { IMember } from "@/types/member";
 import { ITreeNode } from "@/types/tree";
 
@@ -18,6 +17,8 @@ export function buildTree(members: IMember[]): ITreeNode[] {
             pids: [],
             fid: member.chaId || undefined,
             mid: member.meId || undefined,
+            name: member.hoTen,
+            gender: member.gioiTinh === 1 ? "male" : "female",
         };
         memberMap.set(member.thanhVienId, node);
         allNodes.push(node); // Thêm TẤT CẢ node vào mảng

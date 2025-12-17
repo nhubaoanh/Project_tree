@@ -38,8 +38,6 @@ export class nguoiDungReponsitory {
       const [results] = await this.db.query(sql, [tenDangNhap]);
       if (Array.isArray(results) && results.length > 0) {
         const user = results[0];
-        console.log("User fetched in repository:", user);
-
         return user;
       }
       return null;
@@ -51,9 +49,6 @@ export class nguoiDungReponsitory {
   async resetPassword(tenDangNhap: string, matKhauMoi: string): Promise<any> {
     try {
       const sql = "CALL ResetPassWord(? ,?, @err_code, @err_msg)";
-      console.log("sql", sql);
-      console.log("tenDangNhap", tenDangNhap);
-      console.log("matKhauMoi", matKhauMoi);
       await this.db.query(sql, [tenDangNhap, matKhauMoi]);
       return true;
     } catch (error: any) {
@@ -75,8 +70,6 @@ export class nguoiDungReponsitory {
         search_content || null,
         dongHoId || null,
       ]);
-
-      // tra ra toan bo mang object
       return results;
     } catch (error: any) {
       throw new Error(error);
@@ -116,8 +109,6 @@ export class nguoiDungReponsitory {
         nguoidung.soDienThoai,
         nguoidung.nguoiTaoId,
       ]);
-
-      console.log("sql", sql);
       return true;
     } catch (error: any) {
       throw new Error(error.message);

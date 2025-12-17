@@ -3,9 +3,6 @@ import { injectable } from "tsyringe";
 import { nguoiDungService } from "../services/nguoidungService";
 import { nguoiDung } from "../models/nguoidung";
 import { generateToken } from "../config/jwt";
-import { callbackify } from "util";
-import { Action } from "../models/Actions";
-
 @injectable()
 export class NguoiDungController {
   constructor(private nguoiDungService: nguoiDungService) {}
@@ -13,9 +10,7 @@ export class NguoiDungController {
   async loginUser(req: Request, res: Response): Promise<void> {
     try {
       const { tenDangNhap, matKhau } = req.body;
-      console.log("Login request received:", { tenDangNhap, matKhau });
       const user = await this.nguoiDungService.loginUser(tenDangNhap, matKhau);
-
       if (user) {
         let obj: any = {
           nguoiDungId: user.nguoiDungId, 
@@ -29,7 +24,6 @@ export class NguoiDungController {
           ngayTao: user.ngayTao,
           online_flag: user.online_flag,
         };
-
         const token = generateToken(obj);
         user.token = token;
         res.json(user);
@@ -40,7 +34,6 @@ export class NguoiDungController {
         });
       }
     } catch (error: any) {
-      console.error("Lỗi đăng nhập:", error);
       res.status(500).json({ message: "Đăng nhập thất bại.", success: false });
     }
   }
@@ -54,10 +47,7 @@ export class NguoiDungController {
         success: true,
         data: results,
       });
-      console.log(results);
     } catch (error: any) {
-      // res.json({ message: error.message, success: false });
-      console.error("Lỗi đăng ký:", error); // ← Log để debug
       res.status(500).json({
         message: error.message || "Đăng ký thất bại.",
         success: false,
@@ -68,9 +58,6 @@ export class NguoiDungController {
   async resetPassword(req: Request, res: Response): Promise<void> {
     try {
       var userName = req.body.tenDangNhap;
-      // console.log("userName123", userName);
-      // var matKhaunew = req.body.matKhaunew;
-      console.log("userName", userName);
       await this.nguoiDungService.resetPassword(userName);
       res.json({
         message: "Reset password thanh cong. Vui long check email.",
@@ -152,15 +139,12 @@ export class NguoiDungController {
     try {
       const nguoiDung = req.body as nguoiDung;
       const results = await this.nguoiDungService.updateUser(nguoiDung);
-      console.log("results", results.data);
-      
       res.json({
         message : 'Cap nhat nguoi dung thanh cong',
         success : true,
         data : results
       })
     }catch (error: any) {
-      console.log("error",error);
       res.status(500).json({ message: "Cap nhat nguoi dung that bai", success: false });
     }
   }
@@ -168,16 +152,11 @@ export class NguoiDungController {
   async checkUser(req: Request, res: Response) : Promise<void> {
     try{
       const userName = req.body.userName;
-
-      console.log("uss", userName);
-
       if(!userName) {
             res.status(400).json({ message: "userName is required", success: false });
             return;
         }
       const results = await this.nguoiDungService.checkUser(userName);
-      console.log("results", results);
-
       res.json({
         message : 'check nguoi dung thanh cong',
         success : true,
@@ -192,7 +171,6 @@ export class NguoiDungController {
     try{
       const object = req.body as {list_json: any; updated_by_id: string};
       const results = await this.nguoiDungService.deleteUser(object.list_json, object.updated_by_id);
-      console.log("results", results);
       res.json({message: "Đã xóa thành công.", success: true});
     }catch(error: any){
       res.status(500).json({ message: "Xoa nguoi dung that bai.", success: false });

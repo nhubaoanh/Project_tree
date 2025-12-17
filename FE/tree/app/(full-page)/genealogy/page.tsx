@@ -40,7 +40,7 @@ export default function App() {
         {/* CONTENT */}
         <div className="absolute inset-0 w-full h-full z-10 bg-[#ede5b7]">
           {activeView === ViewMode.DIAGRAM && (
-            <div className="w-full h-full overflow-auto">
+            <div className="w-full h-full overflow-hidden">
               {treeData.length > 0 ? (
                 <MyFamilyTree data={treeData} />
               ) : (

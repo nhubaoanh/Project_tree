@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import FamilyTree from "@balkangraph/familytree.js";
 import { ITreeNode } from "@/types/tree";
+import { FamilyMemberModal } from "./FamilyMemberModal";
 
 let initialized = false;
 
@@ -15,16 +16,26 @@ interface MyFamilyTreeProps {
   data: ITreeNode[];
 }
 
-// Helper: Tạo URL ảnh từ path
+type AppFamilyNode = FamilyTree.node & {
+  pids?: (string | number)[];
+  memberId?: number;
+  field_0?: string;
+  field_1?: string;
+  field_2?: string;
+  img_0?: string;
+  tags?: string[];
+  fid?: number | null;
+  mid?: number | null;
+};
+
+// Helper function to get image URL
 const getImageUrl = (anhChanDung: string | null | undefined): string => {
   if (!anhChanDung || anhChanDung.trim() === "") {
     return DEFAULT_AVATAR;
   }
-  // Nếu đã là URL đầy đủ
   if (anhChanDung.startsWith("http")) {
     return anhChanDung;
   }
-  // Nếu là relative path từ backend (vd: "uploads/2025/12/15/abc.jpg" hoặc "2025/12/15/abc.jpg")
   const cleanPath = anhChanDung.startsWith("uploads/") 
     ? anhChanDung 
     : `uploads/${anhChanDung}`;
@@ -34,112 +45,95 @@ const getImageUrl = (anhChanDung: string | null | undefined): string => {
 export const MyFamilyTree = ({ data }: MyFamilyTreeProps) => {
   const divRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  const familyRef = useRef<any>(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedNode, setSelectedNode] = useState<AppFamilyNode | null>(null);
+  const [allNodes, setAllNodes] = useState<any[]>([]);
+  const [family, setFamily] = useState<any>(null);
 
   useEffect(() => {
     if (!divRef.current || data.length === 0 || initialized) return;
     initialized = true;
 
-    // Chuyển dữ liệu thành flat array chuẩn cho FamilyTree
-    const allNodes = data.map((node) => ({
-      id: node.id,
-      pids: node.pids ?? [],
-      fid: node.fid,
-      mid: node.mid,
-      // Lưu thêm thanhVienId để dùng cho navigation
-      thanhVienId: node.thanhVienId,
+    const toNumber = (v: unknown): number | undefined => {
+      if (v === null || v === undefined) return undefined;
+      const n = typeof v === "string" ? Number(v) : (v as number);
+      return Number.isFinite(n) ? n : undefined;
+    };
 
-      // Dữ liệu hiển thị
+    // Initialize nodes
+    const nodes = data.map((node) => ({
+      id: toNumber(node.id)!,
+      pids: (node.pids ?? []).map(toNumber).filter((x): x is number => typeof x === "number"),
+      fid: toNumber(node.fid),
+      mid: toNumber(node.mid),
+      memberId: node.thanhVienId,
       field_0: node.hoTen || "Chưa rõ",
-      field_1: node.ngayMat
-        ? new Date(node.ngayMat).toLocaleDateString("vi-VN")
-        : "Chưa rõ",
+      field_1: node.ngayMat ? new Date(node.ngayMat).toLocaleDateString("vi-VN") : "Chưa rõ",
       field_2: node.ngheNghiep || "Chưa rõ",
       img_0: getImageUrl(node.anhChanDung),
-
       tags: [node.gioiTinh === 1 ? "male" : "female"],
     }));
 
-    // Helper function để tìm tên theo ID
-    const getNameById = (id: number | undefined): string => {
-      if (!id) return "Không có";
-      const node = allNodes.find((n) => n.id === id);
-      return node?.field_0 || "Không có";
-    };
+    setAllNodes(nodes);
 
-    // Helper function để tìm danh sách con
-    const getChildren = (parentId: number): string[] => {
-      return allNodes
-        .filter((n) => n.fid === parentId || n.mid === parentId)
-        .map((n) => n.field_0);
-    };
-
-    // Khởi tạo tree với template john (FREE, nhiều field)
-    const family = new FamilyTree(divRef.current!, {
-      nodes: allNodes,
+    const familyInstance = new FamilyTree(divRef.current!, {
+      nodes,
       template: "john",
       scaleInitial: FamilyTree.match.boundary,
       enableSearch: true,
       miniMap: true,
       mouseScrool: FamilyTree.action.zoom,
       nodeBinding: {
-        field_0: "field_0", // tên
-        field_1: "field_1", // ngày sinh
-        field_2: "field_2", // nghề nghiệp
-        img_0: "img_0", // ảnh
+        field_0: "field_0",
+        field_1: "field_1",
+        field_2: "field_2",
+        img_0: "img_0",
       },
+      
       nodeMenu: {
         details: {
           text: "📋 Xem chi tiết",
-          onClick: (sender: any, args: any) => {
-            const nodeId = args?.node?.id ?? args;
-            const node = sender.get(nodeId);
+          onClick: (nodeId: string | number) => {
+            const id = typeof nodeId === "string" ? Number(nodeId) : nodeId;
+            if (!Number.isFinite(id)) return;
+            const node = familyInstance.get(id) as unknown as AppFamilyNode;
             if (!node) return;
-            const memberId = node.thanhVienId || node.id;
-            router.push(`/member/${memberId}`);
+            setSelectedNode(node);
+            setModalOpen(true);
           },
         },
         viewParents: {
           text: "👨‍👩‍👦 Xem cha mẹ",
-          onClick: (sender: any, args: any) => {
-            const nodeId = args?.node?.id ?? args;
-            const node = sender.get(nodeId);
+          onClick: (nodeId: string | number) => {
+            const id = typeof nodeId === "string" ? Number(nodeId) : nodeId;
+            if (!Number.isFinite(id)) return;
+            const node = familyInstance.get(id) as unknown as AppFamilyNode;
             if (!node) return;
-            const fatherName = getNameById(node.fid);
-            const motherName = getNameById(node.mid);
-            alert(`👨 Cha: ${fatherName}\n👩 Mẹ: ${motherName}`);
+            setSelectedNode(node);
+            setModalOpen(true);
           },
         },
         viewSpouse: {
           text: "💑 Xem vợ/chồng",
-          onClick: (sender: any, args: any) => {
-            const nodeId = args?.node?.id ?? args;
-            const node = sender.get(nodeId);
+          onClick: (nodeId: string | number) => {
+            const id = typeof nodeId === "string" ? Number(nodeId) : nodeId;
+            if (!Number.isFinite(id)) return;
+            const node = familyInstance.get(id) as unknown as AppFamilyNode;
             if (!node) return;
-            const spouseIds: number[] = node.pids || [];
-            if (spouseIds.length === 0) {
-              alert("Chưa có thông tin vợ/chồng");
-              return;
-            }
-            const spouseNames = spouseIds
-              .map((id: number) => getNameById(id))
-              .join(", ");
-            alert(`💑 Vợ/Chồng: ${spouseNames}`);
+            setSelectedNode(node);
+            setModalOpen(true);
           },
         },
         viewChildren: {
           text: "👶 Xem con",
-          onClick: (sender: any, args: any) => {
-            const nodeId = args?.node?.id ?? args;
-            const node = sender.get(nodeId);
+          onClick: (nodeId: string | number) => {
+            const id = typeof nodeId === "string" ? Number(nodeId) : nodeId;
+            if (!Number.isFinite(id)) return;
+            const node = familyInstance.get(id) as unknown as AppFamilyNode;
             if (!node) return;
-            const children = getChildren(node.id);
-            if (children.length === 0) {
-              alert("Chưa có thông tin con cái");
-              return;
-            }
-            alert(
-              `👶 Các con:\n${children.map((name, i) => `${i + 1}. ${name}`).join("\n")}`
-            );
+            setSelectedNode(node);
+            setModalOpen(true);
           },
         },
       },
@@ -152,8 +146,12 @@ export const MyFamilyTree = ({ data }: MyFamilyTreeProps) => {
         male: { template: "john" },
         female: { template: "john" },
       },
-    }).load(allNodes);
+    });
 
+    familyRef.current = familyInstance;
+    setFamily(familyInstance);
+
+    // Cleanup
     return () => {
       if (divRef.current) divRef.current.innerHTML = "";
       initialized = false;
@@ -161,9 +159,30 @@ export const MyFamilyTree = ({ data }: MyFamilyTreeProps) => {
   }, [data, router]);
 
   return (
-    <div
-      ref={divRef}
-      className="w-full h-screen bg-gradient-to-b from-amber-50 to-stone-100 bg-[#ede5b7]"
-    />
+    <>
+      <div
+        ref={divRef}
+        className="w-full h-screen bg-gradient-to-b from-amber-50 to-stone-100 bg-[#ede5b7]"
+      />
+      {selectedNode && (
+        <FamilyMemberModal
+          open={modalOpen}
+          onOpenChange={setModalOpen}
+          node={selectedNode}
+          getNameById={(id) => {
+            if (id === undefined || id === null) return "Không có";
+            const numericId = typeof id === "string" ? Number(id) : id;
+            if (!Number.isFinite(numericId)) return "Không có";
+            const node = allNodes.find((n) => n.id === numericId);
+            return node?.field_0 || "Không có";
+          }}
+          getChildren={(parentId) => {
+            return allNodes
+              .filter((n) => n.fid === parentId || n.mid === parentId)
+              .map((n) => n.field_0 || "Chưa rõ");
+          }}
+        />
+      )}
+    </>
   );
 };
