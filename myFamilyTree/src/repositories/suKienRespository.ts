@@ -2,6 +2,18 @@ import { injectable } from "tsyringe";
 import { suKien } from "../models/sukien";
 import { Database } from "../config/database";
 
+const formatDateForMySQL = (date: any): string | null => {
+  if (!date) return null;
+  try {
+    const d = new Date(date);
+    if (isNaN(d.getTime())) return null;
+    return d.toISOString().split("T")[0]; // "2022-12-31"
+  } catch {
+    return null;
+  }
+};
+
+
 @injectable()
 export class suKienRespository {
   constructor(private db: Database) {}
@@ -35,7 +47,7 @@ export class suKienRespository {
         sukien.suKienId,
         sukien.dongHoId,
         sukien.tenSuKien,
-        sukien.ngayDienRa,
+        formatDateForMySQL(sukien.ngayDienRa),
         sukien.gioDienRa,
         sukien.diaDiem,
         sukien.moTa,
@@ -58,7 +70,7 @@ export class suKienRespository {
         sukien.suKienId,
         sukien.dongHoId,
         sukien.tenSuKien,
-        sukien.ngayDienRa,
+        formatDateForMySQL(sukien.ngayDienRa),
         sukien.gioDienRa,
         sukien.diaDiem,
         sukien.moTa,

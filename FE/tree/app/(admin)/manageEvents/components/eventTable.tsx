@@ -64,8 +64,6 @@ export const EventTable: React.FC<MemberTableProps> = ({
                 Mô tả 
               </th>
               <th className="p-4 text-center min-w-[120px]">Lặp lại</th>
-              <th className="p-4 text-center min-w-[150px]">Trang Thái</th>
-              {/* Cột Hành Động cố định nhỏ */}
               <th className="p-4 text-center min-w-[120px]">Hành Động</th>
             </tr>
           </thead>
@@ -99,10 +97,10 @@ export const EventTable: React.FC<MemberTableProps> = ({
                       {member.diaDiem || "-"}
                     </td>
                     <td className="p-4 text-center font-bold text-[#5d4037] group-hover:text-[#b91c1c] min-w-[120px]">
-                      {member.lapLai || "-"}
+                      {member.moTa || "-"}
                     </td>
                     <td className="p-4 text-center font-bold text-sm text-[#5d4037] min-w-[150px]">
-                      {member.trangThai}
+                      {member.lapLai || "-"}
                     </td>
                     {/* Cột Hành Động cố định */}
                     <td className="p-4 min-w-[120px] text-center">

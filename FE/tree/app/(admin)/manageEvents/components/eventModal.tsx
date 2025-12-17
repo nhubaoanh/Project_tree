@@ -115,7 +115,7 @@ export const EventModal: React.FC<EventModalProps> = ({
         loaiSuKien: initialData?.loaiSuKien ?? 1,
         uuTien: initialData?.uuTien ?? 2,
         lapLai: initialData?.lapLai ?? 0,
-        trangThai: initialData?.trangThai ?? 1,
+        nguoiTaoId: initialData?.nguoiTaoId || "",
       });
       // Reset errors và touched
       setErrors({});

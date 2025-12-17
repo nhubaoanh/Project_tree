@@ -22,7 +22,6 @@ import {
 
 export default function QuanLySuKienPage() {
   const queryClient = useQueryClient();
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // --- STATE ---
   const [pageIndex, setPageIndex] = useState(1);
@@ -64,6 +63,8 @@ export default function QuanLySuKienPage() {
   const totalRecords = eventQuery.data?.totalItems || 0;
   const totalPages = eventQuery.data?.pageCount || 0;
   const isLoading = eventQuery.isLoading;
+
+  console.log("evendata",eventData);
 
   // --- MUTATIONS ---
   const createMutation = useMutation({
@@ -129,7 +130,9 @@ export default function QuanLySuKienPage() {
     if (editingEvent) {
       updateMutation.mutate(event as IEvent);
     } else {
-      createMutation.mutate(event as IEvent);
+      const a = createMutation.mutate(event as IEvent);
+      console.log("a", a);
+
     }
   };
 
@@ -138,17 +141,6 @@ export default function QuanLySuKienPage() {
     setPageIndex(1);
   };
 
-  // --- EXCEL EXPORT ---
-  const handleExportExcel = () => {
-    if (eventData.length === 0) {
-      showError("Không có dữ liệu để xuất");
-      return;
-    }
-    const worksheet = XLSX.utils.json_to_sheet(eventData);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "DanhSachSuKien");
-    XLSX.writeFile(workbook, `DanhSachSuKien_Trang${pageIndex}.xlsx`);
-  };
 
   const isSaving = createMutation.isPending || updateMutation.isPending;
   const isDeleting = deleteMutation.isPending;
@@ -192,13 +184,6 @@ export default function QuanLySuKienPage() {
         </div>
 
         <div className="flex gap-2 flex-wrap justify-end">
-          <button
-            onClick={handleExportExcel}
-            className="flex items-center gap-2 px-4 py-2 bg-[#2c5282] text-white rounded shadow hover:bg-[#2a4365] transition-all text-sm font-bold"
-          >
-            <Download size={16} />
-            <span className="hidden sm:inline">Xuất Excel</span>
-          </button>
           <button
             onClick={handleAdd}
             className="flex items-center gap-2 px-4 py-2 bg-[#b91c1c] text-white rounded shadow hover:bg-[#991b1b] transition-all text-sm font-bold ml-2"

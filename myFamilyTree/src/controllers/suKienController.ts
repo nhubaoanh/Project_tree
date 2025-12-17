@@ -48,11 +48,12 @@ export class suKienController {
   async createSuKien(req: Request, res: Response): Promise<void> {
     try {
       const sukien = req.body as suKien;
+      console.log("re", sukien);
       const results = await this.suKienService.createSuKien(sukien);
       res.json({
         message: "Tạo sự kiện thành công.",
         success: true,
-        data: results[0],
+        data: results,
       });
     } catch (error: any) {
       res.status(500).json({
