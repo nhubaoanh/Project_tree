@@ -27,6 +27,8 @@ export class dongHoResponsitory {
             throw new Error(error);
         }
     }
+
+
     async getAllDongHo () :Promise<any> {
         try{
             const sql = 'CALL getAllDongHo(@err_code, @err_msg)';

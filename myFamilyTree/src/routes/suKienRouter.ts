@@ -19,5 +19,17 @@ suKienRouter.use((req, res, next) => {
 });
 const eventcontroller = container.resolve(suKienController);
 
-suKienRouter.post("/search", eventcontroller.searchSuKien.bind(eventcontroller));
+suKienRouter.post(
+  "/search",
+  eventcontroller.searchSuKien.bind(eventcontroller)
+);
+suKienRouter.post(
+  "/create",
+  eventcontroller.createSuKien.bind(eventcontroller)
+);
+suKienRouter.post(
+  "/update",
+  eventcontroller.updateSuKien.bind(eventcontroller)
+);
+
 export default suKienRouter;

@@ -6,12 +6,11 @@ import { Database } from "../config/database";
 export class suKienRespository {
   constructor(private db: Database) {}
 
-
   async searchSuKien(
     pageIndex: number,
     pageSize: number,
     search_content: string,
-    dongHoId: string,
+    dongHoId: string
   ): Promise<any[]> {
     try {
       const sql = "CALL SearchEvent(?,?,?,?, @err_code, @err_msg)";
@@ -25,6 +24,53 @@ export class suKienRespository {
       return result;
     } catch (error: any) {
       throw new Error(error);
+    }
+  }
+
+  async createSuKien(sukien: suKien): Promise<any> {
+    try {
+      const sql =
+        "CALL InsertEvent(?,?,?,?,?,?,?,?,?,?,?, @err_code, @err_msg)";
+      await this.db.query(sql, [
+        sukien.suKienId,
+        sukien.dongHoId,
+        sukien.tenSuKien,
+        sukien.ngayDienRa,
+        sukien.gioDienRa,
+        sukien.diaDiem,
+        sukien.moTa,
+        sukien.lapLai,
+        sukien.nguoiTaoId,
+        sukien.loaiSuKien,
+        sukien.uuTien,
+      ]);
+      return true;
+    } catch (error: any) {
+      throw new Error(error.message);
+    }
+  }
+
+  async updateSuKien(sukien: suKien): Promise<any> {
+    try {
+      const sql =
+        "CALL UpdateEvent(?,?,?,?,?,?,?,?,?,?,?, @err_code, @err_msg)";
+      await this.db.query(sql, [
+        sukien.suKienId,
+        sukien.dongHoId,
+        sukien.tenSuKien,
+        sukien.ngayDienRa,
+        sukien.gioDienRa,
+        sukien.diaDiem,
+        sukien.moTa,
+        sukien.lapLai,
+        sukien.loaiSuKien,
+        sukien.uuTien,
+        sukien.lu_user_id,
+      ]);
+      return true;
+    } catch (error: any) {
+      console.log("error database => ", error);
+      throw new Error(error.message);
     }
   }
 }

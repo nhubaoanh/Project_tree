@@ -163,8 +163,6 @@ export const MemberModal: React.FC<MemberModalProps> = ({
     // Gửi cả ảnh chính và ảnh phụ
     onSave({
       ...formData,
-      // Nếu cần lưu ảnh phụ, có thể thêm field mới hoặc join thành string
-      // extraImages: extraImages.join(","),
     });
   };
 
@@ -419,7 +417,6 @@ export const MemberModal: React.FC<MemberModalProps> = ({
                 className="w-full px-3 py-2 border border-[#d4af37] rounded focus:outline-none focus:border-[#b91c1c]"
               />
             </div>
-
             {/* Nghề nghiệp */}
             <div>
               <label className="block text-sm font-medium text-[#5d4037] mb-1">
