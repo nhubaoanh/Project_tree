@@ -4,6 +4,7 @@ import { Menu, Bell, Settings, LogOut, User } from "lucide-react";
 import { useSidebar } from "@/context/SidebarContext";
 import { useRouter } from "next/navigation";
 import storage from "@/utils/storage";
+import Link from "next/link";
 
 export default function Header() {
   const [open, setOpen] = useState(false);
@@ -56,27 +57,35 @@ export default function Header() {
 
           {open && (
             <div className="absolute right-0 mt-3 w-56 bg-white rounded-xl shadow-2xl py-3 z-50 border border-gray-100">
-              <div className="px-4 py-2 border-b border-gray-100">
-                <p className="font-semibold text-gray-800">Nguyễn Văn A</p>
-                <p className="text-sm text-gray-500">admin@giaphaviet.vn</p>
+              <div className="px-4 py-3 border-b border-gray-100 hover:bg-gray-50 rounded-t-lg transition-colors">
+                <p className="font-semibold text-gray-900">Nguyễn Văn A</p>
+                <p className="text-sm text-gray-600">admin@giaphaviet.vn</p>
               </div>
 
-              <button className="w-full flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors">
-                <User size={18} />
-                Trang cá nhân
-              </button>
+              <Link
+                href="#"
+                className="w-full flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition-colors rounded-lg"
+                onClick={() => setOpen(false)}
+              >
+                <User size={18} className="flex-shrink-0" />
+                <span>Trang cá nhân</span>
+              </Link>
 
-              <button className="w-full flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors">
-                <Settings size={18} />
-                Cài đặt
-              </button>
+              <Link
+                href="/settings"
+                className="w-full flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition-colors rounded-lg"
+                onClick={() => setOpen(false)}
+              >
+                <Settings size={18} className="flex-shrink-0" />
+                <span>Cài đặt</span>
+              </Link>
 
               <div className="border-t border-gray-100 mt-1 pt-1">
                 <button
                   onClick={handleLogout}
-                  className="w-full flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50 transition-colors"
+                  className="w-full flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50 hover:text-red-700 transition-colors rounded-lg"
                 >
-                  <LogOut size={18} />
+                  <LogOut size={18} className="flex-shrink-0" />
                   Đăng xuất
                 </button>
               </div>

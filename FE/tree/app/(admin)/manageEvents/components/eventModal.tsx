@@ -316,18 +316,35 @@ export const EventModal: React.FC<EventModalProps> = ({
               <label className="text-sm font-bold text-[#8b5e3c] uppercase">
                 Giờ diễn ra
               </label>
-              <div className="relative">
+              <div className="relative flex items-center">
                 <input
                   type="time"
                   name="gioDienRa"
+                  id="gioDienRaInput"
                   value={formatTimeForInput(formData.gioDienRa)}
                   onChange={(e) => {
                     setFormData((prev) => ({ ...prev, gioDienRa: e.target.value as any }));
                   }}
-                  className="w-full p-3 bg-white border border-[#d4af37]/50 rounded shadow-inner focus:border-[#b91c1c] focus:outline-none cursor-pointer"
+                  className="w-full p-3 pr-12 bg-white border border-[#d4af37]/50 rounded shadow-inner focus:border-[#b91c1c] focus:outline-none"
                 />
+                <button
+                  type="button"
+                  onClick={() => {
+                    const input = document.getElementById("gioDienRaInput") as HTMLInputElement;
+                    if (input) {
+                      input.showPicker?.();
+                      input.focus();
+                    }
+                  }}
+                  className="absolute right-2 p-2 text-[#8b5e3c] hover:text-[#b91c1c] transition-colors"
+                  title="Chọn giờ"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12 6 12 12 16 14"/>
+                  </svg>
+                </button>
               </div>
-              <p className="text-xs text-gray-500">Click vào ô để chọn giờ</p>
             </div>
           </div>
 

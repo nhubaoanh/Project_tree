@@ -1,20 +1,20 @@
-export interface IContributionUp {
-  thuId: number;
+export interface IContributionDown {
+  chiId: number;
 
   dongHoId: string;
   danhMucId: number;
   tenDanhMuc?: string;
 
-  hoTenNguoiDong: string;
-  ngayDong?: Date;
+  ngayChi: Date;
   soTien: number;
 
   phuongThucThanhToan: string;
   noiDung: string;
+  nguoiNhan: string;
   ghiChu: string;
 
   nguoiNhapId: string;
-  hoTen?: string;
+  hoTenNguoiNhap?: string;
   soDienThoaiNguoiNhap?: string;
 
   ngayTao: Date;
@@ -23,7 +23,7 @@ export interface IContributionUp {
   lu_user_id: string;
 }
 
-export interface IsearchContributionUp {
+export interface IsearchContributionDown {
   pageIndex?: number;
   pageSize?: number;
   search_content?: string;

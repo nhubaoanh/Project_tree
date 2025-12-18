@@ -17,28 +17,28 @@ export default function TinTucPage() {
       title: "Lễ giỗ tổ Hùng Vương",
       desc: "Thông báo lịch tổ chức lễ giỗ tổ Hùng Vương năm 2025",
       date: "10/11/2025",
-      image: "images/den-hung.jpg",
+      image: "images/xumvay.jpg",
     },
     {
       id: 3,
       title: "Hỗ trợ học bổng",
       desc: "Kế hoạch trao học bổng cho con em trong dòng họ năm học mới",
       date: "05/11/2025",
-      image: "images/hoc-bong.jpg",
+      image: "images/xumvay.jpg",
     },
     {
       id: 4,
       title: "Gặp mặt đầu xuân",
       desc: "Thông báo chương trình gặp mặt đầu xuân 2026",
       date: "01/11/2025",
-      image: "images/tet.jpg",
+      image: "images/xumvay.jpg",
     },
     {
       id: 5,
       title: "Tu bổ nhà thờ họ",
       desc: "Kế hoạch tu bổ, nâng cấp nhà thờ họ năm 2025",
       date: "25/10/2025",
-      image: "images/nha-tho-ho.jpg",
+      image: "images/xumvay.jpg",
     },
   ];
   

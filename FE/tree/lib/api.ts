@@ -17,25 +17,32 @@ apiClient.interceptors.request.use(
     }
 )
 
-// 
+// Response interceptor - xử lý lỗi 401, 403
 apiClient.interceptors.response.use(
     function (response) {
-        if(response.data?.success === false || response.data?.result === false) {
-            throw new Error(response.data.message);
-        }
+        // Trả về response, để từng service tự xử lý success/fail
         return response;
-    } 
-    
-// researching after
-//     function (error) {
-//     // Drunk code here. Will fix after has refresh token api 👀
-//     if (error?.response?.status === 401 || error?.response?.status === 403) {
-//       clearLogout();
-//       if (!window.location.pathname.includes(LOGIN_URL))
-//         window.open(LOGIN_URL, "_parent");
-//     }
-//     return Promise.reject(error);
-//   },
+    },
+    function (error) {
+        const status = error?.response?.status;
+        
+        // 401 - Unauthorized: chưa đăng nhập hoặc token hết hạn
+        if (status === 401) {
+            storage.clearToken();
+            if (typeof window !== "undefined" && !window.location.pathname.includes(LOGIN_URL)) {
+                window.location.href = LOGIN_URL;
+            }
+        }
+        
+        // 403 - Forbidden: không có quyền truy cập
+        if (status === 403) {
+            if (typeof window !== "undefined" && !window.location.pathname.includes("/403")) {
+                window.location.href = "/403";
+            }
+        }
+        
+        return Promise.reject(error);
+    }
 )
 
 export const filterEmptyString = (params: Record<string, any>) => {

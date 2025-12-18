@@ -9,16 +9,11 @@ import {
   keepPreviousData,
 } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
-import {
-  getUsers,
-  createUser,
-  updateUser,
-  deleteUser,
-} from "@/service/user.service";
 import { IContributionUp, IsearchContributionUp } from "@/types/contribuitionUp";
-import { ContributionTable } from "./components/contribuitionUpTable";
-import { createContributionUp, searchContributionUp, updateContributionUp } from "@/service/contribuitionUp.service";
-import { ContributionUpModal } from "./components/contribuitionUpModal";
+import { ContributionTable } from "./components/contribuitionDownTable";
+import { ContributionUpModal } from "./components/contribuitionDownModal";
+import { createContributionDown, deleteContributionDown, searchContributionDown, updateContributionDown } from "@/service/contribuitionDown.service";
+import { IContributionDown, IsearchContributionDown } from "@/types/contribuitionDown";
 
 // --- MAIN PAGE COMPONENT ---
 
@@ -34,9 +29,11 @@ export default function QuanLyThanhVienPage() {
 
   // --- MODAL STATES ---
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingUser, setEditingUser] = useState<IContributionUp | null>(null);
+  const [editingUser, setEditingUser] =
+    useState<IContributionDown | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [contribuitionToDelete, setUserToDelete] = useState<IContributionUp | null>(null);
+  const [contribuitionToDelete, setUserToDelete] =
+    useState<IContributionDown | null>(null);
 
   // --- DEBOUNCE SEARCH ---
   React.useEffect(() => {
@@ -48,15 +45,15 @@ export default function QuanLyThanhVienPage() {
   }, [searchTerm]);
 
   // --- FETCHING DATA ---
-  const searchParams: IsearchContributionUp = {
+  const searchParams: IsearchContributionDown = {
     pageIndex,
     pageSize,
     search_content: debouncedSearch,
   };
 
   const usersQuery = useQuery({
-    queryKey: ["contribuitionUp", searchParams],
-    queryFn: () => searchContributionUp(searchParams),
+    queryKey: ["contribuitionDown", searchParams],
+    queryFn: () => searchContributionDown(searchParams),
     placeholderData: keepPreviousData,
   });
 
@@ -69,7 +66,7 @@ export default function QuanLyThanhVienPage() {
 
   // --- MUTATIONS - CRUD ---
   const createMutation = useMutation({
-    mutationFn: createContributionUp,
+    mutationFn: createContributionDown,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["contribuitionUp"] });
       toast.success("Thêm thành viên thành công!");
@@ -81,10 +78,10 @@ export default function QuanLyThanhVienPage() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: (vars: { id: number; data: Partial<IContributionUp> }) =>
-      updateContributionUp(vars.id, vars.data),
+    mutationFn: (vars: { id: number; data: Partial<IContributionDown> }) =>
+      updateContributionDown(vars.id, vars.data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["contribuitionUp"] });
+      queryClient.invalidateQueries({ queryKey: ["contribuitionDown"] });
       toast.success("Cập nhật thông tin thành công!");
       setIsModalOpen(false);
     },
@@ -94,7 +91,7 @@ export default function QuanLyThanhVienPage() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: deleteUser,
+    mutationFn: deleteContributionDown,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["contribuitionUp"] });
       toast.success("Đã xóa thành viên.");
@@ -113,12 +110,12 @@ export default function QuanLyThanhVienPage() {
     setIsModalOpen(true);
   };
 
-  const handleEdit = (user: IContributionUp) => {
+  const handleEdit = (user: IContributionDown) => {
     setEditingUser(user);
     setIsModalOpen(true);
   };
 
-  const handleDeleteClick = (user: IContributionUp) => {
+  const handleDeleteClick = (user: IContributionDown) => {
     setUserToDelete(user);
     setIsDeleteModalOpen(true);
   };
@@ -129,11 +126,11 @@ export default function QuanLyThanhVienPage() {
   //   }
   // };
 
-  const handleSaveUser = (data: Partial<IContributionUp>) => {
+  const handleSaveUser = (data: Partial<IContributionDown>) => {
     if (editingUser) {
-      updateMutation.mutate({ id: editingUser.thuId, data });
+      updateMutation.mutate({ id: editingUser.chiId, data });
     } else {
-      createMutation.mutate(data as IContributionUp);
+      createMutation.mutate(data as IContributionDown);
     }
   };
 
@@ -155,41 +152,41 @@ export default function QuanLyThanhVienPage() {
     XLSX.writeFile(workbook, `DanhSachThanhVien_Trang${pageIndex}.xlsx`);
   };
 
-  const handleImportExcel = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (evt) => {
-        const bstr = evt.target?.result;
-        const wb = XLSX.read(bstr, { type: "binary" });
-        const wsname = wb.SheetNames[0];
-        const ws = wb.Sheets[wsname];
-        const dataParsed = XLSX.utils.sheet_to_json(ws) as IContributionUp[];
+  // const handleImportExcel = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const file = e.target.files?.[0];
+  //   if (file) {
+  //     const reader = new FileReader();
+  //     reader.onload = (evt) => {
+  //       const bstr = evt.target?.result;
+  //       const wb = XLSX.read(bstr, { type: "binary" });
+  //       const wsname = wb.SheetNames[0];
+  //       const ws = wb.Sheets[wsname];
+  //       const dataParsed = XLSX.utils.sheet_to_json(ws) as IContributionUp[];
 
-        console.log("Imported Data:", dataParsed);
+  //       console.log("Imported Data:", dataParsed);
 
-        if (dataParsed.length > 0) {
-          let successCount = 0;
-          const promises = dataParsed.map(async (u) => {
-            try {
-              const res = await createUser(u);
-              console.log("Import result:", res);
-              successCount++;
-            } catch (err) {
-              console.error("Import error for row", u);
-            }
-          });
+  //       if (dataParsed.length > 0) {
+  //         let successCount = 0;
+  //         const promises = dataParsed.map(async (u) => {
+  //           try {
+  //             const res = await createContributionDown(u);
+  //             console.log("Import result:", res);
+  //             successCount++;
+  //           } catch (err) {
+  //             console.error("Import error for row", u);
+  //           }
+  //         });
 
-          Promise.all(promises).then(() => {
-            queryClient.invalidateQueries({ queryKey: ["users"] });
-            toast.success(`Đã xử lý nhập ${dataParsed.length} dòng.`);
-            if (fileInputRef.current) fileInputRef.current.value = "";
-          });
-        }
-      };
-      reader.readAsBinaryString(file);
-    }
-  };
+  //         Promise.all(promises).then(() => {
+  //           queryClient.invalidateQueries({ queryKey: ["users"] });
+  //           toast.success(`Đã xử lý nhập ${dataParsed.length} dòng.`);
+  //           if (fileInputRef.current) fileInputRef.current.value = "";
+  //         });
+  //       }
+  //     };
+  //     reader.readAsBinaryString(file);
+  //   }
+  // };
 
   const isSaving = createMutation.isPending || updateMutation.isPending;
   const isDeleting = deleteMutation.isPending;
@@ -226,7 +223,7 @@ export default function QuanLyThanhVienPage() {
               ref={fileInputRef}
               type="file"
               accept=".xlsx, .xls"
-              onChange={handleImportExcel}
+              // onChange={handleImportExcel}
               className="absolute inset-0 opacity-0 cursor-pointer"
             />
           </button>

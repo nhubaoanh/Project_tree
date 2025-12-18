@@ -1,6 +1,6 @@
 "use client";
-import React, { useState, useRef } from "react";
-import { Search, Plus, Download, Upload, X, Loader2 } from "lucide-react";
+import React, { useState } from "react";
+import { Search, Plus, Download, X, Loader2 } from "lucide-react";
 import * as XLSX from "xlsx";
 import {
   useQuery,
@@ -26,7 +26,6 @@ import { useToast } from "@/service/useToas";
 
 export default function QuanLyThanhVienPage() {
   const queryClient = useQueryClient();
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // --- STATE FOR API QUERY PARAMETERS ---
   const [pageIndex, setPageIndex] = useState(1);
@@ -75,7 +74,6 @@ export default function QuanLyThanhVienPage() {
     mutationFn: createUser,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
-      // toast.success("Thêm thành viên thành công!");
       showSuccess("Thêm thành viên thành công!");
       setIsModalOpen(false);
     },
@@ -101,15 +99,15 @@ export default function QuanLyThanhVienPage() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: deleteUser,
+    mutationFn: (userIds: string[]) => deleteUser(userIds),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
-      toast.success("Đã xóa thành viên.");
+      showSuccess("Đã xóa thành viên.");
       setIsDeleteModalOpen(false);
       setUserToDelete(null);
     },
     onError: () => {
-      toast.error("Không thể xóa thành viên này.");
+      showError("Không thể xóa thành viên này.");
     },
   });
 
@@ -132,7 +130,7 @@ export default function QuanLyThanhVienPage() {
 
   const handleConfirmDelete = () => {
     if (userToDelete) {
-      deleteMutation.mutate(userToDelete.nguoiDungId);
+      deleteMutation.mutate([userToDelete.nguoiDungId]);
     }
   };
 

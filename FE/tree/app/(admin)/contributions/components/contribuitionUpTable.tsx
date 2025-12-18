@@ -9,10 +9,10 @@ import {
   ChevronRight,
   Loader2,
 } from "lucide-react";
-import { IMember } from "@/types/member";
+import { IContributionUp } from "@/types/contribuitionUp";
 
-interface MemberTableProps {
-  data: IMember[];
+interface ContributionTableProps {
+  data: IContributionUp[];
   isLoading: boolean;
   pageIndex: number;
   pageSize: number;
@@ -20,21 +20,21 @@ interface MemberTableProps {
   totalPages: number;
   onPageChange: (page: number) => void;
   onPageSizeChange: (size: number) => void;
-  onEdit: (member: IMember) => void;
-  onDelete: (member: IMember) => void;
+  onEdit: (contribution: IContributionUp) => void;
+  onDelete: (contribution: IContributionUp) => void;
 }
 
-export const MemberTable: React.FC<MemberTableProps> = ({
-  data,
-  isLoading,
-  pageIndex,
-  pageSize,
-  totalRecords,
-  totalPages,
-  onPageChange,
-  onPageSizeChange,
-  onEdit,
-  onDelete,
+export const ContributionTable: React.FC<ContributionTableProps> = ({
+  data = [],
+  isLoading = false,
+  pageIndex = 1,
+  pageSize = 10,
+  totalRecords = 0,
+  totalPages = 1,
+  onPageChange = () => {},
+  onPageSizeChange = () => {},
+  onEdit = () => {},
+  onDelete = () => {},
 }) => {
   return (
     <div className="bg-white rounded-lg border border-[#d4af37] shadow-lg overflow-hidden relative min-h-[400px] flex flex-col">
@@ -54,16 +54,20 @@ export const MemberTable: React.FC<MemberTableProps> = ({
           <thead>
             <tr className="bg-[#fdf6e3] border-b-2 border-[#d4af37] text-[#8b5e3c] text-sm uppercase font-bold">
               <th className="p-4 w-12 text-center">#</th>
-              <th className="p-4">Họ và Tên</th>
-              <th className="p-4">Gioi tinh</th>
-              <th className="p-4 hidden md:table-cell">Noi sinh</th>
-              <th className="p-4 hidden md:table-cell">Vai Trò</th>
-              <th className="p-4 text-center">Hành Động</th>
+              <th className="p-4 text-center min-w-[150px]">Người đóng</th>
+              <th className="p-4 text-center min-w-[150px]">Số tiền</th>
+              <th className="p-4 text-center min-w-[150px]">Ngày đóng</th>
+              <th className="p-4 text-center min-w-[150px]">Danh mục</th>
+              <th className="p-4 text-center min-w-[150px]">Phương thức</th>
+              <th className="p-4 text-center min-w-[300px]">Nội dung</th>
+              <th className="p-4 text-center min-w-[150px]">Người Cập Nhập</th>
+              <th className="p-4 text-center min-w-[150px]">Ngày Tạo</th>
+              <th className="p-4 text-center">Hành động</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-[#eaddcf]">
             {data.length > 0
-              ? data.map((user, index) => (
+              ? data.map((item, index) => (
                   <tr
                     key={index}
                     className="hover:bg-[#fffdf5] transition-colors group"
@@ -71,27 +75,54 @@ export const MemberTable: React.FC<MemberTableProps> = ({
                     <td className="p-4 text-center text-stone-400 font-mono text-xs">
                       {(pageIndex - 1) * pageSize + index + 1}
                     </td>
-                    <td className="p-4 font-bold text-[#5d4037] group-hover:text-[#b91c1c]">
-                      {user.hoTen}
+                    <td className="p-4 text-center font-bold text-[#5d4037] group-hover:text-[#b91c1c] min-w-[150px]">
+                      {item.hoTenNguoiDong}
                     </td>
-                    <td className="p-4 font-mono text-sm text-slate-600">
-                      {user.gioiTinh === "Nam" ? "Nam" : "Nu"}
+                    <td className="p-4 text-center font-bold text-[#5d4037] group-hover:text-[#b91c1c] min-w-[150px]-600">
+                      {new Intl.NumberFormat("vi-VN", {
+                        style: "currency",
+                        currency: "VND",
+                      }).format(item.soTien)}
                     </td>
-                    <td className="p-4 text-stone-500 hidden md:table-cell text-sm">
-                      {user.noiSinh}
+                    <td className="p-4 text-center font-bold text-[#5d4037] group-hover:text-[#b91c1c] min-w-[150px]-cell text-sm">
+                      {item.ngayDong ? new Date(item.ngayDong).toLocaleDateString("vi-VN", {
+                        year: "numeric",
+                        month: "2-digit",
+                        day: "2-digit",
+                      }) : "N/A"}
                     </td>
-                    <td className="p-4 text-center"></td>
-                    <td className="p-4 text-center">
+                    <td className="p-4 text-center font-bold text-[#5d4037] group-hover:text-[#b91c1c] min-w-[150px]">
+                      {item.tenDanhMuc || "Khác"}
+                    </td>
+                    <td className="p-4 text-center font-bold text-[#5d4037] group-hover:text-[#b91c1c] min-w-[150px]">
+                      {item.phuongThucThanhToan}
+                    </td>
+                    <td className="p-4 text-center font-bold text-[#5d4037] group-hover:text-[#b91c1c] min-w-[300px]">
+                      {item.noiDung}
+                    </td>
+                    <td className="p-4 text-center font-bold text-[#5d4037] group-hover:text-[#b91c1c] min-w-[150px]">
+                      {item.hoTen || "N/A"}
+                    </td>
+                    <td className="p-4 text-center font-bold text-[#5d4037] group-hover:text-[#b91c1c] min-w-[150px]">
+                      {item.ngayTao
+                        ? new Date(item.ngayTao).toLocaleDateString("vi-VN", {
+                            year: "numeric",
+                            month: "2-digit",
+                            day: "2-digit",
+                          })
+                        : "Không có ngày tạo"}
+                    </td>
+                    <td className="p-4 text-center font-bold text-[#5d4037] group-hover:text-[#b91c1c] min-w-[150px]">
                       <div className="flex justify-center gap-2 opacity-80 group-hover:opacity-100 transition-opacity">
                         <button
-                          onClick={() => onEdit(user)}
+                          onClick={() => onEdit(item)}
                           className="p-2 text-blue-600 hover:bg-blue-50 rounded transition-colors"
                           title="Sửa"
                         >
                           <Edit size={18} />
                         </button>
                         <button
-                          onClick={() => onDelete(user)}
+                          onClick={() => onDelete(item)}
                           className="p-2 text-red-600 hover:bg-red-50 rounded transition-colors"
                           title="Xóa"
                         >
@@ -112,7 +143,7 @@ export const MemberTable: React.FC<MemberTableProps> = ({
                           size={48}
                           className="mb-4 opacity-20"
                         />
-                        Không tìm thấy thành viên nào phù hợp.
+                        Không tìm thấy khoản đóng góp nào phù hợp.
                       </div>
                     </td>
                   </tr>
@@ -125,7 +156,7 @@ export const MemberTable: React.FC<MemberTableProps> = ({
       <div className="bg-[#fdf6e3] p-4 border-t border-[#d4af37] flex items-center justify-between">
         <div className="text-sm text-[#8b5e3c]">
           Hiển thị <span className="font-bold">{data.length}</span> / Tổng{" "}
-          <span className="font-bold">{totalRecords}</span> thành viên
+          <span className="font-bold">{totalRecords}</span> khoản đóng góp
         </div>
         <div className="flex gap-1 items-center">
           <select

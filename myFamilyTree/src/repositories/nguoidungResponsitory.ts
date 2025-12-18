@@ -70,9 +70,12 @@ export class nguoiDungReponsitory {
         search_content || null,
         dongHoId || null,
       ]);
-      return results;
+      // Nếu results là mảng rỗng hoặc undefined, trả về []
+      return Array.isArray(results) ? results : [];
     } catch (error: any) {
-      throw new Error(error);
+      console.error("searchUser repository error:", error.message);
+      // Trả về mảng rỗng thay vì throw error để không làm crash app
+      return [];
     }
   }
 

@@ -1,12 +1,11 @@
 import { API_CORE } from "@/constant/config";
 import { apiClient } from "@/lib/api";
-import { IEvent, IsearchEvent } from "@/types/event";
-import { IMember, IMemberSearch } from "@/types/member";
+import { IContributionDown, IsearchContributionDown } from "@/types/contribuitionDown";
 
-const prefix = `${API_CORE}/contributionUp`;
+const prefix = `${API_CORE}/contributionDown`;
 
 
-export const searchContributionDown = async (data: IsearchEvent): Promise<any> => {
+export const searchContributionDown = async (data: IsearchContributionDown): Promise<any> => {
   try {
     const res = await apiClient.post(`${prefix}/search`, data);
 
@@ -16,7 +15,9 @@ export const searchContributionDown = async (data: IsearchEvent): Promise<any> =
   }
 };
 
-export const createEvent = async (data: IEvent): Promise<any> => {
+export const createContributionDown = async (
+  data: IContributionDown
+): Promise<any> => {
   try {
     const res = await apiClient.post(`${prefix}/create`, data);
 
@@ -26,7 +27,7 @@ export const createEvent = async (data: IEvent): Promise<any> => {
   }
 };
 
-export const updateEvent = async (data: IEvent): Promise<any> => {
+export const updateContributionDown = async (id: number, data: any): Promise<any> => {
   try {
     const res = await apiClient.post(`${prefix}/update`, data);
 
@@ -36,7 +37,7 @@ export const updateEvent = async (data: IEvent): Promise<any> => {
   }
 };
 
-export const deleteEvent = async (id: string): Promise<any> => {
+export const deleteContributionDown = async (id: string): Promise<any> => {
   try {
     const res = await apiClient.delete(`${prefix}/${id}`);
     return res?.data;

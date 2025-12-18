@@ -35,11 +35,20 @@ export const autherization = async (token: string): Promise<any> => {
 export const getUsers = async (data: IUserSearch): Promise<any> => {
   try {
     const res = await apiClient.post(`${prefix}/search`, data);
+    // Nếu không có kết quả, trả về mảng rỗng thay vì throw error
+    if (res?.data?.success === false || !res?.data?.data) {
+      return { success: true, data: [], totalItems: 0, pageCount: 0 };
+    }
     return res?.data;
   } catch (error: any) {
     const err = parseApiError(error);
-    console.error(`[getUsers] ${err.message}`);
-    return { success: false, data: [], message: err.message };
+    // Không log error cho trường hợp không có kết quả tìm kiếm (đây là bình thường)
+    const isEmptyResult = err.message?.includes("Không tồn tại kết quả") || 
+                          err.message?.includes("không tìm thấy");
+    if (!isEmptyResult) {
+      console.error(`[getUsers] ${err.message}`);
+    }
+    return { success: true, data: [], totalItems: 0, pageCount: 0 };
   }
 };
 
@@ -65,9 +74,14 @@ export const updateUser = async (id: string, data: IUserSearch): Promise<any> =>
   }
 };
 
-export const deleteUser = async (data: string): Promise<any> => {
+export const deleteUser = async (userIds: string[], updatedById?: string): Promise<any> => {
   try {
-    const res = await apiClient.post(`${prefix}/delete`, { data });
+    // Backend expects: { list_json: [{nguoiDungId: "..."}], updated_by_id: "..." }
+    const list_json = userIds.map(id => ({ nguoiDungId: id }));
+    const res = await apiClient.post(`${prefix}/delete`, { 
+      list_json, 
+      updated_by_id: updatedById || "system" 
+    });
     return res?.data;
   } catch (error: any) {
     const err = parseApiError(error);

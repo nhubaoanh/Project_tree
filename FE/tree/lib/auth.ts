@@ -11,47 +11,47 @@ export interface MenuItem {
 // ==================== MENU CONFIG ====================
 
 export const ALL_MENU_ITEMS: MenuItem[] = [
-  { 
-    name: "Dashboard", 
-    href: "/dashboard", 
+  {
+    name: "Dashboard",
+    href: "/dashboard",
     icon: "/icon/iconmember.png",
-    roles: ["sa", "admin", "thanhvien", "user"] 
+    roles: ["sa", "admin", "thanhvien", "user"],
   },
-  { 
-    name: "Members", 
-    href: "/members", 
+  {
+    name: "Members",
+    href: "/members",
     icon: "/icon/iconmember.png",
-    roles: ["sa", "admin", "thanhvien"] 
+    roles: ["sa", "admin", "thanhvien"],
   },
-  { 
-    name: "Genealogy", 
-    href: "/genealogy", 
+  {
+    name: "Users",
+    href: "/users",
+    icon: "/icon/iconmember.png",
+    roles: ["sa"], // Chỉ super admin
+  },
+  {
+    name: "Genealogy",
+    href: "/genealogy",
     icon: "/icon/pen.png",
-    roles: ["sa", "admin"] 
+    roles: ["sa", "admin"],
   },
-  { 
-    name: "Events", 
-    href: "/manageEvents", 
+  {
+    name: "Events",
+    href: "/manageEvents",
     icon: "/icon/calendar.png",
-    roles: ["sa", "admin", "thanhvien", "user"] 
+    roles: ["sa", "admin", "thanhvien", "user"],
   },
-  { 
-    name: "Notifications", 
-    href: "/notifications", 
-    icon: "/icon/bell.png",
-    roles: ["sa", "admin"] 
-  },
-  { 
-    name: "Contributions", 
-    href: "/contributions", 
+  {
+    name: "ContributionsUp",
+    href: "/contributions",
     icon: "/icon/dollar.png",
-    roles: ["sa", "admin", "thanhvien"] 
+    roles: ["sa", "admin"],
   },
-  { 
-    name: "Users", 
-    href: "/users", 
-    icon: "/icon/iconmember.png",
-    roles: ["sa"] // Chỉ super admin
+  {
+    name: "Expense",
+    href: "/contributionsDown",
+    icon: "/icon/dollar.png",
+    roles: ["sa", "admin"],
   },
 ];
 

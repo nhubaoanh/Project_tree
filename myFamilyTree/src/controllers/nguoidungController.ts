@@ -84,26 +84,28 @@ export class NguoiDungController {
         object.search_content,
         object.dongHoId
       );
-      if (data) {
-        res.json({
-          totalItems: Math.ceil(
-            data && data.length > 0 ? data[0].RecordCount : 0
-          ),
-          page: object.pageIndex,
-          pageSize: object.pageSize,
-          data: data,
-          pageCount: Math.ceil(
-            (data && data.length > 0 ? data[0].RecordCount : 0) /
-              (object.pageSize ? object.pageSize : 1)
-          ),
-        });
-      } else {
-        res.json({ message: "Không tồn tại kết quả tìm kiếm.", success: true });
-      }
+      
+      // Luôn trả về format nhất quán dù có data hay không
+      const totalItems = data && data.length > 0 ? data[0].RecordCount : 0;
+      const pageCount = Math.ceil(totalItems / (object.pageSize || 1));
+      
+      res.json({
+        success: true,
+        totalItems,
+        page: object.pageIndex,
+        pageSize: object.pageSize,
+        data: data || [],
+        pageCount,
+      });
     } catch (error: any) {
-      res
-        .status(500)
-        .json({ message: "Không tồn tại kết quả tìm kiếm.", success: false });
+      console.error("searchUser error:", error);
+      res.status(500).json({ 
+        success: false, 
+        message: error.message || "Lỗi khi tìm kiếm người dùng.",
+        data: [],
+        totalItems: 0,
+        pageCount: 0
+      });
     }
   }
 
@@ -172,8 +174,9 @@ export class NguoiDungController {
     try{
       const object = req.body as {list_json: any; updated_by_id: string};
       const results = await this.nguoiDungService.deleteUser(object.list_json, object.updated_by_id);
-      res.json({message: "Đã xóa thành công.", success: true});
+      res.json({message: "Đã xóa thành công.", success: true, results: results});
     }catch(error: any){
+      console.log("error",error);
       res.status(500).json({ message: "Xoa nguoi dung that bai.", success: false });
     }
   }
