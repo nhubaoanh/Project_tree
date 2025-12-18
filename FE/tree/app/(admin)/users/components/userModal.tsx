@@ -20,40 +20,12 @@ interface UserModalProps {
 
 // Định nghĩa rules validate
 const userRules: FormRules = {
-  hoTen: {
-    label: "Họ và tên",
-    rules: [
-      { type: "required" },
-      { type: "minLength", value: 2 },
-      { type: "maxLength", value: 100 },
-    ],
-  },
-  tenDangNhap: {
-    label: "Tên đăng nhập",
-    rules: [
-      { type: "required" },
-      { type: "email" },
-    ],
-  },
-  matKhau: {
-    label: "Mật khẩu",
-    rules: [
-      { type: "required" },
-      { type: "minLength", value: 6 },
-    ],
-  },
-  email: {
-    label: "Email",
-    rules: [{ type: "email" }],
-  },
-  soDienThoai: {
-    label: "Số điện thoại",
-    rules: [{ type: "phone" }],
-  },
-  dongHoId: {
-    label: "Dòng họ",
-    rules: [{ type: "required" }],
-  },
+  hoTen: { label: "Họ và tên", rules: ["required", "fullName"] },
+  tenDangNhap: { label: "Tên đăng nhập", rules: ["required", "email"] },
+  matKhau: { label: "Mật khẩu", rules: ["required", "password"] },
+  email: { label: "Email", rules: ["email"] },
+  soDienThoai: { label: "Số điện thoại", rules: ["phone"] },
+  dongHoId: { label: "Dòng họ", rules: ["required"] },
 };
 
 export const UserModal: React.FC<UserModalProps> = ({
@@ -106,14 +78,21 @@ export const UserModal: React.FC<UserModalProps> = ({
     }
   }, [isOpen, initialData]);
 
-  // Handle change
+  // Handle change + chặn nhập số vào họ tên
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    let newValue = value;
+    
+    // Chặn nhập số vào họ tên
+    if (name === "hoTen") {
+      newValue = value.replace(/\d/g, "");
+    }
+    
+    setFormData((prev) => ({ ...prev, [name]: newValue }));
 
     // Validate lại nếu đã touched
     if (touched[name]) {
-      const error = validateField(name, value, userRules, formData);
+      const error = validateField(name, newValue, userRules, formData);
       setErrors((prev) => ({ ...prev, [name]: error }));
     }
   };

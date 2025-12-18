@@ -5,6 +5,7 @@ import router from "./routes/index";
 import mysql from "mysql2";
 import cors from 'cors';
 import core_router from "./core/routes";
+import aiRouter from "./routes/aiRouter";
 import { errorHandler } from "./errors/errorHandle";
 const app = express();
 
@@ -15,7 +16,8 @@ app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
 
 app.use('/api-core', core_router);
-app.use('/api-core', router)
+app.use('/api-core', router);
+app.use('/api-core/ai', aiRouter);
 // Đăng ký middleware xử lý lỗi toàn cục
 app.use(errorHandler);
 // Middleware tùy chỉnh để xử lý dữ liệu đầu vào

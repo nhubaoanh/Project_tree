@@ -5,6 +5,16 @@ import { X, Upload, Loader2, Image as ImageIcon, Trash2, Plus } from "lucide-rea
 import { uploadFile, uploadFiles } from "@/service/upload.service";
 import { IMember } from "@/types/member";
 import { API_DOWNLOAD } from "@/constant/config";
+import { FormRules, validateForm, validateField } from "@/lib/validator";
+
+// Validation rules
+const memberRules: FormRules = {
+  hoTen: { label: "Họ tên", rules: ["required", "fullName"] },
+  dongHoId: { label: "Dòng họ", rules: ["required"] },
+  gioiTinh: { label: "Giới tính", rules: ["required", "gender"] },
+  ngaySinh: { label: "Ngày sinh", rules: ["required", "date", "notFuture"] },
+  doiThuoc: { label: "Đời thứ", rules: ["integer", "positive"] },
+};
 
 interface MemberModalProps {
   isOpen: boolean;
@@ -26,6 +36,8 @@ export const MemberModal: React.FC<MemberModalProps> = ({
 
   // Form state
   const [formData, setFormData] = useState<Partial<IMember>>({});
+  const [errors, setErrors] = useState<Record<string, string | null>>({});
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
   
   // Upload state - ảnh chân dung (1 ảnh)
   const [uploading, setUploading] = useState(false);
@@ -61,8 +73,35 @@ export const MemberModal: React.FC<MemberModalProps> = ({
         member?.anhChanDung ? `${API_DOWNLOAD}/${member.anhChanDung}` : null
       );
       setExtraImages([]);
+      setErrors({});
+      setTouched({});
     }
   }, [isOpen, member]);
+
+  // Handle change với validation + chặn nhập số vào họ tên
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const { name, value, type } = e.target;
+    let newValue: any = type === "number" ? (value ? Number(value) : undefined) : value;
+    
+    // Chặn nhập số vào họ tên
+    if (name === "hoTen" && typeof newValue === "string") {
+      newValue = newValue.replace(/\d/g, "");
+    }
+    
+    setFormData((prev) => ({ ...prev, [name]: newValue }));
+    if (touched[name]) {
+      const error = validateField(name, newValue, memberRules, formData);
+      setErrors((prev) => ({ ...prev, [name]: error }));
+    }
+  };
+
+  // Handle blur
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setTouched((prev) => ({ ...prev, [name]: true }));
+    const error = validateField(name, value, memberRules, formData);
+    setErrors((prev) => ({ ...prev, [name]: error }));
+  };
 
   // Upload 1 ảnh chân dung
   const handleSingleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -156,14 +195,15 @@ export const MemberModal: React.FC<MemberModalProps> = ({
 
   // Submit form
   const handleSubmit = () => {
-    if (!formData.hoTen?.trim()) {
-      alert("Vui lòng nhập họ tên!");
+    const { isValid, errors: formErrors } = validateForm(formData, memberRules);
+    setErrors(formErrors);
+    setTouched(Object.keys(memberRules).reduce((acc, key) => ({ ...acc, [key]: true }), {}));
+    
+    if (!isValid) {
+      alert("Vui lòng kiểm tra lại thông tin!");
       return;
     }
-    // Gửi cả ảnh chính và ảnh phụ
-    onSave({
-      ...formData,
-    });
+    onSave({ ...formData });
   };
 
   // Format date cho input
@@ -309,12 +349,15 @@ export const MemberModal: React.FC<MemberModalProps> = ({
               </label>
               <input
                 type="text"
+                name="hoTen"
                 value={formData.hoTen || ""}
-                onChange={(e) =>
-                  setFormData({ ...formData, hoTen: e.target.value })
-                }
-                className="w-full px-3 py-2 border border-[#d4af37] rounded focus:outline-none focus:border-[#b91c1c]"
+                onChange={handleChange}
+                onBlur={handleBlur}
+                className={`w-full px-3 py-2 border rounded focus:outline-none ${
+                  touched.hoTen && errors.hoTen ? "border-red-500" : "border-[#d4af37] focus:border-[#b91c1c]"
+                }`}
               />
+              {touched.hoTen && errors.hoTen && <p className="text-red-500 text-xs mt-1">{errors.hoTen}</p>}
             </div>
             {/* Dòng họ */}
             <div>
@@ -323,12 +366,15 @@ export const MemberModal: React.FC<MemberModalProps> = ({
               </label>
               <input
                 type="text"
+                name="dongHoId"
                 value={formData.dongHoId || ""}
-                onChange={(e) =>
-                  setFormData({ ...formData, dongHoId: e.target.value })
-                }
-                className="w-full px-3 py-2 border border-[#d4af37] rounded focus:outline-none focus:border-[#b91c1c]"
+                onChange={handleChange}
+                onBlur={handleBlur}
+                className={`w-full px-3 py-2 border rounded focus:outline-none ${
+                  touched.dongHoId && errors.dongHoId ? "border-red-500" : "border-[#d4af37] focus:border-[#b91c1c]"
+                }`}
               />
+              {touched.dongHoId && errors.dongHoId && <p className="text-red-500 text-xs mt-1">{errors.dongHoId}</p>}
             </div>
 
             {/* Giới tính */}
@@ -337,10 +383,10 @@ export const MemberModal: React.FC<MemberModalProps> = ({
                 Giới tính
               </label>
               <select
+                name="gioiTinh"
                 value={formData.gioiTinh ?? 1}
-                onChange={(e) =>
-                  setFormData({ ...formData, gioiTinh: Number(e.target.value) })
-                }
+                onChange={handleChange}
+                onBlur={handleBlur}
                 className="w-full px-3 py-2 border border-[#d4af37] rounded focus:outline-none focus:border-[#b91c1c]"
               >
                 <option value={1}>Nam</option>
@@ -351,21 +397,30 @@ export const MemberModal: React.FC<MemberModalProps> = ({
             {/* Ngày sinh */}
             <div>
               <label className="block text-sm font-medium text-[#5d4037] mb-1">
-                Ngày sinh
+                Ngày sinh <span className="text-red-500">*</span>
               </label>
               <input
                 type="date"
+                name="ngaySinh"
                 value={formatDateForInput(formData.ngaySinh)}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    ngaySinh: e.target.value
-                      ? new Date(e.target.value)
-                      : undefined,
-                  })
-                }
-                className="w-full px-3 py-2 border border-[#d4af37] rounded focus:outline-none focus:border-[#b91c1c]"
+                max={new Date().toISOString().split("T")[0]}
+                onChange={(e) => {
+                  setFormData({ ...formData, ngaySinh: e.target.value ? new Date(e.target.value) : undefined });
+                  if (touched.ngaySinh) {
+                    const error = validateField("ngaySinh", e.target.value, memberRules, formData);
+                    setErrors((prev) => ({ ...prev, ngaySinh: error }));
+                  }
+                }}
+                onBlur={(e) => {
+                  setTouched((prev) => ({ ...prev, ngaySinh: true }));
+                  const error = validateField("ngaySinh", e.target.value, memberRules, formData);
+                  setErrors((prev) => ({ ...prev, ngaySinh: error }));
+                }}
+                className={`w-full px-3 py-2 border rounded focus:outline-none ${
+                  touched.ngaySinh && errors.ngaySinh ? "border-red-500" : "border-[#d4af37] focus:border-[#b91c1c]"
+                }`}
               />
+              {touched.ngaySinh && errors.ngaySinh && <p className="text-red-500 text-xs mt-1">{errors.ngaySinh}</p>}
             </div>
 
             {/* Ngày mất */}
@@ -454,13 +509,16 @@ export const MemberModal: React.FC<MemberModalProps> = ({
               </label>
               <input
                 type="number"
+                name="doiThuoc"
                 min={1}
                 value={formData.doiThuoc ?? 1}
-                onChange={(e) =>
-                  setFormData({ ...formData, doiThuoc: Number(e.target.value) })
-                }
-                className="w-full px-3 py-2 border border-[#d4af37] rounded focus:outline-none focus:border-[#b91c1c]"
+                onChange={handleChange}
+                onBlur={handleBlur}
+                className={`w-full px-3 py-2 border rounded focus:outline-none ${
+                  touched.doiThuoc && errors.doiThuoc ? "border-red-500" : "border-[#d4af37] focus:border-[#b91c1c]"
+                }`}
               />
+              {touched.doiThuoc && errors.doiThuoc && <p className="text-red-500 text-xs mt-1">{errors.doiThuoc}</p>}
             </div>
 
             {/* Địa chỉ hiện tại */}

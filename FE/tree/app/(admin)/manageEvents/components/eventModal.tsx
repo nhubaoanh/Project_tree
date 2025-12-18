@@ -35,30 +35,11 @@ interface EventModalProps {
  * - date: Kiểm tra định dạng ngày
  */
 const eventRules: FormRules = {
-  tenSuKien: {
-    label: "Tên sự kiện",
-    rules: [
-      { type: "required" },
-      { type: "minLength", value: 3 },
-      { type: "maxLength", value: 200 },
-    ],
-  },
-  ngayDienRa: {
-    label: "Ngày diễn ra",
-    rules: [{ type: "required" }, { type: "date" }],
-  },
-  diaDiem: {
-    label: "Địa điểm",
-    rules: [{ type: "maxLength", value: 300 }],
-  },
-  moTa: {
-    label: "Mô tả",
-    rules: [{ type: "maxLength", value: 1000 }],
-  },
-  dongHoId: {
-    label: "Dòng họ",
-    rules: [{ type: "required" }],
-  },
+  tenSuKien: { label: "Tên sự kiện", rules: ["required", { min: 3 }, { max: 200 }] },
+  ngayDienRa: { label: "Ngày diễn ra", rules: ["required", "date"] },
+  diaDiem: { label: "Địa điểm", rules: [{ max: 300 }] },
+  moTa: { label: "Mô tả", rules: [{ max: 1000 }] },
+  dongHoId: { label: "Dòng họ", rules: ["required"] },
 };
 
 // ==================== LOẠI SỰ KIỆN ====================

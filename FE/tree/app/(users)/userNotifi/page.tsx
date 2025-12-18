@@ -1,3 +1,4 @@
+"use client";
 import React, { useState } from "react";
 import {
   Search,
@@ -128,7 +129,7 @@ const NotificationModal = ({ isOpen, onClose, onSubmit, isLoading }: any) => {
   );
 };
 
-export const NotificationPage: React.FC = () => {
+export default function NotificationPage() {
   const queryClient = useQueryClient();
   const [pageIndex, setPageIndex] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);

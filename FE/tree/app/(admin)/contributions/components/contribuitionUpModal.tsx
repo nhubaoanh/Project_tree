@@ -19,42 +19,15 @@ interface ContributionUpModalProps {
 
 // ==================== VALIDATION RULES ====================
 const rules: FormRules = {
-  hoTenNguoiDong: {
-    label: "Họ tên người đóng",
-    rules: [{ type: "required" }, { type: "maxLength", value: 200 }],
-  },
-  ngayDong: {
-    label: "Ngày đóng",
-    rules: [{ type: "required" }, { type: "date" }],
-  },
-  soTien: {
-    label: "Số tiền",
-    rules: [{ type: "required" }, { type: "positive" }],
-  },
-  dongHoId: {
-    label: "Dòng họ",
-    rules: [{ type: "required" }],
-  },
-  danhMucId: {
-    label: "Danh mục",
-    rules: [{ type: "required" }],
-  },
-  phuongThucThanhToan: {
-    label: "Phương thức thanh toán",
-    rules: [{ type: "required" }],
-  },
-  noiDung: {
-    label: "Nội dung",
-    rules: [{ type: "maxLength", value: 500 }],
-  },
-  ghiChu: {
-    label: "Ghi chú",
-    rules: [{ type: "maxLength", value: 300 }],
-  },
-  soDienThoaiNguoiNhap: {
-    label: "SĐT người nhập",
-    rules: [{ type: "phone" }],
-  },
+  hoTenNguoiDong: { label: "Họ tên người đóng", rules: ["required", { max: 200 }] },
+  ngayDong: { label: "Ngày đóng", rules: ["required", "date"] },
+  soTien: { label: "Số tiền", rules: ["required", "number", "positive"] },
+  dongHoId: { label: "Dòng họ", rules: ["required"] },
+  danhMucId: { label: "Danh mục", rules: ["required"] },
+  phuongThucThanhToan: { label: "Phương thức thanh toán", rules: ["required"] },
+  noiDung: { label: "Nội dung", rules: [{ max: 500 }] },
+  ghiChu: { label: "Ghi chú", rules: [{ max: 300 }] },
+  soDienThoaiNguoiNhap: { label: "SĐT người nhập", rules: ["phone"] },
 };
 
 // ==================== PAYMENT METHODS ====================
