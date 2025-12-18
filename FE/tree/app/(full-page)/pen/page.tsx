@@ -58,7 +58,7 @@ export default function PhaKyPage() {
                   activePage === page.id ? "scale-105" : "hover:scale-102"
                 }`}
                 style={{
-                  backgroundImage: `url('/images/button.png')`, // Chỉ 1 file ảnh duy nhất
+                  backgroundImage: `url('/images/khung.png')`, // Chỉ 1 file ảnh duy nhất
                   backgroundSize: "100% 100%",
                   backgroundRepeat: "no-repeat",
                   height: "60px",

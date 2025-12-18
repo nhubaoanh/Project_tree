@@ -1,13 +1,49 @@
 import React from "react";
 
 export default function TinTucPage() {
+  const [showAll, setShowAll] = React.useState(false);
+  
   // Dữ liệu giả lập cho danh sách tin tức
-  const newsItems = Array(4).fill({
-    title: "Họp họ ngày tết vui vẻ",
-    desc: "Mô tả ngắn gọn về sự kiện",
-    date: "15/11/2025",
-    image: "images/xumvay.jpg",
-  });
+  const allNewsItems = [
+    {
+      id: 1,
+      title: "Họp họ ngày tết vui vẻ",
+      desc: "Chuẩn bị cho buổi họp họ đầu năm mới với nhiều hoạt động thú vị",
+      date: "15/11/2025",
+      image: "images/xumvay.jpg",
+    },
+    {
+      id: 2,
+      title: "Lễ giỗ tổ Hùng Vương",
+      desc: "Thông báo lịch tổ chức lễ giỗ tổ Hùng Vương năm 2025",
+      date: "10/11/2025",
+      image: "images/den-hung.jpg",
+    },
+    {
+      id: 3,
+      title: "Hỗ trợ học bổng",
+      desc: "Kế hoạch trao học bổng cho con em trong dòng họ năm học mới",
+      date: "05/11/2025",
+      image: "images/hoc-bong.jpg",
+    },
+    {
+      id: 4,
+      title: "Gặp mặt đầu xuân",
+      desc: "Thông báo chương trình gặp mặt đầu xuân 2026",
+      date: "01/11/2025",
+      image: "images/tet.jpg",
+    },
+    {
+      id: 5,
+      title: "Tu bổ nhà thờ họ",
+      desc: "Kế hoạch tu bổ, nâng cấp nhà thờ họ năm 2025",
+      date: "25/10/2025",
+      image: "images/nha-tho-ho.jpg",
+    },
+  ];
+  
+  // Hiển thị 3 tin mới nhất mặc định, hoặc tất cả nếu đã nhấn Xem thêm
+  const displayedNews = showAll ? allNewsItems : allNewsItems.slice(0, 3);
 
   const NewsItem = ({ item }: { item: any }) => (
     <div className="flex gap-3 group cursor-pointer bg-white/60 p-3 rounded-lg transition-all border border-[#d4af37]/20">
@@ -116,21 +152,31 @@ export default function TinTucPage() {
               <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-[#d4af37] to-transparent"></div>
             </h3>
             <div className="space-y-4">
-              {newsItems.map((item, idx) => (
-                <NewsItem key={`latest-${idx}`} item={item} />
+              {displayedNews.map((item) => (
+                <NewsItem key={`news-${item.id}`} item={item} />
               ))}
+              {!showAll && allNewsItems.length > 3 && (
+                <div className="text-center mt-6">
+                  <button 
+                    onClick={() => setShowAll(true)}
+                    className="px-6 py-2 bg-[#8b5e3c] text-white rounded-full hover:bg-[#8b0000] transition-colors duration-300 text-sm font-medium"
+                  >
+                    Xem thêm tin tức
+                  </button>
+                </div>
+              )}
             </div>
           </div>
 
-          {/* Cột 2: Xem thêm */}
+          {/* Cột 2: Sự kiện sắp diễn ra */}
           <div className="pl-0 lg:pl-6">
             <h3 className="font-display text-2xl text-[#2d2d2d] italic mb-6 pb-2 relative inline-block">
-              Xem thêm
+              Sự kiện sắp diễn ra
               <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-[#d4af37] to-transparent"></div>
             </h3>
             <div className="space-y-4">
-              {newsItems.map((item, idx) => (
-                <NewsItem key={`more-${idx}`} item={item} />
+              {allNewsItems.slice(0, 2).map((item) => (
+                <NewsItem key={`event-${item.id}`} item={item} />
               ))}
             </div>
           </div>

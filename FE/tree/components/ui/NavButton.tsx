@@ -14,13 +14,18 @@ export const NavButton: React.FC<NavButtonProps> = ({
   return (
     <button
       onClick={onClick}
+      style={{
+        backgroundImage: `url('/images/button.png')`, // Chỉ 1 file ảnh duy nhất
+        backgroundSize: "100% 100%",
+        backgroundRepeat: "no-repeat",
+        height: "60px",
+      }}
       className={`
-        relative px-6 py-2 font-bold uppercase tracking-wide transition-all duration-300
-        border-2 rounded-full
+        relative px-6 py-6 font-bold uppercase tracking-wide transition-all duration-300 cursor-pointer
         ${
           isActive
-            ? "bg-yellow-500 text-red-900 border-yellow-600 shadow-[0_0_15px_rgba(234,179,8,0.6)] scale-105"
-            : "bg-red-900/80 text-yellow-100 border-yellow-500/50 hover:bg-red-800 hover:border-yellow-400"
+            ? "text-back scale-105"
+            : "text-red-500 border-yellow-500/50 "
         }
       `}
     >

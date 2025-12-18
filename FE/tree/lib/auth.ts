@@ -1,8 +1,3 @@
-/**
- * Cấu hình phân quyền và bảo mật route
- */
-
-// ==================== ĐỊNH NGHĨA ROLE ====================
 
 export type RoleCode = "sa" | "admin" | "thanhvien" | "user";
 
@@ -51,12 +46,6 @@ export const ALL_MENU_ITEMS: MenuItem[] = [
     href: "/contributions", 
     icon: "/icon/dollar.png",
     roles: ["sa", "admin", "thanhvien"] 
-  },
-  { 
-    name: "Assets", 
-    href: "/assets", 
-    icon: "/icon/time.png",
-    roles: ["sa", "admin"] 
   },
   { 
     name: "Users", 

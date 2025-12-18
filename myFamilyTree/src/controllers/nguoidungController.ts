@@ -27,6 +27,7 @@ export class NguoiDungController {
         const token = generateToken(obj);
         user.token = token;
         res.json(user);
+        console.log("User logged in:", user);
       } else {
         res.json({
           message: "Sai tài khoản hoặc mật khẩu.",

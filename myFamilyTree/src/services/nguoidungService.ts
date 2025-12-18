@@ -6,14 +6,12 @@ import { system_email } from "../config/system_email";
 import nodemailer from "nodemailer";
 import { verifyToken } from "../config/jwt";
 import { Tree } from "../ultis/tree";
-import { Action } from "../models/Actions";
 
 var md5 = require("md5");
 
 @injectable()
 export class nguoiDungService {
-  constructor(private nguoidungResponsitory: nguoiDungReponsitory,
-    private treeUltility: Tree
+  constructor(private nguoidungResponsitory: nguoiDungReponsitory
   ) {}
 
   async createNguoiDung(nguoiDung: nguoiDung): Promise<any> {
@@ -28,13 +26,6 @@ export class nguoiDungService {
     const md5_pass = md5(matKhau);
     const user = await this.nguoidungResponsitory.LoginUser(tenDangNhap);
     if(user) {
-      let functions = await this.nguoidungResponsitory.getFunctionByUserId(
-        user.nguoiDungId
-      );
-      let functionTree = this.treeUltility.getFunctionTree(functions, 1, "0");
-      let actions = await this.nguoidungResponsitory.getActionByUserId(
-        user.nguoiDungId
-      );
       return {
         nguoiDungId: user.nguoiDungId,
         dongHoId: user.dongHoId,
@@ -46,8 +37,6 @@ export class nguoiDungService {
         anhDaiDien: user.anhDaiDien,
         ngayTao: user.ngayTao,
         online_flag: user.online_flag,
-        functions: functionTree,
-        actions: actions,
       };
 
     }
@@ -126,19 +115,6 @@ export class nguoiDungService {
   async authrize(token: string){
     let user_data = verifyToken(token);    
     if(user_data == null) throw new Error("Phien dang nhap het han.");
-    let functions = await this.nguoidungResponsitory.getFunctionByUserId(
-      user_data.nguoiDungId
-    );
-    let functionTree = this.treeUltility.getFunctionTree(functions, 1, "0");
-    let actions = await this.nguoidungResponsitory.getActionByUserId(
-      user_data.nguoiDungId
-    );
-
-    let action_result = [];
-    for(let row of actions) {
-      let row_data = row as Action;
-      action_result.push(row_data.action_code);
-    }
     let data = {
       nguoiDungId: user_data.nguoiDungId,
       dongHoId: user_data.dongHoId,
@@ -150,8 +126,6 @@ export class nguoiDungService {
       anhDaiDien: user_data.anhDaiDien,
       ngayTao: user_data.ngayTao,
       online_flag: user_data.online_flag,
-      functions: functionTree,
-      actions: action_result,
     };
     return data;
   }

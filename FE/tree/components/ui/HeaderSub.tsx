@@ -32,7 +32,7 @@ export const Header: React.FC<HeaderProps> = ({ activeView, onNavigate }) => {
           />
         </div>
         <div className="flex flex-col items-center justify-center h-full pt-2">
-          <div className="mb-20 transform hover:scale-105 transition-transform duration-500 cursor-pointer">
+          <div className="mb-8 transform hover:scale-105 transition-transform duration-500">
             <Image
               src="/images/logo1.png"
               alt="Dao"
