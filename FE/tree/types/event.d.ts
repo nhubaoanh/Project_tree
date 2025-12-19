@@ -4,7 +4,7 @@ export interface IEvent {
   thanhVienId: number;
   tenSuKien: string;
   ngayDienRa: Date;
-  gioDienRa: Date;
+  gioDienRa: string;
   diaDiem: string;
   moTa: string;
   lapLai: number;

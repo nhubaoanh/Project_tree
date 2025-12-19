@@ -56,7 +56,7 @@ export const MemberTable: React.FC<MemberTableProps> = ({
               {/* Cột cố định nhỏ */}
               <th className="p-4 w-12 text-center">#</th>
 
-              <th className="p-4 text-center min-w-[200px]">Họ và Tên</th>
+              <th className="p-4 text-center min-w-[250px]">Họ và Tên</th>
               <th className="p-4 text-center min-w-[150px]">Dòng Họ</th>
               <th className="p-4 text-center hidden md:table-cell min-w-[180px]">
                 Email
@@ -88,7 +88,7 @@ export const MemberTable: React.FC<MemberTableProps> = ({
                     </td>
 
                     {/* THAY ĐỔI: Thêm min-w tương ứng, bỏ truncate */}
-                    <td className="p-4 text-center font-bold text-[#5d4037] group-hover:text-[#b91c1c] min-w-[200px]">
+                    <td className="p-4 text-center font-bold text-[#5d4037] group-hover:text-[#b91c1c] min-w-[250px]">
                       {user.full_name}
                     </td>
                     <td className="p-4 text-center font-bold text-[#5d4037] group-hover:text-[#b91c1c] min-w-[150px]">

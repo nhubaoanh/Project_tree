@@ -14,7 +14,7 @@ export interface IContributionUp {
   ghiChu: string;
 
   nguoiNhapId: string;
-  hoTen?: string;
+  full_name?: string;
   soDienThoaiNguoiNhap?: string;
 
   ngayTao: Date;

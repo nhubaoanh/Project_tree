@@ -57,7 +57,7 @@ export const ContributionTable: React.FC<ContributionTableProps> = ({
               <th className="p-4 text-center min-w-[150px]">Người đóng</th>
               <th className="p-4 text-center min-w-[150px]">Số tiền</th>
               <th className="p-4 text-center min-w-[150px]">Ngày đóng</th>
-              <th className="p-4 text-center min-w-[150px]">Danh mục</th>
+              <th className="p-4 text-center min-w-[200px]">Danh mục</th>
               <th className="p-4 text-center min-w-[150px]">Phương thức</th>
               <th className="p-4 text-center min-w-[300px]">Nội dung</th>
               <th className="p-4 text-center min-w-[150px]">Người Cập Nhập</th>
@@ -91,7 +91,7 @@ export const ContributionTable: React.FC<ContributionTableProps> = ({
                         day: "2-digit",
                       }) : "N/A"}
                     </td>
-                    <td className="p-4 text-center font-bold text-[#5d4037] group-hover:text-[#b91c1c] min-w-[150px]">
+                    <td className="p-4 text-center font-bold text-[#5d4037] group-hover:text-[#b91c1c] min-w-[200px]">
                       {item.tenDanhMuc || "Khác"}
                     </td>
                     <td className="p-4 text-center font-bold text-[#5d4037] group-hover:text-[#b91c1c] min-w-[150px]">
@@ -101,7 +101,7 @@ export const ContributionTable: React.FC<ContributionTableProps> = ({
                       {item.noiDung}
                     </td>
                     <td className="p-4 text-center font-bold text-[#5d4037] group-hover:text-[#b91c1c] min-w-[150px]">
-                      {item.hoTen || "N/A"}
+                      {item.full_name || "N/A"}
                     </td>
                     <td className="p-4 text-center font-bold text-[#5d4037] group-hover:text-[#b91c1c] min-w-[150px]">
                       {item.ngayTao

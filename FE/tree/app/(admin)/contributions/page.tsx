@@ -17,7 +17,7 @@ import {
 } from "@/service/user.service";
 import { IContributionUp, IsearchContributionUp } from "@/types/contribuitionUp";
 import { ContributionTable } from "./components/contribuitionUpTable";
-import { createContributionUp, searchContributionUp, updateContributionUp } from "@/service/contribuitionUp.service";
+import { createContributionUp, deleteContributionUp, searchContributionUp, updateContributionUp } from "@/service/contribuitionUp.service";
 import { ContributionUpModal } from "./components/contribuitionUpModal";
 
 // --- MAIN PAGE COMPONENT ---
@@ -94,7 +94,7 @@ export default function QuanLyThanhVienPage() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: deleteUser,
+    mutationFn: deleteContributionUp,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["contribuitionUp"] });
       toast.success("Đã xóa thành viên.");

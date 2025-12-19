@@ -72,7 +72,6 @@ export default function LoginPage() {
             middle_name: userData.middle_name,
             last_name: userData.last_name,
             full_name: userData.full_name,
-            hoTen: userData.full_name || userData.hoTen,
             gender: userData.gender,
             date_of_birthday: userData.date_of_birthday,
             avatar: userData.avatar,

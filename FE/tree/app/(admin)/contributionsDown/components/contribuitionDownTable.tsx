@@ -54,7 +54,7 @@ export const ContributionTable: React.FC<ContributionTableProps> = ({
           <thead>
             <tr className="bg-[#fdf6e3] border-b-2 border-[#d4af37] text-[#8b5e3c] text-sm uppercase font-bold">
               <th className="p-4 w-12 text-center">#</th>
-              <th className="p-4 text-center min-w-[150px]">Người nhận</th>
+              <th className="p-4 text-center min-w-[240px]">Người nhận</th>
               <th className="p-4 text-center min-w-[150px]">Số tiền</th>
               <th className="p-4 text-center min-w-[150px]">Ngày chi</th>
               <th className="p-4 text-center min-w-[150px]">Danh mục</th>
@@ -74,7 +74,7 @@ export const ContributionTable: React.FC<ContributionTableProps> = ({
                     <td className="p-4 text-center text-stone-400 font-mono text-xs">
                       {(pageIndex - 1) * pageSize + index + 1}
                     </td>
-                    <td className="p-4 text-center font-bold text-[#5d4037] group-hover:text-[#b91c1c] min-w-[150px]">
+                    <td className="p-4 text-center font-bold text-[#5d4037] group-hover:text-[#b91c1c] min-w-[250px]">
                       {item.nguoiNhan}
                     </td>
                     <td className="p-4 text-center font-bold text-[#5d4037] group-hover:text-[#b91c1c] min-w-[150px]-600">
