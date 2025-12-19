@@ -28,11 +28,11 @@ const initialValues: LoginFormData = {
 const loginRules: FormRules = {
   tenDangNhap: {
     label: "Tên đăng nhập",
-    rules: [{ type: "required" }, { type: "email" }],
+    rules: ["required", "email"],
   },
   matKhau: {
     label: "Mật khẩu",
-    rules: [{ type: "required" }, { type: "minLength", value: 4 }],
+    rules: ["required", "password"],
   },
 };
 

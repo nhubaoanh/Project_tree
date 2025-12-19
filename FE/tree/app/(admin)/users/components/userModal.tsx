@@ -20,11 +20,11 @@ interface UserModalProps {
 
 // Định nghĩa rules validate
 const userRules: FormRules = {
-  hoTen: { label: "Họ và tên", rules: ["required", "fullName"] },
+  full_name: { label: "Họ và tên", rules: ["required", "fullName"] },
   tenDangNhap: { label: "Tên đăng nhập", rules: ["required", "email"] },
   matKhau: { label: "Mật khẩu", rules: ["required", "password"] },
   email: { label: "Email", rules: ["email"] },
-  soDienThoai: { label: "Số điện thoại", rules: ["phone"] },
+  phone: { label: "Số điện thoại", rules: ["phone"] },
   dongHoId: { label: "Dòng họ", rules: ["required"] },
 };
 
@@ -64,11 +64,11 @@ export const UserModal: React.FC<UserModalProps> = ({
   useEffect(() => {
     if (isOpen) {
       setFormData({
-        hoTen: initialData?.hoTen || "",
+        full_name: initialData?.full_name || "",
         tenDangNhap: initialData?.tenDangNhap || "",
         matKhau: initialData?.matKhau || "",
         email: initialData?.email || "",
-        soDienThoai: initialData?.soDienThoai || "",
+        phone: initialData?.phone || "",
         dongHoId: initialData?.dongHoId || "",
         roleId: initialData?.roleId || "",
       });
@@ -84,7 +84,7 @@ export const UserModal: React.FC<UserModalProps> = ({
     let newValue = value;
     
     // Chặn nhập số vào họ tên
-    if (name === "hoTen") {
+    if (name === "full_name") {
       newValue = value.replace(/\d/g, "");
     }
     
@@ -197,12 +197,12 @@ export const UserModal: React.FC<UserModalProps> = ({
             {/* Họ tên */}
             <InputField
               label="Họ và tên"
-              name="hoTen"
+              name="full_name"
               required
-              value={formData.hoTen || ""}
+              value={formData.full_name || ""}
               onChange={handleChange}
               onBlur={handleBlur}
-              error={touched.hoTen ? errors.hoTen : null}
+              error={touched.full_name ? errors.full_name : null}
             />
 
             {/* Dòng họ */}
@@ -278,11 +278,11 @@ export const UserModal: React.FC<UserModalProps> = ({
             {/* Số điện thoại */}
             <InputField
               label="Số điện thoại"
-              name="soDienThoai"
-              value={formData.soDienThoai || ""}
+              name="phone"
+              value={formData.phone || ""}
               onChange={handleChange}
               onBlur={handleBlur}
-              error={touched.soDienThoai ? errors.soDienThoai : null}
+              error={touched.phone ? errors.phone : null}
             />
 
             {/* Vai trò */}

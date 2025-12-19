@@ -70,6 +70,7 @@ export class nguoiDungReponsitory {
         search_content || null,
         dongHoId || null,
       ]);
+      console.log("searchUser results:", results);
       // Nếu results là mảng rỗng hoặc undefined, trả về []
       return Array.isArray(results) ? results : [];
     } catch (error: any) {
@@ -108,8 +109,8 @@ export class nguoiDungReponsitory {
         nguoidung.roleId,
         nguoidung.tenDangNhap,
         nguoidung.matKhau,
-        nguoidung.hoTen,
-        nguoidung.soDienThoai,
+        nguoidung.full_name,
+        nguoidung.phone,
         nguoidung.nguoiTaoId,
       ]);
       return true;
@@ -127,8 +128,8 @@ export class nguoiDungReponsitory {
         nguoidung.roleId,
         nguoidung.tenDangNhap,
         nguoidung.matKhau,
-        nguoidung.hoTen,
-        nguoidung.soDienThoai,
+        nguoidung.full_name,
+        nguoidung.phone,
         nguoidung.lu_user_id,
       ]);
       return true;

@@ -54,21 +54,23 @@ export const MemberTable: React.FC<MemberTableProps> = ({
           <thead>
             <tr className="bg-[#fdf6e3] border-b-2 border-[#d4af37] text-[#8b5e3c] text-sm uppercase font-bold">
               {/* Cột cố định nhỏ */}
-              <th className="p-4 w-12 text-center">#</th> 
-              
-              <th className="p-4 text-center min-w-[150px]">Họ và Tên</th>
-              <th className="p-4 text-center min-w-[120px]">Dòng Họ</th>
-              <th className="p-4 text-center hidden md:table-cell min-w-[180px]">Email</th>
-              <th className="p-4 text-center min-w-[120px]">Số điện thoại</th>
+              <th className="p-4 w-12 text-center">#</th>
+
+              <th className="p-4 text-center min-w-[200px]">Họ và Tên</th>
+              <th className="p-4 text-center min-w-[150px]">Dòng Họ</th>
+              <th className="p-4 text-center hidden md:table-cell min-w-[180px]">
+                Email
+              </th>
+              <th className="p-4 text-center min-w-[150px]">Số điện thoại</th>
               <th className="p-4 text-center min-w-[150px]">Tên Đăng Nhập</th>
               {/* <th className="p-4 text-center min-w-[120px]">Mật khẩu</th> */}
               {/* <th className="p-4 text-center min-w-[120px]">Ảnh đại diện</th> */}
-              
+
               {/* Cột Vai Trò cố định để vừa badge */}
               <th className="p-4 text-center w-32">Vai Trò</th>
-              
-              <th className="p-4 text-center min-w-[120px]">Ngày tạo</th>
-              
+
+              <th className="p-4 text-center min-w-[150px]">Ngày tạo</th>
+
               {/* Cột Hành Động cố định nhỏ */}
               <th className="p-4 text-center min-w-[120px]">Hành Động</th>
             </tr>
@@ -84,19 +86,19 @@ export const MemberTable: React.FC<MemberTableProps> = ({
                     <td className="p-4 w-12 text-center text-stone-400 font-mono text-xs">
                       {(pageIndex - 1) * pageSize + index + 1}
                     </td>
-                    
+
                     {/* THAY ĐỔI: Thêm min-w tương ứng, bỏ truncate */}
-                    <td className="p-4 text-center font-bold text-[#5d4037] group-hover:text-[#b91c1c] min-w-[150px]">
-                      {user.hoTen}
+                    <td className="p-4 text-center font-bold text-[#5d4037] group-hover:text-[#b91c1c] min-w-[200px]">
+                      {user.full_name}
                     </td>
-                    <td className="p-4 text-center font-bold text-[#5d4037] group-hover:text-[#b91c1c] min-w-[120px]">
+                    <td className="p-4 text-center font-bold text-[#5d4037] group-hover:text-[#b91c1c] min-w-[150px]">
                       {user.tenDongHo}
                     </td>
                     <td className="p-4 text-center font-bold text-[#5d4037] hidden md:table-cell min-w-[180px]">
                       {user.email || "-"}
                     </td>
-                    <td className="p-4 text-center font-bold text-[#5d4037] group-hover:text-[#b91c1c] min-w-[120px]">
-                      {user.soDienThoai}
+                    <td className="p-4 text-center font-bold text-[#5d4037] group-hover:text-[#b91c1c] min-w-[150px]">
+                      {user.phone}
                     </td>
                     <td className="p-4 text-center font-bold text-[#5d4037] min-w-[150px]">
                       {user.tenDangNhap}
@@ -107,7 +109,7 @@ export const MemberTable: React.FC<MemberTableProps> = ({
                     {/* <td className="p-4 text-center font-bold text-[#5d4037] group-hover:text-[#b91c1c] min-w-[120px]">
                       {user.anhDaiDien}
                     </td> */}
-                    
+
                     {/* Cột Vai Trò cố định */}
                     <td className="p-4 text-center min-w-[200px] hidden md:table-cell">
                       <span
@@ -127,9 +129,11 @@ export const MemberTable: React.FC<MemberTableProps> = ({
                       </span>
                     </td>
                     <td className="p-4 font-bold text-[#5d4037] group-hover:text-[#b91c1c] min-w-[120px]">
-                      {user.ngayTao ? new Date(user.ngayTao).toLocaleDateString() : 'N/A'}
+                      {user.ngayTao
+                        ? new Date(user.ngayTao).toLocaleDateString()
+                        : "N/A"}
                     </td>
-                    
+
                     {/* Cột Hành Động cố định */}
                     <td className="p-4 min-w-[120px] text-center">
                       <div className="flex justify-center gap-2 opacity-80 group-hover:opacity-100 transition-opacity">

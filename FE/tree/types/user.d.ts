@@ -5,9 +5,9 @@ export interface IUser extends IBaseData {
   dongHoId: string;
   tenDangNhap: string;
   matKhau: string;
-  hoTen: string;
+  full_name: string;
   email: string;
-  soDienThoai: string;
+  phone: string;
   roleId: string;
   roleCode: string;
   anhDaiDien: string;

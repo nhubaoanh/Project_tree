@@ -64,6 +64,7 @@ export default function QuanLyThanhVienPage() {
   });
 
   const userData = usersQuery.data?.data || [];
+  console.log("User Data:", userData);
   const totalRecords = usersQuery.data?.totalItems || 0;
   const totalPages = usersQuery.data?.pageCount || 0;
   const isLoading = usersQuery.isLoading;
@@ -247,7 +248,7 @@ export default function QuanLyThanhVienPage() {
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
         onConfirm={handleConfirmDelete}
-        itemName={userToDelete?.hoTen || ""}
+        itemName={userToDelete?.full_name || ""}
         isLoading={isDeleting}
       />
     </div>
