@@ -56,8 +56,10 @@ export class suKienRespository {
         sukien.loaiSuKien,
         sukien.uuTien,
       ]);
+      console.log("sukien created with ID:", sukien.suKienId);
       return true;
     } catch (error: any) {
+      console.log("error database => ", error);
       throw new Error(error.message);
     }
   }

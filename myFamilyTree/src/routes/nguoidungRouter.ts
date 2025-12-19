@@ -23,7 +23,10 @@ nguoiDungRouter.post(
   "/update-user",
   userController.updateUser.bind(userController)
 );
-
+nguoiDungRouter.post(
+  "/update-user-profile",
+  userController.UpdateMyProfile.bind(userController)
+);
 nguoiDungRouter.post(
   "/delete",
   userController.deleteUser.bind(userController)

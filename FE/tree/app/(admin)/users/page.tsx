@@ -39,7 +39,7 @@ export default function QuanLyThanhVienPage() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<IUser | null>(null);
 
-  const {showSuccess, showError} = useToast();
+  const { showSuccess, showError } = useToast();
 
   // --- DEBOUNCE SEARCH ---
   React.useEffect(() => {
@@ -69,7 +69,6 @@ export default function QuanLyThanhVienPage() {
   const totalPages = usersQuery.data?.pageCount || 0;
   const isLoading = usersQuery.isLoading;
 
-
   // --- MUTATIONS - CRUD ---
   const createMutation = useMutation({
     mutationFn: createUser,
@@ -85,16 +84,13 @@ export default function QuanLyThanhVienPage() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: (vars: { id: string; user: Partial<IUser> }) =>
-      updateUser(vars.id, vars.user),
+    mutationFn: (user: Partial<IUser>) => updateUser(user),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
-      // toast.success("Cập nhật thông tin thành công!");
-      showSuccess("Cập nhật thông tin thành công!")
+      showSuccess("Cập nhật thông tin thành công!");
       setIsModalOpen(false);
     },
     onError: () => {
-      // toast.error("Có lỗi xảy ra khi cập nhật.");
       showError("Có lỗi xảy ra khi cập nhật.");
     },
   });
@@ -137,7 +133,7 @@ export default function QuanLyThanhVienPage() {
 
   const handleSaveUser = (user: Partial<IUser>) => {
     if (editingUser) {
-      updateMutation.mutate({ id: editingUser.nguoiDungId, user });
+      updateMutation.mutate({ ...user, nguoiDungId: editingUser.nguoiDungId });
     } else {
       createMutation.mutate(user);
     }
@@ -253,5 +249,4 @@ export default function QuanLyThanhVienPage() {
       />
     </div>
   );
-};
-
+}

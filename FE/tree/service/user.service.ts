@@ -1,6 +1,6 @@
 import { API_CORE } from "../constant/config";
 import { apiClient } from "@/lib/api";
-import { IUserResetPassword, IUserSearch, IUserss } from "@/types/user";
+import { IUser, IUserProfile, IUserResetPassword, IUserSearch, IUserss } from "@/types/user";
 import { parseApiError } from "@/lib/apiError";
 
 const prefix = `${API_CORE}/users`;
@@ -52,7 +52,7 @@ export const getUsers = async (data: IUserSearch): Promise<any> => {
   }
 };
 
-export const createUser = async (data: IUserSearch): Promise<any> => {
+export const createUser = async (data: Partial<IUser>): Promise<any> => {
   try {
     const res = await apiClient.post(`${prefix}/insert-user`, data);
     return res?.data;
@@ -63,9 +63,20 @@ export const createUser = async (data: IUserSearch): Promise<any> => {
   }
 };
 
-export const updateUser = async (id: string, data: IUserSearch): Promise<any> => {
+export const updateUser = async (data: Partial<IUser>): Promise<any> => {
   try {
     const res = await apiClient.post(`${prefix}/update-user`, data);
+    return res?.data;
+  } catch (error: any) {
+    const err = parseApiError(error);
+    console.error(`[updateUser] ${err.message}`);
+    throw new Error(err.message);
+  }
+};
+
+export const UpdateMyProfile = async (data: IUserProfile): Promise<any> => {
+  try {
+    const res = await apiClient.post(`${prefix}/update-user-profile`, data);
     return res?.data;
   } catch (error: any) {
     const err = parseApiError(error);

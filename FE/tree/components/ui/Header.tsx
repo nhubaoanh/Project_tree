@@ -6,16 +6,47 @@ import { useRouter } from "next/navigation";
 import storage from "@/utils/storage";
 import Link from "next/link";
 
+const DEFAULT_AVATAR = "/images/vangoc.jpg";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:6001";
+
+
 export default function Header() {
   const [open, setOpen] = useState(false);
+  const [userData, setUserData] = useState<{ full_name: string; email: string; avatar?: string } | null>(null);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
-  const { toggleSidebar } = useSidebar(); // ← LẤY TỪ CONTEXT
+  const { toggleSidebar } = useSidebar();
   const router = useRouter();
 
   const handleLogout = () => {
     storage.clearToken();
+    storage.removeUser();
     router.push("/login");
   };
+
+  const getImageUrl = (anhChanDung: string | null | undefined): string => {
+  if (!anhChanDung || anhChanDung.trim() === "") {
+    return DEFAULT_AVATAR;
+  }
+  if (anhChanDung.startsWith("http")) {
+    return anhChanDung;
+  }
+  const cleanPath = anhChanDung.startsWith("uploads/") 
+    ? anhChanDung 
+    : `uploads/${anhChanDung}`;
+  return `${API_BASE_URL}/${cleanPath}`;
+};
+
+  useEffect(() => {
+    // Lấy thông tin user từ localStorage
+    const user = storage.getUser();
+    if (user) {
+      setUserData({ 
+        full_name: user.full_name || '', 
+        email: user.email
+        });
+    }
+  }, []);
+
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (
@@ -49,17 +80,19 @@ export default function Header() {
             className="flex items-center gap-2 hover:opacity-80 transition-opacity"
           >
             <img
-              src="\images\vangoc.jpg"
+              src={getImageUrl(userData?.avatar)}
               alt="avatar"
-              className="w-10 h-10 rounded-full ring-2 ring-white/50 shadow-md"
+              className="w-10 h-10 rounded-full ring-2 ring-white/50 shadow-md object-cover"
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = DEFAULT_AVATAR;
+              }}
             />
           </button>
-
           {open && (
             <div className="absolute right-0 mt-3 w-56 bg-white rounded-xl shadow-2xl py-3 z-50 border border-gray-100">
               <div className="px-4 py-3 border-b border-gray-100 hover:bg-gray-50 rounded-t-lg transition-colors">
-                <p className="font-semibold text-gray-900">Nguyễn Văn A</p>
-                <p className="text-sm text-gray-600">admin@giaphaviet.vn</p>
+                <p className="font-semibold text-gray-900">{userData?.full_name || 'Người dùng'}</p>
+                <p className="text-sm text-gray-600">{userData?.email || ''}</p>
               </div>
 
               <Link

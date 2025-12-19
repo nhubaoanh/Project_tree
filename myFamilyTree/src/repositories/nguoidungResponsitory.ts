@@ -1,5 +1,5 @@
 import { injectable } from "tsyringe";
-import { nguoiDung } from "../models/nguoidung";
+import { nguoiDung, UserProfile } from "../models/nguoidung";
 import { Database } from "../config/database";
 
 @injectable()
@@ -138,12 +138,36 @@ export class nguoiDungReponsitory {
     }
   }
 
-  async deleteUser(list_json: any, updated_by_id: string) : Promise<any>{
-    try{
+  async UpdateMyProfile(nguoidung: UserProfile): Promise<any> {
+    try {
+      const sql =
+        "CALL UpdateMyAccountAndProfile(?,?,?,?,?,?,?,?,?,?,?,?, @err_code, @err_msg)";
+      await this.db.query(sql, [
+        nguoidung.userId,
+        nguoidung.tenDangNhap,
+        nguoidung.matKhau,
+        nguoidung.first_name,
+        nguoidung.middle_name,
+        nguoidung.last_name,
+        nguoidung.gender,
+        nguoidung.date_of_birthday,
+        nguoidung.avatar,
+        nguoidung.email,
+        nguoidung.phone,
+        nguoidung.lu_user_id,
+      ]);
+      return true;
+    } catch (error: any) {
+      throw new Error(error.message);
+    }
+  }
+
+  async deleteUser(list_json: any, updated_by_id: string): Promise<any> {
+    try {
       const sql = "CALL DeleteUser(?, ?, @err_code, @err_msg)";
       await this.db.query(sql, [JSON.stringify(list_json), updated_by_id]);
       return true;
-    }catch(error: any) {
+    } catch (error: any) {
       throw new Error(error.message);
     }
   }

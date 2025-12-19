@@ -60,6 +60,7 @@ export default function LoginPage() {
     try {
       const result = await loginService(form.values);
 
+      console.log("res", result);
       if (result?.token) {
         storage.setToken(result.token);
 
@@ -67,13 +68,20 @@ export default function LoginPage() {
         if (userData) {
           storage.setUser({
             nguoiDungId: userData.nguoiDungId,
-            hoTen: userData.hoTen,
+            first_name: userData.first_name,
+            middle_name: userData.middle_name,
+            last_name: userData.last_name,
+            full_name: userData.full_name,
+            hoTen: userData.full_name || userData.hoTen,
+            gender: userData.gender,
+            date_of_birthday: userData.date_of_birthday,
+            avatar: userData.avatar,
             email: userData.email,
+            phone: userData.phone,
             dongHoId: userData.dongHoId,
             roleId: userData.roleId,
             roleCode: userData.roleCode,
-            functions: userData.functions,
-            actions: userData.actions,
+            online_flag: userData.online_flag,
           });
         }
 

@@ -4,13 +4,21 @@ import { User } from "lucide-react";
 
 interface UserData {
   nguoiDungId: string;
-  hoTen: string;
+  first_name?: string;
+  middle_name?: string;
+  last_name?: string;
+  full_name?: string;
+  gender?: number;
+  date_of_birthday?: string | Date;
+  avatar?: string;
   email: string;
-  dongHoId: string;
-  roleId: string;
-  roleCode: string;
-  functions: any[]; // Cây menu
-  actions: string[]; // Quyền thao tác
+  phone?: string;
+  dongHoId?: string;
+  roleId?: string;
+  roleCode?: string;
+  online_flag?: number;
+  functions?: any[]; // Cây menu
+  actions?: string[]; // Quyền thao tác
 }
 
 const storagePrefix = "BA_";
