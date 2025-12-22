@@ -21,7 +21,16 @@ const TaiChinhThuController = container.resolve(taiChinhThuController);
 
 taiChinhThuRouter.post(
   "/search",
-  TaiChinhThuController.searchTaiChinhThu.bind(TaiChinhThuController    )
+  TaiChinhThuController.searchTaiChinhThu.bind(TaiChinhThuController)
 );
+taiChinhThuRouter.post(
+  "/create",
+  TaiChinhThuController.createTaiChinhThu.bind(TaiChinhThuController)
+);
+taiChinhThuRouter.post(
+  "/update",
+  TaiChinhThuController.updateTaiChinhThu.bind(TaiChinhThuController)
+);
+
 
 export default taiChinhThuRouter;

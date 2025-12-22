@@ -25,7 +25,7 @@ export const createContributionUp = async (data: IContributionUp): Promise<any> 
   }
 };
 
-export const updateContributionUp = async (id: number, data: any): Promise<any> => {
+export const updateContributionUp = async (data: IContributionUp): Promise<any> => {
   try {
     const res = await apiClient.post(`${prefix}/update`, data);
 

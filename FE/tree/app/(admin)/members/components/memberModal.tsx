@@ -6,6 +6,7 @@ import { uploadFile, uploadFiles } from "@/service/upload.service";
 import { IMember } from "@/types/member";
 import { API_DOWNLOAD } from "@/constant/config";
 import { FormRules, validateForm, validateField } from "@/lib/validator";
+import storage from "@/utils/storage";
 
 // Validation rules
 const memberRules: FormRules = {
@@ -203,7 +204,15 @@ export const MemberModal: React.FC<MemberModalProps> = ({
       alert("Vui lòng kiểm tra lại thông tin!");
       return;
     }
-    onSave({ ...formData });
+    
+    // Lấy userId từ storage để lưu người cập nhật
+    const user = storage.getUser();
+    const dataToSave = {
+      ...formData,
+      lu_user_id: user?.nguoiDungId || undefined,
+    };
+    
+    onSave(dataToSave);
   };
 
   // Format date cho input

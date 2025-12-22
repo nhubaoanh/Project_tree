@@ -28,4 +28,48 @@ export class taiChinhThuRespository {
     }
   }
 
+  async createTaiChinhThu(taiChinhThu: taiChinhThu): Promise<any> {
+    try {
+      const sql =
+        "CALL InsertTaiChinhThu(?,?,?,?,?,?,?,?,?, @err_code, @err_msg)";
+      await this.db.query(sql, [
+        taiChinhThu.dongHoId,
+        taiChinhThu.danhMucId,
+        taiChinhThu.hoTenNguoiDong,
+        taiChinhThu.ngayDong,
+        taiChinhThu.soTien,
+        taiChinhThu.phuongThucThanhToan,
+        taiChinhThu.noiDung,
+        taiChinhThu.ghiChu,
+        taiChinhThu.nguoiNhapId,
+      ]);
+      return true;
+    } catch (error: any) {
+      console.log("error database => ", error);
+      throw new Error(error.message);
+    }
+  }
+
+  async UpdateTaiChinhThu(taiChinhThu: taiChinhThu): Promise<any> {
+    try {
+      const sql =
+        "CALL UpdateTaiChinhThu(?,?,?,?,?,?,?,?,?,?, @err_code, @err_msg)";
+      await this.db.query(sql, [
+        taiChinhThu.thuId,
+        taiChinhThu.dongHoId,
+        taiChinhThu.danhMucId,
+        taiChinhThu.hoTenNguoiDong,
+        taiChinhThu.ngayDong,
+        taiChinhThu.soTien,
+        taiChinhThu.phuongThucThanhToan,
+        taiChinhThu.noiDung,
+        taiChinhThu.ghiChu,
+        taiChinhThu.lu_user_id,
+      ]);
+      return true;
+    } catch (error: any) {
+      console.log("error database => ", error);
+      throw new Error(error.message);
+    }
+  }
 }

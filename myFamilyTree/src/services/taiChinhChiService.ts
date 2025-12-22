@@ -1,7 +1,6 @@
 import { taiChinhChi } from "../models/TaiChinhChi";
 import { taiChinhChiRespository } from "../repositories/taiChinhChiRespository";
 import { injectable } from "tsyringe";
-import { v4 as uuidv4 } from "uuid";
 
 @injectable()
 export class taiChinhChiService {
@@ -18,5 +17,13 @@ export class taiChinhChiService {
       search_content,
       dongHoId
     );
+  }
+
+  async createTaiChinhChi(taiChinhChi: taiChinhChi): Promise<any> {
+    return await this.taiChinhChiRespository.createTaiChinhChi(taiChinhChi);
+  }
+
+  async updateTaiChinhChi(taiChinhChi: taiChinhChi): Promise<any> {
+    return await this.taiChinhChiRespository.UpdateTaiChinhChi(taiChinhChi);
   }
 }

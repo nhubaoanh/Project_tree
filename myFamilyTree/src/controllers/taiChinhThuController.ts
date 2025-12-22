@@ -44,4 +44,37 @@ export class taiChinhThuController {
         .json({ message: "Tim kiếm tài chính thu that bai", success: false });
     }
   }
+
+  async createTaiChinhThu(req: Request, res: Response): Promise<void> {
+      try {
+        const taiChinhThu = req.body as taiChinhThu;
+        const results = await this.taiChinhThuService.createTaiChinhThu(taiChinhThu);
+        console.log("res", results);
+        res.json({
+          message: "Tạo tài chính thu thành công.",
+          success: true,
+          data: results,
+        });
+        
+      } catch (error: any) {
+        res.status(500).json({
+          message: error.message || "Tạo tài chính thu thất bại.",
+          success: false,
+        });
+      }
+    }
+  
+    async updateTaiChinhThu(req: Request, res: Response) : Promise<void> {
+        try {
+          const taiChinhThu = req.body as taiChinhThu;
+          const results = await this.taiChinhThuService.updateTaiChinhThu(taiChinhThu);
+          res.json({
+            message : 'Cap nhat tai chinh thu thanh cong',
+            success : true,
+            data : results
+          })
+        }catch (error: any) {
+          res.status(500).json({ message: "Cap nhat tai chinh thu that bai", success: false });
+        }
+      }
 }

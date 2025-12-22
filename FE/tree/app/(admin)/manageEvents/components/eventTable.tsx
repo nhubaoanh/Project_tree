@@ -89,9 +89,7 @@ export const EventTable: React.FC<MemberTableProps> = ({
                         : "N/A"}
                     </td>
                     <td className="p-4 text-center font-bold text-[#5d4037] hidden md:table-cell text-sm min-w-[180px]">
-                      {member.gioDienRa
-                        ? new Date(member.gioDienRa).toLocaleDateString()
-                        : "N/A"}
+                      {member.gioDienRa?.substring(0, 5) || "Chưa cập nhật"}
                     </td>
                     <td className="p-4 text-center font-bold text-[#5d4037] hidden md:table-cell text-sm min-w-[180px]">
                       {member.diaDiem || "-"}

@@ -19,4 +19,12 @@ export class taiChinhThuService {
       dongHoId
     );
   }
+
+  async createTaiChinhThu(taiChinhThu: taiChinhThu): Promise<any> {
+      return await this.taiChinhThuRespository.createTaiChinhThu(taiChinhThu);
+    }
+
+    async updateTaiChinhThu(taiChinhThu: taiChinhThu): Promise<any> {
+      return await this.taiChinhThuRespository.UpdateTaiChinhThu(taiChinhThu);
+    }
 }

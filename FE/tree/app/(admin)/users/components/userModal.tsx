@@ -9,6 +9,7 @@ import { getAllRole } from "@/service/role.service";
 import { useToast } from "@/service/useToas";
 import { checkUsernameExist } from "@/service/user.service";
 import { FormRules, validateForm, validateField } from "@/lib/validator";
+import storage from "@/utils/storage";
 
 interface UserModalProps {
   isOpen: boolean;
@@ -75,6 +76,8 @@ export const UserModal: React.FC<UserModalProps> = ({
       setErrors({});
       setTouched({});
       setUsernameError(null);
+      const currentUser = storage.getUser();
+    console.log("currr", currentUser?.nguoiDungId)
     }
   }, [isOpen, initialData]);
 
@@ -159,13 +162,16 @@ export const UserModal: React.FC<UserModalProps> = ({
       return;
     }
 
-    const user: Partial<IUser> = {
+    const currentUser = storage.getUser();
+    console.log("currr", currentUser?.nguoiDungId)
+    const user = {
       ...formData,
-      nguoiDungId: initialData?.nguoiDungId,
-      nguoiTaoId: initialData?.nguoiTaoId,
+      nguoiDungId: initialData?.nguoiDungId, // Chỉ có giá trị khi edit, undefined khi thêm mới
+      nguoiTaoId: initialData ? initialData.nguoiTaoId : currentUser?.nguoiDungId, // Khi thêm mới, người tạo là user hiện tại
+      lu_user_id: currentUser?.nguoiDungId || null,
     };
 
-    onSubmit(user);
+    onSubmit(user as Partial<IUser>);
   };
 
   if (!isOpen) return null;

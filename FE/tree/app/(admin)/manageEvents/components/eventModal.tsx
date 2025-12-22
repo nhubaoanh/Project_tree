@@ -1,29 +1,20 @@
 "use client";
-
-/**
- * EventModal - Modal thêm/sửa sự kiện
- * 
- * Tính năng:
- * - Validate form realtime (blur) và khi submit
- * - Controlled form với useState
- * - Hiển thị lỗi dưới mỗi field
- * - Load danh sách dòng họ và thành viên
- */
-
 import React, { useEffect, useState } from "react";
 import { X, Check, Loader2, Calendar } from "lucide-react";
 import { IEvent } from "@/types/event";
 import { useQuery } from "@tanstack/react-query";
 import { getAllDongHo } from "@/service/lineage.service";
+import { searchTypeEvent } from "@/service/typeEvent.service";
 import { useToast } from "@/service/useToas";
 import { FormRules, validateForm, validateField } from "@/lib/validator";
+import storage from "@/utils/storage";
 
 // ==================== PROPS ====================
 interface EventModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (event: Partial<IEvent>) => void;
-  initialData?: IEvent | null;  // null = thêm mới, có data = sửa
+  initialData?: IEvent | null; // null = thêm mới, có data = sửa
   isLoading: boolean;
 }
 
@@ -35,21 +26,15 @@ interface EventModalProps {
  * - date: Kiểm tra định dạng ngày
  */
 const eventRules: FormRules = {
-  tenSuKien: { label: "Tên sự kiện", rules: ["required", { min: 3 }, { max: 200 }] },
+  tenSuKien: {
+    label: "Tên sự kiện",
+    rules: ["required", { min: 3 }, { max: 200 }],
+  },
   ngayDienRa: { label: "Ngày diễn ra", rules: ["required", "date"] },
   diaDiem: { label: "Địa điểm", rules: [{ max: 300 }] },
   moTa: { label: "Mô tả", rules: [{ max: 1000 }] },
   dongHoId: { label: "Dòng họ", rules: ["required"] },
 };
-
-// ==================== LOẠI SỰ KIỆN ====================
-const EVENT_TYPES = [
-  { value: 1, label: "Giỗ" },
-  { value: 2, label: "Cưới" },
-  { value: 3, label: "Sinh nhật" },
-  { value: 4, label: "Họp mặt" },
-  { value: 5, label: "Khác" },
-];
 
 // ==================== MỨC ĐỘ ƯU TIÊN ====================
 const PRIORITY_LEVELS = [
@@ -80,7 +65,15 @@ export const EventModal: React.FC<EventModalProps> = ({
     queryFn: getAllDongHo,
   });
 
-  const dongHoList = Array.isArray(dongHoData) ? dongHoData : dongHoData?.data ?? [];
+  const { data: typeEventData } = useQuery({
+    queryKey: ["TypeEvent"],
+    queryFn: () => searchTypeEvent({ pageIndex: 1, pageSize: 0 }),
+  });
+
+  const dongHoList = Array.isArray(dongHoData)
+    ? dongHoData
+    : dongHoData?.data ?? [];
+  const typeEventList = typeEventData?.data ?? [];
 
   // ========== RESET FORM KHI MODAL MỞ ==========
   useEffect(() => {
@@ -111,10 +104,12 @@ export const EventModal: React.FC<EventModalProps> = ({
    * - Nếu field đã touched và có lỗi, validate lại ngay
    */
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
   ) => {
     const { name, value, type } = e.target;
-    
+
     // Xử lý giá trị theo type
     let newValue: any = value;
     if (type === "number") {
@@ -139,7 +134,9 @@ export const EventModal: React.FC<EventModalProps> = ({
    * - Validate field
    */
   const handleBlur = (
-    e: React.FocusEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+    e: React.FocusEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
   ) => {
     const { name, value } = e.target;
     setTouched((prev) => ({ ...prev, [name]: true }));
@@ -160,16 +157,21 @@ export const EventModal: React.FC<EventModalProps> = ({
     // Validate toàn bộ form
     const { isValid, errors: formErrors } = validateForm(formData, eventRules);
     setErrors(formErrors);
-    
+
     // Mark tất cả fields là touched
     setTouched(
-      Object.keys(eventRules).reduce((acc, key) => ({ ...acc, [key]: true }), {})
+      Object.keys(eventRules).reduce(
+        (acc, key) => ({ ...acc, [key]: true }),
+        {}
+      )
     );
 
     if (!isValid) {
       showError("Vui lòng kiểm tra lại thông tin!");
       // Scroll đến field lỗi đầu tiên
-      const firstErrorField = Object.keys(formErrors).find((k) => formErrors[k]);
+      const firstErrorField = Object.keys(formErrors).find(
+        (k) => formErrors[k]
+      );
       if (firstErrorField) {
         document.querySelector(`[name="${firstErrorField}"]`)?.scrollIntoView({
           behavior: "smooth",
@@ -180,13 +182,15 @@ export const EventModal: React.FC<EventModalProps> = ({
     }
 
     // Gọi callback với data
-    const eventData: Partial<IEvent> = {
+    const user = storage.getUser();
+    const eventData = {
       ...formData,
       suKienId: initialData?.suKienId,
       nguoiTaoId: initialData?.nguoiTaoId,
+      lu_user_id: user?.nguoiDungId || null,
     };
 
-    onSubmit(eventData);
+    onSubmit(eventData as Partial<IEvent>);
   };
 
   // ========== HELPER: FORMAT DATE ==========
@@ -218,7 +222,6 @@ export const EventModal: React.FC<EventModalProps> = ({
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm animate-fadeIn">
       <div className="bg-[#fffdf5] w-full max-w-2xl p-0 rounded-lg shadow-2xl border border-[#d4af37] overflow-hidden flex flex-col max-h-[90vh]">
-        
         {/* ========== HEADER ========== */}
         <div className="bg-[#b91c1c] text-yellow-400 px-6 py-4 flex justify-between items-center">
           <h3 className="text-xl font-bold uppercase tracking-wider flex items-center gap-2">
@@ -270,12 +273,12 @@ export const EventModal: React.FC<EventModalProps> = ({
             <SelectField
               label="Loại sự kiện"
               name="loaiSuKien"
-              value={formData.loaiSuKien ?? 1}
+              value={formData.loaiSuKien ?? ""}
               onChange={handleChange}
               onBlur={handleBlur}
-              options={EVENT_TYPES}
-              optionLabel="label"
-              optionValue="value"
+              options={typeEventList}
+              optionLabel="tenLoaiSuKien"
+              optionValue="loaiSuKien"
             />
           </div>
 
@@ -304,14 +307,19 @@ export const EventModal: React.FC<EventModalProps> = ({
                   id="gioDienRaInput"
                   value={formatTimeForInput(formData.gioDienRa)}
                   onChange={(e) => {
-                    setFormData((prev) => ({ ...prev, gioDienRa: e.target.value as any }));
+                    setFormData((prev) => ({
+                      ...prev,
+                      gioDienRa: e.target.value as any,
+                    }));
                   }}
                   className="w-full p-3 pr-12 bg-white border border-[#d4af37]/50 rounded shadow-inner focus:border-[#b91c1c] focus:outline-none"
                 />
                 <button
                   type="button"
                   onClick={() => {
-                    const input = document.getElementById("gioDienRaInput") as HTMLInputElement;
+                    const input = document.getElementById(
+                      "gioDienRaInput"
+                    ) as HTMLInputElement;
                     if (input) {
                       input.showPicker?.();
                       input.focus();
@@ -320,9 +328,19 @@ export const EventModal: React.FC<EventModalProps> = ({
                   className="absolute right-2 p-2 text-[#8b5e3c] hover:text-[#b91c1c] transition-colors"
                   title="Chọn giờ"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="12" cy="12" r="10"/>
-                    <polyline points="12 6 12 12 16 14"/>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <circle cx="12" cy="12" r="10" />
+                    <polyline points="12 6 12 12 16 14" />
                   </svg>
                 </button>
               </div>

@@ -132,6 +132,8 @@ export default function QuanLyThanhVienPage() {
   };
 
   const handleSaveUser = (user: Partial<IUser>) => {
+    console.log("handleSaveUser - data being sent:", user);
+    console.log("handleSaveUser - nguoiTaoId:", user.nguoiTaoId);
     if (editingUser) {
       updateMutation.mutate({ ...user, nguoiDungId: editingUser.nguoiDungId });
     } else {

@@ -81,8 +81,7 @@ export default function QuanLyThanhVienPage() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: (vars: { id: number; data: Partial<IContributionUp> }) =>
-      updateContributionUp(vars.id, vars.data),
+    mutationFn: updateContributionUp,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["contribuitionUp"] });
       toast.success("Cập nhật thông tin thành công!");
@@ -131,7 +130,7 @@ export default function QuanLyThanhVienPage() {
 
   const handleSaveUser = (data: Partial<IContributionUp>) => {
     if (editingUser) {
-      updateMutation.mutate({ id: editingUser.thuId, data });
+      updateMutation.mutate(data as IContributionUp);
     } else {
       createMutation.mutate(data as IContributionUp);
     }

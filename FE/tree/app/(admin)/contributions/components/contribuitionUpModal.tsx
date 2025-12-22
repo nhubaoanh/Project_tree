@@ -7,6 +7,7 @@ import { getAllDongHo } from "@/service/lineage.service";
 import { useToast } from "@/service/useToas";
 import { useFormValidation } from "@/lib/useFormValidation";
 import { FormRules } from "@/lib/validator";
+import storage from "@/utils/storage";
 
 // ==================== PROPS ====================
 interface ContributionUpModalProps {
@@ -108,10 +109,12 @@ export const ContributionUpModal: React.FC<ContributionUpModalProps> = ({
       return;
     }
 
+    const user = storage.getUser();
     onSubmit({
       ...values,
       thuId: initialData?.thuId,
       nguoiNhapId: initialData?.nguoiNhapId,
+      lu_user_id: user?.nguoiDungId || undefined,
     });
   };
 

@@ -8,6 +8,7 @@ import { useToast } from "@/service/useToas";
 import { useFormValidation } from "@/lib/useFormValidation";
 import { FormRules } from "@/lib/validator";
 import { IContributionDown } from "@/types/contribuitionDown";
+import storage from "@/utils/storage";
 
 // ==================== PROPS ====================
 interface ContributionUpModalProps {
@@ -20,41 +21,37 @@ interface ContributionUpModalProps {
 
 // ==================== VALIDATION RULES ====================
 const rules: FormRules = {
-  hoTenNguoiDong: {
-    label: "Họ tên người đóng",
-    rules: [{ type: "required" }, { type: "maxLength", value: 200 }],
+  nguoiNhan: {
+    label: "Người nhận",
+    rules: ["required", { max: 255 }],
   },
-  ngayDong: {
-    label: "Ngày đóng",
-    rules: [{ type: "required" }, { type: "date" }],
+  ngayChi: {
+    label: "Ngày chi",
+    rules: ["required", "date"],
   },
   soTien: {
     label: "Số tiền",
-    rules: [{ type: "required" }, { type: "positive" }],
+    rules: ["required", "positive"],
   },
   dongHoId: {
     label: "Dòng họ",
-    rules: [{ type: "required" }],
+    rules: ["required"],
   },
   danhMucId: {
     label: "Danh mục",
-    rules: [{ type: "required" }],
+    rules: ["required"],
   },
   phuongThucThanhToan: {
     label: "Phương thức thanh toán",
-    rules: [{ type: "required" }],
+    rules: ["required"],
   },
   noiDung: {
     label: "Nội dung",
-    rules: [{ type: "maxLength", value: 500 }],
+    rules: [{ max: 500 }],
   },
   ghiChu: {
     label: "Ghi chú",
-    rules: [{ type: "maxLength", value: 300 }],
-  },
-  soDienThoaiNguoiNhap: {
-    label: "SĐT người nhập",
-    rules: [{ type: "phone" }],
+    rules: [{ max: 300 }],
   },
 };
 
@@ -65,26 +62,25 @@ const PAYMENT_METHODS = [
   { value: "khac", label: "Khác" },
 ];
 
-// ==================== DANH MỤC THU ====================
+// ==================== DANH MỤC CHI ====================
 const DANH_MUC_LIST = [
-  { value: 1, label: "Đóng góp xây dựng" },
-  { value: 2, label: "Quỹ từ thiện" },
-  { value: 3, label: "Phí thường niên" },
-  { value: 4, label: "Đóng góp sự kiện" },
+  { value: 1, label: "Chi xây dựng" },
+  { value: 2, label: "Chi sự kiện" },
+  { value: 3, label: "Chi từ thiện" },
+  { value: 4, label: "Chi vận hành" },
   { value: 5, label: "Khác" },
 ];
 
 // ==================== INITIAL VALUES ====================
 const getInitialValues = (data?: IContributionDown | null): Partial<IContributionDown> => ({
-  nguoiNhan: data?.nguoiNhan || "",
-  ngayChi: data?.ngayChi || new Date(),
-  soTien: data?.soTien || 0,
   dongHoId: data?.dongHoId || "",
   danhMucId: data?.danhMucId || 1,
+  ngayChi: data?.ngayChi || new Date(),
+  soTien: data?.soTien || 0,
   phuongThucThanhToan: data?.phuongThucThanhToan || "tien_mat",
   noiDung: data?.noiDung || "",
+  nguoiNhan: data?.nguoiNhan || "",
   ghiChu: data?.ghiChu || "",
-  soDienThoaiNguoiNhap: data?.soDienThoaiNguoiNhap || "",
 });
 
 // ==================== MAIN COMPONENT ====================
@@ -136,10 +132,19 @@ export const ContributionUpModal: React.FC<ContributionUpModalProps> = ({
       return;
     }
 
+    const user = storage.getUser();
     onSubmit({
-      ...values,
       chiId: initialData?.chiId,
-      nguoiNhapId: initialData?.nguoiNhapId,
+      dongHoId: values.dongHoId,
+      danhMucId: values.danhMucId,
+      ngayChi: values.ngayChi,
+      soTien: values.soTien,
+      phuongThucThanhToan: values.phuongThucThanhToan,
+      noiDung: values.noiDung,
+      nguoiNhan: values.nguoiNhan,
+      ghiChu: values.ghiChu,
+      nguoiNhapId: initialData?.nguoiNhapId || user?.nguoiDungId,
+      lu_user_id: user?.nguoiDungId || undefined,
     });
   };
 
@@ -160,7 +165,7 @@ export const ContributionUpModal: React.FC<ContributionUpModalProps> = ({
         <div className="bg-[#b91c1c] text-yellow-400 px-6 py-4 flex justify-between items-center">
           <h3 className="text-xl font-bold uppercase flex items-center gap-2">
             <DollarSign size={24} />
-            {initialData ? "Sửa khoản thu" : "Thêm khoản thu"}
+            {initialData ? "Sửa khoản chi" : "Thêm khoản chi"}
           </h3>
           <button onClick={onClose} disabled={isLoading} className="hover:text-white">
             <X size={24} />
@@ -170,16 +175,16 @@ export const ContributionUpModal: React.FC<ContributionUpModalProps> = ({
         {/* FORM */}
         <form id="contributionForm" onSubmit={handleSubmit} className="p-6 overflow-y-auto space-y-4">
           
-          {/* Họ tên người đóng */}
+          {/* Người nhận */}
           <Field
-            label="Họ tên người đóng"
+            label="Người nhận"
             name="nguoiNhan"
             required
             value={values.nguoiNhan || ""}
             onChange={handleChange}
             onBlur={handleBlur}
             error={getError("nguoiNhan")}
-            placeholder="Nhập họ tên người đóng góp"
+            placeholder="Nhập tên người nhận"
           />
 
           {/* Dòng họ + Danh mục */}
@@ -197,7 +202,7 @@ export const ContributionUpModal: React.FC<ContributionUpModalProps> = ({
               error={getError("dongHoId")}
             />
             <Select
-              label="Danh mục thu"
+              label="Danh mục chi"
               name="danhMucId"
               required
               value={values.danhMucId ?? 1}
@@ -210,7 +215,7 @@ export const ContributionUpModal: React.FC<ContributionUpModalProps> = ({
             />
           </div>
 
-          {/* Số tiền + Ngày đóng */}
+          {/* Số tiền + Ngày chi */}
           <div className="grid grid-cols-2 gap-4">
             <Field
               label="Số tiền (VNĐ)"
@@ -224,8 +229,8 @@ export const ContributionUpModal: React.FC<ContributionUpModalProps> = ({
               placeholder="0"
             />
             <Field
-              label="Ngày đóng"
-              name="ngayDong"
+              label="Ngày chi"
+              name="ngayChi"
               type="date"
               required
               value={formatDate(values.ngayChi)}
@@ -257,19 +262,8 @@ export const ContributionUpModal: React.FC<ContributionUpModalProps> = ({
             onChange={handleChange}
             onBlur={handleBlur}
             error={getError("noiDung")}
-            placeholder="VD: Đóng góp xây dựng nhà thờ họ"
+            placeholder="VD: Chi phí tổ chức sự kiện"
             rows={2}
-          />
-
-          {/* SĐT người nhập */}
-          <Field
-            label="SĐT người nhập"
-            name="soDienThoaiNguoiNhap"
-            value={values.soDienThoaiNguoiNhap || ""}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            error={getError("soDienThoaiNguoiNhap")}
-            placeholder="VD: 0912345678"
           />
 
           {/* Ghi chú */}
