@@ -1085,6 +1085,110 @@ DELIMITER ;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;
 /*!50003 SET character_set_results = @saved_cs_results */ ;
 /*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `GetChiGanDay` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`%` PROCEDURE `GetChiGanDay`(
+    IN p_dongHoId VARCHAR(50),
+    IN p_limit INT,
+    OUT p_error_code INT,
+    OUT p_error_message VARCHAR(500)
+)
+BEGIN
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        GET DIAGNOSTICS CONDITION 1
+            p_error_code = RETURNED_SQLSTATE,
+            p_error_message = MESSAGE_TEXT;
+    END;
+
+    SET p_error_code = 0;
+    SET p_error_message = '';
+    
+    IF p_limit IS NULL OR p_limit <= 0 THEN
+        SET p_limit = 5;
+    END IF;
+
+    SELECT 
+        c.chiId,
+        c.nguoiNhan,
+        c.ngayChi,
+        c.soTien,
+        c.noiDung,
+        c.phuongThucThanhToan,
+        dh.tenDongHo
+    FROM taichinhchi c
+    LEFT JOIN dongho dh ON c.dongHoId = dh.dongHoId
+    WHERE (p_dongHoId IS NULL OR p_dongHoId = '' OR c.dongHoId = p_dongHoId)
+    ORDER BY c.ngayChi DESC
+    LIMIT p_limit;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `GetDashboardStats` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`%` PROCEDURE `GetDashboardStats`(
+    IN p_dongHoId VARCHAR(50),
+    OUT p_error_code INT,
+    OUT p_error_message VARCHAR(500)
+)
+BEGIN
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        GET DIAGNOSTICS CONDITION 1
+            p_error_code = RETURNED_SQLSTATE,
+            p_error_message = MESSAGE_TEXT;
+    END;
+
+    SET p_error_code = 0;
+    SET p_error_message = '';
+
+    -- Nếu không truyền dongHoId, lấy tất cả
+    IF p_dongHoId IS NULL OR p_dongHoId = '' THEN
+        SELECT 
+            (SELECT COUNT(*) FROM dongho WHERE active_flag = 1) AS tongDongHo,
+            (SELECT COUNT(*) FROM thanhvien WHERE active_flag = 1) AS tongThanhVien,
+            (SELECT COUNT(*) FROM thanhvien WHERE active_flag = 1 AND gioiTinh = 1) AS tongNam,
+            (SELECT COUNT(*) FROM thanhvien WHERE active_flag = 1 AND gioiTinh = 0) AS tongNu,
+            (SELECT MAX(doiThuoc) FROM thanhvien WHERE active_flag = 1) AS doiCaoNhat,
+            (SELECT COUNT(*) FROM thanhvien WHERE active_flag = 1 AND ngayMat IS NULL) AS conSong,
+            (SELECT COUNT(*) FROM thanhvien WHERE active_flag = 1 AND ngayMat IS NOT NULL) AS daMat;
+    ELSE
+        SELECT 
+            1 AS tongDongHo,
+            COUNT(*) AS tongThanhVien,
+            COUNT(CASE WHEN gioiTinh = 1 THEN 1 END) AS tongNam,
+            COUNT(CASE WHEN gioiTinh = 0 THEN 1 END) AS tongNu,
+            MAX(doiThuoc) AS doiCaoNhat,
+            COUNT(CASE WHEN ngayMat IS NULL THEN 1 END) AS conSong,
+            COUNT(CASE WHEN ngayMat IS NOT NULL THEN 1 END) AS daMat
+        FROM thanhvien
+        WHERE dongHoId = p_dongHoId AND active_flag = 1;
+    END IF;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
 /*!50003 DROP PROCEDURE IF EXISTS `GetDongHoById` */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
@@ -1191,6 +1295,59 @@ DELIMITER ;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;
 /*!50003 SET character_set_results = @saved_cs_results */ ;
 /*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `GetSuKienSapToi` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`%` PROCEDURE `GetSuKienSapToi`(
+    IN p_dongHoId VARCHAR(50),
+    IN p_limit INT,
+    OUT p_error_code INT,
+    OUT p_error_message VARCHAR(500)
+)
+BEGIN
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        GET DIAGNOSTICS CONDITION 1
+            p_error_code = RETURNED_SQLSTATE,
+            p_error_message = MESSAGE_TEXT;
+    END;
+
+    SET p_error_code = 0;
+    SET p_error_message = '';
+    
+    IF p_limit IS NULL OR p_limit <= 0 THEN
+        SET p_limit = 5;
+    END IF;
+
+    SELECT 
+        sk.suKienId,
+        sk.tenSuKien,
+        sk.ngayDienRa,
+        sk.gioDienRa,
+        sk.diaDiem,
+        sk.moTa,
+        sk.loaiSuKien,
+        sk.uuTien,
+        dh.tenDongHo
+    FROM sukien sk
+    LEFT JOIN dongho dh ON sk.dongHoId = dh.dongHoId
+    WHERE sk.ngayDienRa >= CURDATE()
+        AND (p_dongHoId IS NULL OR p_dongHoId = '' OR sk.dongHoId = p_dongHoId)
+    ORDER BY sk.ngayDienRa ASC, sk.gioDienRa ASC
+    LIMIT p_limit;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
 /*!50003 DROP PROCEDURE IF EXISTS `GetThanhVienById` */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
@@ -1247,6 +1404,409 @@ BEGIN
     WHERE tv.thanhVienId = p_thanhVienId
       AND tv.active_flag = 1;
 
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `GetThanhVienMoiNhat` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`%` PROCEDURE `GetThanhVienMoiNhat`(
+    IN p_dongHoId VARCHAR(50),
+    IN p_limit INT,
+    OUT p_error_code INT,
+    OUT p_error_message VARCHAR(500)
+)
+BEGIN
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        GET DIAGNOSTICS CONDITION 1
+            p_error_code = RETURNED_SQLSTATE,
+            p_error_message = MESSAGE_TEXT;
+    END;
+
+    SET p_error_code = 0;
+    SET p_error_message = '';
+    
+    IF p_limit IS NULL OR p_limit <= 0 THEN
+        SET p_limit = 10;
+    END IF;
+
+    SELECT 
+        tv.thanhVienId,
+        tv.hoTen,
+        tv.gioiTinh,
+        tv.ngaySinh,
+        tv.doiThuoc,
+        tv.ngayTao,
+        dh.tenDongHo
+    FROM thanhvien tv
+    LEFT JOIN dongho dh ON tv.dongHoId = dh.dongHoId
+    WHERE tv.active_flag = 1
+        AND (p_dongHoId IS NULL OR p_dongHoId = '' OR tv.dongHoId = p_dongHoId)
+    ORDER BY tv.ngayTao DESC
+    LIMIT p_limit;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `GetThongKeoTheoChi` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`%` PROCEDURE `GetThongKeoTheoChi`(
+    IN p_dongHoId VARCHAR(50),
+    OUT p_error_code INT,
+    OUT p_error_message VARCHAR(500)
+)
+BEGIN
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        GET DIAGNOSTICS CONDITION 1
+            p_error_code = RETURNED_SQLSTATE,
+            p_error_message = MESSAGE_TEXT;
+    END;
+
+    SET p_error_code = 0;
+    SET p_error_message = '';
+
+    -- Lấy các thành viên đời 1 (tổ tiên) làm gốc chi
+    WITH RECURSIVE ChiTree AS (
+        -- Đời 1: Các tổ tiên (không có cha hoặc cha không trong hệ thống)
+        SELECT 
+            thanhVienId,
+            hoTen,
+            thanhVienId AS chiGocId,
+            hoTen AS tenChi,
+            1 AS level
+        FROM thanhvien
+        WHERE dongHoId = p_dongHoId 
+            AND active_flag = 1 
+            AND doiThuoc = 1
+            AND gioiTinh = 1  -- Chỉ lấy nam làm gốc chi
+        
+        UNION ALL
+        
+        -- Các đời sau: con cháu
+        SELECT 
+            tv.thanhVienId,
+            tv.hoTen,
+            ct.chiGocId,
+            ct.tenChi,
+            ct.level + 1
+        FROM thanhvien tv
+        INNER JOIN ChiTree ct ON tv.chaId = ct.thanhVienId
+        WHERE tv.dongHoId = p_dongHoId AND tv.active_flag = 1
+    )
+    SELECT 
+        ct.chiGocId,
+        ct.tenChi AS tenChi,
+        COUNT(*) AS soThanhVien,
+        MAX(ct.level) AS soDoi
+    FROM ChiTree ct
+    GROUP BY ct.chiGocId, ct.tenChi
+    ORDER BY ct.chiGocId;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `GetThongKeoTheoDoi` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`%` PROCEDURE `GetThongKeoTheoDoi`(
+    IN p_dongHoId VARCHAR(50),
+    OUT p_error_code INT,
+    OUT p_error_message VARCHAR(500)
+)
+BEGIN
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        GET DIAGNOSTICS CONDITION 1
+            p_error_code = RETURNED_SQLSTATE,
+            p_error_message = MESSAGE_TEXT;
+    END;
+
+    SET p_error_code = 0;
+    SET p_error_message = '';
+
+    SELECT 
+        doiThuoc AS doi,
+        COUNT(*) AS soThanhVien,
+        COUNT(CASE WHEN gioiTinh = 1 THEN 1 END) AS soNam,
+        COUNT(CASE WHEN gioiTinh = 0 THEN 1 END) AS soNu,
+        COUNT(CASE WHEN ngayMat IS NOT NULL THEN 1 END) AS daMat
+    FROM thanhvien
+    WHERE dongHoId = p_dongHoId AND active_flag = 1
+    GROUP BY doiThuoc
+    ORDER BY doiThuoc ASC;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `GetThongKeSuKien` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`%` PROCEDURE `GetThongKeSuKien`(
+    IN p_dongHoId VARCHAR(50),
+    IN p_nam INT,
+    OUT p_error_code INT,
+    OUT p_error_message VARCHAR(500)
+)
+BEGIN
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        GET DIAGNOSTICS CONDITION 1
+            p_error_code = RETURNED_SQLSTATE,
+            p_error_message = MESSAGE_TEXT;
+    END;
+
+    SET p_error_code = 0;
+    SET p_error_message = '';
+
+    SELECT 
+        COUNT(*) AS tongSuKien,
+        COUNT(CASE WHEN ngayDienRa < CURDATE() THEN 1 END) AS daQua,
+        COUNT(CASE WHEN ngayDienRa >= CURDATE() THEN 1 END) AS sapToi,
+        COUNT(CASE WHEN loaiSuKien = 'gio' THEN 1 END) AS suKienGio,
+        COUNT(CASE WHEN loaiSuKien = 'cuoi' THEN 1 END) AS suKienCuoi,
+        COUNT(CASE WHEN loaiSuKien = 'tang' THEN 1 END) AS suKienTang,
+        COUNT(CASE WHEN loaiSuKien = 'khac' OR loaiSuKien IS NULL THEN 1 END) AS suKienKhac
+    FROM sukien
+    WHERE dongHoId = p_dongHoId
+        AND (p_nam IS NULL OR YEAR(ngayDienRa) = p_nam);
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `GetThongKeThuChi` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`%` PROCEDURE `GetThongKeThuChi`(
+    IN p_dongHoId VARCHAR(50),
+    IN p_nam INT,
+    OUT p_error_code INT,
+    OUT p_error_message VARCHAR(500)
+)
+BEGIN
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        GET DIAGNOSTICS CONDITION 1
+            p_error_code = RETURNED_SQLSTATE,
+            p_error_message = MESSAGE_TEXT;
+    END;
+
+    SET p_error_code = 0;
+    SET p_error_message = '';
+
+    SELECT 
+        COALESCE((SELECT SUM(soTien) FROM taichinhthu 
+                  WHERE dongHoId = p_dongHoId 
+                  AND (p_nam IS NULL OR YEAR(ngayDong) = p_nam)), 0) AS tongThu,
+        COALESCE((SELECT SUM(soTien) FROM taichinhchi 
+                  WHERE dongHoId = p_dongHoId 
+                  AND (p_nam IS NULL OR YEAR(ngayChi) = p_nam)), 0) AS tongChi,
+        COALESCE((SELECT COUNT(*) FROM taichinhthu 
+                  WHERE dongHoId = p_dongHoId 
+                  AND (p_nam IS NULL OR YEAR(ngayDong) = p_nam)), 0) AS soLanThu,
+        COALESCE((SELECT COUNT(*) FROM taichinhchi 
+                  WHERE dongHoId = p_dongHoId 
+                  AND (p_nam IS NULL OR YEAR(ngayChi) = p_nam)), 0) AS soLanChi;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `GetThongKeThuChiTheoThang` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`%` PROCEDURE `GetThongKeThuChiTheoThang`(
+    IN p_dongHoId VARCHAR(50),
+    IN p_nam INT,
+    OUT p_error_code INT,
+    OUT p_error_message VARCHAR(500)
+)
+BEGIN
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        GET DIAGNOSTICS CONDITION 1
+            p_error_code = RETURNED_SQLSTATE,
+            p_error_message = MESSAGE_TEXT;
+    END;
+
+    SET p_error_code = 0;
+    SET p_error_message = '';
+
+    -- Nếu không truyền năm, lấy năm hiện tại
+    IF p_nam IS NULL THEN
+        SET p_nam = YEAR(CURDATE());
+    END IF;
+
+    SELECT 
+        m.thang,
+        COALESCE(t.tongThu, 0) AS tongThu,
+        COALESCE(c.tongChi, 0) AS tongChi
+    FROM (
+        SELECT 1 AS thang UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 
+        UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 
+        UNION SELECT 9 UNION SELECT 10 UNION SELECT 11 UNION SELECT 12
+    ) m
+    LEFT JOIN (
+        SELECT MONTH(ngayDong) AS thang, SUM(soTien) AS tongThu
+        FROM taichinhthu
+        WHERE dongHoId = p_dongHoId AND YEAR(ngayDong) = p_nam
+        GROUP BY MONTH(ngayDong)
+    ) t ON m.thang = t.thang
+    LEFT JOIN (
+        SELECT MONTH(ngayChi) AS thang, SUM(soTien) AS tongChi
+        FROM taichinhchi
+        WHERE dongHoId = p_dongHoId AND YEAR(ngayChi) = p_nam
+        GROUP BY MONTH(ngayChi)
+    ) c ON m.thang = c.thang
+    ORDER BY m.thang;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `GetThongKeTongQuan` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`%` PROCEDURE `GetThongKeTongQuan`(
+    IN p_dongHoId VARCHAR(50),
+    OUT p_error_code INT,
+    OUT p_error_message VARCHAR(500)
+)
+BEGIN
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        GET DIAGNOSTICS CONDITION 1
+            p_error_code = RETURNED_SQLSTATE,
+            p_error_message = MESSAGE_TEXT;
+    END;
+
+    SET p_error_code = 0;
+    SET p_error_message = '';
+
+    SELECT 
+        COUNT(*) AS tongThanhVien,
+        COUNT(CASE WHEN gioiTinh = 1 THEN 1 END) AS soNam,
+        COUNT(CASE WHEN gioiTinh = 0 THEN 1 END) AS soNu,
+        COUNT(CASE WHEN ngayMat IS NOT NULL THEN 1 END) AS daMat,
+        COUNT(CASE WHEN ngayMat IS NULL THEN 1 END) AS conSong,
+        MAX(doiThuoc) AS soDoi,
+        COUNT(DISTINCT chaId) AS soChi
+    FROM thanhvien
+    WHERE dongHoId = p_dongHoId AND active_flag = 1;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `GetThuGanDay` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`%` PROCEDURE `GetThuGanDay`(
+    IN p_dongHoId VARCHAR(50),
+    IN p_limit INT,
+    OUT p_error_code INT,
+    OUT p_error_message VARCHAR(500)
+)
+BEGIN
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        GET DIAGNOSTICS CONDITION 1
+            p_error_code = RETURNED_SQLSTATE,
+            p_error_message = MESSAGE_TEXT;
+    END;
+
+    SET p_error_code = 0;
+    SET p_error_message = '';
+    
+    IF p_limit IS NULL OR p_limit <= 0 THEN
+        SET p_limit = 5;
+    END IF;
+
+    SELECT 
+        t.thuId,
+        t.hoTenNguoiDong,
+        t.ngayDong,
+        t.soTien,
+        t.noiDung,
+        t.phuongThucThanhToan,
+        dh.tenDongHo
+    FROM taichinhthu t
+    LEFT JOIN dongho dh ON t.dongHoId = dh.dongHoId
+    WHERE (p_dongHoId IS NULL OR p_dongHoId = '' OR t.dongHoId = p_dongHoId)
+    ORDER BY t.ngayDong DESC
+    LIMIT p_limit;
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -3917,4 +4477,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-12-24 17:32:03
+-- Dump completed on 2025-12-25  1:44:43
