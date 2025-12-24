@@ -33,6 +33,11 @@ export class thanhVienService {
     return await this.thanhvienRespository.getAllThanhVien();
   }
 
+  // Lấy tất cả thành viên theo dongHoId (không phân trang - dùng cho render cây)
+  async getAllByDongHo(dongHoId: string): Promise<any> {
+    return await this.thanhvienRespository.getAllByDongHo(dongHoId);
+  }
+
   async searchThanhVien(
     pageIndex: number,
     pageSize: number,

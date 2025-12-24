@@ -8,6 +8,7 @@ import { IMember, IMemberSearch } from "@/types/member";
 import { useToast } from "@/service/useToas";
 import { MemberTable } from "./components/MemberTable";
 import { MemberModal } from "./components/MemberModal";
+import { MemberDetailModal } from "./components/MemberDetailModal";
 import { ExcelTemplateButton } from "./components/ExcelTemplateButton";
 import { searchMemberByDongHo, importMembersJson, IMemberImport, createMemberWithDongHo, updateMember, deleteMember } from "@/service/member.service";
 import { getDongHoById, IDongHo } from "@/service/dongho.service";
@@ -27,6 +28,8 @@ export default function MembersByDongHoPage() {
     const [editingMember, setEditingMember] = useState<IMember | null>(null);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [memberToDelete, setMemberToDelete] = useState<IMember | null>(null);
+    const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+    const [detailMember, setDetailMember] = useState<IMember | null>(null);
 
     const { showSuccess, showError } = useToast();
 
@@ -87,6 +90,7 @@ export default function MembersByDongHoPage() {
         else createMutation.mutate(member);
     };
     const handleBack = () => router.push("/family-trees");
+    const handleViewDetail = (member: IMember) => { setDetailMember(member); setIsDetailModalOpen(true); };
 
     // Import Excel với dongHoId từ URL
     const handleImportExcel = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -200,10 +204,13 @@ export default function MembersByDongHoPage() {
             </div>
 
             {/* Table */}
-            <MemberTable data={memberData} isLoading={isLoading} pageIndex={pageIndex} pageSize={pageSize} totalRecords={totalRecords} totalPages={totalPages} onPageChange={setPageIndex} onPageSizeChange={(size) => { setPageSize(size); setPageIndex(1); }} onEdit={handleEdit} onDelete={handleDeleteClick} />
+            <MemberTable data={memberData} isLoading={isLoading} pageIndex={pageIndex} pageSize={pageSize} totalRecords={totalRecords} totalPages={totalPages} onPageChange={setPageIndex} onPageSizeChange={(size) => { setPageSize(size); setPageIndex(1); }} onEdit={handleEdit} onDelete={handleDeleteClick} onViewDetail={handleViewDetail} />
 
             {/* Modal - truyền dongHoId */}
             <MemberModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onSave={handleSaveMember} member={editingMember} isLoading={createMutation.isPending || updateMutation.isPending} dongHoId={dongHoId} />
+
+            {/* Detail Modal */}
+            <MemberDetailModal isOpen={isDetailModalOpen} onClose={() => { setIsDetailModalOpen(false); setDetailMember(null); }} member={detailMember} />
 
             {/* Delete Modal */}
             {isDeleteModalOpen && memberToDelete && (

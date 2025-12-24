@@ -149,6 +149,26 @@ export class thanhVienRespository {
     }
   }
 
+  // Lấy tất cả thành viên theo dongHoId (không phân trang - dùng cho render cây)
+  async getAllByDongHo(dongHoId: string): Promise<any> {
+    try {
+      const sql = `
+        SELECT * FROM thanhvien 
+        WHERE dongHoId = ? AND active_flag = 1
+        ORDER BY doiThuoc ASC, thanhVienId ASC
+      `;
+      const result = await this.db.query(sql, [dongHoId]);
+      // result là [[rows], fields] từ mysql2
+      if (Array.isArray(result) && Array.isArray(result[0])) {
+        return result[0];
+      }
+      return Array.isArray(result) ? result : [];
+    } catch (error: any) {
+      console.error("❌ getAllByDongHo error:", error);
+      throw new Error(error?.message || "Lỗi truy vấn database");
+    }
+  }
+
   async searchThanhVien(
     pageIndex: number,
     pageSize: number,

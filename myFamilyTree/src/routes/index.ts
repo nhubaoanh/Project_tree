@@ -7,6 +7,7 @@ import suKienRouter from "./suKienRouter";
 import taiChinhThuRouter from "./taiChinhThu";
 import taiChinhChiRouter from "./taiChinhChi";
 import loaiSuKienRouter from "./loaiSuKienRouter";
+import thongKeRouter from "./thongKeRouter";
 
 const router = Router();
 router.use('/users', nguoiDungRouter);
@@ -17,5 +18,6 @@ router.use("/event", suKienRouter);
 router.use("/typeevent", loaiSuKienRouter);
 router.use("/contributionUp", taiChinhThuRouter);
 router.use("/contributionDown", taiChinhChiRouter);
+router.use("/thongke", thongKeRouter);
 
 export default router;

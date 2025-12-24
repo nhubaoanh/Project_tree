@@ -4,7 +4,8 @@ import { ITreeNode } from "@/types/tree";
 
 // utils/treeUtils.ts
 export function buildTree(members: IMember[]): ITreeNode[] {
-    if (!members || members.length === 0) return [];
+    // Kiểm tra an toàn - đảm bảo members là array
+    if (!members || !Array.isArray(members) || members.length === 0) return [];
 
     const memberMap = new Map<number, ITreeNode>();
     const allNodes: ITreeNode[] = []; // Thay thế 'roots' bằng 'allNodes'

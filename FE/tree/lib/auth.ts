@@ -20,7 +20,7 @@ export const ALL_MENU_ITEMS: MenuItem[] = [
   {
     name: "Gia Phả",
     href: "/family-trees",
-    icon: "/icon/tree.png",
+    icon: "/icon/iconmember.png",
     roles: ["sa", "admin", "thanhvien"],
   },
   {

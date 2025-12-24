@@ -19,9 +19,14 @@ thanhVienRouter.use((req, res, next) => {
 });
 const thanhviencontroller = container.resolve(thanhVienController);
 
+// Routes cụ thể phải đặt TRƯỚC routes có params động
 thanhVienRouter.get("/getAllMember", thanhviencontroller.getAllThanhVien.bind(thanhviencontroller));
+thanhVienRouter.get("/dongho/:dongHoId/all", thanhviencontroller.getAllByDongHo.bind(thanhviencontroller));
 thanhVienRouter.get('/export-template', thanhviencontroller.exportTemplate.bind(thanhviencontroller));
+
+// Routes với params động đặt SAU
 thanhVienRouter.get('/:id', thanhviencontroller.getThanhVienById.bind(thanhviencontroller));
+
 thanhVienRouter.post("", thanhviencontroller.createThanhVien.bind(thanhviencontroller));
 thanhVienRouter.post("/create", thanhviencontroller.createThanhVien.bind(thanhviencontroller));
 thanhVienRouter.post('/search', thanhviencontroller.searchThanhVien.bind(thanhviencontroller));

@@ -1,6 +1,6 @@
 "use client";
-import React, { useState, useRef, useEffect } from "react";
-import { Menu, Bell, Settings, LogOut, User } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { Menu, Settings, LogOut, User } from "lucide-react";
 import { useSidebar } from "@/context/SidebarContext";
 import { useRouter } from "next/navigation";
 import storage from "@/utils/storage";
@@ -70,7 +70,7 @@ export default function Header() {
           <Menu size={24} className="text-white" />
         </button>
 
-        <h1 className="text-2xl md:text-3xl font-bold text-white tracking-wide">
+        <h1 className="text-3xl md:text-4xl font-bold font-dancing text-white tracking-wide drop-shadow-lg">
           Gia Phả Việt
         </h1>
 

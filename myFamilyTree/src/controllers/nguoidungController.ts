@@ -162,9 +162,7 @@ export class NguoiDungController {
   async UpdateMyProfile(req: Request, res: Response): Promise<void> {
     try {
       const nguoiDung = req.body as UserProfile;
-      console.log("UpdateMyProfile request body:", nguoiDung);
       const results = await this.nguoiDungService.UpdateMyProfile(nguoiDung);
-      console.log("UpdateMyProfile results:", results);
       res.json({
         message: "Cap nhat thông tin nguoi dung thanh cong",
         success: true,

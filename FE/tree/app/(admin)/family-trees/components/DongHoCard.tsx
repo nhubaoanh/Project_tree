@@ -1,24 +1,34 @@
 "use client";
 import React from "react";
-import { Users, Calendar, MapPin, ChevronRight } from "lucide-react";
+import { Users, Calendar, MapPin, GitBranch, UserCog } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { IDongHo } from "@/service/dongho.service";
 
 interface DongHoCardProps {
     dongHo: IDongHo;
-    onClick: () => void;
 }
 
-export function DongHoCard({ dongHo, onClick }: DongHoCardProps) {
+export function DongHoCard({ dongHo }: DongHoCardProps) {
+    const router = useRouter();
+    
     const formatDate = (date: string | Date | null) => {
         if (!date) return "Chưa cập nhật";
         return new Date(date).toLocaleDateString("vi-VN");
     };
 
+    const handleGoToGenealogy = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        localStorage.setItem("currentDongHoId", dongHo.dongHoId);
+        router.push(`/genealogy?dongHoId=${dongHo.dongHoId}`);
+    };
+
+    const handleGoToMembers = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        router.push(`/family-trees/${dongHo.dongHoId}/members`);
+    };
+
     return (
-        <div
-            onClick={onClick}
-            className="bg-white border-2 border-[#d4af37] rounded-xl p-5 shadow-md hover:shadow-xl transition-all cursor-pointer group hover:border-[#b91c1c] hover:scale-[1.02]"
-        >
+        <div className="bg-white border-2 border-[#d4af37] rounded-xl p-5 shadow-md hover:shadow-xl transition-all group hover:border-[#b91c1c]">
             {/* Header */}
             <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-3">
@@ -34,10 +44,6 @@ export function DongHoCard({ dongHo, onClick }: DongHoCardProps) {
                         </p>
                     </div>
                 </div>
-                <ChevronRight
-                    size={20}
-                    className="text-[#d4af37] group-hover:text-[#b91c1c] group-hover:translate-x-1 transition-all"
-                />
             </div>
 
             {/* Info */}
@@ -59,11 +65,22 @@ export function DongHoCard({ dongHo, onClick }: DongHoCardProps) {
                 </p>
             )}
 
-            {/* Action hint */}
-            <div className="mt-4 pt-3 border-t border-[#e8dcc8]">
-                <span className="text-xs text-[#b91c1c] font-semibold uppercase tracking-wide">
-                    Nhấn để quản lý →
-                </span>
+            {/* Action Buttons */}
+            <div className="mt-4 pt-3 border-t border-[#e8dcc8] flex gap-2">
+                <button
+                    onClick={handleGoToGenealogy}
+                    className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-[#b91c1c] text-white rounded-lg hover:bg-[#991b1b] transition-colors text-sm font-semibold"
+                >
+                    <GitBranch size={16} />
+                    Xem Cây
+                </button>
+                <button
+                    onClick={handleGoToMembers}
+                    className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-[#2c5282] text-white rounded-lg hover:bg-[#2a4365] transition-colors text-sm font-semibold"
+                >
+                    <UserCog size={16} />
+                    Thành Viên
+                </button>
             </div>
         </div>
     );

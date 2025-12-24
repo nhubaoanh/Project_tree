@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Edit, Trash2, FileSpreadsheet, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
+import { Edit, Trash2, FileSpreadsheet, ChevronLeft, ChevronRight, Loader2, Eye } from "lucide-react";
 import { IMember } from "@/types/member";
 
 interface MemberTableProps {
@@ -15,11 +15,12 @@ interface MemberTableProps {
   onPageSizeChange: (size: number) => void;
   onEdit: (member: IMember) => void;
   onDelete: (member: IMember) => void;
+  onViewDetail: (member: IMember) => void;
 }
 
 export const MemberTable: React.FC<MemberTableProps> = ({
   data, isLoading, pageIndex, pageSize, totalRecords, totalPages,
-  onPageChange, onPageSizeChange, onEdit, onDelete,
+  onPageChange, onPageSizeChange, onEdit, onDelete, onViewDetail,
 }) => {
   return (
     <div className="bg-white rounded-lg border border-[#d4af37] shadow-lg overflow-hidden relative min-h-[400px] flex flex-col">
@@ -43,23 +44,32 @@ export const MemberTable: React.FC<MemberTableProps> = ({
               <th className="p-4 text-center min-w-[120px]">Ngày mất</th>
               <th className="p-4 text-center min-w-[150px]">Nơi sinh</th>
               <th className="p-4 text-center min-w-[120px]">Nghề nghiệp</th>
-              <th className="p-4 text-center min-w-[100px]">Đời thứ</th>
-              <th className="p-4 text-center min-w-[120px]">Hành Động</th>
+              <th className="p-4 text-center min-w-[80px]">Đời</th>
+              <th className="p-4 text-center min-w-[140px]">Hành Động</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-[#eaddcf]">
             {data.length > 0 ? data.map((member, index) => (
               <tr key={index} className="hover:bg-[#fffdf5] transition-colors group">
                 <td className="p-4 w-12 text-center text-stone-400 font-mono text-xs">{(pageIndex - 1) * pageSize + index + 1}</td>
-                <td className="p-4 text-center font-bold text-[#5d4037] group-hover:text-[#b91c1c]">{member.hoTen}</td>
-                <td className="p-4 text-center text-[#5d4037]">{member.gioiTinh === 1 ? "Nam" : "Nữ"}</td>
+                <td className="p-4 text-center">
+                  <button onClick={() => onViewDetail(member)} className="font-bold text-[#5d4037] hover:text-[#b91c1c] hover:underline transition-colors cursor-pointer">
+                    {member.hoTen}
+                  </button>
+                </td>
+                <td className="p-4 text-center">
+                  <span className={`px-2 py-1 rounded text-xs font-semibold ${member.gioiTinh === 1 ? "bg-blue-100 text-blue-700" : "bg-pink-100 text-pink-700"}`}>
+                    {member.gioiTinh === 1 ? "Nam" : "Nữ"}
+                  </span>
+                </td>
                 <td className="p-4 text-center text-[#5d4037] text-sm">{member.ngaySinh ? new Date(member.ngaySinh).toLocaleDateString("vi-VN") : "-"}</td>
                 <td className="p-4 text-center text-[#5d4037] text-sm">{member.ngayMat ? new Date(member.ngayMat).toLocaleDateString("vi-VN") : "-"}</td>
                 <td className="p-4 text-center text-[#5d4037] text-sm">{member.noiSinh || "-"}</td>
                 <td className="p-4 text-center text-[#5d4037] text-sm">{member.ngheNghiep || "-"}</td>
-                <td className="p-4 text-center text-[#5d4037] text-sm">{member.doiThuoc || "-"}</td>
+                <td className="p-4 text-center text-[#5d4037] text-sm font-semibold">{member.doiThuoc || "-"}</td>
                 <td className="p-4 text-center">
-                  <div className="flex justify-center gap-2 opacity-80 group-hover:opacity-100">
+                  <div className="flex justify-center gap-1 opacity-80 group-hover:opacity-100">
+                    <button onClick={() => onViewDetail(member)} className="p-2 text-green-600 hover:bg-green-50 rounded" title="Xem chi tiết"><Eye size={18} /></button>
                     <button onClick={() => onEdit(member)} className="p-2 text-blue-600 hover:bg-blue-50 rounded" title="Sửa"><Edit size={18} /></button>
                     <button onClick={() => onDelete(member)} className="p-2 text-red-600 hover:bg-red-50 rounded" title="Xóa"><Trash2 size={18} /></button>
                   </div>

@@ -117,6 +117,26 @@ export class thanhVienController {
     }
   }
 
+  // Lấy tất cả thành viên theo dongHoId (không phân trang - dùng cho render cây)
+  async getAllByDongHo(req: Request, res: Response): Promise<void> {
+    try {
+      const dongHoId = req.params.dongHoId;
+      if (!dongHoId) {
+        res.status(400).json({ message: "Thiếu dongHoId", success: false });
+        return;
+      }
+      const results = await this.thanhvienService.getAllByDongHo(dongHoId);
+      res.status(200).json({
+        message: "Lấy danh sách thành viên thành công",
+        success: true,
+        data: results,
+      });
+    } catch (error: any) {
+      console.log("error", error);
+      res.status(500).json({ message: "Lấy danh sách thành viên thất bại", success: false });
+    }
+  }
+
   async searchThanhVien(req: Request, res: Response): Promise<void> {
     try {
       const object = req.body as {

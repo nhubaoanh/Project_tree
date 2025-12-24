@@ -16,6 +16,18 @@ export const getMembers = async (): Promise<any> => {
     }
 }
 
+// Lấy tất cả thành viên theo dongHoId (không phân trang - dùng cho render cây)
+export const getMembersByDongHo = async (dongHoId: string): Promise<any> => {
+    try {
+        const res = await apiClient.get(`${prefix}/dongho/${dongHoId}/all`);
+        return res?.data;
+    } catch (error: any) {
+        const err = parseApiError(error);
+        console.error(`[getMembersByDongHo] ${err.message}`);
+        return { success: false, data: [], message: err.message };
+    }
+}
+
 export const getMemberById = async (id: number): Promise<any> => {
     try {
         const res = await apiClient.get(`${prefix}/${id}`);

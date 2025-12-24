@@ -9,7 +9,6 @@ export const generateToken = (payload: object): string => {
 
 export const verifyToken = (token: string): any => {
   try {
-    console.log("token_vertyfi",token);
     return jwt.verify(token, config.jwt.secret);
   } catch (error) {
     return null;
