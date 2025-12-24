@@ -72,7 +72,7 @@ CREATE TABLE `dongho` (
 
 LOCK TABLES `dongho` WRITE;
 /*!40000 ALTER TABLE `dongho` DISABLE KEYS */;
-INSERT INTO `dongho` VALUES ('e9022e64-cbae-11f0-8020-a8934a9bae74','Dòng họ NHỮ','Hải Dương','2000-01-01','Nguyễn Văn A','Dòng họ lưu trữ thông tin gia phả.',1,'admin','2025-11-27 23:34:14','admin','2025-12-02 11:28:12');
+INSERT INTO `dongho` VALUES ('025721a4-bd0d-4447-9b9b-505d174de937','Trần','Hải Dương','2025-12-25','Trần Thanh Tùng','dòng họ gia giáo ',1,'system','2025-12-24 15:59:25','system','2025-12-24 15:59:25'),('e9022e64-cbae-11f0-8020-a8934a9bae74','Dòng họ NHỮ','Hải Dương','2000-01-01','Nguyễn Văn A','Dòng họ lưu trữ thông tin gia phả.',1,'admin','2025-11-27 23:34:14','admin','2025-12-02 11:28:12');
 /*!40000 ALTER TABLE `dongho` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -309,7 +309,7 @@ CREATE TABLE `taichinhchi` (
   CONSTRAINT `taichinhchi_ibfk_1` FOREIGN KEY (`dongHoId`) REFERENCES `dongho` (`dongHoId`),
   CONSTRAINT `taichinhchi_ibfk_2` FOREIGN KEY (`danhMucId`) REFERENCES `danhmuctaichinh` (`danhMucId`),
   CONSTRAINT `taichinhchi_ibfk_3` FOREIGN KEY (`nguoiNhapId`) REFERENCES `nguoidung` (`nguoiDungId`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -318,7 +318,7 @@ CREATE TABLE `taichinhchi` (
 
 LOCK TABLES `taichinhchi` WRITE;
 /*!40000 ALTER TABLE `taichinhchi` DISABLE KEYS */;
-INSERT INTO `taichinhchi` VALUES (1,'e9022e64-cbae-11f0-8020-a8934a9bae74',3,'2025-12-06',800000.00,'Tiền mặt','Chi tổ chức giỗ tổ','Nhà hàng Hồng Phát',NULL,'2025-12-18 10:53:27','89fd6f88-c909-11f0-8020-a8934a9bae74',1,NULL,NULL),(2,'e9022e64-cbae-11f0-8020-a8934a9bae74',4,'2025-12-07',1200000.00,'Chuyển khoản','Chi sửa mộ tổ','Thợ xây Nguyễn Văn A',NULL,'2025-12-18 10:53:27','89fd6f88-c909-11f0-8020-a8934a9bae74',1,NULL,NULL),(3,'e9022e64-cbae-11f0-8020-a8934a9bae74',5,'2025-12-08',500000.00,'Tiền mặt','Chi họp họ cuối năm','Nhà văn hóa thôn',NULL,'2025-12-18 10:53:27','89fd6f88-c909-11f0-8020-a8934a9bae74',1,NULL,NULL),(4,'e9022e64-cbae-11f0-8020-a8934a9bae74',3,'2025-12-09',300000.00,'Tiền mặt','Mua đồ lễ giỗ tổ','Cửa hàng đồ lễ',NULL,'2025-12-18 10:53:27','89fd6f88-c909-11f0-8020-a8934a9bae74',1,NULL,NULL),(5,'e9022e64-cbae-11f0-8020-a8934a9bae74',5,'2025-12-10',400000.00,'Chuyển khoản','Chi nước uống họp họ','Tạp hóa Minh Anh',NULL,'2025-12-18 10:53:27','89fd6f88-c909-11f0-8020-a8934a9bae74',1,NULL,NULL),(6,'e9022e64-cbae-11f0-8020-a8934a9bae74',3,'2025-12-22',9990000.00,'Tiền mặt','Chi mua vật tư abc ăn thật nhiều','Cửa hàng xây dựng A','Có hóa đơn','2025-12-22 19:32:12','89fd6f88-c909-11f0-8020-a8934a9bae74',1,'2025-12-22 00:00:00','89fd6f88-c909-11f0-8020-a8934a9bae74');
+INSERT INTO `taichinhchi` VALUES (1,'e9022e64-cbae-11f0-8020-a8934a9bae74',3,'2025-12-06',800000.00,'Tiền mặt','Chi tổ chức giỗ tổ','Nhà hàng Hồng Phát',NULL,'2025-12-18 10:53:27','89fd6f88-c909-11f0-8020-a8934a9bae74',1,NULL,NULL),(2,'e9022e64-cbae-11f0-8020-a8934a9bae74',4,'2025-12-07',1200000.00,'Chuyển khoản','Chi sửa mộ tổ','Thợ xây Nguyễn Văn A',NULL,'2025-12-18 10:53:27','89fd6f88-c909-11f0-8020-a8934a9bae74',1,NULL,NULL),(3,'e9022e64-cbae-11f0-8020-a8934a9bae74',5,'2025-12-08',500000.00,'Tiền mặt','Chi họp họ cuối năm','Nhà văn hóa thôn',NULL,'2025-12-18 10:53:27','89fd6f88-c909-11f0-8020-a8934a9bae74',1,NULL,NULL),(4,'e9022e64-cbae-11f0-8020-a8934a9bae74',3,'2025-12-09',300000.00,'Tiền mặt','Mua đồ lễ giỗ tổ','Cửa hàng đồ lễ',NULL,'2025-12-18 10:53:27','89fd6f88-c909-11f0-8020-a8934a9bae74',1,NULL,NULL),(5,'e9022e64-cbae-11f0-8020-a8934a9bae74',5,'2025-12-10',400000.00,'Chuyển khoản','Chi nước uống họp họ','Tạp hóa Minh Anh',NULL,'2025-12-18 10:53:27','89fd6f88-c909-11f0-8020-a8934a9bae74',1,NULL,NULL),(6,'e9022e64-cbae-11f0-8020-a8934a9bae74',3,'2025-12-22',9990000.00,'chuyen_khoan','Chi mua vật tư abc ăn thật nhiều','Cửa hàng xây dựng Abc','Có hóa đơn','2025-12-22 19:32:12','89fd6f88-c909-11f0-8020-a8934a9bae74',1,'2025-12-24 00:00:00','89fd6f88-c909-11f0-8020-a8934a9bae74'),(7,'e9022e64-cbae-11f0-8020-a8934a9bae74',2,'2025-12-25',3000000.00,'chuyen_khoan','đóng lấy tiền đẹp nha','Tạp hóa ngân vũ','đóng laauys tiền','2025-12-24 14:43:11','89fd6f88-c909-11f0-8020-a8934a9bae74',1,'2025-12-24 00:00:00','89fd6f88-c909-11f0-8020-a8934a9bae74');
 /*!40000 ALTER TABLE `taichinhchi` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -351,7 +351,7 @@ CREATE TABLE `taichinhthu` (
   CONSTRAINT `taichinhthu_ibfk_1` FOREIGN KEY (`dongHoId`) REFERENCES `dongho` (`dongHoId`),
   CONSTRAINT `taichinhthu_ibfk_2` FOREIGN KEY (`danhMucId`) REFERENCES `danhmuctaichinh` (`danhMucId`),
   CONSTRAINT `taichinhthu_ibfk_3` FOREIGN KEY (`nguoiNhapId`) REFERENCES `nguoidung` (`nguoiDungId`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -360,7 +360,7 @@ CREATE TABLE `taichinhthu` (
 
 LOCK TABLES `taichinhthu` WRITE;
 /*!40000 ALTER TABLE `taichinhthu` DISABLE KEYS */;
-INSERT INTO `taichinhthu` VALUES (1,'e9022e64-cbae-11f0-8020-a8934a9bae74',1,'Nguyễn Văn Sơn','2025-12-01',100000.00,'Tiền mặt','Đóng góp giỗ tổ','2025-12-18 10:51:55','89fd6f88-c909-11f0-8020-a8934a9bae74','2025-12-18 10:51:55',1,NULL,NULL),(2,'e9022e64-cbae-11f0-8020-a8934a9bae74',1,'Nhữ Bảo Anh','2025-12-02',200000.00,'Chuyển khoản','Đóng góp giỗ tổ','2025-12-18 10:51:55','89fd6f88-c909-11f0-8020-a8934a9bae74','2025-12-18 10:51:55',1,NULL,NULL),(3,'e9022e64-cbae-11f0-8020-a8934a9bae74',2,'Hoàng Văn Bình','2025-12-03',300000.00,'Tiền mặt','Đóng quỹ họ','2025-12-18 10:51:55','89fd6f88-c909-11f0-8020-a8934a9bae74','2025-12-18 10:51:55',1,NULL,NULL),(4,'e9022e64-cbae-11f0-8020-a8934a9bae74',2,'Nguyễn Thị Hoa','2025-12-04',150000.00,'Chuyển khoản','Đóng quỹ họ','2025-12-18 10:51:55','89fd6f88-c909-11f0-8020-a8934a9bae74','2025-12-18 10:51:55',1,NULL,NULL),(5,'e9022e64-cbae-11f0-8020-a8934a9bae74',1,'Nhữ Văn Hùng','2025-12-05',500000.00,'Tiền mặt','Ủng hộ thêm cho giỗ tổ','2025-12-18 10:51:55','89fd6f88-c909-11f0-8020-a8934a9bae74','2025-12-18 10:51:55',1,NULL,NULL),(8,'e9022e64-cbae-11f0-8020-a8934a9bae74',2,'Nguyễn Văn Anh đẹp zai','2025-12-22',9900000.00,'Chuyển khoản','Thu tiền vệ sinh ngày tết lễ','Đã thu đủ','89fd6f88-c909-11f0-8020-a8934a9bae74','2025-12-22 19:26:39',1,'2025-12-22 00:00:00',NULL),(9,'e9022e64-cbae-11f0-8020-a8934a9bae74',1,'Nhữ Văn Hùng','2025-12-23',300000.00,'tien_mat','đóng góp xây nha thok','sguytdfththt',NULL,'2025-12-22 19:48:28',1,'2025-12-22 19:48:28',NULL);
+INSERT INTO `taichinhthu` VALUES (1,'e9022e64-cbae-11f0-8020-a8934a9bae74',1,'Nguyễn Văn Sơn','2025-12-01',100000.00,'Tiền mặt','Đóng góp giỗ tổ','2025-12-18 10:51:55','89fd6f88-c909-11f0-8020-a8934a9bae74','2025-12-18 10:51:55',1,NULL,NULL),(2,'e9022e64-cbae-11f0-8020-a8934a9bae74',1,'Nhữ Bảo Anh','2025-12-02',200000.00,'Chuyển khoản','Đóng góp giỗ tổ','2025-12-18 10:51:55','89fd6f88-c909-11f0-8020-a8934a9bae74','2025-12-18 10:51:55',1,NULL,NULL),(3,'e9022e64-cbae-11f0-8020-a8934a9bae74',2,'Hoàng Văn Bình','2025-12-03',300000.00,'Tiền mặt','Đóng quỹ họ','2025-12-18 10:51:55','89fd6f88-c909-11f0-8020-a8934a9bae74','2025-12-18 10:51:55',1,NULL,NULL),(4,'e9022e64-cbae-11f0-8020-a8934a9bae74',2,'Nguyễn Thị Hoa','2025-12-04',150000.00,'Chuyển khoản','Đóng quỹ họ','2025-12-18 10:51:55','89fd6f88-c909-11f0-8020-a8934a9bae74','2025-12-18 10:51:55',1,NULL,NULL),(5,'e9022e64-cbae-11f0-8020-a8934a9bae74',1,'Nhữ Văn Hùng','2025-12-05',500000.00,'Tiền mặt','Ủng hộ thêm cho giỗ tổ','2025-12-18 10:51:55','89fd6f88-c909-11f0-8020-a8934a9bae74','2025-12-18 10:51:55',1,NULL,NULL),(8,'e9022e64-cbae-11f0-8020-a8934a9bae74',2,'Nguyễn Văn Anh đẹp zai','2025-12-22',9900000.00,'Chuyển khoản','Thu tiền vệ sinh ngày tết lễ','Đã thu đủ','89fd6f88-c909-11f0-8020-a8934a9bae74','2025-12-22 19:26:39',1,'2025-12-22 00:00:00',NULL),(9,'e9022e64-cbae-11f0-8020-a8934a9bae74',1,'Nhữ Văn Hùng','2025-12-23',300000.00,'chuyen_khoan','đóng góp xây nha thok','cố lên anh em ơi','89fd6f88-c909-11f0-8020-a8934a9bae74','2025-12-22 19:48:28',1,'2025-12-24 00:00:00','89fd6f88-c909-11f0-8020-a8934a9bae74'),(10,'e9022e64-cbae-11f0-8020-a8934a9bae74',1,'Hoàng Văn Bình','2025-12-25',4000000.00,'chuyen_khoan','nhớ đóng tiền sớm đó','ưgrgrgrgrgr','89fd6f88-c909-11f0-8020-a8934a9bae74','2025-12-24 14:12:04',1,'2025-12-24 00:00:00','89fd6f88-c909-11f0-8020-a8934a9bae74');
 /*!40000 ALTER TABLE `taichinhthu` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -646,6 +646,50 @@ BEGIN
     	select f2.danhMucId
     	from Results f2
     );
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `DeleteDongHo` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`%` PROCEDURE `DeleteDongHo`(
+    IN p_dongHoId VARCHAR(50),
+    IN p_lu_user_id VARCHAR(50),
+    OUT p_error_code INT,
+    OUT p_error_message VARCHAR(500)
+)
+BEGIN
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        GET DIAGNOSTICS CONDITION 1
+            p_error_code = RETURNED_SQLSTATE,
+            p_error_message = MESSAGE_TEXT;
+        ROLLBACK;
+    END;
+
+    SET p_error_code = 0;
+    SET p_error_message = '';
+
+    START TRANSACTION;
+
+    UPDATE dongho 
+    SET 
+        active_flag = 0,
+        lu_updated = NOW(),
+        lu_user_id = p_lu_user_id
+    WHERE dongHoId = p_dongHoId;
+
+    COMMIT;
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -1038,6 +1082,52 @@ DELIMITER ;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;
 /*!50003 SET character_set_results = @saved_cs_results */ ;
 /*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `GetDongHoById` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`%` PROCEDURE `GetDongHoById`(
+    IN p_dongHoId VARCHAR(50),
+    OUT p_error_code INT,
+    OUT p_error_message VARCHAR(500)
+)
+BEGIN
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        GET DIAGNOSTICS CONDITION 1
+            p_error_code = RETURNED_SQLSTATE,
+            p_error_message = MESSAGE_TEXT;
+    END;
+
+    SET p_error_code = 0;
+    SET p_error_message = '';
+
+    SELECT 
+        dongHoId,
+        tenDongHo,
+        queQuanGoc,
+        ngayThanhLap,
+        nguoiQuanLy,
+        ghiChu,
+        active_flag,
+        nguoiTaoId,
+        ngayTao,
+        lu_updated,
+        lu_user_id
+    FROM dongho 
+    WHERE dongHoId = p_dongHoId AND active_flag = 1;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
 /*!50003 DROP PROCEDURE IF EXISTS `GetFunctionsByUserId` */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
@@ -1297,6 +1387,74 @@ BEGIN
     COMMIT;
 
     SET p_err_msg = CONCAT('Import thanh cong: ', v_insert_count, ' moi, ', v_update_count, ' cap nhat. Tong: ', v_count);
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `InsertDongHo` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`%` PROCEDURE `InsertDongHo`(
+    IN p_dongHoId VARCHAR(50),
+    IN p_tenDongHo VARCHAR(255),
+    IN p_queQuanGoc VARCHAR(255),
+    IN p_ngayThanhLap DATE,
+    IN p_nguoiQuanLy VARCHAR(255),
+    IN p_ghiChu TEXT,
+    IN p_nguoiTaoId VARCHAR(50),
+    OUT p_error_code INT,
+    OUT p_error_message VARCHAR(500)
+)
+BEGIN
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        GET DIAGNOSTICS CONDITION 1
+            p_error_code = RETURNED_SQLSTATE,
+            p_error_message = MESSAGE_TEXT;
+        ROLLBACK;
+    END;
+
+    SET p_error_code = 0;
+    SET p_error_message = '';
+
+    START TRANSACTION;
+
+    INSERT INTO dongho (
+        dongHoId,
+        tenDongHo,
+        queQuanGoc,
+        ngayThanhLap,
+        nguoiQuanLy,
+        ghiChu,
+        active_flag,
+        nguoiTaoId,
+        ngayTao,
+        lu_updated,
+        lu_user_id
+    ) VALUES (
+        p_dongHoId,
+        p_tenDongHo,
+        p_queQuanGoc,
+        p_ngayThanhLap,
+        p_nguoiQuanLy,
+        p_ghiChu,
+        1,
+        p_nguoiTaoId,
+        NOW(),
+        NOW(),
+        p_nguoiTaoId
+    );
+
+    COMMIT;
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -2693,6 +2851,172 @@ DELIMITER ;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;
 /*!50003 SET character_set_results = @saved_cs_results */ ;
 /*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `SearchThanhVienByDongHo` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`%` PROCEDURE `SearchThanhVienByDongHo`(
+    IN p_pageIndex INT,
+    IN p_pageSize INT,
+    IN p_search_content VARCHAR(255),
+    IN p_dongHoId VARCHAR(50),
+    OUT p_error_code INT,
+    OUT p_error_message VARCHAR(500)
+)
+BEGIN
+    DECLARE p_total_row INT;
+
+    -- =========================
+    -- ERROR HANDLER
+    -- =========================
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        GET DIAGNOSTICS CONDITION 1
+            p_error_code = RETURNED_SQLSTATE,
+            p_error_message = MESSAGE_TEXT;
+    END;
+
+    SET p_error_code = 0;
+    SET p_error_message = '';
+
+    -- =========================
+    -- CÓ PHÂN TRANG
+    -- =========================
+    IF p_pageSize <> 0 THEN
+
+        DROP TEMPORARY TABLE IF EXISTS Results;
+
+        CREATE TEMPORARY TABLE Results AS
+        SELECT
+            (@row_number := @row_number + 1) AS RowNumber,
+            tv.thanhVienId,
+            tv.dongHoId,
+            tv.hoTen,
+            tv.gioiTinh,
+            tv.ngaySinh,
+            tv.ngayMat,
+            tv.noiSinh,
+            tv.noiMat,
+            tv.ngheNghiep,
+            tv.trinhDoHocVan,
+            tv.diaChiHienTai,
+            tv.tieuSu,
+            tv.anhChanDung,
+            tv.doiThuoc,
+            tv.chaId,
+            tv.meId,
+            tv.voId,
+            tv.chongId,
+            tv.ngayTao,
+            tv.active_flag,
+            tv.nguoiTaoId,
+            tv.lu_updated,
+            tv.lu_user_id,
+            cha.hoTen   AS tenCha,
+            me.hoTen    AS tenMe,
+            vo.hoTen    AS tenVo,
+            chong.hoTen AS tenChong
+        FROM thanhvien tv
+        LEFT JOIN thanhvien cha   ON tv.chaId   = cha.thanhVienId
+        LEFT JOIN thanhvien me    ON tv.meId    = me.thanhVienId
+        LEFT JOIN thanhvien vo    ON tv.voId    = vo.thanhVienId
+        LEFT JOIN thanhvien chong ON tv.chongId = chong.thanhVienId
+        CROSS JOIN (SELECT @row_number := 0) r
+        WHERE tv.active_flag = 1
+          AND tv.dongHoId = p_dongHoId
+          AND (
+                p_search_content IS NULL
+                OR p_search_content = ''
+                OR tv.hoTen LIKE CONCAT('%', p_search_content, '%')
+                OR tv.ngheNghiep LIKE CONCAT('%', p_search_content, '%')
+                OR tv.diaChiHienTai LIKE CONCAT('%', p_search_content, '%')
+          )
+        ORDER BY tv.doiThuoc ASC, tv.thanhVienId ASC;
+
+        SELECT COUNT(*) INTO p_total_row FROM Results;
+
+        SELECT *, p_total_row AS RecordCount
+        FROM Results
+        WHERE RowNumber BETWEEN ((p_pageIndex - 1) * p_pageSize) + 1
+                             AND (p_pageIndex * p_pageSize);
+
+        DROP TEMPORARY TABLE Results;
+
+    -- =========================
+    -- KHÔNG PHÂN TRANG
+    -- =========================
+    ELSE
+
+        DROP TEMPORARY TABLE IF EXISTS Results;
+
+        CREATE TEMPORARY TABLE Results AS
+        SELECT
+            (@row_number := @row_number + 1) AS RowNumber,
+            tv.thanhVienId,
+            tv.dongHoId,
+            tv.hoTen,
+            tv.gioiTinh,
+            tv.ngaySinh,
+            tv.ngayMat,
+            tv.noiSinh,
+            tv.noiMat,
+            tv.ngheNghiep,
+            tv.trinhDoHocVan,
+            tv.diaChiHienTai,
+            tv.tieuSu,
+            tv.anhChanDung,
+            tv.doiThuoc,
+            tv.chaId,
+            tv.meId,
+            tv.voId,
+            tv.chongId,
+            tv.ngayTao,
+            tv.active_flag,
+            tv.nguoiTaoId,
+            tv.lu_updated,
+            tv.lu_user_id,
+            cha.hoTen   AS tenCha,
+            me.hoTen    AS tenMe,
+            vo.hoTen    AS tenVo,
+            chong.hoTen AS tenChong
+        FROM thanhvien tv
+        LEFT JOIN thanhvien cha   ON tv.chaId   = cha.thanhVienId
+        LEFT JOIN thanhvien me    ON tv.meId    = me.thanhVienId
+        LEFT JOIN thanhvien vo    ON tv.voId    = vo.thanhVienId
+        LEFT JOIN thanhvien chong ON tv.chongId = chong.thanhVienId
+        CROSS JOIN (SELECT @row_number := 0) r
+        WHERE tv.active_flag = 1
+          AND tv.dongHoId = p_dongHoId
+          AND (
+                p_search_content IS NULL
+                OR p_search_content = ''
+                OR tv.hoTen LIKE CONCAT('%', p_search_content, '%')
+                OR tv.ngheNghiep LIKE CONCAT('%', p_search_content, '%')
+                OR tv.diaChiHienTai LIKE CONCAT('%', p_search_content, '%')
+          )
+        ORDER BY tv.doiThuoc ASC, tv.thanhVienId ASC;
+
+        SELECT COUNT(*) INTO p_total_row FROM Results;
+
+        SELECT *, p_total_row AS RecordCount
+        FROM Results;
+
+        DROP TEMPORARY TABLE Results;
+
+    END IF;
+
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
 /*!50003 DROP PROCEDURE IF EXISTS `SignUp` */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
@@ -2760,6 +3084,59 @@ BEGIN
 
     END IF;
 
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `UpdateDongHo` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`%` PROCEDURE `UpdateDongHo`(
+    IN p_dongHoId VARCHAR(50),
+    IN p_tenDongHo VARCHAR(255),
+    IN p_queQuanGoc VARCHAR(255),
+    IN p_ngayThanhLap DATE,
+    IN p_nguoiQuanLy VARCHAR(255),
+    IN p_ghiChu TEXT,
+    IN p_lu_user_id VARCHAR(50),
+    OUT p_error_code INT,
+    OUT p_error_message VARCHAR(500)
+)
+BEGIN
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        GET DIAGNOSTICS CONDITION 1
+            p_error_code = RETURNED_SQLSTATE,
+            p_error_message = MESSAGE_TEXT;
+        ROLLBACK;
+    END;
+
+    SET p_error_code = 0;
+    SET p_error_message = '';
+
+    START TRANSACTION;
+
+    UPDATE dongho 
+    SET 
+        tenDongHo = COALESCE(p_tenDongHo, tenDongHo),
+        queQuanGoc = COALESCE(p_queQuanGoc, queQuanGoc),
+        ngayThanhLap = COALESCE(p_ngayThanhLap, ngayThanhLap),
+        nguoiQuanLy = COALESCE(p_nguoiQuanLy, nguoiQuanLy),
+        ghiChu = COALESCE(p_ghiChu, ghiChu),
+        lu_updated = NOW(),
+        lu_user_id = p_lu_user_id
+    WHERE dongHoId = p_dongHoId AND active_flag = 1;
+
+    COMMIT;
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -3149,7 +3526,8 @@ BEGIN
             noiDung = p_noiDung,
             ghiChu = p_ghiChu,
             lu_updated = CURDATE(),
-            lu_user_id = p_lu_user_id
+            lu_user_id = p_lu_user_id,
+            nguoiNhapId = p_lu_user_id
         WHERE thuId = p_thuId
           AND active_flag = 1;
 
@@ -3304,4 +3682,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-12-23 22:52:49
+-- Dump completed on 2025-12-24 16:40:15
