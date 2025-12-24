@@ -8,7 +8,7 @@ const formatDateForMySQL = (date: any): string | null => {
   try {
     const d = new Date(date);
     if (isNaN(d.getTime())) return null;
-    return d.toISOString().split("T")[0]; // "2022-12-31"
+    return d.toISOString().split("T")[0];
   } catch {
     return null;
   }
@@ -18,12 +18,11 @@ const formatDateForMySQL = (date: any): string | null => {
 export class thanhVienRespository {
   constructor(private db: Database) {}
 
+  // Tạo thành viên mới - sử dụng Composite Key (tự động tăng ID theo dòng họ)
   async createThanhVien(thanhvien: thanhVien): Promise<any> {
     try {
-      const sql =
-        "CALL InsertMember(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?, @err_code, @err_msg)";
+      const sql = `CALL InsertMemberComposite(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?, @newId, @err_code, @err_msg)`;
       await this.db.query(sql, [
-        thanhvien.thanhVienId,
         thanhvien.dongHoId,
         thanhvien.hoTen,
         thanhvien.gioiTinh,
@@ -43,20 +42,42 @@ export class thanhVienRespository {
         thanhvien.chongId,
         thanhvien.nguoiTaoId,
       ]);
-      return true;
+      
+      // Lấy ID mới được tạo
+      const [result]: any = await this.db.query('SELECT @newId AS newThanhVienId', []);
+      return { success: true, thanhVienId: result[0]?.newThanhVienId };
     } catch (error: any) {
       console.log("error database => ", error);
       throw new Error(error.message);
     }
   }
 
+  // Update thành viên - cần cả dongHoId và thanhVienId (Composite Key)
   async updateMultipleThanhVien(thanhVien: thanhVien): Promise<any> {
     try {
-      const sql =
-        "CALL updateMember(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?, @err_code, @err_msg)";
+      const sql = `
+        UPDATE thanhvien SET
+          hoTen = ?,
+          gioiTinh = ?,
+          ngaySinh = ?,
+          ngayMat = ?,
+          noiSinh = ?,
+          noiMat = ?,
+          ngheNghiep = ?,
+          trinhDoHocVan = ?,
+          diaChiHienTai = ?,
+          tieuSu = ?,
+          anhChanDung = ?,
+          doiThuoc = ?,
+          chaId = ?,
+          meId = ?,
+          voId = ?,
+          chongId = ?,
+          lu_updated = NOW(),
+          lu_user_id = ?
+        WHERE dongHoId = ? AND thanhVienId = ?
+      `;
       await this.db.query(sql, [
-        thanhVien.thanhVienId,
-        thanhVien.dongHoId,
         thanhVien.hoTen,
         thanhVien.gioiTinh,
         formatDateForMySQL(thanhVien.ngaySinh),
@@ -74,6 +95,8 @@ export class thanhVienRespository {
         thanhVien.voId,
         thanhVien.chongId,
         thanhVien.lu_user_id,
+        thanhVien.dongHoId,
+        thanhVien.thanhVienId,
       ]);
       return true;
     } catch (error: any) {
@@ -82,20 +105,32 @@ export class thanhVienRespository {
     }
   }
 
-  async getThanhVienById(thanhVienId: number): Promise<any> {
+  // Lấy thành viên theo Composite Key (dongHoId + thanhVienId)
+  async getThanhVienById(dongHoId: string, thanhVienId: number): Promise<any> {
     try {
-      const sql = "CALL GetThanhVienById(?, @err_code, @err_msg)";
-      const [result] = await this.db.query(sql, [thanhVienId]);
-      return result[0];
+      const sql = `
+        SELECT tv.*, 
+          cha.hoTen AS tenCha, me.hoTen AS tenMe, 
+          vo.hoTen AS tenVo, chong.hoTen AS tenChong
+        FROM thanhvien tv
+        LEFT JOIN thanhvien cha ON tv.dongHoId = cha.dongHoId AND tv.chaId = cha.thanhVienId
+        LEFT JOIN thanhvien me ON tv.dongHoId = me.dongHoId AND tv.meId = me.thanhVienId
+        LEFT JOIN thanhvien vo ON tv.dongHoId = vo.dongHoId AND tv.voId = vo.thanhVienId
+        LEFT JOIN thanhvien chong ON tv.dongHoId = chong.dongHoId AND tv.chongId = chong.thanhVienId
+        WHERE tv.dongHoId = ? AND tv.thanhVienId = ? AND tv.active_flag = 1
+      `;
+      const [result] = await this.db.query(sql, [dongHoId, thanhVienId]);
+      return result;
     } catch (error: any) {
       throw new Error(error.message);
     }
   }
 
-  async deleteThanhVien(thanhVienId: number): Promise<any> {
+  // Xóa thành viên (soft delete) - cần Composite Key
+  async deleteThanhVien(dongHoId: string, thanhVienId: number): Promise<any> {
     try {
-      const sql = "UPDATE thanhvien SET active_flag = 0 WHERE thanhVienId = ?";
-      await this.db.query(sql, [thanhVienId]);
+      const sql = "UPDATE thanhvien SET active_flag = 0 WHERE dongHoId = ? AND thanhVienId = ?";
+      await this.db.query(sql, [dongHoId, thanhVienId]);
       return true;
     } catch (error: any) {
       console.log("error database => ", error);
@@ -158,7 +193,7 @@ export class thanhVienRespository {
     }
   }
 
-  // Import từ JSON - gọi stored procedure
+  // Import từ JSON - sử dụng procedure mới cho Composite Key
   async importFromJson(
     thanhviens: any[],
     dongHoId: string,
@@ -167,9 +202,9 @@ export class thanhVienRespository {
     const connection = await this.db.getRawConnection();
     try {
       const jsonData = JSON.stringify(thanhviens);
-      // Gọi stored procedure
+      // Gọi stored procedure mới cho Composite Key
       await connection.query(
-        'CALL ImportThanhVienFromJson(?, ?, ?, @err_code, @err_msg)',
+        'CALL ImportThanhVienFromJsonComposite(?, ?, ?, @err_code, @err_msg)',
         [jsonData, dongHoId, nguoiTaoId]
       );
 
@@ -177,7 +212,6 @@ export class thanhVienRespository {
       const [outParams]: any = await connection.query(
         'SELECT @err_code AS err_code, @err_msg AS err_msg'
       );
-      
 
       if (outParams[0].err_code !== 0 && outParams[0].err_code !== null) {
         throw new Error(outParams[0].err_msg || 'Lỗi khi import dữ liệu');

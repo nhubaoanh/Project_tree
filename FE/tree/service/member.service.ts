@@ -49,9 +49,11 @@ export const updateMember = async (id: number, data: any): Promise<any> => {
     }
 }
 
-export const deleteMember = async (id: number): Promise<any> => {
+export const deleteMember = async (id: number, dongHoId?: string): Promise<any> => {
     try {
-        const res = await apiClient.delete(`${prefix}/${id}`);
+        const res = await apiClient.delete(`${prefix}/${id}`, {
+            data: { dongHoId }
+        });
         return res?.data;
     } catch (error: any) {
         const err = parseApiError(error);

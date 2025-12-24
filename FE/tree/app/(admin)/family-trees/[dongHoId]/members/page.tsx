@@ -72,7 +72,7 @@ export default function MembersByDongHoPage() {
     });
 
     const deleteMutation = useMutation({
-        mutationFn: deleteMember,
+        mutationFn: (thanhVienId: number) => deleteMember(thanhVienId, dongHoId),
         onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["member", dongHoId] }); showSuccess("Đã xóa thành viên."); setIsDeleteModalOpen(false); setMemberToDelete(null); },
         onError: (error: any) => { showError(error.message || "Không thể xóa thành viên này."); },
     });

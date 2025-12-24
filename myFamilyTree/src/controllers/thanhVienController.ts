@@ -10,12 +10,14 @@ import { Readable } from "stream";
 @injectable()
 export class thanhVienController {
   constructor(private thanhvienService: thanhVienService) {}
+
+  // Tạo thành viên mới - dongHoId bắt buộc
   async createThanhVien(req: Request, res: Response): Promise<void> {
     try {
       const thanhvien = req.body as thanhVien;
-      // Gán dongHoId mặc định nếu chưa có
       if (!thanhvien.dongHoId) {
-        thanhvien.dongHoId = "e9022e64-cbae-11f0-8020-a8934a9bae74";
+        res.status(400).json({ message: "Thiếu dongHoId", success: false });
+        return;
       }
       const results = await this.thanhvienService.createThanhVien(thanhvien);
       res.status(200).json({
@@ -25,16 +27,22 @@ export class thanhVienController {
       });
     } catch (error: any) {
       console.log("error", error);
-      res
-        .status(500)
-        .json({ message: "Thêm thành viên thất bại", success: false });
+      res.status(500).json({ message: "Thêm thành viên thất bại", success: false });
     }
   }
 
+  // Lấy thành viên theo Composite Key (dongHoId + thanhVienId)
   async getThanhVienById(req: Request, res: Response): Promise<void> {
     try {
-      const id = parseInt(req.params.id);
-      const result = await this.thanhvienService.getThanhVienById(id);
+      const dongHoId = req.params.dongHoId || req.query.dongHoId as string;
+      const thanhVienId = parseInt(req.params.id);
+      
+      if (!dongHoId) {
+        res.status(400).json({ success: false, message: "Thiếu dongHoId" });
+        return;
+      }
+      
+      const result = await this.thanhvienService.getThanhVienById(dongHoId, thanhVienId);
       if (result) {
         res.status(200).json({ success: true, data: result });
       } else {
@@ -46,11 +54,18 @@ export class thanhVienController {
     }
   }
 
+  // Cập nhật thành viên - cần dongHoId trong body
   async updateThanhVien(req: Request, res: Response): Promise<void> {
     try {
-      const id = parseInt(req.params.id);
+      const thanhVienId = parseInt(req.params.id);
       const thanhvien = req.body as thanhVien;
-      thanhvien.thanhVienId = id;
+      thanhvien.thanhVienId = thanhVienId;
+      
+      if (!thanhvien.dongHoId) {
+        res.status(400).json({ message: "Thiếu dongHoId", success: false });
+        return;
+      }
+      
       const results = await this.thanhvienService.updateThanhVien(thanhvien);
       res.status(200).json({
         message: "Cập nhật thành viên thành công",
@@ -63,10 +78,18 @@ export class thanhVienController {
     }
   }
 
+  // Xóa thành viên - cần dongHoId
   async deleteThanhVien(req: Request, res: Response): Promise<void> {
     try {
-      const id = parseInt(req.params.id);
-      const results = await this.thanhvienService.deleteThanhVien(id);
+      const dongHoId = req.params.dongHoId || req.query.dongHoId as string || req.body.dongHoId;
+      const thanhVienId = parseInt(req.params.id);
+      
+      if (!dongHoId) {
+        res.status(400).json({ message: "Thiếu dongHoId", success: false });
+        return;
+      }
+      
+      const results = await this.thanhvienService.deleteThanhVien(dongHoId, thanhVienId);
       res.status(200).json({
         message: "Xóa thành viên thành công",
         success: true,

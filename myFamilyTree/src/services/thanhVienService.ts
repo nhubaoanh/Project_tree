@@ -15,16 +15,18 @@ export class thanhVienService {
     return await this.thanhvienRespository.createThanhVien(thanhvien);
   }
 
-  async getThanhVienById(id: number): Promise<any> {
-    return await this.thanhvienRespository.getThanhVienById(id);
+  // Lấy thành viên theo Composite Key
+  async getThanhVienById(dongHoId: string, thanhVienId: number): Promise<any> {
+    return await this.thanhvienRespository.getThanhVienById(dongHoId, thanhVienId);
   }
 
   async updateThanhVien(thanhvien: thanhVien): Promise<any> {
     return await this.thanhvienRespository.updateMultipleThanhVien(thanhvien);
   }
 
-  async deleteThanhVien(id: number): Promise<any> {
-    return await this.thanhvienRespository.deleteThanhVien(id);
+  // Xóa thành viên theo Composite Key
+  async deleteThanhVien(dongHoId: string, thanhVienId: number): Promise<any> {
+    return await this.thanhvienRespository.deleteThanhVien(dongHoId, thanhVienId);
   }
 
   async getAllThanhVien(): Promise<any> {
