@@ -14,6 +14,7 @@ import { ContributionTable } from "./components/contribuitionDownTable";
 import { ContributionUpModal } from "./components/contribuitionDownModal";
 import { createContributionDown, deleteContributionDown, searchContributionDown, updateContributionDown } from "@/service/contribuitionDown.service";
 import { IContributionDown, IsearchContributionDown } from "@/types/contribuitionDown";
+import { useToast } from "@/service/useToas";
 
 // --- MAIN PAGE COMPONENT ---
 
@@ -27,6 +28,7 @@ export default function QuanLyThanhVienPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
 
+  const { showSuccess, showError } = useToast();
   // --- MODAL STATES ---
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] =
@@ -69,11 +71,11 @@ export default function QuanLyThanhVienPage() {
     mutationFn: createContributionDown,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["contribuitionUp"] });
-      toast.success("Thêm thành viên thành công!");
+      showSuccess("Thêm thành viên thành công!");
       setIsModalOpen(false);
     },
     onError: () => {
-      toast.error("Có lỗi xảy ra khi thêm thành viên.");
+      showError("Có lỗi xảy ra khi thêm thành viên.");
     },
   });
 
@@ -82,11 +84,11 @@ export default function QuanLyThanhVienPage() {
       updateContributionDown(vars.id, vars.data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["contribuitionDown"] });
-      toast.success("Cập nhật thông tin thành công!");
+      showSuccess("Cập nhật thông tin thành công!");
       setIsModalOpen(false);
     },
     onError: () => {
-      toast.error("Có lỗi xảy ra khi cập nhật.");
+      showError("Có lỗi xảy ra khi cập nhật.");
     },
   });
 

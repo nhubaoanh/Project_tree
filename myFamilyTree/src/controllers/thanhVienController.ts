@@ -135,6 +135,48 @@ export class thanhVienController {
     }
   }
 
+  // Search thành viên theo dòng họ cụ thể
+  async searchThanhVienByDongHo(req: Request, res: Response): Promise<void> {
+    try {
+      const object = req.body as {
+        pageIndex: number;
+        pageSize: number;
+        search_content: string;
+        dongHoId: string;
+      };
+
+      if (!object.dongHoId) {
+        res.status(400).json({ message: "Thiếu dongHoId", success: false });
+        return;
+      }
+
+      const data: any = await this.thanhvienService.searchThanhVienByDongHo(
+        object.pageIndex,
+        object.pageSize,
+        object.search_content,
+        object.dongHoId
+      );
+
+      if (data) {
+        res.json({
+          totalItems: data && data.length > 0 ? data[0].RecordCount : 0,
+          page: object.pageIndex,
+          pageSize: object.pageSize,
+          data: data,
+          pageCount: Math.ceil(
+            (data && data.length > 0 ? data[0].RecordCount : 0) /
+              (object.pageSize ? object.pageSize : 1)
+          ),
+        });
+      } else {
+        res.json({ message: "Không tồn tại kết quả tìm kiếm.", success: true, data: [] });
+      }
+    } catch (error: any) {
+      console.log("error", error);
+      res.status(500).json({ message: "Tìm kiếm thành viên thất bại", success: false });
+    }
+  }
+
   // Import từ JSON (giải pháp mới - 1 transaction)
   async importFromJson(req: Request, res: Response): Promise<void> {
     try {

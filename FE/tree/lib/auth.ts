@@ -18,6 +18,12 @@ export const ALL_MENU_ITEMS: MenuItem[] = [
     roles: ["sa", "admin", "thanhvien", "user"],
   },
   {
+    name: "Gia Phả",
+    href: "/family-trees",
+    icon: "/icon/tree.png",
+    roles: ["sa", "admin", "thanhvien"],
+  },
+  {
     name: "Members",
     href: "/members",
     icon: "/icon/iconmember.png",

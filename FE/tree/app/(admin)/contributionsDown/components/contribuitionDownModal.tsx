@@ -137,7 +137,7 @@ export const ContributionUpModal: React.FC<ContributionUpModalProps> = ({
       chiId: initialData?.chiId,
       dongHoId: values.dongHoId,
       danhMucId: values.danhMucId,
-      ngayChi: values.ngayChi,
+      ngayChi: formatDateForServer(values.ngayChi) as unknown as Date,
       soTien: values.soTien,
       phuongThucThanhToan: values.phuongThucThanhToan,
       noiDung: values.noiDung,
@@ -153,6 +153,17 @@ export const ContributionUpModal: React.FC<ContributionUpModalProps> = ({
     if (!date) return "";
     const d = new Date(date);
     return isNaN(d.getTime()) ? "" : d.toISOString().split("T")[0];
+  };
+
+  // Format ngày để gửi lên server (YYYY-MM-DD)
+  const formatDateForServer = (date: any): string => {
+    if (!date) return "";
+    const d = new Date(date);
+    if (isNaN(d.getTime())) return "";
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
   };
 
   if (!isOpen) return null;

@@ -25,6 +25,7 @@ thanhVienRouter.get('/:id', thanhviencontroller.getThanhVienById.bind(thanhvienc
 thanhVienRouter.post("", thanhviencontroller.createThanhVien.bind(thanhviencontroller));
 thanhVienRouter.post("/create", thanhviencontroller.createThanhVien.bind(thanhviencontroller));
 thanhVienRouter.post('/search', thanhviencontroller.searchThanhVien.bind(thanhviencontroller));
+thanhVienRouter.post('/search-by-dongho', thanhviencontroller.searchThanhVienByDongHo.bind(thanhviencontroller));
 thanhVienRouter.post('/import-json', thanhviencontroller.importFromJson.bind(thanhviencontroller));
 thanhVienRouter.put('/:id', thanhviencontroller.updateThanhVien.bind(thanhviencontroller));
 thanhVienRouter.delete('/:id', thanhviencontroller.deleteThanhVien.bind(thanhviencontroller));

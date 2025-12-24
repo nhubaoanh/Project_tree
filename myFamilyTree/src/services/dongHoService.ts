@@ -18,4 +18,20 @@ export class dongHoService {
     async getAllDongHo():Promise<any> {
         return this.donghoRespository.getAllDongHo();
     }
+
+    async createDongHo(data: Partial<dongHo>, nguoiTaoId: string): Promise<any> {
+        return this.donghoRespository.createDongHo(data, nguoiTaoId);
+    }
+
+    async getDongHoById(dongHoId: string): Promise<any> {
+        return this.donghoRespository.getDongHoById(dongHoId);
+    }
+
+    async updateDongHo(dongHoId: string, data: Partial<dongHo>, luUserId: string): Promise<any> {
+        return this.donghoRespository.updateDongHo(dongHoId, data, luUserId);
+    }
+
+    async deleteDongHo(dongHoId: string, luUserId: string): Promise<any> {
+        return this.donghoRespository.deleteDongHo(dongHoId, luUserId);
+    }
 }

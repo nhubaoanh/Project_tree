@@ -137,6 +137,27 @@ export class thanhVienRespository {
     }
   }
 
+  // Search thành viên theo dòng họ cụ thể (dùng procedure mới)
+  async searchThanhVienByDongHo(
+    pageIndex: number,
+    pageSize: number,
+    search_content: string,
+    dongHoId: string
+  ): Promise<any[]> {
+    try {
+      const sql = "CALL SearchThanhVienByDongHo(?,?,?,?, @err_code, @err_msg)";
+      const [result] = await this.db.query(sql, [
+        pageIndex,
+        pageSize,
+        search_content || null,
+        dongHoId,
+      ]);
+      return result;
+    } catch (error: any) {
+      throw new Error(error);
+    }
+  }
+
   // Import từ JSON - gọi stored procedure
   async importFromJson(
     thanhviens: any[],

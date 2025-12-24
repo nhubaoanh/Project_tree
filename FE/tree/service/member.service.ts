@@ -71,6 +71,30 @@ export const searchMember = async (data: IMemberSearch): Promise<any> => {
     }
 }
 
+// Search member theo dongHoId cụ thể
+export const searchMemberByDongHo = async (data: IMemberSearch): Promise<any> => {
+    try {
+        const res = await apiClient.post(`${prefix}/search-by-dongho`, data);
+        return res?.data;
+    } catch (error: any) {
+        const err = parseApiError(error);
+        console.error(`[searchMemberByDongHo] ${err.message}`);
+        return { success: false, data: [], message: err.message, totalItems: 0, pageCount: 0 };
+    }
+}
+
+// Tạo member với dongHoId
+export const createMemberWithDongHo = async (data: any, dongHoId: string): Promise<any> => {
+    try {
+        const res = await apiClient.post(`${prefix}`, { ...data, dongHoId });
+        return res?.data;
+    } catch (error: any) {
+        const err = parseApiError(error);
+        console.error(`[createMemberWithDongHo] ${err.message}`);
+        throw new Error(err.message);
+    }
+}
+
 export const dowExcelTemple = async (): Promise<Blob | null> => {
     try {
         const res = await apiClient.get(`${prefix}/export-template`, {

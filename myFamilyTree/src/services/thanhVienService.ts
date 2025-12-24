@@ -47,6 +47,21 @@ export class thanhVienService {
     );
   }
 
+  // Search thành viên theo dòng họ cụ thể
+  async searchThanhVienByDongHo(
+    pageIndex: number,
+    pageSize: number,
+    search_content: string,
+    dongHoId: string
+  ): Promise<any> {
+    return await this.thanhvienRespository.searchThanhVienByDongHo(
+      pageIndex,
+      pageSize,
+      search_content,
+      dongHoId
+    );
+  }
+
   // Import từ JSON (FE đã parse Excel, gửi JSON xuống)
   async importFromJson(
     members: MemberImportData[], 

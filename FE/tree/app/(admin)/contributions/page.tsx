@@ -19,6 +19,7 @@ import { IContributionUp, IsearchContributionUp } from "@/types/contribuitionUp"
 import { ContributionTable } from "./components/contribuitionUpTable";
 import { createContributionUp, deleteContributionUp, searchContributionUp, updateContributionUp } from "@/service/contribuitionUp.service";
 import { ContributionUpModal } from "./components/contribuitionUpModal";
+import { useToast } from "@/service/useToas";
 
 // --- MAIN PAGE COMPONENT ---
 
@@ -37,6 +38,8 @@ export default function QuanLyThanhVienPage() {
   const [editingUser, setEditingUser] = useState<IContributionUp | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [contribuitionToDelete, setUserToDelete] = useState<IContributionUp | null>(null);
+
+    const { showSuccess, showError } = useToast();
 
   // --- DEBOUNCE SEARCH ---
   React.useEffect(() => {
@@ -65,14 +68,12 @@ export default function QuanLyThanhVienPage() {
   const totalPages = usersQuery.data?.pageCount || 0;
   const isLoading = usersQuery.isLoading;
 
-  console.log("Fetched Users:", userData);
-
   // --- MUTATIONS - CRUD ---
   const createMutation = useMutation({
     mutationFn: createContributionUp,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["contribuitionUp"] });
-      toast.success("Thêm thành viên thành công!");
+      showSuccess("Thêm dữ liệu đóng thành công thành công!");
       setIsModalOpen(false);
     },
     onError: () => {
@@ -84,11 +85,11 @@ export default function QuanLyThanhVienPage() {
     mutationFn: updateContributionUp,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["contribuitionUp"] });
-      toast.success("Cập nhật thông tin thành công!");
+      showSuccess("Cập nhập dữ liệu đóng thành công thành công!");
       setIsModalOpen(false);
     },
     onError: () => {
-      toast.error("Có lỗi xảy ra khi cập nhật.");
+      showError("Có lỗi xảy ra khi cập nhật.");
     },
   });
 
@@ -101,7 +102,7 @@ export default function QuanLyThanhVienPage() {
       setUserToDelete(null);
     },
     onError: () => {
-      toast.error("Không thể xóa thành viên này.");
+      showError("Không thể xóa thành viên này.");
     },
   });
 
