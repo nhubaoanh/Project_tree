@@ -171,4 +171,47 @@ export class nguoiDungReponsitory {
       throw new Error(error.message);
     }
   }
+
+  /**
+   * Lấy danh sách quyền của user từ stored procedure GetUserPermissions
+   */
+  async getUserPermissions(nguoiDungId: string): Promise<any[]> {
+    try {
+      const sql = "CALL GetUserPermissions(?)";
+      const results = await this.db.query(sql, [nguoiDungId]);
+      console.log("getUserPermissions results:", results);
+      return Array.isArray(results) ? results : [];
+    } catch (error: any) {
+      console.error("getUserPermissions error:", error.message);
+      return [];
+    }
+  }
+
+  /**
+   * Lấy menu + quyền theo roleId
+   */
+  async getMenuByRoleId(roleId: string): Promise<any[]> {
+    try {
+      const sql = "CALL GetMenuByRoleId(?)";
+      const results = await this.db.query(sql, [roleId]);
+      console.log("getMenuByRoleId raw results:", JSON.stringify(results, null, 2));
+      
+      // Stored procedure trả về [[rows], OkPacket], cần lấy results[0] hoặc results trực tiếp
+      // Kiểm tra nếu results[0] là array thì đó là data
+      if (Array.isArray(results) && results.length > 0) {
+        // Nếu results[0] là array (nested), lấy results[0]
+        if (Array.isArray(results[0])) {
+          console.log("getMenuByRoleId - nested array, returning results[0]:", results[0]);
+          return results[0];
+        }
+        // Nếu results[0] là object (flat), trả về results
+        console.log("getMenuByRoleId - flat array, returning results:", results);
+        return results;
+      }
+      return [];
+    } catch (error: any) {
+      console.error("getMenuByRoleId error:", error.message);
+      return [];
+    }
+  }
 }

@@ -1,3 +1,14 @@
+// Menu item từ DB
+interface MenuItem {
+  code: string;
+  name: string;
+  href: string;
+  icon: string;
+  sortOrder: number;
+  parentId?: string;
+  actions: string[];
+}
+
 interface UserData {
   nguoiDungId: string;
   first_name?: string;
@@ -13,8 +24,10 @@ interface UserData {
   roleId?: string;
   roleCode?: string;
   online_flag?: number;
-  functions?: any[]; // Cây menu
-  actions?: string[]; // Quyền thao tác
+  // Menu và permissions từ DB
+  menus?: MenuItem[];
+  permissions?: Record<string, string[]>;
+  canSelectAllDongHo?: boolean;
 }
 
 const storagePrefix = "BA_";
@@ -52,45 +65,49 @@ const storage = {
       localStorage.removeItem(`${storagePrefix}user`);
     }
   },
+
   clearAll: () => {
     if (typeof window !== "undefined") {
       localStorage.removeItem(`${storagePrefix}token`);
+      localStorage.removeItem(`${storagePrefix}user`);
     }
-  }, // GET FUNCTIONS (Menu Tree)
-  getFunctions: (): any[] => {
+  },
+
+  // GET MENUS - Lấy danh sách menu từ DB
+  getMenus: (): MenuItem[] => {
     const user = storage.getUser();
-    return user?.functions || [];
+    return user?.menus || [];
   },
 
-  // GET ACTIONS
-  getActions: (): string[] => {
+  // GET PERMISSIONS - Lấy permissions map
+  getPermissions: (): Record<string, string[]> => {
     const user = storage.getUser();
-    return user?.actions || [];
-  },
-  hasPermission: (functionCode: string): boolean => {
-    const functions = storage.getFunctions();
-
-    const checkFunction = (funcs: any[]): boolean => {
-      for (const func of funcs) {
-        if (func.function_code === functionCode) {
-          return true;
-        }
-        if (func.children && func.children.length > 0) {
-          if (checkFunction(func.children)) {
-            return true;
-          }
-        }
-      }
-      return false;
-    };
-
-    return checkFunction(functions);
+    return user?.permissions || {};
   },
 
-  // CHECK ACTION
-  hasAction: (actionCode: string): boolean => {
-    const actions = storage.getActions();
-    return actions.includes(actionCode);
+  // CHECK PERMISSION - Kiểm tra quyền trên chức năng
+  checkPermission: (chucNangCode: string, thaoTacCode: string): boolean => {
+    const permissions = storage.getPermissions();
+    const actions = permissions[chucNangCode];
+    return actions ? actions.includes(thaoTacCode) : false;
+  },
+
+  // CAN SELECT ALL DONG HO - Có quyền chọn tất cả dòng họ không
+  canSelectAllDongHo: (): boolean => {
+    const user = storage.getUser();
+    return user?.canSelectAllDongHo === true;
+  },
+
+  // CHECK CAN ACCESS ROUTE - Kiểm tra có quyền truy cập route không
+  canAccessRoute: (pathname: string): boolean => {
+    const menus = storage.getMenus();
+    // Tìm menu item có href match với pathname
+    const menuItem = menus.find(
+      (item) => pathname === item.href || pathname.startsWith(item.href + "/")
+    );
+    // Nếu tìm thấy menu item => có quyền
+    // Nếu không tìm thấy => cho phép (có thể là trang public)
+    return menuItem !== undefined || menus.length === 0;
   },
 };
 

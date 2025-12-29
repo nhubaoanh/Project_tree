@@ -38,19 +38,20 @@ const getClientIP = (req: Request): string => {
 // ============================================================================
 /**
  * Áp dụng cho: Tất cả routes
- * Giới hạn: 100 requests / 15 phút / IP
+ * Giới hạn: 500 requests / 15 phút / IP
  *
- * Tại sao 100/15 phút?
- * - User bình thường: ~20-30 requests/15 phút
- * - Cho phép gấp 3-4 lần để không ảnh hưởng UX
- * - Đủ thấp để chặn bot spam
+ * Tại sao 500/15 phút?
+ * - Dashboard có thể load 10-20 API cùng lúc
+ * - User navigate nhiều trang, mỗi trang load data
+ * - Cho phép đủ cho UX mượt mà
+ * - Vẫn đủ thấp để chặn bot spam
  */
 export const generalLimiter = rateLimit({
   // Cửa sổ thời gian: 15 phút (tính bằng milliseconds)
   windowMs: 15 * 60 * 1000,
 
   // Số request tối đa trong cửa sổ thời gian
-  max: 100,
+  max: 500,
 
   // Message trả về khi vượt giới hạn
   message: {
@@ -80,10 +81,8 @@ export const generalLimiter = rateLimit({
  * - Không có limit: Thử 1000 lần/giây → 17 phút là xong
  * - Có limit 5/15 phút: Cần 50 năm để thử hết!
  *
- * skipSuccessfulRequests: true
- * - Chỉ đếm request THẤT BẠI
- * - Login thành công không bị đếm
- * - User nhập đúng mật khẩu vẫn vào được bình thường
+ * LƯU Ý: Đếm TẤT CẢ request, không chỉ request thất bại
+ * Vì controller có thể trả về status 200 với success: false
  */
 export const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 phút
@@ -97,10 +96,18 @@ export const loginLimiter = rateLimit({
 
   standardHeaders: true,
   legacyHeaders: false,
-  keyGenerator: getClientIP,
 
-  // QUAN TRỌNG: Chỉ đếm request thất bại
-  skipSuccessfulRequests: true,
+  // Block theo TÀI KHOẢN + IP (kết hợp cả 2 để bảo mật hơn)
+  // - Cùng IP, khác tài khoản: Không bị block lẫn nhau
+  // - Cùng tài khoản, khác IP: Mỗi IP có limit riêng
+  keyGenerator: (req: Request): string => {
+    const ip = getClientIP(req);
+    const username = req.body?.tenDangNhap || "unknown";
+    return `${ip}:${username}`;
+  },
+
+  // Đếm TẤT CẢ request (không dùng skipSuccessfulRequests)
+  // Vì controller trả về 200 với success: false khi sai mật khẩu
 });
 
 // ============================================================================

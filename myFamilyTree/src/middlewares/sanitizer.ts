@@ -215,9 +215,8 @@ export const sanitizeBody = (
 /**
  * Làm sạch req.query (data từ URL: ?search=xxx&page=1)
  *
- * Ví dụ:
- * - URL: /api/users?search=<script>hack</script>
- * - Sau sanitize: req.query.search = ""
+ * Lưu ý: Express 5 req.query là read-only, không thể gán trực tiếp
+ * Nên chỉ sanitize từng property thay vì gán lại object
  */
 export const sanitizeQuery = (
   req: Request,
@@ -225,7 +224,13 @@ export const sanitizeQuery = (
   next: NextFunction
 ) => {
   if (req.query && typeof req.query === "object") {
-    req.query = sanitizeValue(req.query);
+    // Sanitize từng property thay vì gán lại object (Express 5 compatibility)
+    for (const key of Object.keys(req.query)) {
+      const value = req.query[key];
+      if (typeof value === "string") {
+        (req.query as any)[key] = sanitizeValue(value);
+      }
+    }
   }
   next();
 };
@@ -236,9 +241,8 @@ export const sanitizeQuery = (
 /**
  * Làm sạch req.params (data từ URL path: /users/:id)
  *
- * Ví dụ:
- * - URL: /api/users/<script>hack</script>
- * - Sau sanitize: req.params.id = ""
+ * Lưu ý: Express 5 req.params có thể là read-only
+ * Nên chỉ sanitize từng property
  */
 export const sanitizeParams = (
   req: Request,
@@ -246,7 +250,12 @@ export const sanitizeParams = (
   next: NextFunction
 ) => {
   if (req.params && typeof req.params === "object") {
-    req.params = sanitizeValue(req.params);
+    for (const key of Object.keys(req.params)) {
+      const value = req.params[key];
+      if (typeof value === "string") {
+        (req.params as any)[key] = sanitizeValue(value);
+      }
+    }
   }
   next();
 };

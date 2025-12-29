@@ -323,11 +323,19 @@ export const paginationRules = [
   body("page")
     .optional()
     .isInt({ min: 1 })
-    .withMessage("page phải là số nguyên >= 1"),
+    .withMessage("page phải là số /* nguyên */ >= 1"),
+  body("pageIndex")
+    .optional()
+    .isInt({ min: 0 })
+    .withMessage("pageIndex phải là số nguyên >= 0"),
   body("limit")
     .optional()
     .isInt({ min: 1, max: 100 })
     .withMessage("limit phải từ 1 đến 100"),
+  body("pageSize")
+    .optional()
+    .isInt({ min: 1, max: 100 })
+    .withMessage("pageSize phải từ 1 đến 100"),
 ];
 
 // ============================================================================

@@ -14,10 +14,9 @@ taiChinhThuRouter.use((err: any, req: any, res: any, next: any) => {
   next();
 });
 
-taiChinhThuRouter.use((req, res, next) => {
-  next();
-});
 const TaiChinhThuController = container.resolve(taiChinhThuController);
+
+// Áp dụng enforceDongHo
 
 taiChinhThuRouter.post(
   "/search",

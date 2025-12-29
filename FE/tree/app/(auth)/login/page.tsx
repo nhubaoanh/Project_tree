@@ -81,6 +81,10 @@ export default function LoginPage() {
             roleId: userData.roleId,
             roleCode: userData.roleCode,
             online_flag: userData.online_flag,
+            // Menu và permissions từ DB
+            menus: userData.menus,
+            permissions: userData.permissions,
+            canSelectAllDongHo: userData.canSelectAllDongHo,
           });
         }
 

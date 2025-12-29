@@ -2,6 +2,8 @@
 import React, { useState, useEffect } from "react";
 import { X, Loader2 } from "lucide-react";
 import { ITinTuc } from "@/service/tintuc.service";
+import { FormRules, validateForm, validateField } from "@/lib/validator";
+import { useToast } from "@/service/useToas";
 
 interface TinTucModalProps {
   isOpen: boolean;
@@ -11,6 +13,15 @@ interface TinTucModalProps {
   isLoading: boolean;
 }
 
+// Validation rules
+const tinTucRules: FormRules = {
+  tieuDe: { label: "Tiêu đề", rules: ["required", { min: 5 }, { max: 200 }] },
+  tacGia: { label: "Tác giả", rules: ["fullName"] },
+  tomTat: { label: "Tóm tắt", rules: [{ max: 500 }] },
+  noiDung: { label: "Nội dung", rules: [{ max: 10000 }] },
+  anhDaiDien: { label: "Ảnh đại diện", rules: ["url"] },
+};
+
 export function TinTucModal({
   isOpen,
   onClose,
@@ -18,6 +29,8 @@ export function TinTucModal({
   initialData,
   isLoading,
 }: TinTucModalProps) {
+  const { showError } = useToast();
+  
   const [formData, setFormData] = useState<Partial<ITinTuc>>({
     tieuDe: "",
     noiDung: "",
@@ -26,35 +39,60 @@ export function TinTucModal({
     tacGia: "",
     ghim: 0,
   });
+  const [errors, setErrors] = useState<Record<string, string | null>>({});
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
-    if (initialData) {
+    if (isOpen) {
       setFormData({
-        tieuDe: initialData.tieuDe || "",
-        noiDung: initialData.noiDung || "",
-        tomTat: initialData.tomTat || "",
-        anhDaiDien: initialData.anhDaiDien || "",
-        tacGia: initialData.tacGia || "",
-        ghim: initialData.ghim || 0,
+        tieuDe: initialData?.tieuDe || "",
+        noiDung: initialData?.noiDung || "",
+        tomTat: initialData?.tomTat || "",
+        anhDaiDien: initialData?.anhDaiDien || "",
+        tacGia: initialData?.tacGia || "",
+        ghim: initialData?.ghim || 0,
       });
-    } else {
-      setFormData({
-        tieuDe: "",
-        noiDung: "",
-        tomTat: "",
-        anhDaiDien: "",
-        tacGia: "",
-        ghim: 0,
-      });
+      setErrors({});
+      setTouched({});
     }
   }, [initialData, isOpen]);
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    let newValue: string = value;
+    
+    // Chặn nhập số vào field tác giả
+    if (name === "tacGia") {
+      newValue = value.replace(/\d/g, "");
+    }
+    
+    setFormData((prev) => ({ ...prev, [name]: newValue }));
+    
+    if (touched[name]) {
+      const error = validateField(name, newValue, tinTucRules, formData);
+      setErrors((prev) => ({ ...prev, [name]: error }));
+    }
+  };
+
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setTouched((prev) => ({ ...prev, [name]: true }));
+    const error = validateField(name, value, tinTucRules, formData);
+    setErrors((prev) => ({ ...prev, [name]: error }));
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.tieuDe?.trim()) {
-      alert("Vui lòng nhập tiêu đề");
+    
+    const { isValid, errors: formErrors } = validateForm(formData, tinTucRules);
+    setErrors(formErrors);
+    setTouched(Object.keys(tinTucRules).reduce((acc, key) => ({ ...acc, [key]: true }), {}));
+    
+    if (!isValid) {
+      showError("Vui lòng kiểm tra lại thông tin!");
       return;
     }
+    
     onSubmit(formData);
   };
 
@@ -79,33 +117,54 @@ export function TinTucModal({
             </label>
             <input
               type="text"
-              value={formData.tieuDe}
-              onChange={(e) => setFormData({ ...formData, tieuDe: e.target.value })}
-              className="w-full px-3 py-2 border border-[#d4af37] rounded focus:outline-none focus:ring-2 focus:ring-[#d4af37]/50"
+              name="tieuDe"
+              value={formData.tieuDe || ""}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              className={`w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#d4af37]/50 ${
+                touched.tieuDe && errors.tieuDe ? "border-red-500" : "border-[#d4af37]"
+              }`}
               placeholder="Nhập tiêu đề tin tức"
             />
+            {touched.tieuDe && errors.tieuDe && (
+              <p className="text-red-500 text-xs mt-1">{errors.tieuDe}</p>
+            )}
           </div>
 
           <div>
             <label className="block text-sm font-medium text-[#5d4037] mb-1">Tóm tắt</label>
             <textarea
-              value={formData.tomTat}
-              onChange={(e) => setFormData({ ...formData, tomTat: e.target.value })}
+              name="tomTat"
+              value={formData.tomTat || ""}
+              onChange={handleChange}
+              onBlur={handleBlur}
               rows={2}
-              className="w-full px-3 py-2 border border-[#d4af37] rounded focus:outline-none focus:ring-2 focus:ring-[#d4af37]/50"
+              className={`w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#d4af37]/50 ${
+                touched.tomTat && errors.tomTat ? "border-red-500" : "border-[#d4af37]"
+              }`}
               placeholder="Tóm tắt ngắn gọn nội dung"
             />
+            {touched.tomTat && errors.tomTat && (
+              <p className="text-red-500 text-xs mt-1">{errors.tomTat}</p>
+            )}
           </div>
 
           <div>
             <label className="block text-sm font-medium text-[#5d4037] mb-1">Nội dung</label>
             <textarea
-              value={formData.noiDung}
-              onChange={(e) => setFormData({ ...formData, noiDung: e.target.value })}
+              name="noiDung"
+              value={formData.noiDung || ""}
+              onChange={handleChange}
+              onBlur={handleBlur}
               rows={6}
-              className="w-full px-3 py-2 border border-[#d4af37] rounded focus:outline-none focus:ring-2 focus:ring-[#d4af37]/50"
+              className={`w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#d4af37]/50 ${
+                touched.noiDung && errors.noiDung ? "border-red-500" : "border-[#d4af37]"
+              }`}
               placeholder="Nội dung chi tiết của tin tức"
             />
+            {touched.noiDung && errors.noiDung && (
+              <p className="text-red-500 text-xs mt-1">{errors.noiDung}</p>
+            )}
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -113,21 +172,35 @@ export function TinTucModal({
               <label className="block text-sm font-medium text-[#5d4037] mb-1">Tác giả</label>
               <input
                 type="text"
-                value={formData.tacGia}
-                onChange={(e) => setFormData({ ...formData, tacGia: e.target.value })}
-                className="w-full px-3 py-2 border border-[#d4af37] rounded focus:outline-none focus:ring-2 focus:ring-[#d4af37]/50"
-                placeholder="Tên tác giả"
+                name="tacGia"
+                value={formData.tacGia || ""}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                className={`w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#d4af37]/50 ${
+                  touched.tacGia && errors.tacGia ? "border-red-500" : "border-[#d4af37]"
+                }`}
+                placeholder="Tên tác giả (không nhập số)"
               />
+              {touched.tacGia && errors.tacGia && (
+                <p className="text-red-500 text-xs mt-1">{errors.tacGia}</p>
+              )}
             </div>
             <div>
               <label className="block text-sm font-medium text-[#5d4037] mb-1">Ảnh đại diện</label>
               <input
                 type="text"
-                value={formData.anhDaiDien}
-                onChange={(e) => setFormData({ ...formData, anhDaiDien: e.target.value })}
-                className="w-full px-3 py-2 border border-[#d4af37] rounded focus:outline-none focus:ring-2 focus:ring-[#d4af37]/50"
+                name="anhDaiDien"
+                value={formData.anhDaiDien || ""}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                className={`w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#d4af37]/50 ${
+                  touched.anhDaiDien && errors.anhDaiDien ? "border-red-500" : "border-[#d4af37]"
+                }`}
                 placeholder="URL ảnh đại diện"
               />
+              {touched.anhDaiDien && errors.anhDaiDien && (
+                <p className="text-red-500 text-xs mt-1">{errors.anhDaiDien}</p>
+              )}
             </div>
           </div>
 

@@ -23,7 +23,8 @@ export class nguoiDungService {
   async loginUser(tenDangNhap: string, matKhau: string): Promise<any> {
     const md5_pass = md5(matKhau);
     const user = await this.nguoidungResponsitory.LoginUser(tenDangNhap);
-    if (user) {
+    console.log(md5_pass)
+    if (user && user.matKhau === md5_pass) {
       return {
         nguoiDungId: user.nguoiDungId,
         first_name: user.first_name,
@@ -115,6 +116,57 @@ export class nguoiDungService {
     let user_data = verifyToken(token);
     if (user_data == null) throw new Error("Phien dang nhap het han.")
     
+    console.log("authrize - user_data:", user_data);
+    console.log("authrize - roleId:", user_data.roleId);
+    
+    // Lấy menu + quyền từ DB theo roleId
+    const menuList = await this.nguoidungResponsitory.getMenuByRoleId(user_data.roleId);
+    console.log("authrize - menuList:", menuList);
+    
+    // Chuyển đổi thành format cho frontend
+    const menus: any[] = [];
+    const permissions: Record<string, string[]> = {};
+    let canSelectAllDongHo = false;
+    
+    // Log để debug field names
+    if (menuList.length > 0) {
+      console.log("authrize - first item keys:", Object.keys(menuList[0]));
+      console.log("authrize - first item:", menuList[0]);
+    }
+    
+    menuList.forEach((item: any) => {
+      // Stored procedure trả về: chucNangId, code, name, href, icon, sortOrder, parentId, actions, roleCode, canSelectAllDongHo
+      const code = item.code || item.chucNangCode;
+      const name = item.name || item.tenChucNang;
+      const href = item.href || item.duongDan;
+      const icon = item.icon || '/icon/default.png';
+      const sortOrder = item.sortOrder || item.thuTu || 0;
+      const parentId = item.parentId || null;
+      const actions = item.actions ? item.actions.split(',') : [];
+      
+      // Build menu item
+      menus.push({
+        code,
+        name,
+        href,
+        icon,
+        sortOrder,
+        parentId,
+        actions,
+      });
+      
+      // Build permissions map
+      if (code) {
+        permissions[code] = actions;
+      }
+      
+      // Check canSelectAllDongHo
+      if (item.canSelectAllDongHo === 1) canSelectAllDongHo = true;
+    });
+    
+    console.log("authrize - menus:", menus);
+    console.log("authrize - permissions:", permissions);
+    
     let data = {
       nguoiDungId: user_data.nguoiDungId,
       first_name: user_data.first_name,
@@ -131,6 +183,10 @@ export class nguoiDungService {
       roleId: user_data.roleId,
       roleCode: user_data.roleCode,
       online_flag: user_data.online_flag,
+      // Thêm menu và permissions
+      menus: menus,
+      permissions: permissions,
+      canSelectAllDongHo: canSelectAllDongHo,
     };
     return data;
   }
@@ -163,5 +219,19 @@ export class nguoiDungService {
 
   async deleteUser(list_json: any, updated_by_id: string): Promise<any> {
     return this.nguoidungResponsitory.deleteUser(list_json, updated_by_id);
+  }
+
+  /**
+   * Lấy danh sách quyền của user
+   */
+  async getUserPermissions(nguoiDungId: string): Promise<any[]> {
+    return this.nguoidungResponsitory.getUserPermissions(nguoiDungId);
+  }
+
+  /**
+   * Lấy menu + quyền theo roleId
+   */
+  async getMenuByRoleId(roleId: string): Promise<any[]> {
+    return this.nguoidungResponsitory.getMenuByRoleId(roleId);
   }
 }

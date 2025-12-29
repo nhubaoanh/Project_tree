@@ -166,7 +166,7 @@ CREATE TABLE `nguoidung` (
 
 LOCK TABLES `nguoidung` WRITE;
 /*!40000 ALTER TABLE `nguoidung` DISABLE KEYS */;
-INSERT INTO `nguoidung` VALUES ('15e5e9b2-b293-4f18-b0f4-86548bbda3b0','e9022e64-cbae-11f0-8020-a8934a9bae74','0aa1a174-c8ed-11f0-8020-a8934a9bae74','nguyenvanbao123@gmail.com','ee2a39ced74bf7f6aa36bef85067aa9a','2025-12-19 11:22:31',0,1,NULL,'2025-12-19 15:50:27',NULL),('61ef80c1-d2fa-4675-9323-bec58d33ed19','e9022e64-cbae-11f0-8020-a8934a9bae74','0aa1a174-c8ed-11f0-8020-a8934a9bae74','nhubaoanh221@gmail.com','bc9ae919caed0fc37d2db4f70f19c45e','2025-12-22 21:27:02',0,1,'89fd6f88-c909-11f0-8020-a8934a9bae74','2025-12-22 21:27:02','89fd6f88-c909-11f0-8020-a8934a9bae74'),('6aa26582-bd12-4fdb-95d8-4e09fdb2f102','e9022e64-cbae-11f0-8020-a8934a9bae74','0aa1a174-c8ed-11f0-8020-a8934a9bae74','minh123@gmail.com','ddc83bf88c241349a4211172137545e0','2025-12-22 21:16:56',0,1,NULL,'2025-12-22 21:16:56',NULL),('77f83890-6765-4c19-8139-31a29071fac3','e9022e64-cbae-11f0-8020-a8934a9bae74','0aa1a174-c8ed-11f0-8020-a8934a9bae74','baoanh222@gmail.com','3a9df786cd4b24e2ff195aea08e654ea','2025-11-27 23:34:46',0,1,'c2ed095e-c905-11f0-8020-a8934a9bae74','2025-12-02 17:20:04',NULL),('89fd6f88-c909-11f0-8020-a8934a9bae74','e9022e64-cbae-11f0-8020-a8934a9bae74','c2ed095e-c905-11f0-8020-a8934a9bae74','nhubaoanh111@gmail.com','0192023a7bbd73250516f069df18b500','2025-11-24 14:45:25',1,1,'admin','2025-12-03 10:00:08',NULL),('a20a6246-4800-4992-af5c-adcd6e898ee6','e9022e64-cbae-11f0-8020-a8934a9bae74','0aa1a174-c8ed-11f0-8020-a8934a9bae74','minh111@gmail.com','d9d706df20df775493eb3ba05e65c57f','2025-12-19 15:51:04',0,0,NULL,'2025-12-19 22:06:29','system'),('b9b116b0-3d3c-4187-b1a9-fd8247274d64','e9022e64-cbae-11f0-8020-a8934a9bae74','0aa1a174-c8ed-11f0-8020-a8934a9bae74','nguyenvanbao222@gmail.com','014663e57b654fd69a2352969e57e2e6','2025-12-22 21:11:25',0,1,NULL,'2025-12-22 21:11:25',NULL);
+INSERT INTO `nguoidung` VALUES ('15e5e9b2-b293-4f18-b0f4-86548bbda3b0','e9022e64-cbae-11f0-8020-a8934a9bae74','0aa1a174-c8ed-11f0-8020-a8934a9bae74','nguyenvanbao123@gmail.com','ee2a39ced74bf7f6aa36bef85067aa9a','2025-12-19 11:22:31',0,1,NULL,'2025-12-19 15:50:27',NULL),('61ef80c1-d2fa-4675-9323-bec58d33ed19','e9022e64-cbae-11f0-8020-a8934a9bae74','0aa1a174-c8ed-11f0-8020-a8934a9bae74','nhubaoanh221@gmail.com','bc9ae919caed0fc37d2db4f70f19c45e','2025-12-22 21:27:02',0,1,'89fd6f88-c909-11f0-8020-a8934a9bae74','2025-12-22 21:27:02','89fd6f88-c909-11f0-8020-a8934a9bae74'),('6aa26582-bd12-4fdb-95d8-4e09fdb2f102','e9022e64-cbae-11f0-8020-a8934a9bae74','c2ed095e-c905-11f0-8020-a8934a9bae74','minh123@gmail.com','ddc83bf88c241349a4211172137545e0','2025-12-22 21:16:56',0,1,NULL,'2025-12-22 21:16:56',NULL),('77f83890-6765-4c19-8139-31a29071fac3','e9022e64-cbae-11f0-8020-a8934a9bae74','0aa1a174-c8ed-11f0-8020-a8934a9bae74','baoanh222@gmail.com','3a9df786cd4b24e2ff195aea08e654ea','2025-11-27 23:34:46',0,1,'c2ed095e-c905-11f0-8020-a8934a9bae74','2025-12-02 17:20:04',NULL),('89fd6f88-c909-11f0-8020-a8934a9bae74','e9022e64-cbae-11f0-8020-a8934a9bae74','c2ed095e-c905-11f0-8020-a8934a9bae74','nhubaoanh111@gmail.com','0192023a7bbd73250516f069df18b500','2025-11-24 14:45:25',1,1,'admin','2025-12-03 10:00:08',NULL),('a20a6246-4800-4992-af5c-adcd6e898ee6','e9022e64-cbae-11f0-8020-a8934a9bae74','0aa1a174-c8ed-11f0-8020-a8934a9bae74','minh111@gmail.com','d9d706df20df775493eb3ba05e65c57f','2025-12-19 15:51:04',0,0,NULL,'2025-12-19 22:06:29','system'),('b9b116b0-3d3c-4187-b1a9-fd8247274d64','e9022e64-cbae-11f0-8020-a8934a9bae74','0aa1a174-c8ed-11f0-8020-a8934a9bae74','nguyenvanbao222@gmail.com','014663e57b654fd69a2352969e57e2e6','2025-12-22 21:11:25',0,1,NULL,'2025-12-22 21:11:25',NULL);
 /*!40000 ALTER TABLE `nguoidung` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -374,23 +374,22 @@ DROP TABLE IF EXISTS `tailieu`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `tailieu` (
   `taiLieuId` varchar(50) NOT NULL,
-  `thanhVienId` int DEFAULT NULL,
-  `suKienId` varchar(50) DEFAULT NULL,
-  `nguoiTaiLenId` varchar(50) DEFAULT NULL,
-  `tenTaiLieu` varchar(255) DEFAULT NULL,
+  `dongHoId` varchar(50) DEFAULT NULL,
+  `tenTaiLieu` varchar(255) NOT NULL,
   `duongDan` varchar(255) DEFAULT NULL,
   `moTa` text,
+  `loaiTaiLieu` varchar(100) DEFAULT NULL,
+  `namSangTac` int DEFAULT NULL,
+  `tacGia` varchar(255) DEFAULT NULL,
+  `nguonGoc` varchar(255) DEFAULT NULL,
+  `ghiChu` text,
   `ngayTaiLen` date DEFAULT NULL,
-  `active_flag` tinyint DEFAULT NULL,
+  `active_flag` tinyint DEFAULT '1',
   `nguoiTaoId` varchar(50) DEFAULT NULL,
   `lu_updated` datetime DEFAULT NULL,
   `lu_user_id` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`taiLieuId`),
-  KEY `thanhVienId` (`thanhVienId`),
-  KEY `suKienId` (`suKienId`),
-  KEY `nguoiTaiLenId` (`nguoiTaiLenId`),
-  CONSTRAINT `tailieu_ibfk_2` FOREIGN KEY (`suKienId`) REFERENCES `sukien` (`suKienId`) ON DELETE SET NULL,
-  CONSTRAINT `tailieu_ibfk_3` FOREIGN KEY (`nguoiTaiLenId`) REFERENCES `nguoidung` (`nguoiDungId`) ON DELETE SET NULL
+  KEY `idx_tailieu_dongho` (`dongHoId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -400,6 +399,7 @@ CREATE TABLE `tailieu` (
 
 LOCK TABLES `tailieu` WRITE;
 /*!40000 ALTER TABLE `tailieu` DISABLE KEYS */;
+INSERT INTO `tailieu` VALUES ('c3fa16f6-853a-44ce-8edd-c5f65b52c63e','e9022e64-cbae-11f0-8020-a8934a9bae74','Cúng tổ họ',NULL,'đây là là một trong những trtuyeenf thống tốt đẹp của ông cha ta ','Văn bản cổ',1930,'Nhữ Bảo Anh','tại nhà thờ','yêu nước','2025-12-29',1,NULL,'2025-12-29 16:45:15',NULL),('TL001','e9022e64-cbae-11f0-8020-a8934a9bae74','Gia phả dòng họ - Bản gốc',NULL,'Gia phả ghi chép từ đời thứ nhất đến đời thứ 5 của dòng họ. Bản viết tay bằng chữ Hán Nôm, được lưu giữ cẩn thận qua nhiều thế hệ.','Gia phả',1920,'Cụ tổ đời thứ 5','Lưu trữ tại nhà thờ họ',NULL,'2025-12-29',1,NULL,NULL,NULL),('TL002','e9022e64-cbae-11f0-8020-a8934a9bae74','Sắc phong triều Nguyễn',NULL,'Sắc phong của vua Tự Đức ban cho cụ tổ năm 1865, ghi nhận công lao đóng góp cho triều đình.','Sắc phong',1865,'Triều đình nhà Nguyễn','Lưu trữ tại bảo tàng tỉnh',NULL,'2025-12-29',1,NULL,NULL,NULL),('TL003','e9022e64-cbae-11f0-8020-a8934a9bae74','Hình ảnh nhà thờ họ xưa',NULL,'Bộ ảnh chụp nhà thờ họ từ năm 1950, ghi lại kiến trúc cổ trước khi được tu bổ.','Hình ảnh',1950,'Không rõ','Sưu tầm từ gia đình',NULL,'2025-12-29',1,NULL,NULL,NULL),('TL004','e9022e64-cbae-11f0-8020-a8934a9bae74','Văn tế tổ tiên',NULL,'Bài văn tế được đọc trong các dịp giỗ tổ, lễ tết. Nội dung ca ngợi công đức tổ tiên.','Văn bản cổ',1900,'Cụ tổ đời thứ 4','Truyền khẩu trong dòng họ',NULL,'2025-12-29',1,NULL,NULL,NULL),('TL005','e9022e64-cbae-11f0-8020-a8934a9bae74','Gia phả bổ sung - Đời 6 đến 10',NULL,'Phần bổ sung gia phả, ghi chép các đời từ thứ 6 đến thứ 10 của dòng họ.','Gia phả',1980,'Ông Nguyễn Văn B','Biên soạn mới',NULL,'2025-12-29',1,NULL,NULL,NULL),('TL006','e9022e64-cbae-11f0-8020-a8934a9bae74','Hình ảnh lễ giỗ tổ 2020',NULL,'Bộ ảnh ghi lại lễ giỗ tổ năm 2020 với sự tham gia của hơn 200 con cháu.','Hình ảnh',2020,'Ban tổ chức','Chụp tại lễ giỗ tổ',NULL,'2025-12-29',1,NULL,NULL,NULL);
 /*!40000 ALTER TABLE `tailieu` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -527,6 +527,45 @@ CREATE TABLE `thongbao` (
 LOCK TABLES `thongbao` WRITE;
 /*!40000 ALTER TABLE `thongbao` DISABLE KEYS */;
 /*!40000 ALTER TABLE `thongbao` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `tintuc`
+--
+
+DROP TABLE IF EXISTS `tintuc`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `tintuc` (
+  `tinTucId` varchar(50) NOT NULL,
+  `dongHoId` varchar(50) NOT NULL,
+  `tieuDe` varchar(255) NOT NULL,
+  `noiDung` text,
+  `tomTat` varchar(500) DEFAULT NULL,
+  `anhDaiDien` varchar(255) DEFAULT NULL,
+  `tacGia` varchar(255) DEFAULT NULL,
+  `ngayDang` datetime DEFAULT CURRENT_TIMESTAMP,
+  `luotXem` int DEFAULT '0',
+  `ghim` tinyint DEFAULT '0',
+  `active_flag` tinyint DEFAULT '1',
+  `nguoiTaoId` varchar(50) DEFAULT NULL,
+  `lu_updated` datetime DEFAULT NULL,
+  `lu_user_id` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`tinTucId`),
+  KEY `idx_tintuc_dongho` (`dongHoId`),
+  KEY `idx_tintuc_ngaydang` (`ngayDang`),
+  CONSTRAINT `fk_tintuc_dongho` FOREIGN KEY (`dongHoId`) REFERENCES `dongho` (`dongHoId`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `tintuc`
+--
+
+LOCK TABLES `tintuc` WRITE;
+/*!40000 ALTER TABLE `tintuc` DISABLE KEYS */;
+INSERT INTO `tintuc` VALUES ('TT001','e9022e64-cbae-11f0-8020-a8934a9bae74','Thông báo họp họ cuối năm 2025','Kính mời toàn thể bà con trong dòng họ tham dự buổi họp họ cuối năm 2025. Thời gian: 10h ngày 28/12/2025. Địa điểm: Nhà thờ họ. Nội dung: Tổng kết hoạt động năm 2025, kế hoạch năm 2026, trao học bổng cho con cháu học giỏi.','Thông báo họp họ cuối năm 2025 tại nhà thờ họ',NULL,'Ban quản lý dòng họ','2025-12-29 16:02:10',0,1,1,NULL,NULL,NULL),('TT002','e9022e64-cbae-11f0-8020-a8934a9bae74','Chúc mừng cháu Nguyễn Văn A đỗ đại học','Dòng họ xin chúc mừng cháu Nguyễn Văn A đã xuất sắc đỗ vào trường Đại học Bách Khoa Hà Nội năm 2025 với số điểm cao. Đây là niềm tự hào của cả dòng họ.','Chúc mừng thành viên đỗ đại học',NULL,'Ban quản lý dòng họ','2025-12-24 16:02:10',0,0,1,NULL,NULL,NULL),('TT003','e9022e64-cbae-11f0-8020-a8934a9bae74','Lễ giỗ tổ Hùng Vương năm 2025','Thông báo lịch tổ chức lễ giỗ tổ Hùng Vương năm 2025. Thời gian: Mùng 10 tháng 3 âm lịch. Địa điểm: Đền thờ họ. Mong bà con sắp xếp thời gian tham dự.','Lễ giỗ tổ Hùng Vương năm 2025',NULL,'Ban tổ chức','2025-12-19 16:02:10',0,1,1,NULL,NULL,NULL),('TT004','e9022e64-cbae-11f0-8020-a8934a9bae74','Kế hoạch tu bổ nhà thờ họ','Ban quản lý dòng họ thông báo kế hoạch tu bổ, nâng cấp nhà thờ họ trong năm 2025. Dự kiến kinh phí: 500 triệu đồng. Kêu gọi bà con đóng góp.','Kế hoạch tu bổ nhà thờ họ năm 2025',NULL,'Ban quản lý','2025-12-14 16:02:10',0,0,1,NULL,NULL,NULL),('TT005','e9022e64-cbae-11f0-8020-a8934a9bae74','Hỗ trợ học bổng cho con cháu','Dòng họ triển khai chương trình học bổng hỗ trợ con cháu có hoàn cảnh khó khăn học giỏi. Mức hỗ trợ: 2-5 triệu đồng/năm học.','Chương trình học bổng dòng họ',NULL,'Ban khuyến học','2025-12-09 16:02:10',0,0,1,NULL,NULL,NULL);
+/*!40000 ALTER TABLE `tintuc` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -693,6 +732,38 @@ BEGIN
     WHERE dongHoId = p_dongHoId;
 
     COMMIT;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `DeleteMemberComposite` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`%` PROCEDURE `DeleteMemberComposite`(
+  IN p_dongHoId VARCHAR(50),
+  IN p_thanhVienId INT,
+  IN p_lu_user_id VARCHAR(50),
+  OUT p_err_code INT,
+  OUT p_err_msg VARCHAR(255)
+)
+BEGIN
+  UPDATE thanhvien SET 
+    active_flag = 0,
+    lu_updated = NOW(),
+    lu_user_id = p_lu_user_id
+  WHERE dongHoId = p_dongHoId AND thanhVienId = p_thanhVienId;
+  
+  SET p_err_code = 0;
+  SET p_err_msg = 'Success';
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -883,6 +954,68 @@ DELIMITER ;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;
 /*!50003 SET character_set_results = @saved_cs_results */ ;
 /*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `DeleteTaiLieu` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`%` PROCEDURE `DeleteTaiLieu`(
+  IN p_taiLieuId VARCHAR(50),
+  IN p_lu_user_id VARCHAR(50),
+  OUT p_err_code INT,
+  OUT p_err_msg VARCHAR(255)
+)
+BEGIN
+  UPDATE tailieu SET
+    active_flag = 0,
+    lu_updated = NOW(),
+    lu_user_id = p_lu_user_id
+  WHERE taiLieuId = p_taiLieuId;
+  
+  SET p_err_code = 0;
+  SET p_err_msg = 'Success';
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `DeleteTinTuc` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`%` PROCEDURE `DeleteTinTuc`(
+  IN p_tinTucId VARCHAR(50),
+  IN p_lu_user_id VARCHAR(50),
+  OUT p_err_code INT,
+  OUT p_err_msg VARCHAR(255)
+)
+BEGIN
+  UPDATE tintuc SET
+    active_flag = 0,
+    lu_updated = NOW(),
+    lu_user_id = p_lu_user_id
+  WHERE tinTucId = p_tinTucId;
+  
+  SET p_err_code = 0;
+  SET p_err_msg = 'Success';
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
 /*!50003 DROP PROCEDURE IF EXISTS `DeleteUser` */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
@@ -1047,6 +1180,34 @@ BEGIN
 		meId  ,
 		voId  ,
 		chongId  from ThanhVien;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `GetAllMemberByDongHo` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`%` PROCEDURE `GetAllMemberByDongHo`(
+  IN p_dongHoId VARCHAR(50),
+  OUT p_err_code INT,
+  OUT p_err_msg VARCHAR(255)
+)
+BEGIN
+  SELECT * FROM thanhvien 
+  WHERE dongHoId = p_dongHoId AND active_flag = 1
+  ORDER BY doiThuoc ASC, thanhVienId ASC;
+  
+  SET p_err_code = 0;
+  SET p_err_msg = 'Success';
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -1271,6 +1432,41 @@ DELIMITER ;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;
 /*!50003 SET character_set_results = @saved_cs_results */ ;
 /*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `GetMemberById` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`%` PROCEDURE `GetMemberById`(
+  IN p_dongHoId VARCHAR(50),
+  IN p_thanhVienId INT,
+  OUT p_err_code INT,
+  OUT p_err_msg VARCHAR(255)
+)
+BEGIN
+  SELECT tv.*, 
+    cha.hoTen AS tenCha, me.hoTen AS tenMe, 
+    vo.hoTen AS tenVo, chong.hoTen AS tenChong
+  FROM thanhvien tv
+  LEFT JOIN thanhvien cha ON tv.dongHoId = cha.dongHoId AND tv.chaId = cha.thanhVienId
+  LEFT JOIN thanhvien me ON tv.dongHoId = me.dongHoId AND tv.meId = me.thanhVienId
+  LEFT JOIN thanhvien vo ON tv.dongHoId = vo.dongHoId AND tv.voId = vo.thanhVienId
+  LEFT JOIN thanhvien chong ON tv.dongHoId = chong.dongHoId AND tv.chongId = chong.thanhVienId
+  WHERE tv.dongHoId = p_dongHoId AND tv.thanhVienId = p_thanhVienId AND tv.active_flag = 1;
+  
+  SET p_err_code = 0;
+  SET p_err_msg = 'Success';
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
 /*!50003 DROP PROCEDURE IF EXISTS `GetNextThanhVienId` */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
@@ -1348,7 +1544,7 @@ DELIMITER ;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;
 /*!50003 SET character_set_results = @saved_cs_results */ ;
 /*!50003 SET collation_connection  = @saved_col_connection */ ;
-/*!50003 DROP PROCEDURE IF EXISTS `GetThanhVienById` */;
+/*!50003 DROP PROCEDURE IF EXISTS `GetTaiLieuById` */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
 /*!50003 SET @saved_col_connection = @@collation_connection */ ;
@@ -1358,52 +1554,34 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`%` PROCEDURE `GetThanhVienById`(
-    IN  p_thanhVienId VARCHAR(50), 
-    OUT p_error_code INT,
-    OUT p_error_message VARCHAR(500)
+CREATE DEFINER=`root`@`%` PROCEDURE `GetTaiLieuById`(
+  IN p_taiLieuId VARCHAR(50),
+  OUT p_err_code INT,
+  OUT p_err_msg VARCHAR(255)
 )
-BEGIN   
-    -- Handler lỗi SQL
-    DECLARE EXIT HANDLER FOR SQLEXCEPTION
-    BEGIN
-        GET DIAGNOSTICS CONDITION 1 
-            p_error_code = RETURNED_SQLSTATE, 
-            p_error_message = MESSAGE_TEXT;
-    END;
-
-    SET p_error_code = 0;
-    SET p_error_message = ''; 
-    SET SESSION group_concat_max_len = 10000000;
-
-    SELECT 
-        tv.thanhVienId,
-        tv.dongHoId,
-        tv.hoTen,
-        tv.gioiTinh,
-        tv.ngaySinh,
-        tv.ngayMat,
-        tv.noiSinh,
-        tv.noiMat,
-        tv.ngheNghiep,
-        tv.trinhDoHocVan,
-        tv.diaChiHienTai,
-        tv.tieuSu,
-        tv.anhChanDung,
-        tv.doiThuoc,
-        tv.chaId,
-        tv.meId,
-        tv.voId,
-        tv.chongId,
-        tv.ngayTao,
-        tv.active_flag,
-        tv.nguoiTaoId,
-        tv.lu_updated,
-        tv.lu_user_id
-    FROM thanhvien tv
-    WHERE tv.thanhVienId = p_thanhVienId
-      AND tv.active_flag = 1;
-
+BEGIN
+  SELECT 
+    tl.taiLieuId,
+    tl.dongHoId,
+    tl.tenTaiLieu,
+    tl.duongDan,
+    tl.moTa,
+    tl.loaiTaiLieu,
+    tl.namSangTac,
+    tl.tacGia,
+    tl.nguonGoc,
+    tl.ghiChu,
+    tl.ngayTaiLen,
+    tl.active_flag,
+    tl.nguoiTaoId,
+    tl.lu_updated,
+    d.tenDongHo
+  FROM tailieu tl
+  LEFT JOIN dongho d ON tl.dongHoId = d.dongHoId
+  WHERE tl.taiLieuId = p_taiLieuId AND tl.active_flag = 1;
+  
+  SET p_err_code = 0;
+  SET p_err_msg = 'Success';
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -1807,6 +1985,53 @@ BEGIN
     WHERE (p_dongHoId IS NULL OR p_dongHoId = '' OR t.dongHoId = p_dongHoId)
     ORDER BY t.ngayDong DESC
     LIMIT p_limit;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `GetTinTucById` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`%` PROCEDURE `GetTinTucById`(
+  IN p_tinTucId VARCHAR(50),
+  OUT p_err_code INT,
+  OUT p_err_msg VARCHAR(255)
+)
+BEGIN
+  -- Tăng lượt xem
+  UPDATE tintuc SET luotXem = luotXem + 1 WHERE tinTucId = p_tinTucId;
+  
+  -- Lấy dữ liệu
+  SELECT 
+    t.tinTucId,
+    t.dongHoId,
+    t.tieuDe,
+    t.noiDung,
+    t.tomTat,
+    t.anhDaiDien,
+    t.tacGia,
+    t.ngayDang,
+    t.luotXem,
+    t.ghim,
+    t.active_flag,
+    t.nguoiTaoId,
+    t.lu_updated,
+    d.tenDongHo
+  FROM tintuc t
+  LEFT JOIN dongho d ON t.dongHoId = d.dongHoId
+  WHERE t.tinTucId = p_tinTucId AND t.active_flag = 1;
+  
+  SET p_err_code = 0;
+  SET p_err_msg = 'Success';
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -2476,6 +2701,90 @@ BEGIN
         );
 
     COMMIT;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `InsertTaiLieu` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`%` PROCEDURE `InsertTaiLieu`(
+  IN p_taiLieuId VARCHAR(50),
+  IN p_dongHoId VARCHAR(50),
+  IN p_tenTaiLieu VARCHAR(255),
+  IN p_duongDan VARCHAR(255),
+  IN p_moTa TEXT,
+  IN p_loaiTaiLieu VARCHAR(100),
+  IN p_namSangTac INT,
+  IN p_tacGia VARCHAR(255),
+  IN p_nguonGoc VARCHAR(255),
+  IN p_ghiChu TEXT,
+  IN p_nguoiTaoId VARCHAR(50),
+  OUT p_err_code INT,
+  OUT p_err_msg VARCHAR(255)
+)
+BEGIN
+  INSERT INTO tailieu (
+    taiLieuId, dongHoId, tenTaiLieu, duongDan, moTa, loaiTaiLieu,
+    namSangTac, tacGia, nguonGoc, ghiChu, ngayTaiLen,
+    active_flag, nguoiTaoId, lu_updated, lu_user_id
+  ) VALUES (
+    p_taiLieuId, p_dongHoId, p_tenTaiLieu, p_duongDan, p_moTa, p_loaiTaiLieu,
+    p_namSangTac, p_tacGia, p_nguonGoc, p_ghiChu, CURDATE(),
+    1, p_nguoiTaoId, NOW(), p_nguoiTaoId
+  );
+  
+  SET p_err_code = 0;
+  SET p_err_msg = 'Success';
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `InsertTinTuc` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`%` PROCEDURE `InsertTinTuc`(
+  IN p_tinTucId VARCHAR(50),
+  IN p_dongHoId VARCHAR(50),
+  IN p_tieuDe VARCHAR(255),
+  IN p_noiDung TEXT,
+  IN p_tomTat VARCHAR(500),
+  IN p_anhDaiDien VARCHAR(255),
+  IN p_tacGia VARCHAR(255),
+  IN p_ghim TINYINT,
+  IN p_nguoiTaoId VARCHAR(50),
+  OUT p_err_code INT,
+  OUT p_err_msg VARCHAR(255)
+)
+BEGIN
+  INSERT INTO tintuc (
+    tinTucId, dongHoId, tieuDe, noiDung, tomTat, anhDaiDien, 
+    tacGia, ngayDang, ghim, nguoiTaoId, lu_updated, lu_user_id
+  ) VALUES (
+    p_tinTucId, p_dongHoId, p_tieuDe, p_noiDung, p_tomTat, p_anhDaiDien,
+    p_tacGia, NOW(), IFNULL(p_ghim, 0), p_nguoiTaoId, NOW(), p_nguoiTaoId
+  );
+  
+  SET p_err_code = 0;
+  SET p_err_msg = 'Success';
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -3539,6 +3848,73 @@ DELIMITER ;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;
 /*!50003 SET character_set_results = @saved_cs_results */ ;
 /*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `SearchTaiLieu` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`%` PROCEDURE `SearchTaiLieu`(
+  IN p_pageIndex INT,
+  IN p_pageSize INT,
+  IN p_search_content VARCHAR(255),
+  IN p_dongHoId VARCHAR(50),
+  IN p_loaiTaiLieu VARCHAR(100),
+  OUT p_err_code INT,
+  OUT p_err_msg VARCHAR(255)
+)
+BEGIN
+  DECLARE v_offset INT;
+  DECLARE v_total INT;
+  
+  SET v_offset = (p_pageIndex - 1) * p_pageSize;
+  
+  -- Đếm tổng số bản ghi
+  SELECT COUNT(*) INTO v_total FROM tailieu 
+  WHERE active_flag = 1 
+    AND (p_dongHoId IS NULL OR p_dongHoId = '' OR dongHoId = p_dongHoId)
+    AND (p_loaiTaiLieu IS NULL OR p_loaiTaiLieu = '' OR loaiTaiLieu = p_loaiTaiLieu)
+    AND (p_search_content IS NULL OR p_search_content = '' OR tenTaiLieu LIKE CONCAT('%', p_search_content, '%'));
+  
+  -- Lấy dữ liệu
+  SELECT 
+    tl.taiLieuId,
+    tl.dongHoId,
+    tl.tenTaiLieu,
+    tl.duongDan,
+    tl.moTa,
+    tl.loaiTaiLieu,
+    tl.namSangTac,
+    tl.tacGia,
+    tl.nguonGoc,
+    tl.ghiChu,
+    tl.ngayTaiLen,
+    tl.active_flag,
+    tl.nguoiTaoId,
+    tl.lu_updated,
+    d.tenDongHo,
+    v_total AS RecordCount
+  FROM tailieu tl
+  LEFT JOIN dongho d ON tl.dongHoId = d.dongHoId
+  WHERE tl.active_flag = 1
+    AND (p_dongHoId IS NULL OR p_dongHoId = '' OR tl.dongHoId = p_dongHoId)
+    AND (p_loaiTaiLieu IS NULL OR p_loaiTaiLieu = '' OR tl.loaiTaiLieu = p_loaiTaiLieu)
+    AND (p_search_content IS NULL OR p_search_content = '' OR tl.tenTaiLieu LIKE CONCAT('%', p_search_content, '%'))
+  ORDER BY tl.ngayTaiLen DESC
+  LIMIT v_offset, p_pageSize;
+  
+  SET p_err_code = 0;
+  SET p_err_msg = 'Success';
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
 /*!50003 DROP PROCEDURE IF EXISTS `SearchThanhVien` */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
@@ -3665,147 +4041,160 @@ CREATE DEFINER=`root`@`%` PROCEDURE `SearchThanhVienByDongHo`(
 )
 BEGIN
     DECLARE p_total_row INT;
-
+    
     DECLARE EXIT HANDLER FOR SQLEXCEPTION
     BEGIN
         GET DIAGNOSTICS CONDITION 1
             p_error_code = RETURNED_SQLSTATE,
             p_error_message = MESSAGE_TEXT;
     END;
-
+    
     SET p_error_code = 0;
     SET p_error_message = '';
-
-    -- ==============================
+    
     -- CÓ PHÂN TRANG
-    -- ==============================
     IF p_pageSize <> 0 THEN
-
         DROP TEMPORARY TABLE IF EXISTS Results;
-
         CREATE TEMPORARY TABLE Results AS
         SELECT 
             (@row_number := @row_number + 1) AS RowNumber,
-            tv.thanhVienId,
-            tv.dongHoId,
-            tv.hoTen,
-            tv.gioiTinh,
-            tv.ngaySinh,
-            tv.ngayMat,
-            tv.noiSinh,
-            tv.noiMat,
-            tv.ngheNghiep,
-            tv.trinhDoHocVan,
-            tv.diaChiHienTai,
-            tv.tieuSu,
-            tv.anhChanDung,
-            tv.doiThuoc,
-            tv.chaId,
-            tv.meId,
-            tv.voId,
-            tv.chongId,
-            tv.ngayTao,
-            tv.active_flag,
-            cha.hoTen   AS tenCha,
-            me.hoTen    AS tenMe,
-            vo.hoTen    AS tenVo,
+            tv.thanhVienId, tv.dongHoId, tv.hoTen, tv.gioiTinh,
+            tv.ngaySinh, tv.ngayMat, tv.noiSinh, tv.noiMat,
+            tv.ngheNghiep, tv.trinhDoHocVan, tv.diaChiHienTai,
+            tv.tieuSu, tv.anhChanDung, tv.doiThuoc,
+            tv.chaId, tv.meId, tv.voId, tv.chongId,
+            tv.ngayTao, tv.active_flag,
+            cha.hoTen AS tenCha,
+            me.hoTen AS tenMe,
+            vo.hoTen AS tenVo,
             chong.hoTen AS tenChong
         FROM thanhvien tv
-        LEFT JOIN thanhvien cha   ON tv.chaId   = cha.thanhVienId
-        LEFT JOIN thanhvien me    ON tv.meId    = me.thanhVienId
-        LEFT JOIN thanhvien vo    ON tv.voId    = vo.thanhVienId
-        LEFT JOIN thanhvien chong ON tv.chongId = chong.thanhVienId
+        LEFT JOIN thanhvien cha ON tv.dongHoId = cha.dongHoId AND tv.chaId = cha.thanhVienId
+        LEFT JOIN thanhvien me ON tv.dongHoId = me.dongHoId AND tv.meId = me.thanhVienId
+        LEFT JOIN thanhvien vo ON tv.dongHoId = vo.dongHoId AND tv.voId = vo.thanhVienId
+        LEFT JOIN thanhvien chong ON tv.dongHoId = chong.dongHoId AND tv.chongId = chong.thanhVienId
         CROSS JOIN (SELECT @row_number := 0) r
         WHERE tv.active_flag = 1
-          AND (p_dongHoId IS NULL OR p_dongHoId = '' OR tv.dongHoId = p_dongHoId)
-          AND (
-                p_search_content IS NULL
-                OR p_search_content = ''
+            AND (p_dongHoId IS NULL OR p_dongHoId = '' OR tv.dongHoId = p_dongHoId)
+            AND (p_search_content IS NULL OR p_search_content = ''
                 OR LOWER(CONCAT(
                     COALESCE(tv.hoTen, ''),
                     COALESCE(tv.ngheNghiep, ''),
                     COALESCE(tv.trinhDoHocVan, ''),
                     COALESCE(tv.diaChiHienTai, '')
-                )) LIKE CONCAT('%', LOWER(TRIM(p_search_content)), '%')
-          )
+                )) LIKE CONCAT('%', LOWER(TRIM(p_search_content)), '%'))
         ORDER BY tv.doiThuoc ASC, tv.thanhVienId ASC;
-
+        
         SELECT COUNT(*) INTO p_total_row FROM Results;
-
-        SELECT 
-            *,
-            p_total_row AS RecordCount
+        
+        SELECT *, p_total_row AS RecordCount
         FROM Results
-        WHERE RowNumber BETWEEN ((p_pageIndex - 1) * p_pageSize) + 1
-                             AND (p_pageIndex * p_pageSize);
-
+        WHERE RowNumber BETWEEN ((p_pageIndex - 1) * p_pageSize) + 1 AND (p_pageIndex * p_pageSize);
+        
         DROP TEMPORARY TABLE Results;
-
-    -- ==============================
-    -- KHÔNG PHÂN TRANG (LẤY HẾT)
-    -- ==============================
+    
+    -- KHÔNG PHÂN TRANG
     ELSE
-
         DROP TEMPORARY TABLE IF EXISTS Results;
-
         CREATE TEMPORARY TABLE Results AS
         SELECT 
             (@row_number := @row_number + 1) AS RowNumber,
-            tv.thanhVienId,
-            tv.dongHoId,
-            tv.hoTen,
-            tv.gioiTinh,
-            tv.ngaySinh,
-            tv.ngayMat,
-            tv.noiSinh,
-            tv.noiMat,
-            tv.ngheNghiep,
-            tv.trinhDoHocVan,
-            tv.diaChiHienTai,
-            tv.tieuSu,
-            tv.anhChanDung,
-            tv.doiThuoc,
-            tv.chaId,
-            tv.meId,
-            tv.voId,
-            tv.chongId,
-            tv.ngayTao,
-            tv.active_flag,
-            cha.hoTen   AS tenCha,
-            me.hoTen    AS tenMe,
-            vo.hoTen    AS tenVo,
+            tv.thanhVienId, tv.dongHoId, tv.hoTen, tv.gioiTinh,
+            tv.ngaySinh, tv.ngayMat, tv.noiSinh, tv.noiMat,
+            tv.ngheNghiep, tv.trinhDoHocVan, tv.diaChiHienTai,
+            tv.tieuSu, tv.anhChanDung, tv.doiThuoc,
+            tv.chaId, tv.meId, tv.voId, tv.chongId,
+            tv.ngayTao, tv.active_flag,
+            cha.hoTen AS tenCha,
+            me.hoTen AS tenMe,
+            vo.hoTen AS tenVo,
             chong.hoTen AS tenChong
         FROM thanhvien tv
-        LEFT JOIN thanhvien cha   ON tv.chaId   = cha.thanhVienId
-        LEFT JOIN thanhvien me    ON tv.meId    = me.thanhVienId
-        LEFT JOIN thanhvien vo    ON tv.voId    = vo.thanhVienId
-        LEFT JOIN thanhvien chong ON tv.chongId = chong.thanhVienId
+        LEFT JOIN thanhvien cha ON tv.dongHoId = cha.dongHoId AND tv.chaId = cha.thanhVienId
+        LEFT JOIN thanhvien me ON tv.dongHoId = me.dongHoId AND tv.meId = me.thanhVienId
+        LEFT JOIN thanhvien vo ON tv.dongHoId = vo.dongHoId AND tv.voId = vo.thanhVienId
+        LEFT JOIN thanhvien chong ON tv.dongHoId = chong.dongHoId AND tv.chongId = chong.thanhVienId
         CROSS JOIN (SELECT @row_number := 0) r
         WHERE tv.active_flag = 1
-          AND (p_dongHoId IS NULL OR p_dongHoId = '' OR tv.dongHoId = p_dongHoId)
-          AND (
-                p_search_content IS NULL
-                OR p_search_content = ''
+            AND (p_dongHoId IS NULL OR p_dongHoId = '' OR tv.dongHoId = p_dongHoId)
+            AND (p_search_content IS NULL OR p_search_content = ''
                 OR LOWER(CONCAT(
                     COALESCE(tv.hoTen, ''),
                     COALESCE(tv.ngheNghiep, ''),
                     COALESCE(tv.trinhDoHocVan, ''),
                     COALESCE(tv.diaChiHienTai, '')
-                )) LIKE CONCAT('%', LOWER(TRIM(p_search_content)), '%')
-          )
+                )) LIKE CONCAT('%', LOWER(TRIM(p_search_content)), '%'))
         ORDER BY tv.doiThuoc ASC, tv.thanhVienId ASC;
-
+        
         SELECT COUNT(*) INTO p_total_row FROM Results;
-
-        SELECT 
-            *,
-            p_total_row AS RecordCount
-        FROM Results;
-
+        
+        SELECT *, p_total_row AS RecordCount FROM Results;
+        
         DROP TEMPORARY TABLE Results;
-
     END IF;
-
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `SearchTinTuc` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`%` PROCEDURE `SearchTinTuc`(
+  IN p_pageIndex INT,
+  IN p_pageSize INT,
+  IN p_search_content VARCHAR(255),
+  IN p_dongHoId VARCHAR(50),
+  OUT p_err_code INT,
+  OUT p_err_msg VARCHAR(255)
+)
+BEGIN
+  DECLARE v_offset INT;
+  DECLARE v_total INT;
+  
+  SET v_offset = (p_pageIndex - 1) * p_pageSize;
+  
+  -- Đếm tổng số bản ghi
+  SELECT COUNT(*) INTO v_total FROM tintuc 
+  WHERE active_flag = 1 
+    AND (p_dongHoId IS NULL OR p_dongHoId = '' OR dongHoId = p_dongHoId)
+    AND (p_search_content IS NULL OR p_search_content = '' OR tieuDe LIKE CONCAT('%', p_search_content, '%'));
+  
+  -- Lấy dữ liệu
+  SELECT 
+    t.tinTucId,
+    t.dongHoId,
+    t.tieuDe,
+    t.noiDung,
+    t.tomTat,
+    t.anhDaiDien,
+    t.tacGia,
+    t.ngayDang,
+    t.luotXem,
+    t.ghim,
+    t.active_flag,
+    t.nguoiTaoId,
+    t.lu_updated,
+    d.tenDongHo,
+    v_total AS RecordCount
+  FROM tintuc t
+  LEFT JOIN dongho d ON t.dongHoId = d.dongHoId
+  WHERE t.active_flag = 1
+    AND (p_dongHoId IS NULL OR p_dongHoId = '' OR t.dongHoId = p_dongHoId)
+    AND (p_search_content IS NULL OR p_search_content = '' OR t.tieuDe LIKE CONCAT('%', p_search_content, '%'))
+  ORDER BY t.ghim DESC, t.ngayDang DESC
+  LIMIT v_offset, p_pageSize;
+  
+  SET p_err_code = 0;
+  SET p_err_msg = 'Success';
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -4063,6 +4452,69 @@ BEGIN
 		lu_user_id = p_lu_user_id
         where thanhVienId = p_thanhVienId;
         commit;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `UpdateMemberComposite` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`%` PROCEDURE `UpdateMemberComposite`(
+  IN p_dongHoId VARCHAR(50),
+  IN p_thanhVienId INT,
+  IN p_hoTen VARCHAR(255),
+  IN p_gioiTinh INT,
+  IN p_ngaySinh DATE,
+  IN p_ngayMat DATE,
+  IN p_noiSinh VARCHAR(255),
+  IN p_noiMat VARCHAR(255),
+  IN p_ngheNghiep VARCHAR(255),
+  IN p_trinhDoHocVan VARCHAR(255),
+  IN p_diaChiHienTai VARCHAR(500),
+  IN p_tieuSu TEXT,
+  IN p_anhChanDung VARCHAR(255),
+  IN p_doiThuoc INT,
+  IN p_chaId INT,
+  IN p_meId INT,
+  IN p_voId INT,
+  IN p_chongId INT,
+  IN p_lu_user_id VARCHAR(50),
+  OUT p_err_code INT,
+  OUT p_err_msg VARCHAR(255)
+)
+BEGIN
+  UPDATE thanhvien SET
+    hoTen = p_hoTen,
+    gioiTinh = p_gioiTinh,
+    ngaySinh = p_ngaySinh,
+    ngayMat = p_ngayMat,
+    noiSinh = p_noiSinh,
+    noiMat = p_noiMat,
+    ngheNghiep = p_ngheNghiep,
+    trinhDoHocVan = p_trinhDoHocVan,
+    diaChiHienTai = p_diaChiHienTai,
+    tieuSu = p_tieuSu,
+    anhChanDung = p_anhChanDung,
+    doiThuoc = p_doiThuoc,
+    chaId = p_chaId,
+    meId = p_meId,
+    voId = p_voId,
+    chongId = p_chongId,
+    lu_updated = NOW(),
+    lu_user_id = p_lu_user_id
+  WHERE dongHoId = p_dongHoId AND thanhVienId = p_thanhVienId;
+  
+  SET p_err_code = 0;
+  SET p_err_msg = 'Success';
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -4333,6 +4785,98 @@ DELIMITER ;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;
 /*!50003 SET character_set_results = @saved_cs_results */ ;
 /*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `UpdateTaiLieu` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`%` PROCEDURE `UpdateTaiLieu`(
+  IN p_taiLieuId VARCHAR(50),
+  IN p_dongHoId VARCHAR(50),
+  IN p_tenTaiLieu VARCHAR(255),
+  IN p_duongDan VARCHAR(255),
+  IN p_moTa TEXT,
+  IN p_loaiTaiLieu VARCHAR(100),
+  IN p_namSangTac INT,
+  IN p_tacGia VARCHAR(255),
+  IN p_nguonGoc VARCHAR(255),
+  IN p_ghiChu TEXT,
+  IN p_lu_user_id VARCHAR(50),
+  OUT p_err_code INT,
+  OUT p_err_msg VARCHAR(255)
+)
+BEGIN
+  UPDATE tailieu SET
+    dongHoId = p_dongHoId,
+    tenTaiLieu = p_tenTaiLieu,
+    duongDan = IFNULL(p_duongDan, duongDan),
+    moTa = p_moTa,
+    loaiTaiLieu = p_loaiTaiLieu,
+    namSangTac = p_namSangTac,
+    tacGia = p_tacGia,
+    nguonGoc = p_nguonGoc,
+    ghiChu = p_ghiChu,
+    lu_updated = NOW(),
+    lu_user_id = p_lu_user_id
+  WHERE taiLieuId = p_taiLieuId;
+  
+  SET p_err_code = 0;
+  SET p_err_msg = 'Success';
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `UpdateTinTuc` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`%` PROCEDURE `UpdateTinTuc`(
+  IN p_tinTucId VARCHAR(50),
+  IN p_dongHoId VARCHAR(50),
+  IN p_tieuDe VARCHAR(255),
+  IN p_noiDung TEXT,
+  IN p_tomTat VARCHAR(500),
+  IN p_anhDaiDien VARCHAR(255),
+  IN p_tacGia VARCHAR(255),
+  IN p_ghim TINYINT,
+  IN p_lu_user_id VARCHAR(50),
+  OUT p_err_code INT,
+  OUT p_err_msg VARCHAR(255)
+)
+BEGIN
+  UPDATE tintuc SET
+    dongHoId = p_dongHoId,
+    tieuDe = p_tieuDe,
+    noiDung = p_noiDung,
+    tomTat = p_tomTat,
+    anhDaiDien = IFNULL(p_anhDaiDien, anhDaiDien),
+    tacGia = p_tacGia,
+    ghim = IFNULL(p_ghim, 0),
+    lu_updated = NOW(),
+    lu_user_id = p_lu_user_id
+  WHERE tinTucId = p_tinTucId;
+  
+  SET p_err_code = 0;
+  SET p_err_msg = 'Success';
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
 /*!50003 DROP PROCEDURE IF EXISTS `UpdateUser` */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
@@ -4477,4 +5021,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-12-25  1:44:43
+-- Dump completed on 2025-12-29 21:25:28

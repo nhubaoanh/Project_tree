@@ -78,6 +78,7 @@ export const idParamRules: ValidationChain[] = [idParam("id")];
  */
 export const searchThanhVienRules: ValidationChain[] = [
   optionalStringLength("keyword", "Từ khóa", 100),
-  optionalId("dongHoId", "Dòng họ ID"),
+  optionalStringLength("search_content", "Nội dung tìm kiếm", 100),
+  optionalStringLength("dongHoId", "Dòng họ ID", 50),
   ...paginationRules,
 ];

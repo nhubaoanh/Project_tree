@@ -6,7 +6,17 @@ import Link from "next/link";
 import { useSidebar } from "@/context/SidebarContext";
 import Image from "next/image";
 import storage from "@/utils/storage";
-import { getMenuByRole, MenuItem } from "@/lib/auth";
+
+// Menu item từ DB
+interface MenuItem {
+  code: string;
+  name: string;
+  href: string;
+  icon: string;
+  sortOrder: number;
+  parentId?: string;
+  actions: string[];
+}
 
 export default function Sidebar() {
   const { isSidebarOpen } = useSidebar();
@@ -14,10 +24,9 @@ export default function Sidebar() {
   const [sidebarItems, setSidebarItems] = useState<MenuItem[]>([]);
 
   useEffect(() => {
-    const user = storage.getUser();
-    // Lấy menu theo role từ config tập trung
-    const menuItems = getMenuByRole(user?.roleCode);
-    setSidebarItems(menuItems);
+    // Lấy menu từ storage (đã được load từ DB khi login)
+    const menus = storage.getMenus();
+    setSidebarItems(menus);
   }, []);
 
   return (
@@ -34,7 +43,7 @@ export default function Sidebar() {
           <nav className="flex flex-col space-y-2 mt-4">
             {sidebarItems.map((item) => (
               <Link
-                key={item.name}
+                key={item.code}
                 href={item.href}
                 className={`flex items-center gap-3 px-4 py-1.5 rounded-md transition-colors ${
                   pathname === item.href
@@ -43,7 +52,7 @@ export default function Sidebar() {
                 }`}
               >
                 <Image
-                  src={item.icon}
+                  src={item.icon || "/icon/default.png"}
                   width={25}
                   height={25}
                   alt={item.name}

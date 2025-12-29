@@ -38,7 +38,8 @@ export function parseApiError(error: unknown): ApiErrorDetail {
     }
 
     // Map status code sang message tiếng Việt
-    if (status === 401) {
+    // Chỉ override message nếu server không trả message cụ thể
+    if (status === 401 && !data?.message) {
       message = "Phiên đăng nhập hết hạn, vui lòng đăng nhập lại";
     } else if (status === 403) {
       message = "Bạn không có quyền thực hiện thao tác này";

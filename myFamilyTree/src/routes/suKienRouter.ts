@@ -14,9 +14,6 @@ suKienRouter.use((err: any, req: any, res: any, next: any) => {
   next();
 });
 
-suKienRouter.use((req, res, next) => {
-  next();
-});
 const eventcontroller = container.resolve(suKienController);
 
 suKienRouter.post(

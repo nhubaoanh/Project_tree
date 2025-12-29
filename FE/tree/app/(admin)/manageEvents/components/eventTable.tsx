@@ -20,8 +20,9 @@ interface MemberTableProps {
   totalPages: number;
   onPageChange: (page: number) => void;
   onPageSizeChange: (size: number) => void;
-  onEdit: (member: IEvent) => void;
-  onDelete: (member: IEvent) => void;
+  onEdit?: (member: IEvent) => void;
+  onDelete?: (member: IEvent) => void;
+  onView?: (member: IEvent) => void;
 }
 
 export const EventTable: React.FC<MemberTableProps> = ({
@@ -35,6 +36,7 @@ export const EventTable: React.FC<MemberTableProps> = ({
   onPageSizeChange,
   onEdit,
   onDelete,
+  onView,
 }) => {
   return (
     <div className="bg-white rounded-lg border border-[#d4af37] shadow-lg overflow-hidden relative min-h-[400px] flex flex-col">
@@ -72,7 +74,8 @@ export const EventTable: React.FC<MemberTableProps> = ({
               ? data.map((member, index) => (
                   <tr
                     key={index}
-                    className="hover:bg-[#fffdf5] transition-colors group"
+                    onClick={() => onView?.(member)}
+                    className="hover:bg-[#fffdf5] transition-colors group cursor-pointer"
                   >
                     {/* Cột # cố định */}
                     <td className="p-4 w-12 text-center text-stone-400 font-mono text-xs">
@@ -101,22 +104,26 @@ export const EventTable: React.FC<MemberTableProps> = ({
                       {member.lapLai || "-"}
                     </td>
                     {/* Cột Hành Động cố định */}
-                    <td className="p-4 min-w-[120px] text-center">
+                    <td className="p-4 min-w-[120px] text-center" onClick={(e) => e.stopPropagation()}>
                       <div className="flex justify-center gap-2 opacity-80 group-hover:opacity-100 transition-opacity">
-                        <button
-                          onClick={() => onEdit(member)}
-                          className="p-2 text-blue-600 hover:bg-blue-50 rounded transition-colors"
-                          title="Sửa"
-                        >
-                          <Edit size={18} />
-                        </button>
-                        <button
-                          onClick={() => onDelete(member)}
-                          className="p-2 text-red-600 hover:bg-red-50 rounded transition-colors"
-                          title="Xóa"
-                        >
-                          <Trash2 size={18} />
-                        </button>
+                        {onEdit && (
+                          <button
+                            onClick={() => onEdit(member)}
+                            className="p-2 text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                            title="Sửa"
+                          >
+                            <Edit size={18} />
+                          </button>
+                        )}
+                        {onDelete && (
+                          <button
+                            onClick={() => onDelete(member)}
+                            className="p-2 text-red-600 hover:bg-red-50 rounded transition-colors"
+                            title="Xóa"
+                          >
+                            <Trash2 size={18} />
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>

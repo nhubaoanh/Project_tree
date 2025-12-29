@@ -3,7 +3,9 @@
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import storage from "@/utils/storage";
-import { canAccessRoute, isPublicRoute } from "@/lib/auth";
+
+// Các route public (không cần đăng nhập)
+const PUBLIC_ROUTES = ["/login", "/register", "/forgotPass", "/reset-password"];
 
 interface RouteGuardProps {
   children: React.ReactNode;
@@ -22,7 +24,7 @@ export default function RouteGuard({ children }: RouteGuardProps) {
   useEffect(() => {
     const checkAuth = () => {
       // 1. Route public - cho phép truy cập
-      if (isPublicRoute(pathname)) {
+      if (PUBLIC_ROUTES.some((route) => pathname.startsWith(route))) {
         setAuthorized(true);
         setChecking(false);
         return;
@@ -40,8 +42,34 @@ export default function RouteGuard({ children }: RouteGuardProps) {
         return;
       }
 
-      // 3. Kiểm tra quyền truy cập route
-      const hasAccess = canAccessRoute(pathname, user.roleCode);
+      // 3. Kiểm tra quyền truy cập route (dựa trên menus từ DB)
+      const menus = storage.getMenus();
+      
+      console.log("[RouteGuard] Checking access for:", pathname);
+      console.log("[RouteGuard] User menus:", menus);
+      console.log("[RouteGuard] Menu hrefs:", menus.map(m => m.href));
+      
+      // Nếu chưa có menus (chưa load xong) => cho phép tạm
+      if (menus.length === 0) {
+        console.log("[RouteGuard] No menus loaded, allowing access");
+        setAuthorized(true);
+        setChecking(false);
+        return;
+      }
+
+      // Dashboard luôn được phép nếu đã đăng nhập
+      if (pathname === "/dashboard") {
+        setAuthorized(true);
+        setChecking(false);
+        return;
+      }
+
+      // Tìm menu item có href match với pathname
+      const hasAccess = menus.some(
+        (item) => item.href && (pathname === item.href || pathname.startsWith(item.href + "/"))
+      );
+
+      console.log("[RouteGuard] hasAccess:", hasAccess);
 
       if (!hasAccess) {
         // Không có quyền - redirect về trang 403
