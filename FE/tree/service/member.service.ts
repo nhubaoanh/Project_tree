@@ -28,9 +28,9 @@ export const getMembersByDongHo = async (dongHoId: string): Promise<any> => {
     }
 }
 
-export const getMemberById = async (id: number): Promise<any> => {
+export const getMemberById = async (dongHoId: string, id: number): Promise<any> => {
     try {
-        const res = await apiClient.get(`${prefix}/${id}`);
+        const res = await apiClient.get(`${prefix}/${id}?dongHoId=${dongHoId}`);
         return res?.data;
     } catch (error: any) {
         const err = parseApiError(error);

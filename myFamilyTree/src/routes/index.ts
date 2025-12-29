@@ -8,6 +8,8 @@ import taiChinhThuRouter from "./taiChinhThu";
 import taiChinhChiRouter from "./taiChinhChi";
 import loaiSuKienRouter from "./loaiSuKienRouter";
 import thongKeRouter from "./thongKeRouter";
+import tinTucRouter from "./tinTucRouter";
+import taiLieuRouter from "./taiLieuRouter";
 
 const router = Router();
 router.use('/users', nguoiDungRouter);
@@ -19,5 +21,7 @@ router.use("/typeevent", loaiSuKienRouter);
 router.use("/contributionUp", taiChinhThuRouter);
 router.use("/contributionDown", taiChinhChiRouter);
 router.use("/thongke", thongKeRouter);
+router.use("/tintuc", tinTucRouter);
+router.use("/tailieu", taiLieuRouter);
 
 export default router;

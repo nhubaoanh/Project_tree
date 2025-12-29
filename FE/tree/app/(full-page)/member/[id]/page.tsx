@@ -1,8 +1,10 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { getMemberById, getMembers } from "@/service/member.service";
+import { getMemberById, getMembersByDongHo } from "@/service/member.service";
+import storage from "@/utils/storage";
 import { ArrowLeft, User, Calendar, MapPin, Briefcase, GraduationCap, Users } from "lucide-react";
 import Image from "next/image";
 
@@ -10,20 +12,33 @@ export default function MemberDetailPage() {
   const params = useParams();
   const router = useRouter();
   const memberId = Number(params.id);
+  const [dongHoId, setDongHoId] = useState<string>("");
+
+  useEffect(() => {
+    const user = storage.getUser();
+    if (user?.dongHoId) {
+      setDongHoId(user.dongHoId);
+    } else {
+      // Fallback: lấy từ localStorage nếu có
+      const storedId = localStorage.getItem("currentDongHoId");
+      if (storedId) setDongHoId(storedId);
+    }
+  }, []);
 
   const { data: memberRes, isLoading } = useQuery({
-    queryKey: ["member", memberId],
-    queryFn: () => getMemberById(memberId),
-    enabled: !!memberId,
+    queryKey: ["member", dongHoId, memberId],
+    queryFn: () => getMemberById(dongHoId, memberId),
+    enabled: !!memberId && !!dongHoId,
   });
 
   const { data: allMembersRes } = useQuery({
-    queryKey: ["member"],
-    queryFn: () => getMembers(),
+    queryKey: ["members-dongho", dongHoId],
+    queryFn: () => getMembersByDongHo(dongHoId),
+    enabled: !!dongHoId,
   });
 
   const member = memberRes?.data;
-  const allMembers = allMembersRes?.data?.[0] || [];
+  const allMembers = allMembersRes?.data || [];
 
   const getNameById = (id: number | null) => {
     if (!id) return null;

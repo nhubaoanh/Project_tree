@@ -24,26 +24,26 @@ export const ALL_MENU_ITEMS: MenuItem[] = [
     roles: ["sa", "admin", "thanhvien"],
   },
   {
-    name: "Members",
-    href: "/members",
-    icon: "/icon/iconmember.png",
-    roles: ["sa", "admin", "thanhvien"],
-  },
-  {
     name: "Users",
     href: "/users",
     icon: "/icon/iconmember.png",
     roles: ["sa"], // Chỉ super admin
   },
   {
-    name: "Genealogy",
-    href: "/genealogy",
-    icon: "/icon/pen.png",
-    roles: ["sa", "admin"],
-  },
-  {
     name: "Events",
     href: "/manageEvents",
+    icon: "/icon/calendar.png",
+    roles: ["sa", "admin", "thanhvien", "user"],
+  },
+  {
+    name: "News",
+    href: "/manage-news",
+    icon: "/icon/calendar.png",
+    roles: ["sa", "admin", "thanhvien", "user"],
+  },
+  {
+    name: "Document",
+    href: "/documents",
     icon: "/icon/calendar.png",
     roles: ["sa", "admin", "thanhvien", "user"],
   },

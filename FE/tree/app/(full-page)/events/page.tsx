@@ -1,14 +1,16 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Calendar, MapPin, ChevronDown, ArrowUp } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { searchEvent } from "@/service/event.service";
-import { IEvent, IsearchEvent } from "@/types/event";
+import { IsearchEvent } from "@/types/event";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import storage from "@/utils/storage";
+
 
 const getBadgeColor = (type: string) => {
   switch (type) {
@@ -23,17 +25,35 @@ const getBadgeColor = (type: string) => {
   }
 };
 
-export const NotificationPage: React.FC = () => {
+export const SuKienPage: React.FC = () => {
   const [visibleCount, setVisibleCount] = useState(3);
+  const [dongHoId, setDongHoId] = useState<string>("");
+
+  // Lấy dongHoId từ user đã đăng nhập
+  useEffect(() => {
+    const user = storage.getUser();
+    if (user?.dongHoId) {
+      setDongHoId(user.dongHoId);
+    }
+  }, []);
+
   const searchParams: IsearchEvent = {
     pageIndex: 1,
     pageSize: 100,
+    dongHoId: dongHoId,
   };
 
   const eventQuery = useQuery({
     queryKey: ["events", searchParams],
     queryFn: () => searchEvent(searchParams),
+    enabled: !!dongHoId, // Chỉ gọi API khi có dongHoId
   });
+
+  // Debug log
+  console.log("SuKienPage - dongHoId:", dongHoId);
+  console.log("SuKienPage - eventQuery:", eventQuery.data);
+  console.log("SuKienPage - isLoading:", eventQuery.isLoading);
+  console.log("SuKienPage - error:", eventQuery.error);
 
   // Sắp xếp sự kiện mới nhất lên đầu
   const sortedEvents = React.useMemo(
@@ -73,7 +93,18 @@ export const NotificationPage: React.FC = () => {
 
       {/* Danh sách sự kiện */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {eventQuery.isLoading ? (
+        {!dongHoId ? (
+          // Hiển thị khi chưa có dongHoId
+          <div className="col-span-full text-center py-12">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-amber-100">
+              <Calendar className="h-6 w-6 text-amber-600" />
+            </div>
+            <h3 className="mt-4 text-lg font-medium">Chưa xác định dòng họ</h3>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Vui lòng đăng nhập để xem sự kiện
+            </p>
+          </div>
+        ) : eventQuery.isLoading ? (
           // Hiển thị skeleton khi đang tải
           Array(3)
             .fill(0)
@@ -218,4 +249,4 @@ export const NotificationPage: React.FC = () => {
   );
 };
 
-export default NotificationPage;
+export default SuKienPage;

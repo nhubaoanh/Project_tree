@@ -13,7 +13,7 @@ export const Header: React.FC<HeaderProps> = ({ activeView, onNavigate }) => {
   const navItems = [
     { key: ViewMode.PHA_KY, label: "Phả Ký" },
     { key: ViewMode.DIAGRAM, label: "Phả Đồ" },
-    { key: ViewMode.HISTORY, label: "Sự Kiện" },
+    { key: ViewMode.EVENT, label: "Sự Kiện" },
     { key: ViewMode.NEWS, label: "Tin Tức" },
   ];
 

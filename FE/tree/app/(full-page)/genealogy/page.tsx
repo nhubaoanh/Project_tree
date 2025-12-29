@@ -5,7 +5,6 @@ import { Header } from "@/components/ui/HeaderSub";
 import { MyFamilyTree } from "@/components/ui/tree";
 import { ViewMode } from "@/types/familytree";
 import { Settings, ChevronDown, Users } from "lucide-react";
-import { NotificationPage } from "../events/page";
 import TinTucPage from "../news/page";
 import PhaKyPage from "../pen/page";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
@@ -13,6 +12,7 @@ import { getMembersByDongHo } from "@/service/member.service";
 import { getAllDongHo, IDongHo } from "@/service/dongho.service";
 import { ITreeNode } from "@/types/tree";
 import { buildTree } from "@/utils/treeUtils";
+import SuKienPage from "../events/page";
 
 export default function App() {
   const searchParams = useSearchParams();
@@ -96,7 +96,12 @@ export default function App() {
                 <span className="flex-1 text-left font-semibold text-[#5d4037] truncate">
                   {selectedDongHo?.tenDongHo || "Chọn dòng họ"}
                 </span>
-                <ChevronDown size={18} className={`text-[#8b5e3c] transition-transform ${isDropdownOpen ? "rotate-180" : ""}`} />
+                <ChevronDown
+                  size={18}
+                  className={`text-[#8b5e3c] transition-transform ${
+                    isDropdownOpen ? "rotate-180" : ""
+                  }`}
+                />
               </button>
 
               {isDropdownOpen && (
@@ -107,7 +112,9 @@ export default function App() {
                         key={dongHo.dongHoId}
                         onClick={() => handleSelectDongHo(dongHo.dongHoId)}
                         className={`w-full px-4 py-2 text-left hover:bg-[#fdf6e3] transition-colors flex items-center gap-2 ${
-                          selectedDongHoId === dongHo.dongHoId ? "bg-[#fdf6e3] text-[#b91c1c] font-bold" : "text-[#5d4037]"
+                          selectedDongHoId === dongHo.dongHoId
+                            ? "bg-[#fdf6e3] text-[#b91c1c] font-bold"
+                            : "text-[#5d4037]"
                         }`}
                       >
                         <Users size={16} className="text-[#d4af37]" />
@@ -132,7 +139,9 @@ export default function App() {
               {!selectedDongHoId ? (
                 <div className="flex flex-col items-center justify-center h-full text-[#8b5e3c]">
                   <Users size={64} className="mb-4 opacity-50" />
-                  <p className="text-xl">Vui lòng chọn dòng họ để xem cây gia phả</p>
+                  <p className="text-xl">
+                    Vui lòng chọn dòng họ để xem cây gia phả
+                  </p>
                 </div>
               ) : membersQuery.isLoading ? (
                 <div className="flex items-center justify-center h-full">
@@ -144,7 +153,9 @@ export default function App() {
                 <div className="flex flex-col items-center justify-center h-full text-[#8b5e3c]">
                   <Users size={64} className="mb-4 opacity-50" />
                   <p className="text-xl">Dòng họ này chưa có thành viên nào</p>
-                  <p className="text-sm mt-2">Hãy thêm thành viên từ trang quản lý</p>
+                  <p className="text-sm mt-2">
+                    Hãy thêm thành viên từ trang quản lý
+                  </p>
                 </div>
               )}
             </div>
@@ -156,22 +167,15 @@ export default function App() {
             </div>
           )}
 
-          {activeView === ViewMode.HISTORY && (
-            <div className="w-full h-full overflow-y-auto">
-              <NotificationPage />
-            </div>
-          )}
-
           {activeView === ViewMode.NEWS && (
             <div className="w-full h-full overflow-y-auto mt-10">
               <TinTucPage />
             </div>
           )}
 
-          {activeView === ViewMode.SETTINGS && (
-            <div className="w-full h-full overflow-y-auto flex flex-col items-center justify-center text-stone-500">
-              <Settings className="w-16 h-16 mb-4 text-red-800 opacity-50" />
-              <h2 className="text-2xl font-display mb-2">Cài đặt hệ thống</h2>
+          {activeView === ViewMode.EVENT && (
+            <div className="w-full h-full overflow-y-auto mt-10">
+              <SuKienPage />
             </div>
           )}
         </div>

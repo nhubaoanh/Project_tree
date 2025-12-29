@@ -1,7 +1,3 @@
-import { clear } from "console";
-import { LOGIN_URL } from "@/urls";
-import { User } from "lucide-react";
-
 interface UserData {
   nguoiDungId: string;
   first_name?: string;
