@@ -16,6 +16,40 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
+-- Table structure for table `chucnang`
+--
+
+DROP TABLE IF EXISTS `chucnang`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `chucnang` (
+  `chucNangId` varchar(50) NOT NULL,
+  `chucNangCode` varchar(50) NOT NULL COMMENT 'Mã chức năng: SUKIEN, TAICHINH, TAILIEU...',
+  `tenChucNang` varchar(100) NOT NULL COMMENT 'Tên hiển thị: Quản lý sự kiện',
+  `moTa` varchar(255) DEFAULT NULL,
+  `parentId` varchar(50) DEFAULT NULL COMMENT 'Chức năng cha (nếu có)',
+  `icon` varchar(50) DEFAULT NULL COMMENT 'Icon hiển thị',
+  `duongDan` varchar(100) DEFAULT NULL COMMENT 'URL path: /admin/events',
+  `thuTu` int DEFAULT '0' COMMENT 'Thứ tự hiển thị',
+  `active_flag` tinyint DEFAULT '1',
+  `lu_updated` datetime DEFAULT NULL,
+  `lu_user_id` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`chucNangId`),
+  UNIQUE KEY `uk_chucnang_code` (`chucNangCode`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `chucnang`
+--
+
+LOCK TABLES `chucnang` WRITE;
+/*!40000 ALTER TABLE `chucnang` DISABLE KEYS */;
+INSERT INTO `chucnang` VALUES ('8fbe62e7-e4cc-11f0-a0f9-a8934a9bae74','CHICHI','Quản lý chi tiêu','Quản lý chi tiêu dòng họ',NULL,'/icon/dollar.png','/contributionsDown',5,1,NULL,NULL),('CN001','DASHBOARD','Trang chủ','Dashboard tổng quan',NULL,'/icon/iconmember.png','/dashboard',1,1,NULL,NULL),('CN002','THANHVIEN','Quản lý thành viên','Quản lý thành viên dòng họ',NULL,'/icon/iconmember.png','/family-trees',2,1,NULL,NULL),('CN003','SUKIEN','Quản lý sự kiện','Quản lý sự kiện dòng họ',NULL,'/icon/calendar.png','/manageEvents',3,1,NULL,NULL),('CN004','TAICHINH','Quản lý tài chính','Quản lý thu chi',NULL,'/icon/dollar.png','/contributions',4,1,NULL,NULL),('CN005','TAILIEU','Quản lý tài liệu','Quản lý phả ký, tài liệu',NULL,'/icon/iconmember.png','/documents',5,1,NULL,NULL),('CN006','TINTUC','Quản lý tin tức','Quản lý tin tức, thông báo',NULL,'/icon/iconmember.png','/manage-news',6,1,NULL,NULL),('CN007','NGUOIDUNG','Quản lý người dùng','Quản lý tài khoản',NULL,'/icon/iconmember.png','/users',7,1,NULL,NULL),('CN008','DONGHO','Quản lý dòng họ','Quản lý thông tin dòng họ',NULL,'/icon/iconmember.png','/lineage',8,1,NULL,NULL),('CN009','PHANQUYEN','Phân quyền','Quản lý role và quyền',NULL,'/icon/iconmember.png','/roles',9,1,NULL,NULL);
+/*!40000 ALTER TABLE `chucnang` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `danhmuctaichinh`
 --
 
@@ -72,7 +106,7 @@ CREATE TABLE `dongho` (
 
 LOCK TABLES `dongho` WRITE;
 /*!40000 ALTER TABLE `dongho` DISABLE KEYS */;
-INSERT INTO `dongho` VALUES ('025721a4-bd0d-4447-9b9b-505d174de937','Trần','Hải Dương','2025-12-25','Trần Thanh Tùng','dòng họ gia giáo ',1,'system','2025-12-24 15:59:25','system','2025-12-24 15:59:25'),('e9022e64-cbae-11f0-8020-a8934a9bae74','Dòng họ NHỮ','Hải Dương','2000-01-01','Nguyễn Văn A','Dòng họ lưu trữ thông tin gia phả.',1,'admin','2025-11-27 23:34:14','admin','2025-12-02 11:28:12');
+INSERT INTO `dongho` VALUES ('025721a4-bd0d-4447-9b9b-505d174de937','Trần','Hải Dương','2025-12-25','Trần Thanh Tùng','dòng họ gia giáo ',1,'system','2025-12-24 15:59:25','system','2025-12-24 15:59:25'),('d5070904-a492-4963-b612-0bfa3e117318','LÊ','Hải Phòng','2025-12-09','Lê Văn Sơn','Dòng họ lâu đời',1,'system','2025-12-29 22:54:26','system','2025-12-29 22:54:26'),('e9022e64-cbae-11f0-8020-a8934a9bae74','Dòng họ NHỮ','Hải Dương','2000-01-01','Nguyễn Văn A','Dòng họ lưu trữ thông tin gia phả.',1,'admin','2025-11-27 23:34:14','admin','2025-12-02 11:28:12');
 /*!40000 ALTER TABLE `dongho` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -166,7 +200,7 @@ CREATE TABLE `nguoidung` (
 
 LOCK TABLES `nguoidung` WRITE;
 /*!40000 ALTER TABLE `nguoidung` DISABLE KEYS */;
-INSERT INTO `nguoidung` VALUES ('15e5e9b2-b293-4f18-b0f4-86548bbda3b0','e9022e64-cbae-11f0-8020-a8934a9bae74','0aa1a174-c8ed-11f0-8020-a8934a9bae74','nguyenvanbao123@gmail.com','ee2a39ced74bf7f6aa36bef85067aa9a','2025-12-19 11:22:31',0,1,NULL,'2025-12-19 15:50:27',NULL),('61ef80c1-d2fa-4675-9323-bec58d33ed19','e9022e64-cbae-11f0-8020-a8934a9bae74','0aa1a174-c8ed-11f0-8020-a8934a9bae74','nhubaoanh221@gmail.com','bc9ae919caed0fc37d2db4f70f19c45e','2025-12-22 21:27:02',0,1,'89fd6f88-c909-11f0-8020-a8934a9bae74','2025-12-22 21:27:02','89fd6f88-c909-11f0-8020-a8934a9bae74'),('6aa26582-bd12-4fdb-95d8-4e09fdb2f102','e9022e64-cbae-11f0-8020-a8934a9bae74','c2ed095e-c905-11f0-8020-a8934a9bae74','minh123@gmail.com','ddc83bf88c241349a4211172137545e0','2025-12-22 21:16:56',0,1,NULL,'2025-12-22 21:16:56',NULL),('77f83890-6765-4c19-8139-31a29071fac3','e9022e64-cbae-11f0-8020-a8934a9bae74','0aa1a174-c8ed-11f0-8020-a8934a9bae74','baoanh222@gmail.com','3a9df786cd4b24e2ff195aea08e654ea','2025-11-27 23:34:46',0,1,'c2ed095e-c905-11f0-8020-a8934a9bae74','2025-12-02 17:20:04',NULL),('89fd6f88-c909-11f0-8020-a8934a9bae74','e9022e64-cbae-11f0-8020-a8934a9bae74','c2ed095e-c905-11f0-8020-a8934a9bae74','nhubaoanh111@gmail.com','0192023a7bbd73250516f069df18b500','2025-11-24 14:45:25',1,1,'admin','2025-12-03 10:00:08',NULL),('a20a6246-4800-4992-af5c-adcd6e898ee6','e9022e64-cbae-11f0-8020-a8934a9bae74','0aa1a174-c8ed-11f0-8020-a8934a9bae74','minh111@gmail.com','d9d706df20df775493eb3ba05e65c57f','2025-12-19 15:51:04',0,0,NULL,'2025-12-19 22:06:29','system'),('b9b116b0-3d3c-4187-b1a9-fd8247274d64','e9022e64-cbae-11f0-8020-a8934a9bae74','0aa1a174-c8ed-11f0-8020-a8934a9bae74','nguyenvanbao222@gmail.com','014663e57b654fd69a2352969e57e2e6','2025-12-22 21:11:25',0,1,NULL,'2025-12-22 21:11:25',NULL);
+INSERT INTO `nguoidung` VALUES ('15e5e9b2-b293-4f18-b0f4-86548bbda3b0','e9022e64-cbae-11f0-8020-a8934a9bae74','0aa1a174-c8ed-11f0-8020-a8934a9bae74','nguyenvanbao123@gmail.com','ee2a39ced74bf7f6aa36bef85067aa9a','2025-12-19 11:22:31',0,1,NULL,'2025-12-19 15:50:27',NULL),('61ef80c1-d2fa-4675-9323-bec58d33ed19','e9022e64-cbae-11f0-8020-a8934a9bae74','0aa1a174-c8ed-11f0-8020-a8934a9bae74','nhubaoanh221@gmail.com','bc9ae919caed0fc37d2db4f70f19c45e','2025-12-22 21:27:02',0,1,'89fd6f88-c909-11f0-8020-a8934a9bae74','2025-12-22 21:27:02','89fd6f88-c909-11f0-8020-a8934a9bae74'),('6aa26582-bd12-4fdb-95d8-4e09fdb2f102','e9022e64-cbae-11f0-8020-a8934a9bae74','0aa1a174-c8ed-11f0-8020-a8934a9bae74','minh123@gmail.com','ddc83bf88c241349a4211172137545e0','2025-12-22 21:16:56',0,1,NULL,'2025-12-22 21:16:56',NULL),('77f83890-6765-4c19-8139-31a29071fac3','e9022e64-cbae-11f0-8020-a8934a9bae74','0aa1a174-c8ed-11f0-8020-a8934a9bae74','baoanh222@gmail.com','3a9df786cd4b24e2ff195aea08e654ea','2025-11-27 23:34:46',0,1,'c2ed095e-c905-11f0-8020-a8934a9bae74','2025-12-02 17:20:04',NULL),('89fd6f88-c909-11f0-8020-a8934a9bae74','e9022e64-cbae-11f0-8020-a8934a9bae74','c2ed095e-c905-11f0-8020-a8934a9bae74','nhubaoanh111@gmail.com','0192023a7bbd73250516f069df18b500','2025-11-24 14:45:25',1,1,'admin','2025-12-03 10:00:08',NULL),('a20a6246-4800-4992-af5c-adcd6e898ee6','e9022e64-cbae-11f0-8020-a8934a9bae74','0aa1a174-c8ed-11f0-8020-a8934a9bae74','minh111@gmail.com','d9d706df20df775493eb3ba05e65c57f','2025-12-19 15:51:04',0,0,NULL,'2025-12-19 22:06:29','system'),('b9b116b0-3d3c-4187-b1a9-fd8247274d64','e9022e64-cbae-11f0-8020-a8934a9bae74','0aa1a174-c8ed-11f0-8020-a8934a9bae74','nguyenvanbao222@gmail.com','014663e57b654fd69a2352969e57e2e6','2025-12-22 21:11:25',0,1,NULL,'2025-12-22 21:11:25',NULL);
 /*!40000 ALTER TABLE `nguoidung` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -237,6 +271,43 @@ LOCK TABLES `role` WRITE;
 /*!40000 ALTER TABLE `role` DISABLE KEYS */;
 INSERT INTO `role` VALUES ('0437a931-cf5e-11f0-8020-a8934a9bae74','thudo','Thư đồ',NULL,1,'2025-12-02 16:05:15','9ef39219-4c31-4a9b-8632-3a8a4850a01e','2025-12-02 16:05:15','9ef39219-4c31-4a9b-8632-3a8a4850a01e'),('0aa1a174-c8ed-11f0-8020-a8934a9bae74','thanhvien','Thành viên','Role mặc định tạo riêng cho người dùng mới',1,'2025-11-24 11:21:25','9ef39219-4c31-4a9b-8632-3a8a4850a01e','2025-11-24 11:21:25','9ef39219-4c31-4a9b-8632-3a8a4850a01e'),('c2ed095e-c905-11f0-8020-a8934a9bae74','sa','Quản trị hệ thống',NULL,1,'2025-11-24 14:18:23','admin','2025-11-24 14:18:23',NULL);
 /*!40000 ALTER TABLE `role` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `role_chucnang`
+--
+
+DROP TABLE IF EXISTS `role_chucnang`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `role_chucnang` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `roleId` varchar(50) NOT NULL,
+  `chucNangId` varchar(50) NOT NULL,
+  `thaoTacId` varchar(50) NOT NULL,
+  `dongHoId` varchar(50) DEFAULT NULL COMMENT 'NULL = tất cả dòng họ, có giá trị = chỉ dòng họ đó',
+  `active_flag` tinyint DEFAULT '1',
+  `lu_updated` datetime DEFAULT NULL,
+  `lu_user_id` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_role_chucnang` (`roleId`,`chucNangId`,`thaoTacId`,`dongHoId`),
+  KEY `fk_rc_role` (`roleId`),
+  KEY `fk_rc_chucnang` (`chucNangId`),
+  KEY `fk_rc_thaotac` (`thaoTacId`),
+  CONSTRAINT `fk_rc_chucnang` FOREIGN KEY (`chucNangId`) REFERENCES `chucnang` (`chucNangId`) ON DELETE CASCADE,
+  CONSTRAINT `fk_rc_role` FOREIGN KEY (`roleId`) REFERENCES `role` (`roleId`) ON DELETE CASCADE,
+  CONSTRAINT `fk_rc_thaotac` FOREIGN KEY (`thaoTacId`) REFERENCES `thaotac` (`thaoTacId`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=92 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `role_chucnang`
+--
+
+LOCK TABLES `role_chucnang` WRITE;
+/*!40000 ALTER TABLE `role_chucnang` DISABLE KEYS */;
+INSERT INTO `role_chucnang` VALUES (1,'c2ed095e-c905-11f0-8020-a8934a9bae74','CN001','TT006',NULL,1,NULL,NULL),(2,'c2ed095e-c905-11f0-8020-a8934a9bae74','CN001','TT005',NULL,1,NULL,NULL),(3,'c2ed095e-c905-11f0-8020-a8934a9bae74','CN001','TT004',NULL,1,NULL,NULL),(4,'c2ed095e-c905-11f0-8020-a8934a9bae74','CN001','TT003',NULL,1,NULL,NULL),(5,'c2ed095e-c905-11f0-8020-a8934a9bae74','CN001','TT002',NULL,1,NULL,NULL),(6,'c2ed095e-c905-11f0-8020-a8934a9bae74','CN001','TT001',NULL,1,NULL,NULL),(7,'c2ed095e-c905-11f0-8020-a8934a9bae74','CN002','TT006',NULL,1,NULL,NULL),(8,'c2ed095e-c905-11f0-8020-a8934a9bae74','CN002','TT005',NULL,1,NULL,NULL),(9,'c2ed095e-c905-11f0-8020-a8934a9bae74','CN002','TT004',NULL,1,NULL,NULL),(10,'c2ed095e-c905-11f0-8020-a8934a9bae74','CN002','TT003',NULL,1,NULL,NULL),(11,'c2ed095e-c905-11f0-8020-a8934a9bae74','CN002','TT002',NULL,1,NULL,NULL),(12,'c2ed095e-c905-11f0-8020-a8934a9bae74','CN002','TT001',NULL,1,NULL,NULL),(13,'c2ed095e-c905-11f0-8020-a8934a9bae74','CN003','TT006',NULL,1,NULL,NULL),(14,'c2ed095e-c905-11f0-8020-a8934a9bae74','CN003','TT005',NULL,1,NULL,NULL),(15,'c2ed095e-c905-11f0-8020-a8934a9bae74','CN003','TT004',NULL,1,NULL,NULL),(16,'c2ed095e-c905-11f0-8020-a8934a9bae74','CN003','TT003',NULL,1,NULL,NULL),(17,'c2ed095e-c905-11f0-8020-a8934a9bae74','CN003','TT002',NULL,1,NULL,NULL),(18,'c2ed095e-c905-11f0-8020-a8934a9bae74','CN003','TT001',NULL,1,NULL,NULL),(19,'c2ed095e-c905-11f0-8020-a8934a9bae74','CN004','TT006',NULL,1,NULL,NULL),(20,'c2ed095e-c905-11f0-8020-a8934a9bae74','CN004','TT005',NULL,1,NULL,NULL),(21,'c2ed095e-c905-11f0-8020-a8934a9bae74','CN004','TT004',NULL,1,NULL,NULL),(22,'c2ed095e-c905-11f0-8020-a8934a9bae74','CN004','TT003',NULL,1,NULL,NULL),(23,'c2ed095e-c905-11f0-8020-a8934a9bae74','CN004','TT002',NULL,1,NULL,NULL),(24,'c2ed095e-c905-11f0-8020-a8934a9bae74','CN004','TT001',NULL,1,NULL,NULL),(25,'c2ed095e-c905-11f0-8020-a8934a9bae74','CN005','TT006',NULL,1,NULL,NULL),(26,'c2ed095e-c905-11f0-8020-a8934a9bae74','CN005','TT005',NULL,1,NULL,NULL),(27,'c2ed095e-c905-11f0-8020-a8934a9bae74','CN005','TT004',NULL,1,NULL,NULL),(28,'c2ed095e-c905-11f0-8020-a8934a9bae74','CN005','TT003',NULL,1,NULL,NULL),(29,'c2ed095e-c905-11f0-8020-a8934a9bae74','CN005','TT002',NULL,1,NULL,NULL),(30,'c2ed095e-c905-11f0-8020-a8934a9bae74','CN005','TT001',NULL,1,NULL,NULL),(31,'c2ed095e-c905-11f0-8020-a8934a9bae74','CN006','TT006',NULL,1,NULL,NULL),(32,'c2ed095e-c905-11f0-8020-a8934a9bae74','CN006','TT005',NULL,1,NULL,NULL),(33,'c2ed095e-c905-11f0-8020-a8934a9bae74','CN006','TT004',NULL,1,NULL,NULL),(34,'c2ed095e-c905-11f0-8020-a8934a9bae74','CN006','TT003',NULL,1,NULL,NULL),(35,'c2ed095e-c905-11f0-8020-a8934a9bae74','CN006','TT002',NULL,1,NULL,NULL),(36,'c2ed095e-c905-11f0-8020-a8934a9bae74','CN006','TT001',NULL,1,NULL,NULL),(37,'c2ed095e-c905-11f0-8020-a8934a9bae74','CN007','TT006',NULL,1,NULL,NULL),(38,'c2ed095e-c905-11f0-8020-a8934a9bae74','CN007','TT005',NULL,1,NULL,NULL),(39,'c2ed095e-c905-11f0-8020-a8934a9bae74','CN007','TT004',NULL,1,NULL,NULL),(40,'c2ed095e-c905-11f0-8020-a8934a9bae74','CN007','TT003',NULL,1,NULL,NULL),(41,'c2ed095e-c905-11f0-8020-a8934a9bae74','CN007','TT002',NULL,1,NULL,NULL),(42,'c2ed095e-c905-11f0-8020-a8934a9bae74','CN007','TT001',NULL,1,NULL,NULL),(43,'c2ed095e-c905-11f0-8020-a8934a9bae74','CN008','TT006',NULL,1,NULL,NULL),(44,'c2ed095e-c905-11f0-8020-a8934a9bae74','CN008','TT005',NULL,1,NULL,NULL),(45,'c2ed095e-c905-11f0-8020-a8934a9bae74','CN008','TT004',NULL,1,NULL,NULL),(46,'c2ed095e-c905-11f0-8020-a8934a9bae74','CN008','TT003',NULL,1,NULL,NULL),(47,'c2ed095e-c905-11f0-8020-a8934a9bae74','CN008','TT002',NULL,1,NULL,NULL),(48,'c2ed095e-c905-11f0-8020-a8934a9bae74','CN008','TT001',NULL,1,NULL,NULL),(49,'c2ed095e-c905-11f0-8020-a8934a9bae74','CN009','TT006',NULL,1,NULL,NULL),(50,'c2ed095e-c905-11f0-8020-a8934a9bae74','CN009','TT005',NULL,1,NULL,NULL),(51,'c2ed095e-c905-11f0-8020-a8934a9bae74','CN009','TT004',NULL,1,NULL,NULL),(52,'c2ed095e-c905-11f0-8020-a8934a9bae74','CN009','TT003',NULL,1,NULL,NULL),(53,'c2ed095e-c905-11f0-8020-a8934a9bae74','CN009','TT002',NULL,1,NULL,NULL),(54,'c2ed095e-c905-11f0-8020-a8934a9bae74','CN009','TT001',NULL,1,NULL,NULL),(64,'0437a931-cf5e-11f0-8020-a8934a9bae74','CN001','TT001',NULL,1,NULL,NULL),(65,'0437a931-cf5e-11f0-8020-a8934a9bae74','CN002','TT001',NULL,1,NULL,NULL),(66,'0437a931-cf5e-11f0-8020-a8934a9bae74','CN002','TT002',NULL,1,NULL,NULL),(67,'0437a931-cf5e-11f0-8020-a8934a9bae74','CN002','TT003',NULL,1,NULL,NULL),(68,'0437a931-cf5e-11f0-8020-a8934a9bae74','CN002','TT004',NULL,1,NULL,NULL),(69,'0437a931-cf5e-11f0-8020-a8934a9bae74','CN003','TT001',NULL,1,NULL,NULL),(70,'0437a931-cf5e-11f0-8020-a8934a9bae74','CN003','TT002',NULL,1,NULL,NULL),(71,'0437a931-cf5e-11f0-8020-a8934a9bae74','CN003','TT003',NULL,1,NULL,NULL),(72,'0437a931-cf5e-11f0-8020-a8934a9bae74','CN003','TT004',NULL,1,NULL,NULL),(73,'0437a931-cf5e-11f0-8020-a8934a9bae74','CN004','TT001',NULL,1,NULL,NULL),(74,'0437a931-cf5e-11f0-8020-a8934a9bae74','CN004','TT002',NULL,1,NULL,NULL),(75,'0437a931-cf5e-11f0-8020-a8934a9bae74','CN004','TT003',NULL,1,NULL,NULL),(76,'0437a931-cf5e-11f0-8020-a8934a9bae74','CN004','TT004',NULL,1,NULL,NULL),(77,'0437a931-cf5e-11f0-8020-a8934a9bae74','CN005','TT001',NULL,1,NULL,NULL),(78,'0437a931-cf5e-11f0-8020-a8934a9bae74','CN005','TT002',NULL,1,NULL,NULL),(79,'0437a931-cf5e-11f0-8020-a8934a9bae74','CN005','TT003',NULL,1,NULL,NULL),(80,'0437a931-cf5e-11f0-8020-a8934a9bae74','CN005','TT004',NULL,1,NULL,NULL),(81,'0437a931-cf5e-11f0-8020-a8934a9bae74','CN006','TT001',NULL,1,NULL,NULL),(82,'0437a931-cf5e-11f0-8020-a8934a9bae74','CN006','TT002',NULL,1,NULL,NULL),(83,'0437a931-cf5e-11f0-8020-a8934a9bae74','CN006','TT003',NULL,1,NULL,NULL),(84,'0437a931-cf5e-11f0-8020-a8934a9bae74','CN006','TT004',NULL,1,NULL,NULL),(85,'0437a931-cf5e-11f0-8020-a8934a9bae74','CN007','TT001',NULL,1,NULL,NULL),(86,'0aa1a174-c8ed-11f0-8020-a8934a9bae74','CN001','TT001',NULL,1,NULL,NULL);
+/*!40000 ALTER TABLE `role_chucnang` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -462,6 +533,34 @@ INSERT INTO `thanhvien` VALUES (1,'025721a4-bd0d-4447-9b9b-505d174de937','Trần
 UNLOCK TABLES;
 
 --
+-- Table structure for table `thaotac`
+--
+
+DROP TABLE IF EXISTS `thaotac`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `thaotac` (
+  `thaoTacId` varchar(50) NOT NULL,
+  `thaoTacCode` varchar(50) NOT NULL COMMENT 'Mã thao tác: VIEW, CREATE, UPDATE, DELETE',
+  `tenThaoTac` varchar(100) NOT NULL COMMENT 'Tên: Xem, Thêm, Sửa, Xóa',
+  `moTa` varchar(255) DEFAULT NULL,
+  `active_flag` tinyint DEFAULT '1',
+  PRIMARY KEY (`thaoTacId`),
+  UNIQUE KEY `uk_thaotac_code` (`thaoTacCode`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `thaotac`
+--
+
+LOCK TABLES `thaotac` WRITE;
+/*!40000 ALTER TABLE `thaotac` DISABLE KEYS */;
+INSERT INTO `thaotac` VALUES ('TT001','VIEW','Xem','Quyền xem dữ liệu',1),('TT002','CREATE','Thêm mới','Quyền thêm dữ liệu',1),('TT003','UPDATE','Cập nhật','Quyền sửa dữ liệu',1),('TT004','DELETE','Xóa','Quyền xóa dữ liệu',1),('TT005','EXPORT','Xuất file','Quyền xuất Excel/PDF',1),('TT006','IMPORT','Nhập file','Quyền nhập từ Excel',1);
+/*!40000 ALTER TABLE `thaotac` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `thehe`
 --
 
@@ -609,6 +708,92 @@ UNLOCK TABLES;
 --
 -- Dumping routines for database 'treefamily'
 --
+/*!50003 DROP PROCEDURE IF EXISTS `CheckPermission` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`%` PROCEDURE `CheckPermission`(
+   IN p_nguoiDungId VARCHAR(50),
+   IN p_chucNangCode VARCHAR(50),
+   IN p_thaoTacCode VARCHAR(50),
+   IN p_dongHoId VARCHAR(50),
+   OUT p_hasPermission TINYINT,
+   OUT p_error_code INT,
+   OUT p_error_message VARCHAR(500)
+)
+proc: BEGIN
+   DECLARE v_roleId VARCHAR(50);
+   DECLARE v_userDongHoId VARCHAR(50);
+   DECLARE v_roleCode VARCHAR(50);
+   DECLARE v_count INT DEFAULT 0;
+
+   SET p_error_code = 0;
+   SET p_error_message = '';
+   SET p_hasPermission = 0;
+
+   -- Lấy thông tin user
+   SELECT roleId, dongHoId
+   INTO v_roleId, v_userDongHoId
+   FROM nguoidung
+   WHERE nguoiDungId = p_nguoiDungId
+     AND active_flag = 1
+   LIMIT 1;
+
+   IF v_roleId IS NULL THEN
+     SET p_error_code = 1;
+     SET p_error_message = 'Người dùng không tồn tại hoặc đã bị khóa';
+     LEAVE proc;
+   END IF;
+
+   -- Lấy roleCode
+   SELECT roleCode
+   INTO v_roleCode
+   FROM role
+   WHERE roleId = v_roleId
+   LIMIT 1;
+
+   -- Super Admin
+   IF v_roleCode = 'sa' THEN
+     SET p_hasPermission = 1;
+     LEAVE proc;
+   END IF;
+
+   -- Kiểm tra quyền
+   SELECT COUNT(*) INTO v_count
+   FROM role_chucnang rc
+   JOIN chucnang cn ON rc.chucNangId = cn.chucNangId
+   JOIN thaotac tt ON rc.thaoTacId = tt.thaoTacId
+   WHERE rc.roleId = v_roleId
+     AND cn.chucNangCode = p_chucNangCode
+     AND tt.thaoTacCode = p_thaoTacCode
+     AND rc.active_flag = 1
+     AND (rc.dongHoId IS NULL OR rc.dongHoId = v_userDongHoId);
+
+   IF v_count > 0 THEN
+     IF p_dongHoId IS NOT NULL
+        AND p_dongHoId <> v_userDongHoId THEN
+       SET p_error_code = 2;
+       SET p_error_message = 'Bạn không có quyền thao tác trên dòng họ này';
+     ELSE
+       SET p_hasPermission = 1;
+     END IF;
+   ELSE
+     SET p_error_code = 3;
+     SET p_error_message = 'Bạn không có quyền thực hiện thao tác này';
+   END IF;
+
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
 /*!50003 DROP PROCEDURE IF EXISTS `checkUsernameExist` */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
@@ -1461,6 +1646,61 @@ BEGIN
   
   SET p_err_code = 0;
   SET p_err_msg = 'Success';
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `GetMenuByRoleId` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`%` PROCEDURE `GetMenuByRoleId`(
+  IN p_roleId VARCHAR(50)
+)
+BEGIN
+  DECLARE v_roleCode VARCHAR(50);
+  
+  -- Set default
+  SET @err_code = 0;
+  SET @err_msg = '';
+  
+  -- Lấy roleCode
+  SELECT roleCode INTO v_roleCode FROM role WHERE roleId = p_roleId AND active_flag = 1;
+  
+  IF v_roleCode IS NULL THEN
+    SET @err_code = 1;
+    SET @err_msg = 'Role không tồn tại';
+  END IF;
+  
+  -- Trả về danh sách menu + quyền
+  SELECT 
+    cn.chucNangId,
+    cn.chucNangCode as code,
+    cn.tenChucNang as name,
+    cn.duongDan as href,
+    cn.icon,
+    cn.thuTu as sortOrder,
+    cn.parentId,
+    GROUP_CONCAT(DISTINCT tt.thaoTacCode ORDER BY tt.thaoTacCode) as actions,
+    v_roleCode as roleCode,
+    CASE WHEN v_roleCode = 'sa' THEN 1 ELSE 0 END as canSelectAllDongHo
+  FROM role_chucnang rc
+  JOIN chucnang cn ON rc.chucNangId = cn.chucNangId
+  JOIN thaotac tt ON rc.thaoTacId = tt.thaoTacId
+  WHERE rc.roleId = p_roleId
+    AND rc.active_flag = 1
+    AND cn.active_flag = 1
+  GROUP BY cn.chucNangId, cn.chucNangCode, cn.tenChucNang, cn.duongDan, cn.icon, cn.thuTu, cn.parentId
+  ORDER BY cn.thuTu;
+  
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -5021,4 +5261,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-12-29 21:25:28
+-- Dump completed on 2025-12-29 22:56:41
