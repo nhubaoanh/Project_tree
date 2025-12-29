@@ -44,4 +44,21 @@ export class Database {
       }
     }
   }
+
+  // Raw query - không kiểm tra @err_code/@err_msg (dùng cho SELECT thuần)
+  public async rawQuery(sql: string, values: any[]): Promise<any> {
+    let connection: PoolConnection | null = null;
+
+    try {
+      connection = await this.pool.getConnection();
+      const result = await connection.query(sql, values);
+      return result;
+    } catch (error) {
+      throw error;
+    } finally {
+      if (connection) {
+        connection.release();
+      }
+    }
+  }
 }

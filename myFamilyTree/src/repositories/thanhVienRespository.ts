@@ -108,17 +108,7 @@ export class thanhVienRespository {
   // Lấy thành viên theo Composite Key (dongHoId + thanhVienId)
   async getThanhVienById(dongHoId: string, thanhVienId: number): Promise<any> {
     try {
-      const sql = `
-        SELECT tv.*, 
-          cha.hoTen AS tenCha, me.hoTen AS tenMe, 
-          vo.hoTen AS tenVo, chong.hoTen AS tenChong
-        FROM thanhvien tv
-        LEFT JOIN thanhvien cha ON tv.dongHoId = cha.dongHoId AND tv.chaId = cha.thanhVienId
-        LEFT JOIN thanhvien me ON tv.dongHoId = me.dongHoId AND tv.meId = me.thanhVienId
-        LEFT JOIN thanhvien vo ON tv.dongHoId = vo.dongHoId AND tv.voId = vo.thanhVienId
-        LEFT JOIN thanhvien chong ON tv.dongHoId = chong.dongHoId AND tv.chongId = chong.thanhVienId
-        WHERE tv.dongHoId = ? AND tv.thanhVienId = ? AND tv.active_flag = 1
-      `;
+      const sql = "CALL GetMemberById(?, ?, @err_code, @err_mgs)";
       const [result] = await this.db.query(sql, [dongHoId, thanhVienId]);
       return result;
     } catch (error: any) {
@@ -149,14 +139,10 @@ export class thanhVienRespository {
     }
   }
 
-  // Lấy tất cả thành viên theo dongHoId (không phân trang - dùng cho render cây)
   async getAllByDongHo(dongHoId: string): Promise<any> {
-    try {
-      const sql = `
-        SELECT * FROM thanhvien 
-        WHERE dongHoId = ? AND active_flag = 1
-        ORDER BY doiThuoc ASC, thanhVienId ASC
-      `;
+    try { 
+      const sql = "CALL GetAllMemberByDongHo(?, @err_code, @err_mgs)";
+      // Dùng rawQuery vì đây là SELECT thuần, không phải stored procedure
       const result = await this.db.query(sql, [dongHoId]);
       // result là [[rows], fields] từ mysql2
       if (Array.isArray(result) && Array.isArray(result[0])) {
