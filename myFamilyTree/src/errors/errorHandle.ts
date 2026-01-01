@@ -10,7 +10,15 @@ export const errorHandler = (
   console.error("═".repeat(50));
   console.error("[ERROR HANDLER]");
   console.error("URL:", req.method, req.originalUrl);
-  console.error("Body:", JSON.stringify(req.body).substring(0, 200));
+  
+  // Safe log body (có thể undefined khi upload file)
+  try {
+    const bodyStr = req.body ? JSON.stringify(req.body) : "undefined";
+    console.error("Body:", bodyStr.substring(0, 200));
+  } catch {
+    console.error("Body: [Cannot stringify]");
+  }
+  
   console.error("Error:", err.message);
   console.error("Stack:", err.stack);
   console.error("═".repeat(50));

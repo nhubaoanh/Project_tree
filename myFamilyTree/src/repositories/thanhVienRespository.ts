@@ -208,7 +208,7 @@ export class thanhVienRespository {
     const connection = await this.db.getRawConnection();
     try {
       const jsonData = JSON.stringify(thanhviens);
-      // Gọi stored procedure mới cho Composite Key
+      // Gọi stored procedure với OUT params
       await connection.query(
         'CALL ImportThanhVienFromJsonComposite(?, ?, ?, @err_code, @err_msg)',
         [jsonData, dongHoId, nguoiTaoId]

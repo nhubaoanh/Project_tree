@@ -6,7 +6,7 @@
  * ╚══════════════════════════════════════════════════════════════════════════════╝
  */
 
-import { ValidationChain } from "express-validator";
+import { ValidationChain, body } from "express-validator";
 import {
   stringLength,
   optionalStringLength,
@@ -25,7 +25,7 @@ import {
  *
  * Fields:
  * - hoTen: Bắt buộc, 2-100 ký tự
- * - gioiTinh: Tùy chọn, Nam/Nữ/Khác
+ * - gioiTinh: Tùy chọn (0, 1, 2 hoặc "Nam", "Nữ", "Khác")
  * - ngaySinh: Tùy chọn, format YYYY-MM-DD
  * - ngayMat: Tùy chọn, format YYYY-MM-DD
  * - dongHoId: Tùy chọn, số nguyên dương
@@ -34,7 +34,16 @@ import {
  */
 export const createThanhVienRules: ValidationChain[] = [
   stringLength("hoTen", "Họ tên", 2, 100),
-  optionalEnum("gioiTinh", "Giới tính", ["Nam", "Nữ", "Khác"]),
+  // gioiTinh có thể là số (0, 1, 2) hoặc string
+  body("gioiTinh")
+    .optional({ values: "falsy" })
+    .custom((value) => {
+      const validValues = [0, 1, 2, "0", "1", "2", "Nam", "Nữ", "Khác"];
+      if (!validValues.includes(value)) {
+        throw new Error("Giới tính không hợp lệ");
+      }
+      return true;
+    }),
   optionalDate("ngaySinh", "Ngày sinh"),
   optionalDate("ngayMat", "Ngày mất"),
   optionalId("dongHoId", "Dòng họ ID"),
@@ -51,13 +60,23 @@ export const createThanhVienRules: ValidationChain[] = [
  * Fields:
  * - id (param): Bắt buộc, số nguyên dương
  * - hoTen: Tùy chọn, 2-100 ký tự
- * - gioiTinh: Tùy chọn
+ * - gioiTinh: Tùy chọn (0, 1, 2 hoặc "Nam", "Nữ", "Khác")
  * - ngaySinh: Tùy chọn
  */
 export const updateThanhVienRules: ValidationChain[] = [
   idParam("id"),
   optionalStringLength("hoTen", "Họ tên", 100),
-  optionalEnum("gioiTinh", "Giới tính", ["Nam", "Nữ", "Khác"]),
+  // gioiTinh có thể là số (0, 1, 2) hoặc string
+  body("gioiTinh")
+    .optional({ values: "falsy" })
+    .custom((value) => {
+      // Chấp nhận số 0, 1, 2 hoặc string "Nam", "Nữ", "Khác"
+      const validValues = [0, 1, 2, "0", "1", "2", "Nam", "Nữ", "Khác"];
+      if (!validValues.includes(value)) {
+        throw new Error("Giới tính không hợp lệ");
+      }
+      return true;
+    }),
   optionalDate("ngaySinh", "Ngày sinh"),
   optionalDate("ngayMat", "Ngày mất"),
 ];

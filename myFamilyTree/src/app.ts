@@ -49,6 +49,16 @@ import { errorHandler } from "./errors/errorHandle";
 const app = express();
 
 // ============================================================================
+// STATIC FILES - Đặt TRƯỚC security headers để không bị CSP block
+// ============================================================================
+app.use("/uploads", (req, res, next) => {
+  // Cho phép CORS cho static files
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
+  next();
+}, express.static(path.join(__dirname, "..", "uploads")));
+
+// ============================================================================
 // 1. CORS - Cho phép cross-origin requests
 // ============================================================================
 app.use(
@@ -74,8 +84,9 @@ app.use("/api-core", generalLimiter);
 // ============================================================================
 // 4. BODY PARSER - Parse JSON với giới hạn size
 // ============================================================================
-app.use(express.json({ limit: "10kb" }));
-app.use(express.urlencoded({ extended: true, limit: "10kb" }));
+// Tăng limit cho import JSON (gia phả có thể có nhiều thành viên)
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
 // ============================================================================
 // 5. HPP - Chống HTTP Parameter Pollution
@@ -93,11 +104,6 @@ app.use(sanitizeParams);
 // 7. SQL INJECTION CHECK - Kiểm tra SQL injection
 // ============================================================================
 app.use(checkSqlInjection);
-
-// ============================================================================
-// STATIC FILES
-// ============================================================================
-app.use("/uploads", express.static(path.join(__dirname, "..", "uploads")));
 
 // ============================================================================
 // 8. ROUTES

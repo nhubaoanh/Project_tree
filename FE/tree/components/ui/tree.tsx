@@ -26,8 +26,17 @@ type AppFamilyNode = FamilyTree.node & {
 // Helpers
 const getImageUrl = (img: string | null | undefined): string => {
   if (!img?.trim()) return DEFAULT_AVATAR;
+  // Nếu là URL đầy đủ
   if (img.startsWith("http")) return img;
-  return `${API_BASE_URL}/${img.startsWith("uploads/") ? img : `uploads/${img}`}`;
+  // Nếu là đường dẫn tương đối
+  const path = img.startsWith("uploads/") ? img : `uploads/${img}`;
+  return `${API_BASE_URL}/${path}`;
+};
+
+// Xử lý lỗi ảnh - trả về ảnh mặc định
+const handleImageError = (imgUrl: string): string => {
+  // Nếu ảnh lỗi, trả về ảnh mặc định
+  return DEFAULT_AVATAR;
 };
 
 const toNum = (v: unknown): number | undefined => {
@@ -39,6 +48,7 @@ const toNum = (v: unknown): number | undefined => {
 // Custom Templates - Fix hình ảnh không bị méo
 const initTemplates = () => {
   const create = (name: string, bg: string, border: string, opacity = 1) => {
+    // Copy từ template john
     FamilyTree.templates[name] = Object.assign({}, FamilyTree.templates.john);
     FamilyTree.templates[name].size = [180, 120];
     FamilyTree.templates[name].node = `
@@ -49,11 +59,15 @@ const initTemplates = () => {
     FamilyTree.templates[name].field_0 = '<text x="90" y="24" text-anchor="middle" fill="#fff" font-weight="bold" font-size="12">{val}</text>';
     FamilyTree.templates[name].field_1 = '<text x="90" y="95" text-anchor="middle" fill="#555" font-size="10">{val}</text>';
     FamilyTree.templates[name].field_2 = '<text x="90" y="108" text-anchor="middle" fill="#777" font-size="9">{val}</text>';
-    // Ảnh tròn, không méo
+    // Ảnh tròn với clipPath - fix ảnh vuông không vừa node
+    FamilyTree.templates[name].defs = `
+      <clipPath id="${name}_clip">
+        <circle cx="90" cy="62" r="20"/>
+      </clipPath>
+    `;
     FamilyTree.templates[name].img_0 = `
-      <defs><clipPath id="${name}_clip"><circle cx="90" cy="62" r="18"/></clipPath></defs>
-      <circle cx="90" cy="62" r="20" fill="#fff" stroke="${border}" stroke-width="2"/>
-      <image x="72" y="44" width="36" height="36" clip-path="url(#${name}_clip)" href="{val}" preserveAspectRatio="xMidYMid slice"/>
+      <circle cx="90" cy="62" r="22" fill="#fff" stroke="${border}" stroke-width="2"/>
+      <image x="70" y="42" width="40" height="40" href="{val}" xlink:href="{val}" preserveAspectRatio="xMidYMid slice" clip-path="url(#${name}_clip)"/>
     `;
   };
   create("male_tpl", "#e3f2fd", "#1976d2");
@@ -126,19 +140,31 @@ export const MyFamilyTree = ({ data }: Props) => {
       return [n.gioiTinh === 1 ? "male" : "female"];
     };
 
-    const nodes = filtered.map((n) => ({
-      id: toNum(n.id)!,
-      pids: (n.pids ?? []).map(toNum).filter((x): x is number => typeof x === "number"),
-      fid: toNum(n.fid),
-      mid: toNum(n.mid),
-      memberId: n.thanhVienId,
-      doiThuoc: n.doiThuoc || 1,
-      field_0: n.hoTen || "Chưa rõ",
-      field_1: n.ngayMat ? `Mất: ${new Date(n.ngayMat).toLocaleDateString("vi-VN")}` : "Còn sống",
-      field_2: n.ngheNghiep || "Chưa rõ",
-      img_0: getImageUrl(n.anhChanDung),
-      tags: getTags(n),
-    }));
+    const nodes = filtered.map((n) => {
+      // Debug: log data để xem anhChanDung
+      console.log("Node data:", n.id, n.hoTen, "anhChanDung:", n.anhChanDung);
+      
+      // Xử lý ảnh - nếu không có hoặc rỗng thì dùng ảnh mặc định
+      let imgUrl = DEFAULT_AVATAR;
+      if (n.anhChanDung && n.anhChanDung.trim()) {
+        imgUrl = getImageUrl(n.anhChanDung);
+        console.log("Image URL:", imgUrl);
+      }
+      
+      return {
+        id: toNum(n.id)!,
+        pids: (n.pids ?? []).map(toNum).filter((x): x is number => typeof x === "number"),
+        fid: toNum(n.fid),
+        mid: toNum(n.mid),
+        memberId: n.thanhVienId,
+        doiThuoc: n.doiThuoc || 1,
+        field_0: n.hoTen || "Chưa rõ",
+        field_1: n.ngayMat ? `Mất: ${new Date(n.ngayMat).toLocaleDateString("vi-VN")}` : "Còn sống",
+        field_2: n.ngheNghiep || "Chưa rõ",
+        img_0: imgUrl,
+        tags: getTags(n),
+      };
+    });
     setAllNodes(nodes);
 
     if (familyRef.current) divRef.current.innerHTML = "";

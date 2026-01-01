@@ -127,8 +127,8 @@ export const securityHeaders = helmet({
       defaultSrc: ["'self'"], // Chỉ load từ cùng domain
       scriptSrc: ["'self'"], // JS chỉ từ cùng domain
       styleSrc: ["'self'", "'unsafe-inline'"], // CSS cho phép inline
-      imgSrc: ["'self'", "data:", "https:"], // Ảnh từ self, data URL, HTTPS
-      connectSrc: ["'self'"], // AJAX chỉ đến cùng domain
+      imgSrc: ["'self'", "data:", "https:", "http://localhost:*", "blob:"], // Ảnh từ self, data URL, HTTPS, localhost
+      connectSrc: ["'self'", "http://localhost:*"], // AJAX đến cùng domain và localhost
       fontSrc: ["'self'"], // Font từ cùng domain
       objectSrc: ["'none'"], // Không cho <object>, <embed>
       mediaSrc: ["'self'"], // Video/audio từ cùng domain
