@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { Search, Plus, Upload, X, Loader2, ArrowLeft } from "lucide-react";
+import { Search, Plus, Upload, X, Loader2, ArrowLeft, Download } from "lucide-react";
 import * as XLSX from "xlsx";
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 import { IMember, IMemberSearch } from "@/types/member";
@@ -10,7 +10,7 @@ import { MemberTable } from "./components/MemberTable";
 import { MemberModal } from "./components/MemberModal";
 import { MemberDetailModal } from "./components/MemberDetailModal";
 import { ExcelTemplateButton } from "./components/ExcelTemplateButton";
-import { searchMemberByDongHo, importMembersJson, IMemberImport, createMemberWithDongHo, updateMember, deleteMember } from "@/service/member.service";
+import { searchMemberByDongHo, importMembersJson, IMemberImport, createMemberWithDongHo, updateMember, deleteMember, exportMembersExcel } from "@/service/member.service";
 import { getDongHoById, IDongHo } from "@/service/dongho.service";
 
 export default function MembersByDongHoPage() {
@@ -91,6 +91,16 @@ export default function MembersByDongHoPage() {
     };
     const handleBack = () => router.push("/family-trees");
     const handleViewDetail = (member: IMember) => { setDetailMember(member); setIsDetailModalOpen(true); };
+
+    // Export Excel
+    const handleExportExcel = async () => {
+        try {
+            await exportMembersExcel(dongHoId);
+            showSuccess("Xuất Excel thành công!");
+        } catch (error: any) {
+            showError(error.message || "Có lỗi khi xuất Excel");
+        }
+    };
 
     // Import Excel với dongHoId từ URL
     const handleImportExcel = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -186,6 +196,9 @@ export default function MembersByDongHoPage() {
                 </div>
                 <div className="flex gap-2 flex-wrap justify-end">
                     <ExcelTemplateButton />
+                    <button onClick={handleExportExcel} className="flex items-center gap-2 px-4 py-2 bg-[#38a169] text-white rounded shadow hover:bg-[#2f855a] text-sm font-bold">
+                        <Download size={16} /><span className="hidden sm:inline">Xuất Excel</span>
+                    </button>
                     <button onClick={() => fileInputRef.current?.click()} className="flex items-center gap-2 px-4 py-2 bg-[#2c5282] text-white rounded shadow hover:bg-[#2a4365] text-sm font-bold">
                         <Upload size={16} /><span className="hidden sm:inline">Nhập Excel</span>
                         <input ref={fileInputRef} type="file" accept=".xlsx, .xls" onChange={handleImportExcel} className="hidden" />

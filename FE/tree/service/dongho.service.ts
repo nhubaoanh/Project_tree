@@ -113,3 +113,6 @@ export const getMyDongHo = async (): Promise<any> => {
         return { success: false, data: [], message: err.message };
     }
 };
+
+// Alias cho getAllDongHo - dùng cho dropdown
+export const getDongHoList = getAllDongHo;

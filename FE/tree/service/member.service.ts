@@ -122,6 +122,32 @@ export const dowExcelTemple = async (): Promise<Blob | null> => {
     }
 }
 
+// Export danh sách thành viên ra Excel (cùng format với template import)
+export const exportMembersExcel = async (dongHoId: string): Promise<void> => {
+    try {
+        const res = await apiClient.get(`${prefix}/export/${dongHoId}`, {
+            responseType: 'blob'
+        });
+        
+        // Tạo link download
+        const blob = new Blob([res.data], { 
+            type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
+        });
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', `DanhSach_ThanhVien_${dongHoId}.xlsx`);
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.URL.revokeObjectURL(url);
+    } catch (error: any) {
+        const err = parseApiError(error);
+        console.error(`[exportMembersExcel] ${err.message}`);
+        throw new Error(err.message);
+    }
+}
+
 export const importExcel = async(file: File): Promise<any> => {
     try {
         const formData = new FormData();

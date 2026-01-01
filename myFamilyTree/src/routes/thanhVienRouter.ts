@@ -76,6 +76,15 @@ thanhVienRouter.get(
 );
 
 /**
+ * GET /export/:dongHoId
+ * Export danh sách thành viên ra Excel
+ */
+thanhVienRouter.get(
+  "/export/:dongHoId",
+  controller.exportMembers.bind(controller)
+);
+
+/**
  * GET /:id
  * Lấy thành viên theo ID
  *
