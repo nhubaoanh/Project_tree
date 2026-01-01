@@ -1,0 +1,43 @@
+# Environment files - QUAN TRỌNG: chứa secrets
+.env
+.env.local
+.env.production
+.env.*.local
+
+# Node modules
+node_modules/
+*/node_modules/
+
+# Build outputs
+dist/
+build/
+.next/
+*/dist/
+*/build/
+*/.next/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Docker volumes (local data)
+mysql_data/
+
+# Uploads (user data)
+uploads/
+*/uploads/
+
+# SSL certificates
+nginx/ssl/*.pem
+nginx/ssl/*.key
+nginx/ssl/*.crt
