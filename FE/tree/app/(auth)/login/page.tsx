@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -42,6 +42,10 @@ export default function LoginPage() {
   const router = useRouter();
   const { showError, showSuccess } = useToast();
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    storage.clearToken()
+  }, []);
 
   // Sử dụng custom hook - gom nhóm tất cả logic validate
   const form = useFormValidation<LoginFormData>({

@@ -18,10 +18,6 @@ export default function MemberDetailPage() {
     const user = storage.getUser();
     if (user?.dongHoId) {
       setDongHoId(user.dongHoId);
-    } else {
-      // Fallback: lấy từ localStorage nếu có
-      const storedId = localStorage.getItem("currentDongHoId");
-      if (storedId) setDongHoId(storedId);
     }
   }, []);
 

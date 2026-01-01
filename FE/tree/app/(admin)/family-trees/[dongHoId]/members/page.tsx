@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Search, Plus, Upload, X, Loader2, ArrowLeft, Download } from "lucide-react";
 import * as XLSX from "xlsx";
@@ -12,6 +12,7 @@ import { MemberDetailModal } from "./components/MemberDetailModal";
 import { ExcelTemplateButton } from "./components/ExcelTemplateButton";
 import { searchMemberByDongHo, importMembersJson, IMemberImport, createMemberWithDongHo, updateMember, deleteMember, exportMembersExcel } from "@/service/member.service";
 import { getDongHoById, IDongHo } from "@/service/dongho.service";
+import storage from "@/utils/storage";
 
 export default function MembersByDongHoPage() {
     const params = useParams();
@@ -19,6 +20,19 @@ export default function MembersByDongHoPage() {
     const dongHoId = params.dongHoId as string;
     const queryClient = useQueryClient();
     const fileInputRef = useRef<HTMLInputElement>(null);
+
+    // Kiểm tra quyền truy cập
+    const [hasAccess, setHasAccess] = useState(true);
+    const user = storage.getUser();
+    const isAdmin = user?.roleCode === "sa";
+
+    useEffect(() => {
+        // Nếu không phải Admin và dongHoId không khớp với dòng họ của user
+        if (user && user.roleCode !== "sa" && user.dongHoId && user.dongHoId !== dongHoId) {
+            setHasAccess(false);
+            router.push("/dashboard");
+        }
+    }, [dongHoId, user, router]);
 
     const [pageIndex, setPageIndex] = useState(1);
     const [pageSize, setPageSize] = useState(5);
@@ -91,6 +105,11 @@ export default function MembersByDongHoPage() {
     };
     const handleBack = () => router.push("/family-trees");
     const handleViewDetail = (member: IMember) => { setDetailMember(member); setIsDetailModalOpen(true); };
+
+    // Nếu không có quyền truy cập
+    if (!hasAccess) {
+        return <div className="flex items-center justify-center h-64"><Loader2 className="animate-spin h-12 w-12 text-[#d4af37]" /></div>;
+    }
 
     // Export Excel
     const handleExportExcel = async () => {
@@ -186,9 +205,12 @@ export default function MembersByDongHoPage() {
             {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-end md:items-center mb-8 gap-4 border-b border-[#d4af37] pb-4">
                 <div>
-                    <button onClick={handleBack} className="flex items-center gap-1 text-[#8b5e3c] hover:text-[#b91c1c] mb-2 transition-colors">
-                        <ArrowLeft size={16} /><span className="text-sm">Quay lại danh sách</span>
-                    </button>
+                    {/* Chỉ Admin mới thấy nút quay lại */}
+                    {isAdmin && (
+                        <button onClick={handleBack} className="flex items-center gap-1 text-[#8b5e3c] hover:text-[#b91c1c] mb-2 transition-colors">
+                            <ArrowLeft size={16} /><span className="text-sm">Quay lại danh sách</span>
+                        </button>
+                    )}
                     <h2 className="text-3xl font-display font-bold text-[#b91c1c] uppercase drop-shadow-sm">
                         {dongHoInfo?.tenDongHo || "Quản Lý Thành Viên"}
                     </h2>

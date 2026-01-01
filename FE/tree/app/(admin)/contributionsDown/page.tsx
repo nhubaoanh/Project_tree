@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Search, Plus, Download, Upload, X, Loader2 } from "lucide-react";
 import * as XLSX from "xlsx";
 import {
@@ -15,12 +15,27 @@ import { ContributionUpModal } from "./components/contribuitionDownModal";
 import { createContributionDown, deleteContributionDown, searchContributionDown, updateContributionDown } from "@/service/contribuitionDown.service";
 import { IContributionDown, IsearchContributionDown } from "@/types/contribuitionDown";
 import { useToast } from "@/service/useToas";
+import storage from "@/utils/storage";
 
 // --- MAIN PAGE COMPONENT ---
 
 export default function QuanLyThanhVienPage() {
   const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Lấy thông tin user và dongHoId
+  const [user, setUser] = useState<any>(null);
+  const [dongHoId, setDongHoId] = useState<string>("");
+  const [isReady, setIsReady] = useState(false);
+
+  useEffect(() => {
+    const userData = storage.getUser();
+    setUser(userData);
+    if (userData?.dongHoId) {
+      setDongHoId(userData.dongHoId);
+    }
+    setIsReady(true);
+  }, []);
 
   // --- STATE FOR API QUERY PARAMETERS ---
   const [pageIndex, setPageIndex] = useState(1);
@@ -46,17 +61,19 @@ export default function QuanLyThanhVienPage() {
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
-  // --- FETCHING DATA ---
+  // --- FETCHING DATA với dongHoId ---
   const searchParams: IsearchContributionDown = {
     pageIndex,
     pageSize,
     search_content: debouncedSearch,
+    dongHoId: dongHoId || undefined, // Filter theo dòng họ
   };
 
   const usersQuery = useQuery({
     queryKey: ["contribuitionDown", searchParams],
     queryFn: () => searchContributionDown(searchParams),
     placeholderData: keepPreviousData,
+    enabled: isReady && !!dongHoId, // Chỉ fetch khi có dongHoId
   });
 
   const userData = usersQuery.data?.data || [];
@@ -194,6 +211,22 @@ export default function QuanLyThanhVienPage() {
   const isDeleting = deleteMutation.isPending;
 
   // --- RENDER UI ---
+  
+  // Chưa có dongHoId
+  if (isReady && !dongHoId) {
+    return (
+      <div className="max-w-6xl mx-auto font-dancing text-[#4a4a4a] pb-20 animate-fadeIn">
+        <div className="text-center py-16">
+          <Loader2 size={64} className="mx-auto text-[#d4af37] mb-4 opacity-50" />
+          <h2 className="text-2xl font-bold text-[#b91c1c] mb-2">Chưa được gán dòng họ</h2>
+          <p className="text-[#8b5e3c] text-lg">
+            Tài khoản của bạn chưa được gán vào dòng họ nào.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-6xl mx-auto font-dancing text-[#4a4a4a] pb-20 animate-fadeIn">
       {/* Header & Toolbar */}

@@ -20,7 +20,6 @@ apiClient.interceptors.request.use(
 // Response interceptor - xử lý lỗi 401, 403
 apiClient.interceptors.response.use(
     function (response) {
-        // Trả về response, để từng service tự xử lý success/fail
         return response;
     },
     function (error) {
@@ -35,11 +34,7 @@ apiClient.interceptors.response.use(
         }
         
         // 403 - Forbidden: không có quyền truy cập
-        if (status === 403) {
-            if (typeof window !== "undefined" && !window.location.pathname.includes("/403")) {
-                window.location.href = "/403";
-            }
-        }
+        // Không log warning - để component xử lý gracefully
         
         return Promise.reject(error);
     }

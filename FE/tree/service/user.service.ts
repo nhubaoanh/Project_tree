@@ -42,13 +42,14 @@ export const getUsers = async (data: IUserSearch): Promise<any> => {
     return res?.data;
   } catch (error: any) {
     const err = parseApiError(error);
-    // Không log error cho trường hợp không có kết quả tìm kiếm (đây là bình thường)
+    // Không log error cho trường hợp không có kết quả tìm kiếm hoặc 403
     const isEmptyResult = err.message?.includes("Không tồn tại kết quả") || 
                           err.message?.includes("không tìm thấy");
-    if (!isEmptyResult) {
+    const is403 = error?.response?.status === 403;
+    if (!isEmptyResult && !is403) {
       console.error(`[getUsers] ${err.message}`);
     }
-    return { success: true, data: [], totalItems: 0, pageCount: 0 };
+    return { success: true, data: [], totalItems: 0, pageCount: 0, is403 };
   }
 };
 

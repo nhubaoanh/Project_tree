@@ -43,7 +43,8 @@ import {
   getSuKienSapToi,
   IThongKeTheoDoi,
 } from "@/service/thongke.service";
-import { getAllDongHo, IDongHo } from "@/service/dongho.service";
+import { getAllDongHo, getDongHoById, IDongHo } from "@/service/dongho.service";
+import storage from "@/utils/storage";
 
 const COLORS = ["#1e3a5f", "#d4af37", "#b91c1c", "#5d4037", "#2c5282", "#a16207"];
 
@@ -118,16 +119,48 @@ const KPICard = ({ title, value, trend, trendValue, icon: Icon, bgColor, iconBg 
 export default function Dashboard() {
   const [selectedDongHoId, setSelectedDongHoId] = useState<string>("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isReady, setIsReady] = useState(false);
   const currentYear = new Date().getFullYear();
 
-  const dongHoQuery = useQuery({ queryKey: ["dongho-list"], queryFn: getAllDongHo });
-  const dongHoList: IDongHo[] = dongHoQuery.data?.data || [];
+  // Lấy thông tin user
+  const [user, setUser] = useState<any>(null);
+  const isAdmin = user?.roleCode === "sa";
 
   useEffect(() => {
-    if (dongHoList.length > 0 && !selectedDongHoId) {
+    const userData = storage.getUser();
+    setUser(userData);
+    setIsReady(true);
+    
+    // Non-Admin: tự động set dongHoId của mình
+    if (userData && userData.roleCode !== "sa" && userData.dongHoId) {
+      setSelectedDongHoId(userData.dongHoId);
+    }
+  }, []);
+
+  // Admin: fetch tất cả dòng họ
+  const dongHoQuery = useQuery({ 
+    queryKey: ["dongho-list"], 
+    queryFn: getAllDongHo,
+    enabled: isReady && isAdmin,
+  });
+  
+  // Non-Admin: fetch dòng họ của mình
+  const myDongHoQuery = useQuery({
+    queryKey: ["my-dongho", user?.dongHoId],
+    queryFn: () => getDongHoById(user?.dongHoId),
+    enabled: isReady && !isAdmin && !!user?.dongHoId,
+  });
+
+  const dongHoList: IDongHo[] = isAdmin 
+    ? (dongHoQuery.data?.data || [])
+    : (myDongHoQuery.data?.data ? [myDongHoQuery.data.data] : []);
+
+  useEffect(() => {
+    // Admin: chọn dòng họ đầu tiên nếu chưa chọn
+    if (isAdmin && dongHoList.length > 0 && !selectedDongHoId) {
       setSelectedDongHoId(dongHoList[0].dongHoId);
     }
-  }, [dongHoList, selectedDongHoId]);
+  }, [dongHoList, selectedDongHoId, isAdmin]);
 
   const statsQuery = useQuery({
     queryKey: ["dashboard-stats", selectedDongHoId],
@@ -211,34 +244,38 @@ export default function Dashboard() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div>
           <h1 className="text-2xl font-bold text-[#1e3a5f]">Tổng Quan Gia Phả</h1>
-          <p className="text-sm text-gray-500">Thống kê và quản lý dòng họ</p>
+          <p className="text-sm text-gray-500">
+            {isAdmin ? "Thống kê và quản lý dòng họ" : `Dòng họ: ${selectedDongHo?.tenDongHo || ""}`}
+          </p>
         </div>
         
-        {/* Dropdown */}
-        <div className="relative">
-          <button onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            className="flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow transition-all min-w-[200px]">
-            <Users size={18} className="text-[#d4af37]" />
-            <span className="flex-1 text-left font-medium text-[#1e3a5f] truncate text-sm">
-              {selectedDongHoId ? selectedDongHo?.tenDongHo : "Tất cả dòng họ"}
-            </span>
-            <ChevronDown size={16} className={`text-gray-400 transition-transform ${isDropdownOpen ? "rotate-180" : ""}`} />
-          </button>
-          {isDropdownOpen && (
-            <div className="absolute top-full right-0 mt-2 w-full bg-white border border-gray-200 rounded-xl shadow-xl max-h-60 overflow-y-auto z-50">
-              <button onClick={() => { setSelectedDongHoId(""); setIsDropdownOpen(false); }}
-                className={`w-full px-4 py-2.5 text-left hover:bg-gray-50 text-sm ${!selectedDongHoId ? "bg-[#fdf6e3] text-[#d4af37] font-semibold" : "text-gray-700"}`}>
-                Tất cả dòng họ
-              </button>
-              {dongHoList.map((dongHo) => (
-                <button key={dongHo.dongHoId} onClick={() => { setSelectedDongHoId(dongHo.dongHoId); setIsDropdownOpen(false); }}
-                  className={`w-full px-4 py-2.5 text-left hover:bg-gray-50 text-sm ${selectedDongHoId === dongHo.dongHoId ? "bg-[#fdf6e3] text-[#d4af37] font-semibold" : "text-gray-700"}`}>
-                  {dongHo.tenDongHo}
+        {/* Dropdown - Chỉ Admin mới thấy */}
+        {isAdmin && (
+          <div className="relative">
+            <button onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              className="flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow transition-all min-w-[200px]">
+              <Users size={18} className="text-[#d4af37]" />
+              <span className="flex-1 text-left font-medium text-[#1e3a5f] truncate text-sm">
+                {selectedDongHoId ? selectedDongHo?.tenDongHo : "Tất cả dòng họ"}
+              </span>
+              <ChevronDown size={16} className={`text-gray-400 transition-transform ${isDropdownOpen ? "rotate-180" : ""}`} />
+            </button>
+            {isDropdownOpen && (
+              <div className="absolute top-full right-0 mt-2 w-full bg-white border border-gray-200 rounded-xl shadow-xl max-h-60 overflow-y-auto z-50">
+                <button onClick={() => { setSelectedDongHoId(""); setIsDropdownOpen(false); }}
+                  className={`w-full px-4 py-2.5 text-left hover:bg-gray-50 text-sm ${!selectedDongHoId ? "bg-[#fdf6e3] text-[#d4af37] font-semibold" : "text-gray-700"}`}>
+                  Tất cả dòng họ
                 </button>
-              ))}
-            </div>
-          )}
-        </div>
+                {dongHoList.map((dongHo) => (
+                  <button key={dongHo.dongHoId} onClick={() => { setSelectedDongHoId(dongHo.dongHoId); setIsDropdownOpen(false); }}
+                    className={`w-full px-4 py-2.5 text-left hover:bg-gray-50 text-sm ${selectedDongHoId === dongHo.dongHoId ? "bg-[#fdf6e3] text-[#d4af37] font-semibold" : "text-gray-700"}`}>
+                    {dongHo.tenDongHo}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {isLoading ? (

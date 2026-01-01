@@ -55,29 +55,10 @@ export class thanhVienRespository {
   // Update thành viên - cần cả dongHoId và thanhVienId (Composite Key)
   async updateMultipleThanhVien(thanhVien: thanhVien): Promise<any> {
     try {
-      const sql = `
-        UPDATE thanhvien SET
-          hoTen = ?,
-          gioiTinh = ?,
-          ngaySinh = ?,
-          ngayMat = ?,
-          noiSinh = ?,
-          noiMat = ?,
-          ngheNghiep = ?,
-          trinhDoHocVan = ?,
-          diaChiHienTai = ?,
-          tieuSu = ?,
-          anhChanDung = ?,
-          doiThuoc = ?,
-          chaId = ?,
-          meId = ?,
-          voId = ?,
-          chongId = ?,
-          lu_updated = NOW(),
-          lu_user_id = ?
-        WHERE dongHoId = ? AND thanhVienId = ?
-      `;
+      const sql = `CALL UpdateThanhVien(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?, @err_code, @err_msg)`;
       await this.db.query(sql, [
+        thanhVien.dongHoId,
+        thanhVien.thanhVienId,
         thanhVien.hoTen,
         thanhVien.gioiTinh,
         formatDateForMySQL(thanhVien.ngaySinh),
@@ -95,9 +76,14 @@ export class thanhVienRespository {
         thanhVien.voId,
         thanhVien.chongId,
         thanhVien.lu_user_id,
-        thanhVien.dongHoId,
-        thanhVien.thanhVienId,
       ]);
+      
+      // Lấy output params
+      const [outParams]: any = await this.db.query('SELECT @err_code AS err_code, @err_msg AS err_msg', []);
+      if (outParams[0]?.err_code !== 0) {
+        throw new Error(outParams[0]?.err_msg || 'Lỗi cập nhật thành viên');
+      }
+      
       return true;
     } catch (error: any) {
       console.log("error database => ", error);
@@ -119,8 +105,15 @@ export class thanhVienRespository {
   // Xóa thành viên (soft delete) - cần Composite Key
   async deleteThanhVien(dongHoId: string, thanhVienId: number): Promise<any> {
     try {
-      const sql = "UPDATE thanhvien SET active_flag = 0 WHERE dongHoId = ? AND thanhVienId = ?";
+      const sql = "CALL DeleteThanhVien(?, ?, @err_code, @err_msg)";
       await this.db.query(sql, [dongHoId, thanhVienId]);
+      
+      // Lấy output params
+      const [outParams]: any = await this.db.query('SELECT @err_code AS err_code, @err_msg AS err_msg', []);
+      if (outParams[0]?.err_code !== 0) {
+        throw new Error(outParams[0]?.err_msg || 'Lỗi xóa thành viên');
+      }
+      
       return true;
     } catch (error: any) {
       console.log("error database => ", error);

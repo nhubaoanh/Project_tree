@@ -5,7 +5,7 @@ import { X, Check, Loader2 } from "lucide-react";
 import { IUser } from "@/types/user";
 import { useQuery } from "@tanstack/react-query";
 import { getAllDongHo } from "@/service/lineage.service";
-import { getAllRole } from "@/service/role.service";
+import { getAllRoles } from "@/service/role.service";
 import { useToast } from "@/service/useToas";
 import { checkUsernameExist } from "@/service/user.service";
 import { FormRules, validateForm, validateField } from "@/lib/validator";
@@ -55,7 +55,7 @@ export const UserModal: React.FC<UserModalProps> = ({
 
   const { data: roleData } = useQuery({
     queryKey: ["Role"],
-    queryFn: getAllRole,
+    queryFn: getAllRoles,
   });
 
   const dongHoList = Array.isArray(dongHoData) ? dongHoData : dongHoData?.data ?? [];

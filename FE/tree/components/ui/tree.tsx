@@ -141,15 +141,8 @@ export const MyFamilyTree = ({ data }: Props) => {
     };
 
     const nodes = filtered.map((n) => {
-      // Debug: log data để xem anhChanDung
-      console.log("Node data:", n.id, n.hoTen, "anhChanDung:", n.anhChanDung);
-      
       // Xử lý ảnh - nếu không có hoặc rỗng thì dùng ảnh mặc định
-      let imgUrl = DEFAULT_AVATAR;
-      if (n.anhChanDung && n.anhChanDung.trim()) {
-        imgUrl = getImageUrl(n.anhChanDung);
-        console.log("Image URL:", imgUrl);
-      }
+      const imgUrl = n.anhChanDung?.trim() ? getImageUrl(n.anhChanDung) : DEFAULT_AVATAR;
       
       return {
         id: toNum(n.id)!,

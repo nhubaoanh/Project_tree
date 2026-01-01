@@ -23,8 +23,12 @@ export const getMembersByDongHo = async (dongHoId: string): Promise<any> => {
         return res?.data;
     } catch (error: any) {
         const err = parseApiError(error);
-        console.error(`[getMembersByDongHo] ${err.message}`);
-        return { success: false, data: [], message: err.message };
+        // Không log 403 error - đây là lỗi quyền truy cập, xử lý gracefully
+        const is403 = error?.response?.status === 403;
+        if (!is403) {
+            console.error(`[getMembersByDongHo] ${err.message}`);
+        }
+        return { success: false, data: [], message: err.message, is403 };
     }
 }
 
@@ -92,8 +96,12 @@ export const searchMemberByDongHo = async (data: IMemberSearch): Promise<any> =>
         return res?.data;
     } catch (error: any) {
         const err = parseApiError(error);
-        console.error(`[searchMemberByDongHo] ${err.message}`);
-        return { success: false, data: [], message: err.message, totalItems: 0, pageCount: 0 };
+        // Không log 403 error - đây là lỗi quyền truy cập, xử lý gracefully
+        const is403 = error?.response?.status === 403;
+        if (!is403) {
+            console.error(`[searchMemberByDongHo] ${err.message}`);
+        }
+        return { success: false, data: [], message: err.message, totalItems: 0, pageCount: 0, is403 };
     }
 }
 

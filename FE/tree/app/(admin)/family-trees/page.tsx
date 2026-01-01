@@ -1,17 +1,19 @@
 "use client";
-import React, { useState } from "react";
-import { Plus, Search, Users, Calendar, MapPin, Loader2 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Plus, Search, Users, Loader2 } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/service/useToas";
 import {
     getAllDongHo,
     createDongHo,
+    getDongHoById,
     IDongHo,
     IDongHoCreate,
 } from "@/service/dongho.service";
 import { DongHoModal } from "./components/DongHoModal";
 import { DongHoCard } from "./components/DongHoCard";
+import storage from "@/utils/storage";
 
 export default function FamilyTreesPage() {
     const router = useRouter();
@@ -20,23 +22,46 @@ export default function FamilyTreesPage() {
 
     const [searchTerm, setSearchTerm] = useState("");
     const [isModalOpen, setIsModalOpen] = useState(false);
+    
+    // Lấy thông tin user
+    const [user, setUser] = useState<any>(null);
+    const [isReady, setIsReady] = useState(false);
+    const isAdmin = user?.roleCode === "sa";
 
-    // Fetch danh sách dòng họ
-    const { data, isLoading, isError, refetch } = useQuery({
+    useEffect(() => {
+        const userData = storage.getUser();
+        setUser(userData);
+        setIsReady(true);
+    }, []);
+
+    // Fetch danh sách dòng họ - Admin fetch tất cả
+    const allDongHoQuery = useQuery({
         queryKey: ["dongho-list"],
         queryFn: getAllDongHo,
+        enabled: isReady && isAdmin,
     });
 
-    const dongHoList: IDongHo[] = data?.data || [];
+    // Fetch dòng họ của user - Non-Admin fetch dòng họ của mình
+    const myDongHoQuery = useQuery({
+        queryKey: ["my-dongho", user?.dongHoId],
+        queryFn: () => getDongHoById(user?.dongHoId),
+        enabled: isReady && !isAdmin && !!user?.dongHoId,
+    });
 
-    console.log("dongho", dongHoList);
+    // Danh sách dòng họ hiển thị
+    const dongHoList: IDongHo[] = isAdmin 
+        ? (allDongHoQuery.data?.data || [])
+        : (myDongHoQuery.data?.data ? [myDongHoQuery.data.data] : []);
 
-    // Filter theo search
-    const filteredList = dongHoList.filter((item) =>
-        item.tenDongHo?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const isLoading = isAdmin ? allDongHoQuery.isLoading : myDongHoQuery.isLoading;
+    const isError = isAdmin ? allDongHoQuery.isError : myDongHoQuery.isError;
 
-    // Mutation tạo mới
+    // Filter theo search (chỉ Admin mới có search)
+    const filteredList = isAdmin 
+        ? dongHoList.filter((item) => item.tenDongHo?.toLowerCase().includes(searchTerm.toLowerCase()))
+        : dongHoList;
+
+    // Mutation tạo mới (chỉ Admin)
     const createMutation = useMutation({
         mutationFn: createDongHo,
         onSuccess: () => {
@@ -53,12 +78,32 @@ export default function FamilyTreesPage() {
         createMutation.mutate(data);
     };
 
-    const handleCardClick = (dongHoId: string) => {
-        // Lưu dongHoId vào localStorage để các trang khác sử dụng
-        localStorage.setItem("currentDongHoId", dongHoId);
-        // Navigate đến trang quản lý thành viên của dòng họ đó
-        router.push(`/family-trees/${dongHoId}/members`);
-    };
+    // Chưa ready
+    if (!isReady) {
+        return (
+            <div className="flex items-center justify-center h-64">
+                <Loader2 className="animate-spin h-12 w-12 text-[#d4af37]" />
+            </div>
+        );
+    }
+
+    // Non-Admin không có dongHoId
+    if (!isAdmin && !user?.dongHoId) {
+        return (
+            <div className="max-w-6xl mx-auto font-dancing text-[#4a4a4a] pb-20 animate-fadeIn">
+                <div className="text-center py-16">
+                    <Users size={64} className="mx-auto text-[#d4af37] mb-4 opacity-50" />
+                    <h2 className="text-2xl font-bold text-[#b91c1c] mb-2">Chưa được gán dòng họ</h2>
+                    <p className="text-[#8b5e3c] text-lg">
+                        Tài khoản của bạn chưa được gán vào dòng họ nào.
+                    </p>
+                    <p className="text-[#8b5e3c] text-sm mt-2">
+                        Vui lòng liên hệ Admin để được hỗ trợ.
+                    </p>
+                </div>
+            </div>
+        );
+    }
 
     if (isLoading) {
         return (
@@ -73,7 +118,7 @@ export default function FamilyTreesPage() {
             <div className="p-4 mb-4 text-red-600 bg-red-100 rounded flex justify-between items-center">
                 <span>Lỗi khi tải dữ liệu. Vui lòng thử lại sau.</span>
                 <button
-                    onClick={() => refetch()}
+                    onClick={() => isAdmin ? allDongHoQuery.refetch() : myDongHoQuery.refetch()}
                     className="px-3 py-1 bg-[#d4af37] text-white rounded hover:bg-[#b8962a]"
                 >
                     Thử lại
@@ -88,34 +133,41 @@ export default function FamilyTreesPage() {
             <div className="flex flex-col md:flex-row justify-between items-end md:items-center mb-8 gap-4 border-b border-[#d4af37] pb-4">
                 <div>
                     <h2 className="text-3xl font-display font-bold text-[#b91c1c] uppercase drop-shadow-sm">
-                        Danh Sách Gia Phả
+                        {isAdmin ? "Danh Sách Gia Phả" : "Gia Phả Của Tôi"}
                     </h2>
                     <p className="text-[#8b5e3c] italic text-sm">
-                        Quản lý các dòng họ và cây gia phả của bạn
+                        {isAdmin 
+                            ? "Quản lý các dòng họ và cây gia phả" 
+                            : "Quản lý cây gia phả dòng họ của bạn"}
                     </p>
                 </div>
 
-                <button
-                    onClick={() => setIsModalOpen(true)}
-                    className="flex items-center gap-2 px-4 py-2 bg-[#b91c1c] text-white rounded shadow hover:bg-[#991b1b] transition-all text-sm font-bold"
-                >
-                    <Plus size={16} />
-                    <span>Tạo Cây Mới</span>
-                </button>
+                {/* Chỉ Admin mới có nút tạo mới */}
+                {isAdmin && (
+                    <button
+                        onClick={() => setIsModalOpen(true)}
+                        className="flex items-center gap-2 px-4 py-2 bg-[#b91c1c] text-white rounded shadow hover:bg-[#991b1b] transition-all text-sm font-bold"
+                    >
+                        <Plus size={16} />
+                        <span>Tạo Cây Mới</span>
+                    </button>
+                )}
             </div>
 
-            {/* Search */}
-            <div className="mb-6 flex items-center bg-white border border-[#d4af37] rounded-lg p-1 shadow-sm w-full md:w-1/2">
-                <div className="p-2 text-stone-400">
-                    <Search size={20} />
+            {/* Search - Chỉ Admin mới có */}
+            {isAdmin && (
+                <div className="mb-6 flex items-center bg-white border border-[#d4af37] rounded-lg p-1 shadow-sm w-full md:w-1/2">
+                    <div className="p-2 text-stone-400">
+                        <Search size={20} />
+                    </div>
+                    <input
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        placeholder="Tìm kiếm dòng họ..."
+                        className="w-full p-2 outline-none bg-transparent text-[#5d4037] placeholder-stone-400"
+                    />
                 </div>
-                <input
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    placeholder="Tìm kiếm dòng họ..."
-                    className="w-full p-2 outline-none bg-transparent text-[#5d4037] placeholder-stone-400"
-                />
-            </div>
+            )}
 
             {/* Grid Cards */}
             {filteredList.length === 0 ? (
@@ -133,19 +185,20 @@ export default function FamilyTreesPage() {
                         <DongHoCard
                             key={dongHo.dongHoId}
                             dongHo={dongHo}
-                            onClick={() => handleCardClick(dongHo.dongHoId)}
                         />
                     ))}
                 </div>
             )}
 
-            {/* Modal tạo mới */}
-            <DongHoModal
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-                onSave={handleCreateDongHo}
-                isLoading={createMutation.isPending}
-            />
+            {/* Modal tạo mới - Chỉ Admin */}
+            {isAdmin && (
+                <DongHoModal
+                    isOpen={isModalOpen}
+                    onClose={() => setIsModalOpen(false)}
+                    onSave={handleCreateDongHo}
+                    isLoading={createMutation.isPending}
+                />
+            )}
         </div>
     );
 }

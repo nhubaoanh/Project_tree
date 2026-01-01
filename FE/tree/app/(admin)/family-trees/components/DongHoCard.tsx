@@ -18,7 +18,6 @@ export function DongHoCard({ dongHo }: DongHoCardProps) {
 
     const handleGoToGenealogy = (e: React.MouseEvent) => {
         e.stopPropagation();
-        localStorage.setItem("currentDongHoId", dongHo.dongHoId);
         router.push(`/genealogy?dongHoId=${dongHo.dongHoId}`);
     };
 

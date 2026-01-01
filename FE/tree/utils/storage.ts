@@ -5,7 +5,7 @@ interface MenuItem {
   href: string;
   icon: string;
   sortOrder: number;
-  parentId?: string;
+  parentId?: string | null;
   actions: string[];
 }
 

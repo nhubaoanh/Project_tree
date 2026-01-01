@@ -1,10 +1,10 @@
 "use client";
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Header } from "@/components/ui/HeaderSub";
 import { MyFamilyTree } from "@/components/ui/tree";
 import { ViewMode } from "@/types/familytree";
-import { Settings, ChevronDown, Users } from "lucide-react";
+import { ChevronDown, Users } from "lucide-react";
 import TinTucPage from "../news/page";
 import PhaKyPage from "../pen/page";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
@@ -13,39 +13,57 @@ import { getAllDongHo, IDongHo } from "@/service/dongho.service";
 import { ITreeNode } from "@/types/tree";
 import { buildTree } from "@/utils/treeUtils";
 import SuKienPage from "../events/page";
+import storage from "@/utils/storage";
 
 export default function App() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [activeView, setActiveView] = useState<ViewMode>(ViewMode.DIAGRAM);
   
-  // Lấy dongHoId từ URL hoặc localStorage
+  // Lấy dongHoId từ URL
   const urlDongHoId = searchParams.get("dongHoId");
   const [selectedDongHoId, setSelectedDongHoId] = useState<string>("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  
+  // State để tránh hydration mismatch - chỉ set sau khi mount
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [userDongHoId, setUserDongHoId] = useState<string | undefined>(undefined);
+  const [mounted, setMounted] = useState(false);
 
-  // Fetch danh sách dòng họ
+  // Đọc user từ localStorage sau khi mount (client-side only)
+  useEffect(() => {
+    const user = storage.getUser();
+    setIsAdmin(user?.roleCode === "sa");
+    setUserDongHoId(user?.dongHoId);
+    setMounted(true);
+  }, []);
+
+  // Fetch danh sách dòng họ - chỉ Admin mới fetch
   const dongHoQuery = useQuery({
     queryKey: ["dongho-list"],
     queryFn: () => getAllDongHo(),
     placeholderData: keepPreviousData,
+    enabled: mounted && isAdmin, // Chỉ fetch khi đã mount và là Admin
   });
-  const dongHoList: IDongHo[] = dongHoQuery.data?.data || [];
+  const dongHoList: IDongHo[] = isAdmin ? (dongHoQuery.data?.data || []) : [];
 
-  // Set initial dongHoId từ URL hoặc localStorage
+  // Set initial dongHoId - KHÔNG dùng currentDongHoId localStorage
   useEffect(() => {
+    if (!mounted) return;
+    
+    // Non-Admin: luôn dùng dongHoId của user từ BA_user
+    if (!isAdmin && userDongHoId) {
+      setSelectedDongHoId(userDongHoId);
+      return;
+    }
+
+    // Admin: có thể chọn từ URL hoặc default dòng họ đầu tiên
     if (urlDongHoId) {
       setSelectedDongHoId(urlDongHoId);
-      localStorage.setItem("currentDongHoId", urlDongHoId);
-    } else {
-      const storedId = localStorage.getItem("currentDongHoId");
-      if (storedId) {
-        setSelectedDongHoId(storedId);
-      } else if (dongHoList.length > 0) {
-        setSelectedDongHoId(dongHoList[0].dongHoId);
-      }
+    } else if (dongHoList.length > 0) {
+      setSelectedDongHoId(dongHoList[0].dongHoId);
     }
-  }, [urlDongHoId, dongHoList]);
+  }, [urlDongHoId, dongHoList, isAdmin, userDongHoId, mounted]);
 
   // Fetch members theo dongHoId đã chọn
   const membersQuery = useQuery({
@@ -64,10 +82,9 @@ export default function App() {
     return buildTree(data);
   }, [data]);
 
-  // Xử lý chọn dòng họ
+  // Xử lý chọn dòng họ - chỉ Admin mới dùng
   const handleSelectDongHo = (dongHoId: string) => {
     setSelectedDongHoId(dongHoId);
-    localStorage.setItem("currentDongHoId", dongHoId);
     router.push(`/genealogy?dongHoId=${dongHoId}`);
     setIsDropdownOpen(false);
   };
@@ -84,8 +101,8 @@ export default function App() {
 
       {/* MAIN */}
       <main className="flex-1 relative w-full bg-stone-50 bg-[#ede5b7]">
-        {/* Dropdown chọn dòng họ - chỉ hiện khi xem cây */}
-        {activeView === ViewMode.DIAGRAM && (
+        {/* Dropdown chọn dòng họ - CHỈ HIỆN CHO ADMIN khi xem cây và đã mount */}
+        {mounted && activeView === ViewMode.DIAGRAM && isAdmin && (
           <div className="absolute top-4 left-67 z-20">
             <div className="relative">
               <button

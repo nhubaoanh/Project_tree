@@ -3,6 +3,7 @@
 import Sidebar from "@/components/ui/Sidebar";
 import Header from "@/components/ui/Header";
 import { SidebarProvider, useSidebar } from "@/context/SidebarContext";
+import { AuthProvider } from "@/context/AuthContext";
 import Image from "next/image";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "@/lib/react-query";
@@ -44,14 +45,16 @@ export default function AdminLayout({
 }) {
   return (
     <QueryClientProvider client={queryClient}>
-      <RouteGuard>
-        <SidebarProvider>
-          <div className="flex h-screen w-full bg-[#FCF9E3]">
-            <Sidebar />
-            <MainContent>{children}</MainContent>
-          </div>
-        </SidebarProvider>
-      </RouteGuard>
+      <AuthProvider>
+        <RouteGuard>
+          <SidebarProvider>
+            <div className="flex h-screen w-full bg-[#FCF9E3]">
+              <Sidebar />
+              <MainContent>{children}</MainContent>
+            </div>
+          </SidebarProvider>
+        </RouteGuard>
+      </AuthProvider>
     </QueryClientProvider>
   );
 }

@@ -5,6 +5,8 @@
  * ║  Routes quản lý người dùng (đăng nhập, đăng ký, cập nhật...)                 ║
  * ║                                                                               ║
  * ║  BẢO MẬT:                                                                    ║
+ * ║  - authenticate: Xác thực JWT token                                          ║
+ * ║  - adminOnly: Chỉ Admin mới được thực hiện                                   ║
  * ║  - loginLimiter: 5 lần/15 phút (chống brute force)                           ║
  * ║  - registerLimiter: 3 tài khoản/giờ (chống spam)                             ║
  * ║  - sensitiveLimiter: 5 lần/giờ (thao tác nhạy cảm)                           ║
@@ -15,6 +17,9 @@
 import { Router } from "express";
 import { container } from "tsyringe";
 import { NguoiDungController } from "../controllers/nguoidungController";
+
+// Auth Middleware
+import { authenticate, adminOnly, checkDongHoAccess } from "../middlewares/authMiddleware";
 
 // Rate Limiters
 import {
@@ -102,57 +107,66 @@ nguoiDungRouter.post(
 );
 
 // ============================================================================
-// PROTECTED ROUTES - Cần đăng nhập (thêm authMiddleware nếu cần)
+// PROTECTED ROUTES - Cần đăng nhập
 // ============================================================================
 
 
 /**
  * POST /search
- * Tìm kiếm user
+ * Tìm kiếm user (Admin only)
  */
 nguoiDungRouter.post(
   "/search",
+  authenticate,
+  adminOnly,
   validate(searchUserRules),
   userController.searchUser.bind(userController)
 );
 
 /**
  * POST /insert-user
- * Thêm user mới (admin)
+ * Thêm user mới (Admin only)
  */
 nguoiDungRouter.post(
   "/insert-user",
+  authenticate,
+  adminOnly,
   registerLimiter,
   userController.insertUser.bind(userController)
 );
 
 /**
  * POST /update-user
- * Cập nhật thông tin user
+ * Cập nhật thông tin user (Admin only)
  */
 nguoiDungRouter.post(
   "/update-user",
+  authenticate,
+  adminOnly,
   validate(updateUserRules),
   userController.updateUser.bind(userController)
 );
 
 /**
  * POST /update-user-profile
- * Cập nhật profile cá nhân
+ * Cập nhật profile cá nhân (user tự cập nhật)
  */
 nguoiDungRouter.post(
   "/update-user-profile",
+  authenticate,
   userController.UpdateMyProfile.bind(userController)
 );
 
 /**
  * POST /delete
- * Xóa user
+ * Xóa user (Admin only)
  *
  * Rate Limit: 5 lần/giờ (thao tác nhạy cảm)
  */
 nguoiDungRouter.post(
   "/delete",
+  authenticate,
+  adminOnly,
   sensitiveLimiter,
   userController.deleteUser.bind(userController)
 );

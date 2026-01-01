@@ -72,11 +72,11 @@ export default function RouteGuard({ children }: RouteGuardProps) {
       console.log("[RouteGuard] hasAccess:", hasAccess);
 
       if (!hasAccess) {
-        // Không có quyền - redirect về trang 403
+        // Không có quyền - redirect về trang 403 trong admin
         setAuthorized(false);
         setChecking(false);
         console.warn(`[RouteGuard] Access denied: ${pathname} for role ${user.roleCode}`);
-        router.replace("/403");
+        router.replace("/dashboard"); // Redirect về dashboard thay vì 403
         return;
       }
 
