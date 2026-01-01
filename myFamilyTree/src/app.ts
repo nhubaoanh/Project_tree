@@ -106,6 +106,13 @@ app.use(sanitizeParams);
 app.use(checkSqlInjection);
 
 // ============================================================================
+// HEALTH CHECK - Cho Docker và Load Balancer
+// ============================================================================
+app.get("/health", (req: Request, res: Response) => {
+  res.status(200).json({ status: "ok", timestamp: new Date().toISOString() });
+});
+
+// ============================================================================
 // 8. ROUTES
 // ============================================================================
 app.use("/api-core", core_router);

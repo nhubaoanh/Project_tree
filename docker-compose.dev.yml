@@ -1,0 +1,32 @@
+# Docker Compose cho môi trường Development
+# Chạy: docker-compose -f docker-compose.dev.yml up -d
+
+version: "3.8"
+
+services:
+  # ========== MySQL Database ==========
+  mysql:
+    image: mysql:8.0
+    container_name: familytree-mysql-dev
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: familytree
+      MYSQL_USER: familytree
+      MYSQL_PASSWORD: familytree123
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data_dev:/var/lib/mysql
+      - ./database:/docker-entrypoint-initdb.d
+    networks:
+      - familytree-network-dev
+    command: --default-authentication-plugin=mysql_native_password
+
+volumes:
+  mysql_data_dev:
+    driver: local
+
+networks:
+  familytree-network-dev:
+    driver: bridge

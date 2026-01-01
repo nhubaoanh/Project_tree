@@ -1,0 +1,89 @@
+# GitHub Actions - Auto Deploy to Production
+# Trigger: Push to main branch
+
+name: Deploy to Production
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: # Cho phép chạy thủ công
+
+jobs:
+  # ========== Job 1: Test ==========
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: myFamilyTree/package-lock.json
+
+      - name: Install backend dependencies
+        run: npm ci
+        working-directory: myFamilyTree
+
+      - name: Build backend
+        run: npm run build
+        working-directory: myFamilyTree
+
+      - name: Install frontend dependencies
+        run: npm ci
+        working-directory: FE/tree
+
+      - name: Build frontend
+        run: npm run build
+        working-directory: FE/tree
+        env:
+          NEXT_PUBLIC_API_BASE_URL: ${{ secrets.NEXT_PUBLIC_API_BASE_URL }}
+
+  # ========== Job 2: Deploy ==========
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Deploy to server via SSH
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT || 22 }}
+          script: |
+            cd /opt/familytree
+            
+            # Pull latest code
+            git pull origin main
+            
+            # Build and restart containers
+            docker compose build --no-cache
+            docker compose up -d
+            
+            # Cleanup old images
+            docker image prune -f
+            
+            # Show status
+            docker compose ps
+            
+            echo "✅ Deployment completed at $(date)"
+
+  # ========== Job 3: Notify (Optional) ==========
+  notify:
+    needs: deploy
+    runs-on: ubuntu-latest
+    if: always()
+
+    steps:
+      - name: Send notification
+        run: |
+          if [ "${{ needs.deploy.result }}" == "success" ]; then
+            echo "✅ Deployment successful!"
+          else
+            echo "❌ Deployment failed!"
+          fi

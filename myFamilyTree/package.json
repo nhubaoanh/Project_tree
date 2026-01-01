@@ -4,6 +4,8 @@
   "main": "index.js",
   "scripts": {
     "dev": "set NODE_OPTIONS=--max-http-header-size=10485760 && npx nodemon --inspect --exec npx ts-node src/index.ts",
+    "build": "tsc",
+    "start:prod": "node dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "set NODE_OPTIONS=--max-http-header-size=10485760 && npx nodemon --exec npx ts-node src/index.ts"
   },

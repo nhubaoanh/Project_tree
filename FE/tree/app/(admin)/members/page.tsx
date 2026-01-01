@@ -99,7 +99,7 @@ export default function QuanLyThanhVienPage() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: deleteMember,
+    mutationFn: (id: number) => deleteMember(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["member"] });
       showSuccess("Đã xóa thành viên.");

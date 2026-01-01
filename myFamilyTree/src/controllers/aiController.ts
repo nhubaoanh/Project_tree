@@ -1,10 +1,10 @@
 import { Request, Response } from "express";
 import { injectable } from "tsyringe";
-import { AIService } from "../services/aiService";
+import { AIChatService } from "../services/aiChatService";
 
 @injectable()
 export class AIController {
-  constructor(private aiService: AIService) {}
+  constructor(private aiService: AIChatService) {}
 
   async chat(req: Request, res: Response): Promise<void> {
     try {
@@ -15,7 +15,17 @@ export class AIController {
         return;
       }
 
-      const response = await this.aiService.chat(message, dongHoId);
+      if (!dongHoId) {
+        res.status(400).json({ success: false, message: "Thiếu dongHoId" });
+        return;
+      }
+
+      // Load dữ liệu dòng họ
+      await this.aiService.loadData(dongHoId);
+
+      // Phân tích và trả lời câu hỏi
+      const response = this.aiService.analyzeQuestion(message);
+      
       res.json({ success: true, data: response });
     } catch (error: any) {
       console.error("AI Chat error:", error.message);

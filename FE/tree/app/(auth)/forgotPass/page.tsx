@@ -1,5 +1,6 @@
 "use client";
-import { useCallback, useState } from "react";
+
+import { useState } from "react";
 import {
   Card,
   CardContent,
@@ -10,134 +11,66 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import Link from "next/link"; // Giữ lại Link nếu bạn cần quay lại trang đăng nhập
+import Link from "next/link";
 import Image from "next/image";
 import { useToast } from "@/service/useToas";
-import { validateEmail } from "@/lib/validator";
+import { useFormValidation } from "@/lib/useFormValidation";
+import { FormRules } from "@/lib/validator";
 import { resetPasswordUser } from "@/service/user.service";
 
-interface FormData {
+// ==================== CONFIG ====================
+
+interface ForgotFormData {
   tenDangNhap: string;
 }
 
-interface FormErrors { // Định nghĩa Type cho lỗi
-    tenDangNhap?: string;
-}
-// Component Quên Mật Khẩu
+const initialValues: ForgotFormData = {
+  tenDangNhap: "",
+};
+
+const forgotRules: FormRules = {
+  tenDangNhap: {
+    label: "Email",
+    rules: ["required", "email"],
+  },
+};
+
+// ==================== COMPONENT ====================
+
 const ForgotPassword = () => {
-  const [formData, setFormData] = useState<FormData>({ tenDangNhap: "" });
-  const [errors, setErrors] = useState<FormErrors>({});
-  const [message, setMessage] = useState("");
-  const [isLoading, setIsLoading] = useState(false); // Thêm state loading
   const { showError, showSuccess } = useToast();
+  const [message, setMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  const validateForgotPassword = useCallback((): boolean => {
-    const newErrors: FormErrors = {};
+  // Sử dụng custom hook
+  const form = useFormValidation<ForgotFormData>({
+    initialValues,
+    rules: forgotRules,
+  });
 
-    const emailError = validateEmail(formData.tenDangNhap) ?? undefined;
-    if (emailError) {
-      newErrors.tenDangNhap = emailError;
-    }
-
-    setErrors(newErrors);
-
-    // Trả về true nếu form hợp lệ
-    return Object.keys(newErrors).length === 0;
-  }, [formData]);
-
-
-  const handleStep1 = async () => {
-
-    setIsLoading(true);
-
-    if (!validateForgotPassword()) {
+  const handleSubmit = async () => {
+    if (!form.validateAll()) {
       showError("Vui lòng nhập email hợp lệ!");
-      setIsLoading(false);
       return;
     }
 
+    setIsLoading(true);
     try {
-      const response = await resetPasswordUser(formData);
-      setIsLoading(false);
+      const response = await resetPasswordUser(form.values);
 
       if (response.success) {
         setMessage("✅ Email reset mật khẩu đã được gửi.");
         showSuccess("Vui lòng kiểm tra email.");
-        setFormData({ tenDangNhap: "" });
+        form.reset();
       } else {
         showError(response.message);
       }
-    } catch (error : any) {
-      showError(" Lỗi kết nối. Vui, thử lập sau.");
+    } catch (error: any) {
+      showError("Lỗi kết nối. Vui lòng thử lại sau.");
       console.error("reset:", error);
-    }finally {
+    } finally {
       setIsLoading(false);
     }
-  };
-
-
-  // Hàm thay đổi giá trị input và xóa lỗi tương ứng
-  const handleIdentifierChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      tenDangNhap: e.target.value,
-    }));
-    // Xóa lỗi khi người dùng bắt đầu gõ lại
-    if (errors.tenDangNhap) {
-      setErrors({});
-    }
-  };
-
-  // Hàm renderCardContent đã được tối ưu hóa
-  const renderCardContent = () => {
-    return (
-      <CardContent className="grid gap-4">
-        {/* Hiển thị thông báo, thay đổi màu sắc dựa trên nội dung */}
-        <p
-          className={`text-sm text-center ${
-            message.startsWith("✅") ? "text-green-500" : "text-red-500"
-          }`}
-        >
-          {message}
-        </p>
-
-        <div className="grid gap-2">
-          <label className="text-sm font-medium text-white/90">
-            Email hoặc Tên đăng nhập
-          </label>
-          <Input
-            type="text"
-            placeholder="Nhập email hoặc tên đăng nhập"
-            value={formData.tenDangNhap}
-            onChange={handleIdentifierChange}
-            className="h-12 text-base bg-white/5"
-            onKeyDown={(e) => e.key === "Enter" && !isLoading && handleStep1()}
-            disabled={isLoading}
-          />
-        </div>
-      </CardContent>
-    );
-  };
-
-  // Hàm renderCardFooter đã được tối ưu hóa và sửa lỗi cú pháp gọi hàm
-  const renderCardFooter = () => {
-    return (
-      <CardFooter className="flex flex-col space-y-4">
-        <Button
-          onClick={handleStep1} // Sửa lỗi: Gọi hàm không có dấu ()
-          className="w-full h-12 text-base bg-red-600 hover:scale-105 active:scale-95 transition-transform duration-150"
-          disabled={isLoading}
-        >
-          {isLoading ? "Đang xử lý..." : "Gửi yêu cầu xác nhận"}
-        </Button>
-        <Link
-          href="/login"
-          className="text-sm text-blue-300 hover:underline font-medium"
-        >
-          Quay lại Đăng nhập
-        </Link>
-      </CardFooter>
-    );
   };
 
   return (
@@ -161,11 +94,59 @@ const ForgotPassword = () => {
               Quên Mật khẩu
             </CardTitle>
             <CardDescription className="text-center text-white/80">
-              Vui lòng nhập email hoặc tên đăng nhập
+              Vui lòng nhập email để nhận link đặt lại mật khẩu
             </CardDescription>
           </CardHeader>
-          {renderCardContent()}
-          {renderCardFooter()}
+
+          <CardContent className="grid gap-4">
+            {/* Hiển thị thông báo */}
+            {message && (
+              <p
+                className={`text-sm text-center ${
+                  message.startsWith("✅") ? "text-green-500" : "text-red-500"
+                }`}
+              >
+                {message}
+              </p>
+            )}
+
+            <div className="grid gap-2">
+              <label className="text-sm font-medium text-white/90">Email</label>
+              <Input
+                type="text"
+                placeholder="Nhập email"
+                className={`h-12 text-base bg-white/5 ${
+                  form.hasError("tenDangNhap") ? "border-red-500" : ""
+                }`}
+                {...form.getFieldProps("tenDangNhap")}
+                onKeyDown={(e) =>
+                  e.key === "Enter" && !isLoading && handleSubmit()
+                }
+                disabled={isLoading}
+              />
+              {form.getError("tenDangNhap") && (
+                <p className="text-sm text-red-500">
+                  {form.getError("tenDangNhap")}
+                </p>
+              )}
+            </div>
+          </CardContent>
+
+          <CardFooter className="flex flex-col space-y-4">
+            <Button
+              onClick={handleSubmit}
+              className="w-full h-12 text-base bg-red-600 hover:scale-105 active:scale-95 transition-transform duration-150"
+              disabled={isLoading}
+            >
+              {isLoading ? "Đang xử lý..." : "Gửi yêu cầu xác nhận"}
+            </Button>
+            <Link
+              href="/login"
+              className="text-sm text-blue-300 hover:underline font-medium"
+            >
+              Quay lại Đăng nhập
+            </Link>
+          </CardFooter>
         </Card>
       </div>
     </div>

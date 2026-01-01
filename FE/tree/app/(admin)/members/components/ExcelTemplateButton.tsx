@@ -3,10 +3,16 @@
 import { Button } from '@/components/ui/button';
 import { Download } from 'lucide-react';
 import { dowExcelTemple } from '@/service/member.service';
+
 export function ExcelTemplateButton() {
     const downloadTemplate = async () => {
         try {
             const blob = await dowExcelTemple();
+
+            // Kiểm tra blob có tồn tại không
+            if (!blob) {
+                throw new Error('Không thể tải file mẫu');
+            }
 
             // Tạo URL tạm thời cho file
             const url = window.URL.createObjectURL(new Blob([blob]));

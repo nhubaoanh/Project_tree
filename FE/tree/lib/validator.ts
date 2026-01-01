@@ -311,3 +311,11 @@ export function validateForm(
 
 // ==================== QUICK VALIDATORS ====================
 export const validate = v;
+
+// ==================== STANDALONE VALIDATORS ====================
+// Các hàm validate đơn lẻ để dùng trực tiếp
+export const validateEmail = (val: string, label = "Email"): string | null => v.email(val, label);
+export const validatePassword = (val: string, label = "Mật khẩu"): string | null => v.password(val, label);
+export const validateName = (val: string, label = "Họ tên"): string | null => v.fullName(val, label);
+export const validatePhone = (val: string, label = "SĐT"): string | null => v.phone(val, label);
+export const validateRequired = (val: any, label = "Trường này"): string | null => v.required(val, label);

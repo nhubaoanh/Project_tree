@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Header } from "@/components/ui/HeaderSub";
 import { MyFamilyTree } from "@/components/ui/tree";
@@ -15,7 +15,18 @@ import { buildTree } from "@/utils/treeUtils";
 import SuKienPage from "../events/page";
 import storage from "@/utils/storage";
 
-export default function App() {
+// Loading component
+function GenealogyLoading() {
+  return (
+    <div className="flex flex-col h-screen w-full bg-[#ede5b7] items-center justify-center">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#d4af37]"></div>
+      <p className="mt-4 text-[#8b5e3c]">Đang tải...</p>
+    </div>
+  );
+}
+
+// Main content component that uses useSearchParams
+function GenealogyContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [activeView, setActiveView] = useState<ViewMode>(ViewMode.DIAGRAM);
@@ -43,11 +54,11 @@ export default function App() {
     queryKey: ["dongho-list"],
     queryFn: () => getAllDongHo(),
     placeholderData: keepPreviousData,
-    enabled: mounted && isAdmin, // Chỉ fetch khi đã mount và là Admin
+    enabled: mounted && isAdmin,
   });
   const dongHoList: IDongHo[] = isAdmin ? (dongHoQuery.data?.data || []) : [];
 
-  // Set initial dongHoId - KHÔNG dùng currentDongHoId localStorage
+  // Set initial dongHoId
   useEffect(() => {
     if (!mounted) return;
     
@@ -198,5 +209,14 @@ export default function App() {
         </div>
       </main>
     </div>
+  );
+}
+
+// Main export with Suspense wrapper
+export default function GenealogyPage() {
+  return (
+    <Suspense fallback={<GenealogyLoading />}>
+      <GenealogyContent />
+    </Suspense>
   );
 }

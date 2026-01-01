@@ -1,0 +1,101 @@
+version: "3.8"
+
+services:
+  # ========== MySQL Database ==========
+  mysql:
+    image: mysql:8.0
+    container_name: familytree-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpassword}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-familytree}
+      MYSQL_USER: ${MYSQL_USER:-familytree}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-familytree123}
+    ports:
+      - "3307:3306"  # Đổi từ 3306 sang 3307 để tránh conflict
+    volumes:
+      # Persist data
+      - mysql_data:/var/lib/mysql
+      # Init scripts
+      - ./database:/docker-entrypoint-initdb.d
+    networks:
+      - familytree-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    command: --default-authentication-plugin=mysql_native_password --lower_case_table_names=1
+
+  # ========== Backend API ==========
+  backend:
+    build:
+      context: ./myFamilyTree
+      dockerfile: Dockerfile
+    container_name: familytree-backend
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 6001
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: ${MYSQL_USER:-familytree}
+      DB_PASSWORD: ${MYSQL_PASSWORD:-familytree123}
+      DB_NAME: ${MYSQL_DATABASE:-familytree}
+      JWT_SECRET: ${JWT_SECRET:-your-super-secret-key-change-this}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+    ports:
+      - "6001:6001"
+    volumes:
+      # Persist uploads
+      - uploads_data:/app/uploads
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - familytree-network
+
+  # ========== Frontend ==========
+  frontend:
+    build:
+      context: ./FE/tree
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL:-http://localhost:6001}
+    container_name: familytree-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - familytree-network
+
+  # ========== Nginx Reverse Proxy ==========
+  nginx:
+    image: nginx:alpine
+    container_name: familytree-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - familytree-network
+
+# ========== Volumes ==========
+volumes:
+  mysql_data:
+    driver: local
+  uploads_data:
+    driver: local
+
+# ========== Networks ==========
+networks:
+  familytree-network:
+    driver: bridge
