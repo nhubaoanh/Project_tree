@@ -30,6 +30,10 @@ taiChinhThuRouter.post(
   "/update",
   TaiChinhThuController.updateTaiChinhThu.bind(TaiChinhThuController)
 );
+taiChinhThuRouter.post(
+  "/delete",
+  TaiChinhThuController.deleteTaiChinhThu.bind(TaiChinhThuController)
+);
 
 
 export default taiChinhThuRouter;

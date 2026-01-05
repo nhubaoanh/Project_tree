@@ -121,6 +121,18 @@ export class thanhVienRespository {
     }
   }
 
+  // Xóa nhiều thành viên
+  async deleteMultipleThanhVien(listJson: any[], luUserId: string): Promise<any> {
+    try {
+      const sql = "CALL DeleteThanhVienMultiple(?, ?, @err_code, @err_msg)";
+      await this.db.query(sql, [JSON.stringify(listJson), luUserId]);
+      return true;
+    } catch (error: any) {
+      console.log("error database => ", error);
+      throw new Error(error.message);
+    }
+  }
+
 
   async getAllThanhVien(): Promise<any> {
     try {

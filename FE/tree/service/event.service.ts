@@ -1,7 +1,6 @@
 import { API_CORE } from "@/constant/config";
 import { apiClient } from "@/lib/api";
 import { IEvent, IsearchEvent } from "@/types/event";
-import { IMember, IMemberSearch } from "@/types/member";
 
 const prefix = `${API_CORE}/event`;
 
@@ -36,9 +35,12 @@ export const updateEvent = async (data: IEvent): Promise<any> => {
   }
 };
 
-export const deleteEvent = async (id: string): Promise<any> => {
+export const deleteEvent = async (listJson: { suKienId: string }[], luUserId: string): Promise<any> => {
   try {
-    const res = await apiClient.delete(`${prefix}/${id}`);
+    const res = await apiClient.post(`${prefix}/delete`, {
+      list_json: listJson,
+      lu_user_id: luUserId,
+    });
     return res?.data;
   } catch (error: any) {
     throw error;

@@ -87,4 +87,15 @@ export class suKienRespository {
       throw new Error(error.message);
     }
   }
+
+  async deleteSuKien(listJson: any[], luUserId: string): Promise<any> {
+    try {
+      const sql = "CALL DeleteSuKien(?, ?, @err_code, @err_msg)";
+      await this.db.query(sql, [JSON.stringify(listJson), luUserId]);
+      return true;
+    } catch (error: any) {
+      console.log("error database => ", error);
+      throw new Error(error.message);
+    }
+  }
 }

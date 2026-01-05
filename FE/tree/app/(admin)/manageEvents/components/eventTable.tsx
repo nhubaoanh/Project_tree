@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { IEvent } from "@/types/event";
 
-interface MemberTableProps {
+interface EventTableProps {
   data: IEvent[];
   isLoading: boolean;
   pageIndex: number;
@@ -20,12 +20,16 @@ interface MemberTableProps {
   totalPages: number;
   onPageChange: (page: number) => void;
   onPageSizeChange: (size: number) => void;
-  onEdit?: (member: IEvent) => void;
-  onDelete?: (member: IEvent) => void;
-  onView?: (member: IEvent) => void;
+  onEdit?: (event: IEvent) => void;
+  onDelete?: (event: IEvent) => void;
+  onView?: (event: IEvent) => void;
+  // Props mới cho selection
+  selectedIds?: string[];
+  onSelectAll?: (checked: boolean) => void;
+  onSelectOne?: (id: string, checked: boolean) => void;
 }
 
-export const EventTable: React.FC<MemberTableProps> = ({
+export const EventTable: React.FC<EventTableProps> = ({
   data,
   isLoading,
   pageIndex,
@@ -37,7 +41,13 @@ export const EventTable: React.FC<MemberTableProps> = ({
   onEdit,
   onDelete,
   onView,
+  selectedIds = [],
+  onSelectAll,
+  onSelectOne,
 }) => {
+  const allSelected = data.length > 0 && data.every((e) => selectedIds.includes(e.suKienId));
+  const someSelected = data.some((e) => selectedIds.includes(e.suKienId));
+
   return (
     <div className="bg-white rounded-lg border border-[#d4af37] shadow-lg overflow-hidden relative min-h-[400px] flex flex-col">
       {isLoading && (
@@ -55,9 +65,19 @@ export const EventTable: React.FC<MemberTableProps> = ({
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-[#fdf6e3] border-b-2 border-[#d4af37] text-[#8b5e3c] text-sm uppercase font-bold">
-              {/* Cột cố định nhỏ */}
+              {/* Checkbox chọn tất cả */}
+              <th className="p-4 w-12 text-center">
+                <input
+                  type="checkbox"
+                  checked={allSelected}
+                  ref={(el) => {
+                    if (el) el.indeterminate = someSelected && !allSelected;
+                  }}
+                  onChange={(e) => onSelectAll?.(e.target.checked)}
+                  className="w-4 h-4 accent-[#b91c1c] cursor-pointer"
+                />
+              </th>
               <th className="p-4 w-12 text-center">#</th>
-
               <th className="p-4 text-center min-w-[150px]">Tên Sự Kiện</th>
               <th className="p-4 text-center min-w-[120px]">Ngày Diễn Ra</th>
               <th className="p-4 text-center min-w-[120px]">Giờ Diễn ra</th>
@@ -71,44 +91,51 @@ export const EventTable: React.FC<MemberTableProps> = ({
           </thead>
           <tbody className="divide-y divide-[#eaddcf]">
             {data.length > 0
-              ? data.map((member, index) => (
+              ? data.map((event, index) => (
                   <tr
-                    key={index}
-                    onClick={() => onView?.(member)}
-                    className="hover:bg-[#fffdf5] transition-colors group cursor-pointer"
+                    key={event.suKienId}
+                    onClick={() => onView?.(event)}
+                    className={`hover:bg-[#fffdf5] transition-colors group cursor-pointer ${
+                      selectedIds.includes(event.suKienId) ? "bg-[#fff8e1]" : ""
+                    }`}
                   >
-                    {/* Cột # cố định */}
+                    {/* Checkbox chọn từng dòng */}
+                    <td className="p-4 w-12 text-center" onClick={(e) => e.stopPropagation()}>
+                      <input
+                        type="checkbox"
+                        checked={selectedIds.includes(event.suKienId)}
+                        onChange={(e) => onSelectOne?.(event.suKienId, e.target.checked)}
+                        className="w-4 h-4 accent-[#b91c1c] cursor-pointer"
+                      />
+                    </td>
                     <td className="p-4 w-12 text-center text-stone-400 font-mono text-xs">
                       {(pageIndex - 1) * pageSize + index + 1}
                     </td>
-
-                    {/* THAY ĐỔI: Thêm min-w tương ứng, bỏ truncate */}
                     <td className="p-4 text-center font-bold text-[#5d4037] group-hover:text-[#b91c1c] min-w-[150px]">
-                      {member.tenSuKien}
+                      {event.tenSuKien}
                     </td>
                     <td className="p-4 text-center font-bold text-[#5d4037] hidden md:table-cell text-sm min-w-[180px]">
-                      {member.ngayDienRa
-                        ? new Date(member.ngayDienRa).toLocaleDateString()
+                      {event.ngayDienRa
+                        ? new Date(event.ngayDienRa).toLocaleDateString()
                         : "N/A"}
                     </td>
                     <td className="p-4 text-center font-bold text-[#5d4037] hidden md:table-cell text-sm min-w-[180px]">
-                      {member.gioDienRa?.substring(0, 5) || "Chưa cập nhật"}
+                      {event.gioDienRa?.substring(0, 5) || "Chưa cập nhật"}
                     </td>
                     <td className="p-4 text-center font-bold text-[#5d4037] hidden md:table-cell text-sm min-w-[180px]">
-                      {member.diaDiem || "-"}
+                      {event.diaDiem || "-"}
                     </td>
                     <td className="p-4 text-center font-bold text-[#5d4037] group-hover:text-[#b91c1c] min-w-[120px]">
-                      {member.moTa || "-"}
+                      {event.moTa || "-"}
                     </td>
                     <td className="p-4 text-center font-bold text-sm text-[#5d4037] min-w-[150px]">
-                      {member.lapLai || "-"}
+                      {event.lapLai || "-"}
                     </td>
-                    {/* Cột Hành Động cố định */}
                     <td className="p-4 min-w-[120px] text-center" onClick={(e) => e.stopPropagation()}>
                       <div className="flex justify-center gap-2 opacity-80 group-hover:opacity-100 transition-opacity">
                         {onEdit && (
                           <button
-                            onClick={() => onEdit(member)}
+                            onClick={() => onEdit(event)}
                             className="p-2 text-blue-600 hover:bg-blue-50 rounded transition-colors"
                             title="Sửa"
                           >
@@ -117,7 +144,7 @@ export const EventTable: React.FC<MemberTableProps> = ({
                         )}
                         {onDelete && (
                           <button
-                            onClick={() => onDelete(member)}
+                            onClick={() => onDelete(event)}
                             className="p-2 text-red-600 hover:bg-red-50 rounded transition-colors"
                             title="Xóa"
                           >
@@ -131,7 +158,7 @@ export const EventTable: React.FC<MemberTableProps> = ({
               : !isLoading && (
                   <tr>
                     <td
-                      colSpan={11}
+                      colSpan={12}
                       className="p-12 text-center text-stone-500 italic"
                     >
                       <div className="flex flex-col items-center">
@@ -151,8 +178,13 @@ export const EventTable: React.FC<MemberTableProps> = ({
       {/* Pagination Footer */}
       <div className="bg-[#fdf6e3] p-4 border-t border-[#d4af37] flex items-center justify-between">
         <div className="text-sm text-[#8b5e3c]">
+          {selectedIds.length > 0 && (
+            <span className="mr-4 text-[#b91c1c] font-bold">
+              Đã chọn {selectedIds.length} sự kiện
+            </span>
+          )}
           Hiển thị <span className="font-bold">{data.length}</span> / Tổng{" "}
-          <span className="font-bold">{totalRecords}</span> thành viên
+          <span className="font-bold">{totalRecords}</span> sự kiện
         </div>
         <div className="flex gap-1 items-center">
           <select
@@ -175,7 +207,6 @@ export const EventTable: React.FC<MemberTableProps> = ({
             <ChevronLeft size={16} />
           </button>
 
-          {/* Simple Pagination Logic for Display */}
           <span className="px-4 text-sm font-bold text-[#5d4037]">
             Trang {pageIndex} / {totalPages || 1}
           </span>

@@ -78,4 +78,20 @@ export class suKienController {
         res.status(500).json({ message: "Cap nhat su kien that bai", success: false });
       }
     }
+
+  async deleteSuKien(req: Request, res: Response): Promise<void> {
+    try {
+      const { list_json, lu_user_id } = req.body as { list_json: any[]; lu_user_id: string };
+      await this.suKienService.deleteSuKien(list_json, lu_user_id);
+      res.json({
+        message: "Xóa sự kiện thành công",
+        success: true,
+      });
+    } catch (error: any) {
+      res.status(500).json({ 
+        message: error.message || "Xóa sự kiện thất bại", 
+        success: false 
+      });
+    }
+  }
 }

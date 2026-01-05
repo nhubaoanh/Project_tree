@@ -69,9 +69,12 @@ export const updateTinTuc = async (id: string, data: ITinTuc): Promise<any> => {
   }
 };
 
-export const deleteTinTuc = async (id: string): Promise<any> => {
+export const deleteTinTuc = async (listJson: { tinTucId: string }[], luUserId: string): Promise<any> => {
   try {
-    const res = await apiClient.delete(`${prefix}/${id}`);
+    const res = await apiClient.post(`${prefix}/delete`, {
+      list_json: listJson,
+      lu_user_id: luUserId,
+    });
     return res?.data;
   } catch (error: any) {
     const err = parseApiError(error);

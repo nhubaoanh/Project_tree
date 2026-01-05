@@ -22,6 +22,9 @@ interface ContributionTableProps {
   onPageSizeChange: (size: number) => void;
   onEdit: (contribution: IContributionUp) => void;
   onDelete: (contribution: IContributionUp) => void;
+  selectedIds?: number[];
+  onSelectAll?: (checked: boolean) => void;
+  onSelectOne?: (id: number, checked: boolean) => void;
 }
 
 export const ContributionTable: React.FC<ContributionTableProps> = ({
@@ -35,7 +38,13 @@ export const ContributionTable: React.FC<ContributionTableProps> = ({
   onPageSizeChange = () => {},
   onEdit = () => {},
   onDelete = () => {},
+  selectedIds = [],
+  onSelectAll,
+  onSelectOne,
 }) => {
+  const allSelected = data.length > 0 && data.every((e) => selectedIds.includes(e.thuId));
+  const someSelected = data.some((e) => selectedIds.includes(e.thuId));
+
   return (
     <div className="bg-white rounded-lg border border-[#d4af37] shadow-lg overflow-hidden relative min-h-[400px] flex flex-col">
       {isLoading && (
@@ -53,6 +62,17 @@ export const ContributionTable: React.FC<ContributionTableProps> = ({
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-[#fdf6e3] border-b-2 border-[#d4af37] text-[#8b5e3c] text-sm uppercase font-bold">
+              <th className="p-4 w-12 text-center">
+                <input
+                  type="checkbox"
+                  checked={allSelected}
+                  ref={(el) => {
+                    if (el) el.indeterminate = someSelected && !allSelected;
+                  }}
+                  onChange={(e) => onSelectAll?.(e.target.checked)}
+                  className="w-4 h-4 accent-[#b91c1c] cursor-pointer"
+                />
+              </th>
               <th className="p-4 w-12 text-center">#</th>
               <th className="p-4 text-center min-w-[150px]">Người đóng</th>
               <th className="p-4 text-center min-w-[150px]">Số tiền</th>
@@ -69,9 +89,19 @@ export const ContributionTable: React.FC<ContributionTableProps> = ({
             {data.length > 0
               ? data.map((item, index) => (
                   <tr
-                    key={index}
-                    className="hover:bg-[#fffdf5] transition-colors group"
+                    key={item.thuId}
+                    className={`hover:bg-[#fffdf5] transition-colors group ${
+                      selectedIds.includes(item.thuId) ? "bg-[#fff8e1]" : ""
+                    }`}
                   >
+                    <td className="p-4 w-12 text-center">
+                      <input
+                        type="checkbox"
+                        checked={selectedIds.includes(item.thuId)}
+                        onChange={(e) => onSelectOne?.(item.thuId, e.target.checked)}
+                        className="w-4 h-4 accent-[#b91c1c] cursor-pointer"
+                      />
+                    </td>
                     <td className="p-4 text-center text-stone-400 font-mono text-xs">
                       {(pageIndex - 1) * pageSize + index + 1}
                     </td>
@@ -135,7 +165,7 @@ export const ContributionTable: React.FC<ContributionTableProps> = ({
               : !isLoading && (
                   <tr>
                     <td
-                      colSpan={7}
+                      colSpan={11}
                       className="p-12 text-center text-stone-500 italic"
                     >
                       <div className="flex flex-col items-center">
@@ -155,6 +185,11 @@ export const ContributionTable: React.FC<ContributionTableProps> = ({
       {/* Pagination Footer */}
       <div className="bg-[#fdf6e3] p-4 border-t border-[#d4af37] flex items-center justify-between">
         <div className="text-sm text-[#8b5e3c]">
+          {selectedIds.length > 0 && (
+            <span className="mr-4 text-[#b91c1c] font-bold">
+              Đã chọn {selectedIds.length}
+            </span>
+          )}
           Hiển thị <span className="font-bold">{data.length}</span> / Tổng{" "}
           <span className="font-bold">{totalRecords}</span> khoản đóng góp
         </div>
@@ -179,7 +214,6 @@ export const ContributionTable: React.FC<ContributionTableProps> = ({
             <ChevronLeft size={16} />
           </button>
 
-          {/* Simple Pagination Logic for Display */}
           <span className="px-4 text-sm font-bold text-[#5d4037]">
             Trang {pageIndex} / {totalPages || 1}
           </span>

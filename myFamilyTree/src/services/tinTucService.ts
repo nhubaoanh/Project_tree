@@ -39,6 +39,10 @@ export class TinTucService {
     return await this.tinTucRepository.delete(tinTucId, luUserId);
   }
 
+  async deleteMultiple(listJson: any[], luUserId: string): Promise<any> {
+    return await this.tinTucRepository.deleteMultiple(listJson, luUserId);
+  }
+
   async getById(tinTucId: string): Promise<TinTuc | null> {
     // Procedure GetTinTucById đã tự động tăng lượt xem
     return await this.tinTucRepository.getById(tinTucId);

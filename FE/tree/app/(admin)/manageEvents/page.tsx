@@ -1,7 +1,6 @@
 "use client";
-import React, { useState, useRef } from "react";
-import { Search, Plus, Download, Upload, X, Loader2 } from "lucide-react";
-import * as XLSX from "xlsx";
+import React, { useState } from "react";
+import { Search, Plus, X, Loader2, Trash2 } from "lucide-react";
 import {
   useQuery,
   useMutation,
@@ -12,12 +11,8 @@ import { IEvent, IsearchEvent } from "@/types/event";
 import { useToast } from "@/service/useToas";
 import { EventTable } from "./components/eventTable";
 import { EventModal } from "./components/eventModal";
-import {
-  searchEvent,
-  createEvent,
-  updateEvent,
-  deleteEvent,
-} from "@/service/event.service";
+import { EventDeleteModal } from "./components/eventDelete";
+import { searchEvent, createEvent, updateEvent } from "@/service/event.service";
 
 export default function QuanLySuKienPage() {
   const queryClient = useQueryClient();
@@ -28,11 +23,14 @@ export default function QuanLySuKienPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
 
+  // --- SELECTION STATE ---
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+
   // --- MODAL STATES ---
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState<IEvent | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [eventToDelete, setEventToDelete] = useState<IEvent | null>(null);
+  const [eventsToDelete, setEventsToDelete] = useState<IEvent[]>([]);
 
   const { showSuccess, showError } = useToast();
 
@@ -63,8 +61,6 @@ export default function QuanLySuKienPage() {
   const totalPages = eventQuery.data?.pageCount || 0;
   const isLoading = eventQuery.isLoading;
 
-  console.log("evendata",eventData);
-
   // --- MUTATIONS ---
   const createMutation = useMutation({
     mutationFn: createEvent,
@@ -90,18 +86,22 @@ export default function QuanLySuKienPage() {
     },
   });
 
-  const deleteMutation = useMutation({
-    mutationFn: deleteEvent,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["event"] });
-      showSuccess("Đã xóa sự kiện.");
-      setIsDeleteModalOpen(false);
-      setEventToDelete(null);
-    },
-    onError: (error: any) => {
-      showError(error.message || "Không thể xóa sự kiện này.");
-    },
-  });
+  // --- SELECTION HANDLERS ---
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedIds(eventData.map((e: IEvent) => e.suKienId));
+    } else {
+      setSelectedIds([]);
+    }
+  };
+
+  const handleSelectOne = (id: string, checked: boolean) => {
+    if (checked) {
+      setSelectedIds((prev) => [...prev, id]);
+    } else {
+      setSelectedIds((prev) => prev.filter((i) => i !== id));
+    }
+  };
 
   // --- EVENT HANDLERS ---
   const handleAdd = () => {
@@ -114,24 +114,37 @@ export default function QuanLySuKienPage() {
     setIsModalOpen(true);
   };
 
+  // Xóa 1 sự kiện hoặc nhiều nếu đã chọn
   const handleDeleteClick = (event: IEvent) => {
-    setEventToDelete(event);
+    // Nếu đã tick nhiều checkbox và event hiện tại nằm trong danh sách đã chọn
+    // thì xóa tất cả những cái đã chọn
+    if (selectedIds.length > 1 && selectedIds.includes(event.suKienId)) {
+      const selected = eventData.filter((e: IEvent) => selectedIds.includes(e.suKienId));
+      setEventsToDelete(selected);
+    } else {
+      // Nếu không, chỉ xóa 1 cái được click
+      setEventsToDelete([event]);
+    }
     setIsDeleteModalOpen(true);
   };
 
-  const handleConfirmDelete = () => {
-    if (eventToDelete) {
-      deleteMutation.mutate(eventToDelete.suKienId);
-    }
+  // Xóa nhiều sự kiện đã chọn
+  const handleDeleteSelected = () => {
+    const selected = eventData.filter((e: IEvent) => selectedIds.includes(e.suKienId));
+    setEventsToDelete(selected);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleDeleteSuccess = () => {
+    setSelectedIds([]);
+    setEventsToDelete([]);
   };
 
   const handleSaveEvent = (event: Partial<IEvent>) => {
     if (editingEvent) {
       updateMutation.mutate(event as IEvent);
     } else {
-      const a = createMutation.mutate(event as IEvent);
-      console.log("a", a);
-
+      createMutation.mutate(event as IEvent);
     }
   };
 
@@ -140,9 +153,7 @@ export default function QuanLySuKienPage() {
     setPageIndex(1);
   };
 
-
   const isSaving = createMutation.isPending || updateMutation.isPending;
-  const isDeleting = deleteMutation.isPending;
 
   // --- LOADING STATE ---
   if (eventQuery.isLoading) {
@@ -183,6 +194,15 @@ export default function QuanLySuKienPage() {
         </div>
 
         <div className="flex gap-2 flex-wrap justify-end">
+          {selectedIds.length > 0 && (
+            <button
+              onClick={handleDeleteSelected}
+              className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded shadow hover:bg-red-700 transition-all text-sm font-bold"
+            >
+              <Trash2 size={16} />
+              <span>Xóa ({selectedIds.length})</span>
+            </button>
+          )}
           <button
             onClick={handleAdd}
             className="flex items-center gap-2 px-4 py-2 bg-[#b91c1c] text-white rounded shadow hover:bg-[#991b1b] transition-all text-sm font-bold ml-2"
@@ -230,6 +250,9 @@ export default function QuanLySuKienPage() {
         onPageSizeChange={handlePageSizeChange}
         onEdit={handleEdit}
         onDelete={handleDeleteClick}
+        selectedIds={selectedIds}
+        onSelectAll={handleSelectAll}
+        onSelectOne={handleSelectOne}
       />
 
       {/* Event Modal */}
@@ -241,42 +264,16 @@ export default function QuanLySuKienPage() {
         isLoading={isSaving}
       />
 
-      {/* Delete Confirmation Modal */}
-      {isDeleteModalOpen && eventToDelete && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full shadow-xl border border-[#d4af37]">
-            <h3 className="text-lg font-bold text-[#5d4037] mb-4">
-              Xác nhận xóa
-            </h3>
-            <p className="text-gray-600 mb-6">
-              Bạn có chắc chắn muốn xóa sự kiện{" "}
-              <strong className="text-[#b91c1c]">
-                {eventToDelete.tenSuKien}
-              </strong>
-              ?
-            </p>
-            <div className="flex justify-end gap-3">
-              <button
-                onClick={() => {
-                  setIsDeleteModalOpen(false);
-                  setEventToDelete(null);
-                }}
-                className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-50 transition-colors"
-              >
-                Hủy
-              </button>
-              <button
-                onClick={handleConfirmDelete}
-                disabled={isDeleting}
-                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50 flex items-center gap-2 transition-colors"
-              >
-                {isDeleting && <Loader2 className="animate-spin" size={16} />}
-                {isDeleting ? "Đang xóa..." : "Xóa"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Delete Modal - Tách riêng component */}
+      <EventDeleteModal
+        isOpen={isDeleteModalOpen}
+        events={eventsToDelete}
+        onClose={() => {
+          setIsDeleteModalOpen(false);
+          setEventsToDelete([]);
+        }}
+        onSuccess={handleDeleteSuccess}
+      />
     </div>
   );
 }

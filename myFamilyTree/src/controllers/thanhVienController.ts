@@ -101,6 +101,18 @@ export class thanhVienController {
     }
   }
 
+  // Xóa nhiều thành viên
+  async deleteMultipleThanhVien(req: Request, res: Response): Promise<void> {
+    try {
+      const { list_json, lu_user_id } = req.body;
+      await this.thanhvienService.deleteMultipleThanhVien(list_json, lu_user_id);
+      res.json({ message: "Xóa thành viên thành công", success: true });
+    } catch (error: any) {
+      console.log("error", error);
+      res.status(500).json({ message: error.message || "Xóa thành viên thất bại", success: false });
+    }
+  }
+
   async getAllThanhVien(req: Request, res: Response): Promise<void> {
     try {
       const results = await this.thanhvienService.getAllThanhVien();

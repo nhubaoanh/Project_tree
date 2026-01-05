@@ -28,4 +28,8 @@ export class suKienService {
   async updateSuKien(sukien: suKien): Promise<any> {
     return await this.suKienRespository.updateSuKien(sukien);
   }
+
+  async deleteSuKien(listJson: any[], luUserId: string): Promise<any> {
+    return await this.suKienRespository.deleteSuKien(listJson, luUserId);
+  }
 }

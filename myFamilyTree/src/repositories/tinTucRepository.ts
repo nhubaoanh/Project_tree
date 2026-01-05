@@ -82,6 +82,17 @@ export class TinTucRepository {
     }
   }
 
+  async deleteMultiple(listJson: any[], luUserId: string): Promise<any> {
+    try {
+      const sql = `CALL DeleteTinTuc(?,?, @err_code, @err_msg)`;
+      await this.db.query(sql, [JSON.stringify(listJson), luUserId]);
+      return { success: true };
+    } catch (error: any) {
+      console.error("DeleteTinTuc error:", error.message);
+      throw new Error(error.message);
+    }
+  }
+
   async getById(tinTucId: string): Promise<TinTuc | null> {
     try {
       const sql = `CALL GetTinTucById(?, @err_code, @err_msg)`;

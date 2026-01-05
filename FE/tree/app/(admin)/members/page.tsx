@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useRef } from "react";
-import { Search, Plus, Download, Upload, X, Loader2 } from "lucide-react";
+import { Search, Plus, Download, Upload, X, Loader2, Trash2 } from "lucide-react";
 import * as XLSX from "xlsx";
 import {
   useQuery,
@@ -20,39 +20,36 @@ import {
   deleteMember,
 } from "@/service/member.service";
 import { MemberModal } from "./components/memberModal";
-import toast from "react-hot-toast";
 import { ExcelTemplateButton } from "./components/ExcelTemplateButton";
-
-// --- MAIN PAGE COMPONENT ---
+import storage from "@/utils/storage";
 
 export default function QuanLyThanhVienPage() {
   const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // --- STATE FOR API QUERY PARAMETERS ---
   const [pageIndex, setPageIndex] = useState(1);
   const [pageSize, setPageSize] = useState(5);
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
 
-  // --- MODAL STATES ---
+  // Selection state
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<IMember | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [userToDelete, setUserToDelete] = useState<IMember | null>(null);
+  const [itemsToDelete, setItemsToDelete] = useState<IMember[]>([]);
 
   const { showSuccess, showError } = useToast();
 
-  // --- DEBOUNCE SEARCH ---
   React.useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(searchTerm);
-      setPageIndex(1); // Reset to page 1 on new search
+      setPageIndex(1);
     }, 500);
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
-  // // --- FETCHING DATA ---
   const searchParams: IMemberSearch = {
     pageIndex,
     pageSize,
@@ -66,13 +63,10 @@ export default function QuanLyThanhVienPage() {
   });
 
   const memberData = memberQuery.data?.data || [];
-  // showSuccess("lay du lieu len thanh cong!")
-  console.log("memberData", memberData);
   const totalRecords = memberQuery.data?.totalItems || 0;
   const totalPages = memberQuery.data?.pageCount || 0;
   const isLoading = memberQuery.isLoading;
 
-  // --- MUTATIONS - CRUD ---
   const createMutation = useMutation({
     mutationFn: createMember,
     onSuccess: () => {
@@ -99,17 +93,36 @@ export default function QuanLyThanhVienPage() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id: number) => deleteMember(id),
+    mutationFn: ({ listJson, luUserId }: { listJson: { thanhVienId: number }[]; luUserId: string }) =>
+      deleteMember(listJson, luUserId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["member"] });
-      showSuccess("Đã xóa thành viên.");
+      showSuccess(itemsToDelete.length > 1 ? `Đã xóa ${itemsToDelete.length} thành viên.` : "Đã xóa thành viên.");
       setIsDeleteModalOpen(false);
-      setUserToDelete(null);
+      setItemsToDelete([]);
+      setSelectedIds([]);
     },
     onError: (error: any) => {
       showError(error.message || "Không thể xóa thành viên này.");
     },
   });
+
+  // --- SELECTION HANDLERS ---
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedIds(memberData.map((e: IMember) => e.thanhVienId));
+    } else {
+      setSelectedIds([]);
+    }
+  };
+
+  const handleSelectOne = (id: number, checked: boolean) => {
+    if (checked) {
+      setSelectedIds((prev) => [...prev, id]);
+    } else {
+      setSelectedIds((prev) => prev.filter((i) => i !== id));
+    }
+  };
 
   // --- EVENT HANDLERS ---
 
@@ -124,13 +137,26 @@ export default function QuanLyThanhVienPage() {
   };
 
   const handleDeleteClick = (user: IMember) => {
-    setUserToDelete(user);
+    if (selectedIds.length > 1 && selectedIds.includes(user.thanhVienId)) {
+      const selected = memberData.filter((e: IMember) => selectedIds.includes(e.thanhVienId));
+      setItemsToDelete(selected);
+    } else {
+      setItemsToDelete([user]);
+    }
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleDeleteSelected = () => {
+    const selected = memberData.filter((e: IMember) => selectedIds.includes(e.thanhVienId));
+    setItemsToDelete(selected);
     setIsDeleteModalOpen(true);
   };
 
   const handleConfirmDelete = () => {
-    if (userToDelete) {
-      deleteMutation.mutate(userToDelete.thanhVienId);
+    const user = storage.getUser();
+    if (itemsToDelete.length > 0 && user?.nguoiDungId) {
+      const listJson = itemsToDelete.map((e) => ({ thanhVienId: e.thanhVienId }));
+      deleteMutation.mutate({ listJson, luUserId: user.nguoiDungId });
     }
   };
 
@@ -370,6 +396,15 @@ export default function QuanLyThanhVienPage() {
         </div>
 
         <div className="flex gap-2 flex-wrap justify-end">
+          {selectedIds.length > 0 && (
+            <button
+              onClick={handleDeleteSelected}
+              className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded shadow hover:bg-red-700 transition-all text-sm font-bold"
+            >
+              <Trash2 size={16} />
+              <span>Xóa ({selectedIds.length})</span>
+            </button>
+          )}
           <button
             // onClick={handleExportExcel}
             className="flex items-center gap-2 px-4 py-2 bg-[#2c5282] text-white rounded shadow hover:bg-[#2a4365] transition-all text-sm font-bold"
@@ -439,6 +474,9 @@ export default function QuanLyThanhVienPage() {
         onPageSizeChange={handlePageSizeChange}
         onEdit={handleEdit}
         onDelete={handleDeleteClick}
+        selectedIds={selectedIds}
+        onSelectAll={handleSelectAll}
+        onSelectOne={handleSelectOne}
       />
 
       {/* Member Modal */}
@@ -451,21 +489,24 @@ export default function QuanLyThanhVienPage() {
       />
 
       {/* Delete Confirmation Modal */}
-      {isDeleteModalOpen && userToDelete && (
+      {isDeleteModalOpen && itemsToDelete.length > 0 && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-lg p-6 max-w-md w-full">
             <h3 className="text-lg font-bold text-[#5d4037] mb-4">
               Xác nhận xóa
             </h3>
             <p className="text-gray-600 mb-6">
-              Bạn có chắc chắn muốn xóa thành viên{" "}
-              <strong>{userToDelete.hoTen}</strong>?
+              {itemsToDelete.length === 1 ? (
+                <>Bạn có chắc chắn muốn xóa thành viên <strong className="text-[#b91c1c]">{itemsToDelete[0].hoTen}</strong>?</>
+              ) : (
+                <>Bạn có chắc chắn muốn xóa <strong className="text-[#b91c1c]">{itemsToDelete.length} thành viên</strong> đã chọn?</>
+              )}
             </p>
             <div className="flex justify-end gap-2">
               <button
                 onClick={() => {
                   setIsDeleteModalOpen(false);
-                  setUserToDelete(null);
+                  setItemsToDelete([]);
                 }}
                 className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-50"
               >

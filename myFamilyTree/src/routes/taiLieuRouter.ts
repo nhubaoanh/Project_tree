@@ -8,6 +8,7 @@ const taiLieuController = container.resolve(TaiLieuController);
 // Áp dụng enforceDongHo
 
 taiLieuRouter.post("/search", taiLieuController.search.bind(taiLieuController));
+taiLieuRouter.post("/delete", taiLieuController.deleteMultiple.bind(taiLieuController));
 taiLieuRouter.post("/",taiLieuController.create.bind(taiLieuController));
 taiLieuRouter.get("/:id",taiLieuController.getById.bind(taiLieuController));
 taiLieuRouter.put("/:id", taiLieuController.update.bind(taiLieuController));

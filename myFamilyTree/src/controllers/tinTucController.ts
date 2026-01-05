@@ -109,6 +109,21 @@ export class TinTucController {
     }
   }
 
+  // Xóa nhiều tin tức
+  async deleteMultiple(req: Request, res: Response): Promise<void> {
+    try {
+      const { list_json, lu_user_id } = req.body;
+      await this.tinTucService.deleteMultiple(list_json, lu_user_id);
+      res.json({
+        success: true,
+        message: "Xóa tin tức thành công",
+      });
+    } catch (error: any) {
+      console.log("error", error);
+      res.status(500).json({ success: false, message: error.message || "Lỗi xóa tin tức" });
+    }
+  }
+
   async getById(req: Request, res: Response): Promise<void> {
     try {
       const tinTucId = req.params.id;

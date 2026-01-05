@@ -35,9 +35,12 @@ export const updateContributionUp = async (data: IContributionUp): Promise<any> 
   }
 };
 
-export const deleteContributionUp = async (id: IContributionUp): Promise<any> => {
+export const deleteContributionUp = async (listJson: { thuId: number }[], luUserId: string): Promise<any> => {
   try {
-    const res = await apiClient.delete(`${prefix}/${id}`);
+    const res = await apiClient.post(`${prefix}/delete`, {
+      list_json: listJson,
+      lu_user_id: luUserId,
+    });
     return res?.data;
   } catch (error: any) {
     throw error;

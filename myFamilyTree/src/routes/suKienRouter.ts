@@ -29,4 +29,9 @@ suKienRouter.post(
   eventcontroller.updateSuKien.bind(eventcontroller)
 );
 
+suKienRouter.post(
+  "/delete",
+  eventcontroller.deleteSuKien.bind(eventcontroller)
+);
+
 export default suKienRouter;

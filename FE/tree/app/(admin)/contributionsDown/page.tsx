@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useRef, useEffect } from "react";
-import { Search, Plus, Download, Upload, X, Loader2 } from "lucide-react";
+import { Search, Plus, Download, Upload, X, Loader2, Trash2 } from "lucide-react";
 import * as XLSX from "xlsx";
 import {
   useQuery,
@@ -9,7 +9,6 @@ import {
   keepPreviousData,
 } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
-import { IContributionUp, IsearchContributionUp } from "@/types/contribuitionUp";
 import { ContributionTable } from "./components/contribuitionDownTable";
 import { ContributionUpModal } from "./components/contribuitionDownModal";
 import { createContributionDown, deleteContributionDown, searchContributionDown, updateContributionDown } from "@/service/contribuitionDown.service";
@@ -17,13 +16,10 @@ import { IContributionDown, IsearchContributionDown } from "@/types/contribuitio
 import { useToast } from "@/service/useToas";
 import storage from "@/utils/storage";
 
-// --- MAIN PAGE COMPONENT ---
-
-export default function QuanLyThanhVienPage() {
+export default function QuanLyTaiChinhChiPage() {
   const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Lấy thông tin user và dongHoId
   const [user, setUser] = useState<any>(null);
   const [dongHoId, setDongHoId] = useState<string>("");
   const [isReady, setIsReady] = useState(false);
@@ -37,43 +33,41 @@ export default function QuanLyThanhVienPage() {
     setIsReady(true);
   }, []);
 
-  // --- STATE FOR API QUERY PARAMETERS ---
   const [pageIndex, setPageIndex] = useState(1);
   const [pageSize, setPageSize] = useState(5);
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
 
-  const { showSuccess, showError } = useToast();
-  // --- MODAL STATES ---
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingUser, setEditingUser] =
-    useState<IContributionDown | null>(null);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [contribuitionToDelete, setUserToDelete] =
-    useState<IContributionDown | null>(null);
+  // Selection state
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
 
-  // --- DEBOUNCE SEARCH ---
+  const { showSuccess, showError } = useToast();
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingUser, setEditingUser] = useState<IContributionDown | null>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [itemsToDelete, setItemsToDelete] = useState<IContributionDown[]>([]);
+
   React.useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(searchTerm);
-      setPageIndex(1); // Reset to page 1 on new search
+      setPageIndex(1);
     }, 500);
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
-  // --- FETCHING DATA với dongHoId ---
   const searchParams: IsearchContributionDown = {
     pageIndex,
     pageSize,
     search_content: debouncedSearch,
-    dongHoId: dongHoId || undefined, // Filter theo dòng họ
+    dongHoId: dongHoId || undefined,
   };
 
   const usersQuery = useQuery({
     queryKey: ["contribuitionDown", searchParams],
     queryFn: () => searchContributionDown(searchParams),
     placeholderData: keepPreviousData,
-    enabled: isReady && !!dongHoId, // Chỉ fetch khi có dongHoId
+    enabled: isReady && !!dongHoId,
   });
 
   const userData = usersQuery.data?.data || [];
@@ -81,18 +75,15 @@ export default function QuanLyThanhVienPage() {
   const totalPages = usersQuery.data?.pageCount || 0;
   const isLoading = usersQuery.isLoading;
 
-  console.log("Fetched Users:", userData);
-
-  // --- MUTATIONS - CRUD ---
   const createMutation = useMutation({
     mutationFn: createContributionDown,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["contribuitionUp"] });
-      showSuccess("Thêm thành viên thành công!");
+      queryClient.invalidateQueries({ queryKey: ["contribuitionDown"] });
+      showSuccess("Thêm khoản chi thành công!");
       setIsModalOpen(false);
     },
     onError: () => {
-      showError("Có lỗi xảy ra khi thêm thành viên.");
+      showError("Có lỗi xảy ra khi thêm.");
     },
   });
 
@@ -110,40 +101,66 @@ export default function QuanLyThanhVienPage() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: deleteContributionDown,
+    mutationFn: (listJson: { chiId: number }[]) => deleteContributionDown(listJson, user?.nguoiDungId || ""),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["contribuitionUp"] });
-      toast.success("Đã xóa thành viên.");
+      queryClient.invalidateQueries({ queryKey: ["contribuitionDown"] });
+      showSuccess("Đã xóa thành công.");
       setIsDeleteModalOpen(false);
-      setUserToDelete(null);
+      setItemsToDelete([]);
+      setSelectedIds([]);
     },
     onError: () => {
-      toast.error("Không thể xóa thành viên này.");
+      showError("Không thể xóa.");
     },
   });
 
-  // --- EVENT HANDLERS ---
+  // Selection handlers
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedIds(userData.map((e: IContributionDown) => e.chiId));
+    } else {
+      setSelectedIds([]);
+    }
+  };
+
+  const handleSelectOne = (id: number, checked: boolean) => {
+    if (checked) {
+      setSelectedIds((prev) => [...prev, id]);
+    } else {
+      setSelectedIds((prev) => prev.filter((i) => i !== id));
+    }
+  };
 
   const handleAdd = () => {
     setEditingUser(null);
     setIsModalOpen(true);
   };
 
-  const handleEdit = (user: IContributionDown) => {
-    setEditingUser(user);
+  const handleEdit = (item: IContributionDown) => {
+    setEditingUser(item);
     setIsModalOpen(true);
   };
 
-  const handleDeleteClick = (user: IContributionDown) => {
-    setUserToDelete(user);
+  const handleDeleteClick = (item: IContributionDown) => {
+    if (selectedIds.length > 1 && selectedIds.includes(item.chiId)) {
+      const selected = userData.filter((e: IContributionDown) => selectedIds.includes(e.chiId));
+      setItemsToDelete(selected);
+    } else {
+      setItemsToDelete([item]);
+    }
     setIsDeleteModalOpen(true);
   };
 
-  // const handleConfirmDelete = () => {
-  //   if (contribuitionToDelete) {
-  //     deleteMutation.mutate(contribuitionToDelete.);
-  //   }
-  // };
+  const handleDeleteSelected = () => {
+    const selected = userData.filter((e: IContributionDown) => selectedIds.includes(e.chiId));
+    setItemsToDelete(selected);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = () => {
+    const listJson = itemsToDelete.map((item) => ({ chiId: item.chiId }));
+    deleteMutation.mutate(listJson);
+  };
 
   const handleSaveUser = (data: Partial<IContributionDown>) => {
     if (editingUser) {
@@ -158,8 +175,6 @@ export default function QuanLyThanhVienPage() {
     setPageIndex(1);
   };
 
-  // --- EXCEL HANDLERS ---
-
   const handleExportExcel = () => {
     if (userData.length === 0) {
       toast("Không có dữ liệu để xuất");
@@ -167,52 +182,13 @@ export default function QuanLyThanhVienPage() {
     }
     const worksheet = XLSX.utils.json_to_sheet(userData);
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "DanhSachThanhVien");
-    XLSX.writeFile(workbook, `DanhSachThanhVien_Trang${pageIndex}.xlsx`);
+    XLSX.utils.book_append_sheet(workbook, worksheet, "TaiChinhChi");
+    XLSX.writeFile(workbook, `TaiChinhChi_Trang${pageIndex}.xlsx`);
   };
-
-  // const handleImportExcel = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   const file = e.target.files?.[0];
-  //   if (file) {
-  //     const reader = new FileReader();
-  //     reader.onload = (evt) => {
-  //       const bstr = evt.target?.result;
-  //       const wb = XLSX.read(bstr, { type: "binary" });
-  //       const wsname = wb.SheetNames[0];
-  //       const ws = wb.Sheets[wsname];
-  //       const dataParsed = XLSX.utils.sheet_to_json(ws) as IContributionUp[];
-
-  //       console.log("Imported Data:", dataParsed);
-
-  //       if (dataParsed.length > 0) {
-  //         let successCount = 0;
-  //         const promises = dataParsed.map(async (u) => {
-  //           try {
-  //             const res = await createContributionDown(u);
-  //             console.log("Import result:", res);
-  //             successCount++;
-  //           } catch (err) {
-  //             console.error("Import error for row", u);
-  //           }
-  //         });
-
-  //         Promise.all(promises).then(() => {
-  //           queryClient.invalidateQueries({ queryKey: ["users"] });
-  //           toast.success(`Đã xử lý nhập ${dataParsed.length} dòng.`);
-  //           if (fileInputRef.current) fileInputRef.current.value = "";
-  //         });
-  //       }
-  //     };
-  //     reader.readAsBinaryString(file);
-  //   }
-  // };
 
   const isSaving = createMutation.isPending || updateMutation.isPending;
   const isDeleting = deleteMutation.isPending;
 
-  // --- RENDER UI ---
-  
-  // Chưa có dongHoId
   if (isReady && !dongHoId) {
     return (
       <div className="max-w-6xl mx-auto font-dancing text-[#4a4a4a] pb-20 animate-fadeIn">
@@ -233,32 +209,40 @@ export default function QuanLyThanhVienPage() {
       <div className="flex flex-col md:flex-row justify-between items-end md:items-center mb-8 gap-4 border-b border-[#d4af37] pb-4">
         <div>
           <h2 className="text-3xl font-display font-bold text-[#b91c1c] uppercase drop-shadow-sm">
-            Quản Lý Tai chinh
+            Quản Lý Tài Chính Chi
           </h2>
           <p className="text-[#8b5e3c] italic text-sm">
-            Danh sách nhân đinh và tài khoản truy cập hệ thống
+            Danh sách các khoản chi tài chính
           </p>
         </div>
 
         <div className="flex gap-2 flex-wrap justify-end">
+          {selectedIds.length > 0 && (
+            <button
+              onClick={handleDeleteSelected}
+              className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded shadow hover:bg-red-700 transition-all text-sm font-bold"
+            >
+              <Trash2 size={16} />
+              <span>Xóa ({selectedIds.length})</span>
+            </button>
+          )}
           <button
             onClick={handleExportExcel}
             className="flex items-center gap-2 px-4 py-2 bg-[#2c5282] text-white rounded shadow hover:bg-[#2a4365] transition-all text-sm font-bold"
           >
-            <Download size={16} />{" "}
+            <Download size={16} />
             <span className="hidden sm:inline">Xuất Excel</span>
           </button>
           <button
             onClick={() => fileInputRef.current?.click()}
             className="flex items-center gap-2 px-4 py-2 bg-[#276749] text-white rounded shadow hover:bg-[#22543d] transition-all text-sm font-bold relative overflow-hidden"
           >
-            <Upload size={16} />{" "}
+            <Upload size={16} />
             <span className="hidden sm:inline">Nhập Excel</span>
             <input
               ref={fileInputRef}
               type="file"
               accept=".xlsx, .xls"
-              // onChange={handleImportExcel}
               className="absolute inset-0 opacity-0 cursor-pointer"
             />
           </button>
@@ -266,7 +250,7 @@ export default function QuanLyThanhVienPage() {
             onClick={handleAdd}
             className="flex items-center gap-2 px-4 py-2 bg-[#b91c1c] text-white rounded shadow hover:bg-[#991b1b] transition-all text-sm font-bold ml-2"
           >
-            <Plus size={16} />{" "}
+            <Plus size={16} />
             <span className="hidden sm:inline">Thêm Mới</span>
           </button>
         </div>
@@ -284,7 +268,7 @@ export default function QuanLyThanhVienPage() {
         <input
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          placeholder="Tìm kiếm theo họ tên, tài khoản..."
+          placeholder="Tìm kiếm..."
           className="w-full p-2 outline-none bg-transparent text-[#5d4037] placeholder-stone-400"
         />
         {searchTerm && (
@@ -309,6 +293,9 @@ export default function QuanLyThanhVienPage() {
         onPageSizeChange={handlePageSizeChange}
         onEdit={handleEdit}
         onDelete={handleDeleteClick}
+        selectedIds={selectedIds}
+        onSelectAll={handleSelectAll}
+        onSelectOne={handleSelectOne}
       />
 
       {/* Modals */}
@@ -320,13 +307,35 @@ export default function QuanLyThanhVienPage() {
         isLoading={isSaving}
       />
 
-      {/* <ConfirmDeleteModal
-        isOpen={isDeleteModalOpen}
-        onClose={() => setIsDeleteModalOpen(false)}
-        onConfirm={handleConfirmDelete}
-        itemName={userToDelete?.hoTen || ""}
-        isLoading={isDeleting}
-      />  */}
+      {/* Delete Confirmation Modal */}
+      {isDeleteModalOpen && itemsToDelete.length > 0 && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full">
+            <h3 className="text-lg font-bold text-[#5d4037] mb-4">Xác nhận xóa</h3>
+            <p className="text-gray-600 mb-6">
+              Bạn có chắc chắn muốn xóa {itemsToDelete.length} khoản chi đã chọn?
+            </p>
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => {
+                  setIsDeleteModalOpen(false);
+                  setItemsToDelete([]);
+                }}
+                className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-50"
+              >
+                Hủy
+              </button>
+              <button
+                onClick={handleConfirmDelete}
+                disabled={isDeleting}
+                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50"
+              >
+                {isDeleting ? "Đang xóa..." : "Xóa"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

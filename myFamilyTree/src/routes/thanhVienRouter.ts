@@ -219,4 +219,16 @@ thanhVienRouter.delete(
   controller.deleteThanhVien.bind(controller)
 );
 
+/**
+ * POST /delete
+ * Xóa nhiều thành viên
+ */
+thanhVienRouter.post(
+  "/delete",
+  authenticate,
+  adminOrThuDo,
+  sensitiveLimiter,
+  controller.deleteMultipleThanhVien.bind(controller)
+);
+
 export default thanhVienRouter;

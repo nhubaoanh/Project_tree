@@ -77,4 +77,14 @@ export class taiChinhThuController {
           res.status(500).json({ message: "Cap nhat tai chinh thu that bai", success: false });
         }
       }
+
+    async deleteTaiChinhThu(req: Request, res: Response): Promise<void> {
+      try {
+        const { list_json, lu_user_id } = req.body;
+        await this.taiChinhThuService.deleteTaiChinhThu(list_json, lu_user_id);
+        res.json({ message: "Xóa tài chính thu thành công", success: true });
+      } catch (error: any) {
+        res.status(500).json({ message: error.message || "Xóa tài chính thu thất bại", success: false });
+      }
+    }
 }

@@ -65,10 +65,11 @@ export const updateMember = async (id: number, data: any): Promise<any> => {
     }
 }
 
-export const deleteMember = async (id: number, dongHoId?: string): Promise<any> => {
+export const deleteMember = async (listJson: { thanhVienId: number }[], luUserId: string): Promise<any> => {
     try {
-        const res = await apiClient.delete(`${prefix}/${id}`, {
-            data: { dongHoId }
+        const res = await apiClient.post(`${prefix}/delete`, {
+            list_json: listJson,
+            lu_user_id: luUserId,
         });
         return res?.data;
     } catch (error: any) {

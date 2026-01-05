@@ -18,7 +18,7 @@ export const Header: React.FC<HeaderProps> = ({ activeView, onNavigate }) => {
   ];
 
   return (
-    <header className="w-full h-[180px] sm:h-[180px] bg-gradient-to-b bg-[#ede5b7] relative overflow-hidden border-b-1 border-yellow-600/50">
+    <header className="w-full h-[180px] sm:h-[200px] bg-gradient-to-b bg-[#ede5b7] relative overflow-hidden border-b-1 border-yellow-600/50">
       <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] mix-blend-overlay pointer-events-none"></div>
 
       <div className="relative z-10 h-full grid grid-cols-3 gap-2 items-center px-4 md:px-8 max-w-7xl mx-auto">
@@ -32,7 +32,7 @@ export const Header: React.FC<HeaderProps> = ({ activeView, onNavigate }) => {
           />
         </div>
         <div className="flex flex-col items-center justify-center h-full pt-2">
-          <div className="mb-8 transform hover:scale-105 transition-transform duration-500">
+          <div className="mb-13 transform hover:scale-105 transition-transform duration-500">
             <Image
               src="/images/logo1.png"
               alt="Dao"

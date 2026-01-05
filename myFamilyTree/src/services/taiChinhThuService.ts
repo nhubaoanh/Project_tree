@@ -27,4 +27,8 @@ export class taiChinhThuService {
     async updateTaiChinhThu(taiChinhThu: taiChinhThu): Promise<any> {
       return await this.taiChinhThuRespository.UpdateTaiChinhThu(taiChinhThu);
     }
+
+    async deleteTaiChinhThu(listJson: any[], luUserId: string): Promise<any> {
+      return await this.taiChinhThuRespository.deleteTaiChinhThu(listJson, luUserId);
+    }
 }

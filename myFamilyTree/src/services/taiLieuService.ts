@@ -49,4 +49,8 @@ export class TaiLieuService {
   async getById(taiLieuId: string): Promise<TaiLieu | null> {
     return await this.taiLieuRepository.getById(taiLieuId);
   }
+
+  async deleteMultiple(listJson: any[], luUserId: string): Promise<any> {
+    return await this.taiLieuRepository.deleteMultiple(listJson, luUserId);
+  }
 }

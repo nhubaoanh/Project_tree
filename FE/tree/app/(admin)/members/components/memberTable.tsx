@@ -22,6 +22,9 @@ interface MemberTableProps {
   onPageSizeChange: (size: number) => void;
   onEdit: (member: IMember) => void;
   onDelete: (member: IMember) => void;
+  selectedIds?: number[];
+  onSelectAll?: (checked: boolean) => void;
+  onSelectOne?: (id: number, checked: boolean) => void;
 }
 
 export const MemberTable: React.FC<MemberTableProps> = ({
@@ -35,7 +38,13 @@ export const MemberTable: React.FC<MemberTableProps> = ({
   onPageSizeChange,
   onEdit,
   onDelete,
+  selectedIds = [],
+  onSelectAll,
+  onSelectOne,
 }) => {
+  const allSelected = data.length > 0 && data.every((e) => selectedIds.includes(e.thanhVienId));
+  const someSelected = data.some((e) => selectedIds.includes(e.thanhVienId));
+
   return (
     <div className="bg-white rounded-lg border border-[#d4af37] shadow-lg overflow-hidden relative min-h-[400px] flex flex-col">
       {isLoading && (
@@ -53,7 +62,18 @@ export const MemberTable: React.FC<MemberTableProps> = ({
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-[#fdf6e3] border-b-2 border-[#d4af37] text-[#8b5e3c] text-sm uppercase font-bold">
-              {/* Cột cố định nhỏ */}
+              {/* Checkbox chọn tất cả */}
+              <th className="p-4 w-12 text-center">
+                <input
+                  type="checkbox"
+                  checked={allSelected}
+                  ref={(el) => {
+                    if (el) el.indeterminate = someSelected && !allSelected;
+                  }}
+                  onChange={(e) => onSelectAll?.(e.target.checked)}
+                  className="w-4 h-4 accent-[#b91c1c] cursor-pointer"
+                />
+              </th>
               <th className="p-4 w-12 text-center">#</th>
 
               <th className="p-4 text-center min-w-[150px]">Họ và Tên</th>
@@ -65,18 +85,11 @@ export const MemberTable: React.FC<MemberTableProps> = ({
               </th>
               <th className="p-4 text-center min-w-[120px]">Noi mất</th>
               <th className="p-4 text-center min-w-[150px]">Nghề nghiệp</th>
-              {/* <th className="p-4 text-center min-w-[120px]">Mật khẩu</th> */}
-              {/* <th className="p-4 text-center min-w-[120px]">Ảnh đại diện</th> */}
-
-              {/* Cột Vai Trò cố định để vừa badge */}
               <th className="p-4 text-center w-32">Trình độ học vấn</th>
-
               <th className="p-4 text-center min-w-[120px]">
                 Địa chỉ hiện tại
               </th>
               <th className="p-4 text-center min-w-[120px]">Tiểu sử</th>
-
-              {/* Cột Hành Động cố định nhỏ */}
               <th className="p-4 text-center min-w-[120px]">Hành Động</th>
             </tr>
           </thead>
@@ -84,15 +97,24 @@ export const MemberTable: React.FC<MemberTableProps> = ({
             {data.length > 0
               ? data.map((member, index) => (
                   <tr
-                    key={index}
-                    className="hover:bg-[#fffdf5] transition-colors group"
+                    key={member.thanhVienId}
+                    className={`hover:bg-[#fffdf5] transition-colors group ${
+                      selectedIds.includes(member.thanhVienId) ? "bg-[#fff8e1]" : ""
+                    }`}
                   >
-                    {/* Cột # cố định */}
+                    {/* Checkbox chọn từng dòng */}
+                    <td className="p-4 w-12 text-center">
+                      <input
+                        type="checkbox"
+                        checked={selectedIds.includes(member.thanhVienId)}
+                        onChange={(e) => onSelectOne?.(member.thanhVienId, e.target.checked)}
+                        className="w-4 h-4 accent-[#b91c1c] cursor-pointer"
+                      />
+                    </td>
                     <td className="p-4 w-12 text-center text-stone-400 font-mono text-xs">
                       {(pageIndex - 1) * pageSize + index + 1}
                     </td>
 
-                    {/* THAY ĐỔI: Thêm min-w tương ứng, bỏ truncate */}
                     <td className="p-4 text-center font-bold text-[#5d4037] group-hover:text-[#b91c1c] min-w-[150px]">
                       {member.hoTen}
                     </td>
@@ -127,17 +149,7 @@ export const MemberTable: React.FC<MemberTableProps> = ({
                     <td className="p-4 text-center font-bold text-sm text-[#5d4037] min-w-[150px]">
                       {member.tieuSu}
                     </td>
-                    {/* <td className="p-4 text-center font-bold text-sm text-[#5d4037] min-w-[150px]">
-                      {member.anhChanDung}
-                    </td> */}
-                    {/* <td className="p-4 text-center font-bold text-[#5d4037] group-hover:text-[#b91c1c] min-w-[120px]">
-                      {member.matKhau}
-                    </td> */}
-                    {/* <td className="p-4 text-center font-bold text-[#5d4037] group-hover:text-[#b91c1c] min-w-[120px]">
-                      {member.anhDaiDien}
-                    </td> */}
 
-                    {/* Cột Hành Động cố định */}
                     <td className="p-4 min-w-[120px] text-center">
                       <div className="flex justify-center gap-2 opacity-80 group-hover:opacity-100 transition-opacity">
                         <button
@@ -161,7 +173,7 @@ export const MemberTable: React.FC<MemberTableProps> = ({
               : !isLoading && (
                   <tr>
                     <td
-                      colSpan={11}
+                      colSpan={13}
                       className="p-12 text-center text-stone-500 italic"
                     >
                       <div className="flex flex-col items-center">
@@ -181,6 +193,11 @@ export const MemberTable: React.FC<MemberTableProps> = ({
       {/* Pagination Footer */}
       <div className="bg-[#fdf6e3] p-4 border-t border-[#d4af37] flex items-center justify-between">
         <div className="text-sm text-[#8b5e3c]">
+          {selectedIds.length > 0 && (
+            <span className="mr-4 text-[#b91c1c] font-bold">
+              Đã chọn {selectedIds.length} thành viên
+            </span>
+          )}
           Hiển thị <span className="font-bold">{data.length}</span> / Tổng{" "}
           <span className="font-bold">{totalRecords}</span> thành viên
         </div>
@@ -205,7 +222,6 @@ export const MemberTable: React.FC<MemberTableProps> = ({
             <ChevronLeft size={16} />
           </button>
 
-          {/* Simple Pagination Logic for Display */}
           <span className="px-4 text-sm font-bold text-[#5d4037]">
             Trang {pageIndex} / {totalPages || 1}
           </span>

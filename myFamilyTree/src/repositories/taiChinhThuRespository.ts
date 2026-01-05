@@ -72,4 +72,15 @@ export class taiChinhThuRespository {
       throw new Error(error.message);
     }
   }
+
+  async deleteTaiChinhThu(listJson: any[], luUserId: string): Promise<any> {
+    try {
+      const sql = "CALL DeleteTaiChinhThu(?, ?, @err_code, @err_msg)";
+      await this.db.query(sql, [JSON.stringify(listJson), luUserId]);
+      return true;
+    } catch (error: any) {
+      console.log("error database => ", error);
+      throw new Error(error.message);
+    }
+  }
 }

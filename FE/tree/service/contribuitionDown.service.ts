@@ -37,9 +37,12 @@ export const updateContributionDown = async (id: number, data: any): Promise<any
   }
 };
 
-export const deleteContributionDown = async (id: string): Promise<any> => {
+export const deleteContributionDown = async (listJson: { chiId: number }[], luUserId: string): Promise<any> => {
   try {
-    const res = await apiClient.delete(`${prefix}/${id}`);
+    const res = await apiClient.post(`${prefix}/delete`, {
+      list_json: listJson,
+      lu_user_id: luUserId,
+    });
     return res?.data;
   } catch (error: any) {
     throw error;

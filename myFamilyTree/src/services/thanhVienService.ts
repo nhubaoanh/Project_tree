@@ -29,6 +29,11 @@ export class thanhVienService {
     return await this.thanhvienRespository.deleteThanhVien(dongHoId, thanhVienId);
   }
 
+  // Xóa nhiều thành viên
+  async deleteMultipleThanhVien(listJson: any[], luUserId: string): Promise<any> {
+    return await this.thanhvienRespository.deleteMultipleThanhVien(listJson, luUserId);
+  }
+
   async getAllThanhVien(): Promise<any> {
     return await this.thanhvienRespository.getAllThanhVien();
   }

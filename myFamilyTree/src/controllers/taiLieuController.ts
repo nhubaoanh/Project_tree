@@ -126,4 +126,15 @@ export class TaiLieuController {
       res.status(500).json({ success: false, message: "Lỗi lấy tài liệu" });
     }
   }
+
+  async deleteMultiple(req: Request, res: Response): Promise<void> {
+    try {
+      const { list_json, lu_user_id } = req.body;
+      const result = await this.taiLieuService.deleteMultiple(list_json, lu_user_id);
+      res.json({ success: true, message: "Xóa tài liệu thành công", data: result });
+    } catch (error: any) {
+      console.log("error", error);
+      res.status(500).json({ success: false, message: "Lỗi xóa tài liệu" });
+    }
+  }
 }
