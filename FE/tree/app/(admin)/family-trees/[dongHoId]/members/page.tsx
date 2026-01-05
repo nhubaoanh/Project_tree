@@ -61,6 +61,8 @@ export default function MembersByDongHoPage() {
     });
     const dongHoInfo: IDongHo | null = dongHoQuery.data?.data || null;
 
+    console.log("dong: ", dongHoInfo);
+
     // Fetch members theo dongHoId
     const searchParams: IMemberSearch = { pageIndex, pageSize, search_content: debouncedSearch, dongHoId };
     const memberQuery = useQuery({
@@ -71,6 +73,8 @@ export default function MembersByDongHoPage() {
     });
 
     const memberData = memberQuery.data?.data || [];
+
+    console.log("member", memberQuery);
     const totalRecords = memberQuery.data?.totalItems || 0;
     const totalPages = memberQuery.data?.pageCount || 0;
     const isLoading = memberQuery.isLoading;

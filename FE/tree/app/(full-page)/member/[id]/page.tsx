@@ -33,7 +33,9 @@ export default function MemberDetailPage() {
     enabled: !!dongHoId,
   });
 
-  const member = memberRes?.data;
+  const member = memberRes?.data[0];
+
+  console.log("member", member);
   const allMembers = allMembersRes?.data || [];
 
   const getNameById = (id: number | null) => {
