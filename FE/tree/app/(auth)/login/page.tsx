@@ -69,6 +69,8 @@ export default function LoginPage() {
         storage.setToken(result.token);
 
         const userData = await autherization(result.token);
+
+        console.log("authorize response:", userData);
         if (userData) {
           storage.setUser({
             nguoiDungId: userData.nguoiDungId,
@@ -85,11 +87,12 @@ export default function LoginPage() {
             roleId: userData.roleId,
             roleCode: userData.roleCode,
             online_flag: userData.online_flag,
-            // Menu và permissions từ DB
-            menus: userData.menus,
-            permissions: userData.permissions,
-            canSelectAllDongHo: userData.canSelectAllDongHo,
+            // Menu và permissions từ authorize response
+            menus: userData.menus || [],
+            permissions: userData.permissions || {},
+            canSelectAllDongHo: userData.canSelectAllDongHo || false,
           });
+          console.log("Saved to storage - menus:", userData.menus);
         }
 
         showSuccess("Đăng nhập thành công!");

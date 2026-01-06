@@ -1,6 +1,6 @@
 "use client";
-import React, { useState } from "react";
-import { Search, Plus, Download, X, Loader2 } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Search, Plus, Download, X, Loader2, Filter } from "lucide-react";
 import * as XLSX from "xlsx";
 import {
   useQuery,
@@ -17,10 +17,12 @@ import {
   updateUser,
   deleteUser,
 } from "@/service/user.service";
+import { getAllDongHo, IDongHo } from "@/service/dongho.service";
 import { MemberTable } from "./components/userTable";
 import { UserModal } from "./components/userModal";
 import { ConfirmDeleteModal } from "./components/userDelete";
 import { useToast } from "@/service/useToas";
+import storage from "@/utils/storage";
 
 // --- MAIN PAGE COMPONENT ---
 
@@ -32,6 +34,12 @@ export default function QuanLyThanhVienPage() {
   const [pageSize, setPageSize] = useState(5);
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
+  
+  // --- STATE FOR DONG HO FILTER (chỉ SA mới dùng) ---
+  const [dongHoList, setDongHoList] = useState<IDongHo[]>([]);
+  const [selectedDongHo, setSelectedDongHo] = useState<string>("");
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [userDongHoId, setUserDongHoId] = useState<string>("");
 
   // --- MODAL STATES ---
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -41,8 +49,31 @@ export default function QuanLyThanhVienPage() {
 
   const { showSuccess, showError } = useToast();
 
+  // --- LOAD USER INFO & DONG HO LIST ---
+  useEffect(() => {
+    const user = storage.getUser();
+    const isSA = user?.roleCode === 'sa';
+    setIsAdmin(isSA);
+    setUserDongHoId(user?.dongHoId || "");
+
+    // Nếu là SA, load danh sách dòng họ
+    if (isSA) {
+      const loadDongHo = async () => {
+        try {
+          const res = await getAllDongHo();
+          if (res.data && Array.isArray(res.data)) {
+            setDongHoList(res.data);
+          }
+        } catch (error) {
+          console.error("Lỗi load dòng họ:", error);
+        }
+      };
+      loadDongHo();
+    }
+  }, []);
+
   // --- DEBOUNCE SEARCH ---
-  React.useEffect(() => {
+  useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(searchTerm);
       setPageIndex(1); // Reset to page 1 on new search
@@ -51,16 +82,20 @@ export default function QuanLyThanhVienPage() {
   }, [searchTerm]);
 
   // --- FETCHING DATA ---
+  // SA: dùng selectedDongHo (có thể rỗng = tất cả)
+  // Thủ đồ: dùng userDongHoId (dòng họ của mình)
   const searchParams: IUserSearch = {
     pageIndex,
     pageSize,
     search_content: debouncedSearch,
+    dongHoId: isAdmin ? selectedDongHo : userDongHoId,
   };
 
   const usersQuery = useQuery({
     queryKey: ["users", searchParams],
     queryFn: () => getUsers(searchParams),
     placeholderData: keepPreviousData,
+    enabled: isAdmin || !!userDongHoId, // Chỉ query khi có dongHoId (trừ SA)
   });
 
   const userData = usersQuery.data?.data || [];
@@ -194,28 +229,53 @@ export default function QuanLyThanhVienPage() {
         </div>
       </div>
 
-      {/* Search Bar */}
-      <div className="mb-6 flex items-center bg-white border border-[#d4af37] rounded-lg p-1 shadow-sm w-full md:w-1/2 transition-all focus-within:ring-2 ring-[#d4af37]/50">
-        <div className="p-2 text-stone-400">
-          {isLoading ? (
-            <Loader2 className="animate-spin" size={20} />
-          ) : (
-            <Search size={20} />
+      {/* Search Bar & Filter */}
+      <div className="mb-6 flex flex-col md:flex-row gap-4">
+        {/* Search */}
+        <div className="flex items-center bg-white border border-[#d4af37] rounded-lg p-1 shadow-sm flex-1 transition-all focus-within:ring-2 ring-[#d4af37]/50">
+          <div className="p-2 text-stone-400">
+            {isLoading ? (
+              <Loader2 className="animate-spin" size={20} />
+            ) : (
+              <Search size={20} />
+            )}
+          </div>
+          <input
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Tìm kiếm theo họ tên, tài khoản..."
+            className="w-full p-2 outline-none bg-transparent text-[#5d4037] placeholder-stone-400"
+          />
+          {searchTerm && (
+            <button
+              onClick={() => setSearchTerm("")}
+              className="p-2 text-stone-400 hover:text-[#b91c1c]"
+            >
+              <X size={16} />
+            </button>
           )}
         </div>
-        <input
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          placeholder="Tìm kiếm theo họ tên, tài khoản..."
-          className="w-full p-2 outline-none bg-transparent text-[#5d4037] placeholder-stone-400"
-        />
-        {searchTerm && (
-          <button
-            onClick={() => setSearchTerm("")}
-            className="p-2 text-stone-400 hover:text-[#b91c1c]"
-          >
-            <X size={16} />
-          </button>
+
+        {/* Bộ lọc dòng họ - chỉ hiện cho SA */}
+        {isAdmin && (
+          <div className="flex items-center gap-2">
+            <Filter size={18} className="text-[#d4af37]" />
+            <select
+              value={selectedDongHo}
+              onChange={(e) => {
+                setSelectedDongHo(e.target.value);
+                setPageIndex(1);
+              }}
+              className="px-4 py-2 bg-white border border-[#d4af37] rounded-lg text-[#5d4037] focus:outline-none focus:ring-2 ring-[#d4af37]/50 min-w-[200px]"
+            >
+              <option value="">Tất cả dòng họ</option>
+              {dongHoList.map((dh) => (
+                <option key={dh.dongHoId} value={dh.dongHoId}>
+                  {dh.tenDongHo}
+                </option>
+              ))}
+            </select>
+          </div>
         )}
       </div>
 

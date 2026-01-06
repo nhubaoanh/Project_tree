@@ -188,12 +188,17 @@ export class AIChatService {
     const lowerMsg = message.toLowerCase();
     const normalizedMsg = this.normalizeVietnamese(lowerMsg);
 
-    // Trích xuất tên từ câu hỏi
+    // Trích xuất tên từ câu hỏi - cải thiện pattern matching
     const namePatterns = [
+      // Pattern cho câu hỏi phức tạp: "Nguyễn Văn Quyết đời thứ 8 con của ai..."
+      /^([a-zA-ZÀ-ỹ\s]+?)(?:\s+đời\s*(?:thứ)?\s*\d+)?\s+(?:con của ai|là con ai|cha mẹ|vợ|chồng|có mấy con|có bao nhiêu con)/i,
+      // Pattern cơ bản
       /(?:của|cua)\s+(.+?)(?:\s+là|\s+la|\?|$)/i,
       /(.+?)\s+(?:là con|la con|là ai|la ai|có bao nhiêu|co bao nhieu)/i,
       /(?:ai là|ai la)\s+(.+?)(?:\?|$)/i,
       /(?:ông|bà|cha|mẹ|con|cháu|chú|bác|cô|dì|cậu)\s+(.+?)(?:\s+là|\?|$)/i,
+      // Pattern tìm tên ở đầu câu
+      /^([a-zA-ZÀ-ỹ\s]{2,30})\s+(?:đời|doi|con|cha|me|vo|chong|la)/i,
     ];
 
     let extractedName = "";
@@ -201,14 +206,13 @@ export class AIChatService {
       const match = message.match(pattern);
       if (match && match[1]) {
         extractedName = match[1].trim();
+        // Loại bỏ các từ không phải tên
+        extractedName = extractedName.replace(/^(ông|bà|anh|chị|em|cô|chú|bác|dì|cậu)\s+/i, '');
         break;
       }
     }
 
-    // Tìm thành viên được hỏi
-    const member = extractedName ? this.findMemberByName(extractedName) : null;
-
-    // Xử lý các loại câu hỏi
+    // Xử lý các loại câu hỏi chung
     if (normalizedMsg.includes("tat ca thanh vien") || normalizedMsg.includes("liet ke") || normalizedMsg.includes("danh sach")) {
       return this.listAllMembers();
     }
@@ -217,25 +221,104 @@ export class AIChatService {
       return this.describeAncestors();
     }
 
-    if (normalizedMsg.includes("doi thu") || normalizedMsg.match(/doi\s*\d+/)) {
-      const genMatch = message.match(/đời\s*(\d+)|doi\s*(\d+)/i);
+    // Hỏi về đời thứ mấy có bao nhiêu người
+    if (normalizedMsg.match(/doi\s*(?:thu)?\s*\d+.*(?:co bao nhieu|bao nhieu nguoi|may nguoi)/)) {
+      const genMatch = message.match(/đời\s*(?:thứ)?\s*(\d+)|doi\s*(?:thu)?\s*(\d+)/i);
       if (genMatch) {
         const gen = parseInt(genMatch[1] || genMatch[2]);
         return this.describeMembersByGeneration(gen);
       }
     }
 
+    if (normalizedMsg.includes("doi thu") || normalizedMsg.match(/doi\s*\d+/)) {
+      const genMatch = message.match(/đời\s*(?:thứ)?\s*(\d+)|doi\s*(?:thu)?\s*(\d+)/i);
+      if (genMatch) {
+        const gen = parseInt(genMatch[1] || genMatch[2]);
+        return this.describeMembersByGeneration(gen);
+      }
+    }
+
+    // Tìm thành viên được hỏi
+    let member = extractedName ? this.findMemberByName(extractedName) : null;
+
+    // Nếu không tìm thấy bằng pattern, thử tìm tên trong toàn bộ câu
     if (!member) {
-      // Thử tìm tên trong toàn bộ câu
       for (const m of this.cachedMembers) {
-        if (normalizedMsg.includes(this.normalizeVietnamese(m.hoTen?.toLowerCase() || ""))) {
-          return this.answerAboutMember(m, normalizedMsg);
+        const memberNameNorm = this.normalizeVietnamese(m.hoTen?.toLowerCase() || "");
+        if (memberNameNorm && normalizedMsg.includes(memberNameNorm)) {
+          member = m;
+          break;
         }
       }
-      return `Xin lỗi, tôi không tìm thấy thông tin về "${extractedName || 'người này'}". Bạn có thể hỏi:\n- Liệt kê tất cả thành viên\n- Ai là tổ tiên?\n- [Tên] là con ai?\n- Con của [Tên] là ai?`;
+    }
+
+    if (!member) {
+      return `Xin lỗi, tôi không tìm thấy thông tin về "${extractedName || 'người này'}". Bạn có thể hỏi:\n- Liệt kê tất cả thành viên\n- Ai là tổ tiên?\n- [Tên] là con ai?\n- Con của [Tên] là ai?\n- [Tên] có vợ/chồng là ai?`;
+    }
+
+    // Kiểm tra xem câu hỏi có nhiều phần không (câu hỏi phức tạp)
+    const isComplexQuestion = this.isComplexQuestion(normalizedMsg);
+    
+    if (isComplexQuestion) {
+      return this.answerComplexQuestion(member, normalizedMsg);
     }
 
     return this.answerAboutMember(member, normalizedMsg);
+  }
+
+  // Kiểm tra câu hỏi phức tạp (hỏi nhiều thông tin cùng lúc)
+  private isComplexQuestion(normalizedMsg: string): boolean {
+    const keywords = ['con cua ai', 'la con ai', 'vo', 'chong', 'co may con', 'bao nhieu con', 'cha me'];
+    let count = 0;
+    for (const kw of keywords) {
+      if (normalizedMsg.includes(kw)) count++;
+    }
+    return count >= 2;
+  }
+
+  // Trả lời câu hỏi phức tạp (nhiều thông tin)
+  private answerComplexQuestion(member: ThanhVien, normalizedMsg: string): string {
+    const name = member.hoTen;
+    let answer = `📌 Thông tin về ${name}:\n\n`;
+
+    // Thông tin cơ bản
+    answer += `• Giới tính: ${member.gioiTinh === 1 ? 'Nam' : 'Nữ'}\n`;
+    answer += `• Đời thứ: ${member.doiThuoc || 'Chưa rõ'}\n\n`;
+
+    // Cha mẹ
+    if (normalizedMsg.includes('con cua ai') || normalizedMsg.includes('la con ai') || normalizedMsg.includes('cha') || normalizedMsg.includes('me')) {
+      const father = this.getFather(member);
+      const mother = this.getMother(member);
+      answer += `👨‍👩‍👧 Cha mẹ:\n`;
+      answer += father ? `  - Cha: ${father.hoTen}\n` : `  - Cha: Không có thông tin\n`;
+      answer += mother ? `  - Mẹ: ${mother.hoTen}\n` : `  - Mẹ: Không có thông tin\n`;
+      answer += '\n';
+    }
+
+    // Vợ/chồng
+    if (normalizedMsg.includes('vo') || normalizedMsg.includes('chong')) {
+      const spouse = this.getSpouse(member);
+      if (spouse) {
+        answer += `💑 ${member.gioiTinh === 1 ? 'Vợ' : 'Chồng'}: ${spouse.hoTen}\n\n`;
+      } else {
+        answer += `💑 ${member.gioiTinh === 1 ? 'Vợ' : 'Chồng'}: Chưa có thông tin\n\n`;
+      }
+    }
+
+    // Con cái
+    if (normalizedMsg.includes('con') || normalizedMsg.includes('may con') || normalizedMsg.includes('bao nhieu con')) {
+      const children = this.getChildren(member);
+      if (children.length > 0) {
+        answer += `👶 Con cái (${children.length} người):\n`;
+        children.forEach(c => {
+          answer += `  - ${c.hoTen} (${c.gioiTinh === 1 ? 'Nam' : 'Nữ'})\n`;
+        });
+      } else {
+        answer += `👶 Con cái: Chưa có thông tin\n`;
+      }
+    }
+
+    return answer.trim();
   }
 
   // Trả lời về một thành viên cụ thể

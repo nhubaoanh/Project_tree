@@ -83,20 +83,50 @@ export class nguoiDungReponsitory {
   async getActionByUserId(id: string): Promise<any[]> {
     try {
       const sql = "CALL GetActionByUserId(?, @err_code, @err_msg)";
-      const [results] = await this.db.query(sql, [id]);
-      return results;
+      const results = await this.db.query(sql, [id]);      
+      // Handle nested array từ stored procedure
+      if (Array.isArray(results) && results.length > 0) {
+        if (Array.isArray(results[0])) {
+          return results[0];
+        }
+        return results;
+      }
+      return [];
     } catch (error: any) {
-      throw new Error(error.message);
+      console.error("getActionByUserId error:", error.message);
+      return [];
     }
   }
 
   async getFunctionByUserId(id: string): Promise<any[]> {
     try {
       const sql = "CALL GetFunctionsByUserId(?, @err_code, @err_msg)";
-      const [result] = await this.db.query(sql, [id]);
-      return result;
+      console.log("getFunctionByUserId - calling with id:", id);
+      const results = await this.db.query(sql, [id]);
+      console.log("getFunctionByUserId - raw results type:", typeof results);
+      console.log("getFunctionByUserId - raw results:", JSON.stringify(results, null, 2));
+      console.log("getFunctionByUserId - results.length:", results?.length);
+      
+      // Handle nested array từ stored procedure - MySQL trả về [[data], ResultSetHeader]
+      if (Array.isArray(results) && results.length > 0) {
+        // results[0] là data array
+        const data = results[0];
+        console.log("getFunctionByUserId - data[0]:", JSON.stringify(data, null, 2));
+        if (Array.isArray(data) && data.length > 0) {
+          console.log("getFunctionByUserId - returning data:", data.length, "items");
+          return data;
+        }
+        // Nếu results[0] không phải array, có thể results chính là data
+        if (!Array.isArray(data) && typeof data === 'object') {
+          console.log("getFunctionByUserId - results[0] is object, returning [results[0]]");
+          return [data];
+        }
+      }
+      console.log("getFunctionByUserId - returning empty array");
+      return [];
     } catch (error: any) {
-      throw new Error(error.message);
+      console.error("getFunctionByUserId error:", error.message);
+      return [];
     }
   }
 
@@ -194,10 +224,7 @@ export class nguoiDungReponsitory {
     try {
       const sql = "CALL GetMenuByRoleId(?)";
       const results = await this.db.query(sql, [roleId]);
-      console.log("getMenuByRoleId raw results:", JSON.stringify(results, null, 2));
-      
-      // Stored procedure trả về [[rows], OkPacket], cần lấy results[0] hoặc results trực tiếp
-      // Kiểm tra nếu results[0] là array thì đó là data
+            // Kiểm tra nếu results[0] là array thì đó là data
       if (Array.isArray(results) && results.length > 0) {
         // Nếu results[0] là array (nested), lấy results[0]
         if (Array.isArray(results[0])) {

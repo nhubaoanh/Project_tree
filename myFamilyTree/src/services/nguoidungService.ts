@@ -11,7 +11,11 @@ var md5 = require("md5");
 
 @injectable()
 export class nguoiDungService {
-  constructor(private nguoidungResponsitory: nguoiDungReponsitory) {}
+  private treeUtility: Tree;
+
+  constructor(private nguoidungResponsitory: nguoiDungReponsitory) {
+    this.treeUtility = new Tree();
+  }
 
   async createNguoiDung(nguoiDung: nguoiDung): Promise<any> {
     nguoiDung.nguoiDungId = uuidv4();
@@ -23,8 +27,25 @@ export class nguoiDungService {
   async loginUser(tenDangNhap: string, matKhau: string): Promise<any> {
     const md5_pass = md5(matKhau);
     const user = await this.nguoidungResponsitory.LoginUser(tenDangNhap);
-    console.log(md5_pass)
+    
     if (user && user.matKhau === md5_pass) {
+      // Lấy danh sách functions và actions (có thể không có nếu chưa tạo stored procedure)
+      let functionTree: any[] = [];
+      let actions: any[] = [];
+      
+      try {
+        const functions = await this.nguoidungResponsitory.getFunctionByUserId(user.nguoiDungId);
+        functionTree = this.treeUtility.getFunctionTree(functions || [], 1, "0");
+      } catch (err) {
+        console.log("getFunctionByUserId error:", err);
+      }
+      
+      try {
+        actions = await this.nguoidungResponsitory.getActionByUserId(user.nguoiDungId);
+      } catch (err) {
+        console.log("getActionByUserId error:", err);
+      }
+
       return {
         nguoiDungId: user.nguoiDungId,
         first_name: user.first_name,
@@ -40,6 +61,8 @@ export class nguoiDungService {
         roleId: user.roleId,
         roleCode: user.roleCode,
         online_flag: user.online_flag,
+        functions: functionTree,
+        actions: actions || [],
       };
     }
     return null;
@@ -60,7 +83,6 @@ export class nguoiDungService {
   }
 
   async resetPassword(tenDangNhap: string): Promise<any> {
-    console.log("tenDangNhap", tenDangNhap);
     const generateRandomString = (length: number) => {
       let result = "";
       const characters =
@@ -75,9 +97,7 @@ export class nguoiDungService {
     };
 
     var new_password = generateRandomString(8);
-    console.log("new_password", new_password);
     var hashed_password = md5(new_password);
-    console.log("hashed_password", hashed_password);
     let result = await this.nguoidungResponsitory.resetPassword(
       tenDangNhap,
       hashed_password
@@ -93,15 +113,15 @@ export class nguoiDungService {
       });
 
       const emailBody = `
-          <p>Xin chào,</p>
-                      <p>Hệ thống đã nhận được yêu cầu đổi mật từ bạn.</p>
-                      <p>Mật khẩu mới của bạn là: <b> ${new_password}</b></p>
-                      <p>Trân trọng.  
-                    `;
+        <p>Xin chào,</p>
+        <p>Hệ thống đã nhận được yêu cầu đổi mật từ bạn.</p>
+        <p>Mật khẩu mới của bạn là: <b>${new_password}</b></p>
+        <p>Trân trọng.</p>
+      `;
       var mailOptions = {
         from: system_email.email,
         to: tenDangNhap,
-        subject: "Đổi mật khâu",
+        subject: "Đổi mật khẩu",
         html: emailBody,
       };
 
@@ -112,83 +132,101 @@ export class nguoiDungService {
     return new_password;
   }
 
-  async authrize(token: string) {
-    let user_data = verifyToken(token);
-    if (user_data == null) throw new Error("Phien dang nhap het han.")
-    
-    console.log("authrize - user_data:", user_data);
-    console.log("authrize - roleId:", user_data.roleId);
-    
-    // Lấy menu + quyền từ DB theo roleId
-    const menuList = await this.nguoidungResponsitory.getMenuByRoleId(user_data.roleId);
-    console.log("authrize - menuList:", menuList);
-    
-    // Chuyển đổi thành format cho frontend
-    const menus: any[] = [];
-    const permissions: Record<string, string[]> = {};
-    let canSelectAllDongHo = false;
-    
-    // Log để debug field names
-    if (menuList.length > 0) {
-      console.log("authrize - first item keys:", Object.keys(menuList[0]));
-      console.log("authrize - first item:", menuList[0]);
-    }
-    
-    menuList.forEach((item: any) => {
-      // Stored procedure trả về: chucNangId, code, name, href, icon, sortOrder, parentId, actions, roleCode, canSelectAllDongHo
-      const code = item.code || item.chucNangCode;
-      const name = item.name || item.tenChucNang;
-      const href = item.href || item.duongDan;
-      const icon = item.icon || '/icon/default.png';
-      const sortOrder = item.sortOrder || item.thuTu || 0;
-      const parentId = item.parentId || null;
-      const actions = item.actions ? item.actions.split(',') : [];
-      
-      // Build menu item
-      menus.push({
-        code,
-        name,
-        href,
-        icon,
-        sortOrder,
-        parentId,
-        actions,
-      });
-      
-      // Build permissions map
-      if (code) {
-        permissions[code] = actions;
+  /**
+   * Authorize - verify token và lấy lại functions/actions từ DB
+   * Trả về format phù hợp với FE Sidebar (đã build tree)
+   */
+  async authorize(token: string) {
+    try {
+      let user_data = verifyToken(token);
+      if (user_data == null) throw new Error("Phiên đăng nhập hết hạn");
+
+      console.log("=== AUTHORIZE DEBUG ===");
+      console.log("User ID:", user_data.nguoiDungId);
+
+      // Lấy functions từ DB và build tree
+      let functionTree: any[] = [];
+      let permissions: Record<string, string[]> = {};
+
+      try {
+        const functions = await this.nguoidungResponsitory.getFunctionByUserId(user_data.nguoiDungId);
+        console.log("Functions from DB:", JSON.stringify(functions, null, 2));
+        
+        if (functions && functions.length > 0) {
+          // Dùng treeUtility để build tree (giống loginUser)
+          functionTree = this.treeUtility.getFunctionTree(functions, 1, "0");
+          console.log("Built function tree:", JSON.stringify(functionTree, null, 2));
+        }
+      } catch (err: any) {
+        console.log("getFunctionByUserId error:", err.message);
       }
-      
-      // Check canSelectAllDongHo
-      if (item.canSelectAllDongHo === 1) canSelectAllDongHo = true;
-    });
-    
-    console.log("authrize - menus:", menus);
-    console.log("authrize - permissions:", permissions);
-    
-    let data = {
-      nguoiDungId: user_data.nguoiDungId,
-      first_name: user_data.first_name,
-      middle_name: user_data.middle_name,
-      last_name: user_data.last_name,
-      full_name: user_data.full_name,
-      hoTen: user_data.full_name || user_data.hoTen,
-      gender: user_data.gender,
-      date_of_birthday: user_data.date_of_birthday,
-      avatar: user_data.avatar,
-      email: user_data.email,
-      phone: user_data.phone,
-      dongHoId: user_data.dongHoId,
-      roleId: user_data.roleId,
-      roleCode: user_data.roleCode,
-      online_flag: user_data.online_flag,
-      // Thêm menu và permissions
-      menus: menus,
-      permissions: permissions,
-      canSelectAllDongHo: canSelectAllDongHo,
-    };
-    return data;
+
+      try {
+        const actions = await this.nguoidungResponsitory.getActionByUserId(user_data.nguoiDungId);
+        console.log("Actions from DB count:", actions?.length);
+        
+        if (actions && actions.length > 0) {
+          // Group actions theo function_code
+          actions.forEach((action: any) => {
+            const code = action.function_code;
+            if (!permissions[code]) {
+              permissions[code] = [];
+            }
+            if (action.action_code && !permissions[code].includes(action.action_code)) {
+              permissions[code].push(action.action_code);
+            }
+          });
+        }
+        console.log("Permissions:", JSON.stringify(permissions, null, 2));
+      } catch (err: any) {
+        console.log("getActionByUserId error:", err.message);
+      }
+
+      // Convert functionTree sang format FE Sidebar cần
+      const convertToMenuFormat = (items: any[]): any[] => {
+        return items.map(item => ({
+          code: item.code,
+          name: item.title,
+          href: item.url || '#',
+          icon: item.icon || '/icon/iconmember.png',
+          sortOrder: item.sort_order || 1,
+          parentId: item.parent_id || null,
+          actions: permissions[item.code] || [],
+          children: item.children && item.children.length > 0 
+            ? convertToMenuFormat(item.children) 
+            : undefined
+        }));
+      };
+
+      const menus = convertToMenuFormat(functionTree);
+      console.log("Final menus:", JSON.stringify(menus, null, 2));
+      console.log("=== END AUTHORIZE DEBUG ===");
+
+      return {
+        nguoiDungId: user_data.nguoiDungId,
+        first_name: user_data.first_name,
+        middle_name: user_data.middle_name,
+        last_name: user_data.last_name,
+        full_name: user_data.full_name,
+        hoTen: user_data.full_name,
+        gender: user_data.gender,
+        date_of_birthday: user_data.date_of_birthday,
+        avatar: user_data.avatar,
+        email: user_data.email,
+        phone: user_data.phone,
+        dongHoId: user_data.dongHoId,
+        roleId: user_data.roleId,
+        roleCode: user_data.roleCode,
+        online_flag: user_data.online_flag,
+        // Format cho FE Sidebar - đã build tree sẵn
+        menus: menus,
+        permissions: permissions,
+        canSelectAllDongHo: user_data.roleCode === 'sa',
+      };
+    } catch (error: any) {
+      console.error("authorize error:", error.message);
+      throw error;
+    }
   }
 
   async insertUser(nguoidung: nguoiDung): Promise<any> {
@@ -204,11 +242,10 @@ export class nguoiDungService {
   }
 
   async UpdateMyProfile(nguoidung: UserProfile): Promise<any> {
-    // Chỉ hash password nếu có nhập mật khẩu mới
-    if (nguoidung.matKhau && nguoidung.matKhau.trim() !== '') {
+    if (nguoidung.matKhau && nguoidung.matKhau.trim() !== "") {
       nguoidung.matKhau = md5(nguoidung.matKhau);
     } else {
-      nguoidung.matKhau = ''; // Để trống để proc không update password
+      nguoidung.matKhau = "";
     }
     return this.nguoidungResponsitory.UpdateMyProfile(nguoidung);
   }
@@ -221,16 +258,10 @@ export class nguoiDungService {
     return this.nguoidungResponsitory.deleteUser(list_json, updated_by_id);
   }
 
-  /**
-   * Lấy danh sách quyền của user
-   */
   async getUserPermissions(nguoiDungId: string): Promise<any[]> {
     return this.nguoidungResponsitory.getUserPermissions(nguoiDungId);
   }
 
-  /**
-   * Lấy menu + quyền theo roleId
-   */
   async getMenuByRoleId(roleId: string): Promise<any[]> {
     return this.nguoidungResponsitory.getMenuByRoleId(roleId);
   }

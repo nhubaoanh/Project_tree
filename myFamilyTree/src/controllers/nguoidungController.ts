@@ -12,6 +12,8 @@ export class NguoiDungController {
       const { tenDangNhap, matKhau } = req.body;
       const user = await this.nguoiDungService.loginUser(tenDangNhap, matKhau);
       if (user) {
+        // Token payload chỉ chứa thông tin cơ bản để giảm kích thước
+        // Functions và actions sẽ được lấy từ authorize endpoint
         let obj: any = {
           nguoiDungId: user.nguoiDungId,
           first_name: user.first_name,
@@ -27,6 +29,7 @@ export class NguoiDungController {
           roleId: user.roleId,
           roleCode: user.roleCode,
           online_flag: user.online_flag,
+          // Không đưa functions và actions vào token để giảm kích thước
         };
         const token = generateToken(obj);
         user.token = token;
@@ -115,14 +118,19 @@ export class NguoiDungController {
   async authorize(req: Request, res: Response): Promise<void> {
     try {
       let token = req.params.token;
-      let result = await this.nguoiDungService.authrize(token);
+      let result = await this.nguoiDungService.authorize(token);
       if (result) {
         res.json(result);
       } else {
-        res.json({ message: "Bản ghi không tồn tại.", success: true });
+        res.json({ message: "Bản ghi không tồn tại.", success: false });
       }
     } catch (error: any) {
-      res.json({ message: error.message, success: false });
+      // Phiên hết hạn không phải lỗi server, trả về 401
+      if (error.message === "Phiên đăng nhập hết hạn") {
+        res.status(401).json({ message: error.message, success: false });
+      } else {
+        res.status(500).json({ message: error.message || "Lỗi máy chủ", success: false });
+      }
     }
   }
 
@@ -136,7 +144,6 @@ export class NguoiDungController {
         data: results,
       });
     } catch (error: any) {
-      console.log("error", error);
       res
         .status(500)
         .json({ message: "Them nguoi dung that bai", success: false });
@@ -169,7 +176,6 @@ export class NguoiDungController {
         data: results,
       });
     } catch (error: any) {
-      console.error("UpdateMyProfile error:", error.message);
       res
         .status(500)
         .json({

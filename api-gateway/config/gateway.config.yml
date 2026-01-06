@@ -1,0 +1,118 @@
+http:
+  port: ${PORT:-8080} 
+
+apiEndpoints:  
+  # Public APIs - không cần auth (authorize với token trong URL)
+  public_auth_api:
+    paths:
+      - '/api-core/users/authorize'
+      - '/api-core/users/authorize/:token'
+  
+  # Public APIs - không cần auth
+  public_api: 
+    paths:
+      - '/api-core/users/login'       
+      - '/api-core/users/reset-password'
+      - '/api-core/users/signup'
+      - '/api-core/users/checkuser'
+      - '/api-firework/dongho/get-all'
+  
+  # Core API - cần admin auth  
+  api_core:    
+    paths:
+      - '/api-core/*'  
+  
+  # Firework API - cần user auth
+  api_firework:   
+    paths:
+      - '/api-firework/*'    
+
+serviceEndpoints:   
+  coreService:
+    url: ${URL_CORE:-http://localhost:6001}  
+  fireworkService:
+    url: ${URL_FIREWORK:-http://localhost:6002}     
+
+policies:
+  - log
+  - cors
+  - proxy
+  - verifyAdmin-token  
+  - verifySelfAuth-token
+
+pipelines: 
+  # Public Auth pipeline - authorize endpoint (PHẢI đặt ĐẦU TIÊN)
+  publicAuthPipeline:
+    apiEndpoints:
+      - public_auth_api
+    policies:  
+      - cors:
+          - action:
+              origin: true
+              methods: "GET, POST, PUT, DELETE, OPTIONS"
+              allowedHeaders: "Content-Type, Authorization, Accept, Origin, X-Requested-With"
+              credentials: true
+      - log:
+          - action:
+              message: "[AUTH] ${req.method} ${req.originalUrl}"
+      - proxy:
+          - action:
+              serviceEndpoint: coreService
+              prependPath: false
+              ignorePath: false
+
+  # Public pipeline - PHẢI đặt TRƯỚC các pipeline khác
+  publicPipeline:
+    apiEndpoints:
+      - public_api
+    policies:  
+      - cors:
+          - action:
+              origin: true
+              methods: "GET, POST, PUT, DELETE, OPTIONS"
+              allowedHeaders: "Content-Type, Authorization, Accept, Origin, X-Requested-With"
+              credentials: true
+      - log:
+          - action:
+              message: "[PUBLIC] ${req.method} ${req.originalUrl}"
+      - proxy:
+          - action:
+              serviceEndpoint: coreService
+
+  # Core API pipeline - cần admin auth
+  coreServicePipeline:
+    apiEndpoints:
+      - api_core
+    policies: 
+      - cors:
+          - action:
+              origin: true
+              methods: "GET, POST, PUT, DELETE, OPTIONS"
+              allowedHeaders: "Content-Type, Authorization, Accept, Origin, X-Requested-With"
+              credentials: true
+      - log:
+          - action:
+              message: "[CORE] ${req.method} ${req.originalUrl}"
+      - verifyAdmin-token:
+      - proxy:
+          - action:
+              serviceEndpoint: coreService
+
+  # Firework API pipeline - cần user auth
+  fireworkServicePipeline:
+    apiEndpoints:
+      - api_firework
+    policies:
+      - cors:
+          - action:
+              origin: true
+              methods: "GET, POST, PUT, DELETE, OPTIONS"
+              allowedHeaders: "Content-Type, Authorization, Accept, Origin, X-Requested-With"
+              credentials: true
+      - log:
+          - action:
+              message: "[FIREWORK] ${req.method} ${req.originalUrl}"        
+      - verifySelfAuth-token:
+      - proxy:
+          - action:
+              serviceEndpoint: fireworkService

@@ -7,6 +7,7 @@ interface MenuItem {
   sortOrder: number;
   parentId?: string | null;
   actions: string[];
+  children?: MenuItem[];
 }
 
 interface UserData {
@@ -73,10 +74,24 @@ const storage = {
     }
   },
 
-  // GET MENUS - Lấy danh sách menu từ DB
+  // GET MENUS - Lấy danh sách menu từ DB (flatten tất cả bao gồm children)
   getMenus: (): MenuItem[] => {
     const user = storage.getUser();
-    return user?.menus || [];
+    const menus = user?.menus || [];
+    
+    // Flatten menus để lấy tất cả items bao gồm children
+    const flattenMenus = (items: any[]): MenuItem[] => {
+      let result: MenuItem[] = [];
+      items.forEach(item => {
+        result.push(item);
+        if (item.children && item.children.length > 0) {
+          result = result.concat(flattenMenus(item.children));
+        }
+      });
+      return result;
+    };
+    
+    return flattenMenus(menus);
   },
 
   // GET PERMISSIONS - Lấy permissions map

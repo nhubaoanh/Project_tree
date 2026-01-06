@@ -20,34 +20,9 @@ interface MenuItem {
   children?: MenuItem[];
 }
 
-// Menu mặc định cho ADMIN
-const ADMIN_MENU: MenuItem[] = [
-  { 
-    code: "QUANLY_HETHONG", name: "Quản trị hệ thống", href: "#", icon: "/icon/iconmember.png", sortOrder: 1, actions: ["VIEW"],
-    children: [
-      { code: "USERS", name: "Quản lý người dùng", href: "/users", icon: "/icon/iconmember.png", sortOrder: 1, actions: ["VIEW", "CREATE", "UPDATE", "DELETE"] },
-      { code: "ROLES", name: "Quản lý nhóm quyền", href: "/roles", icon: "/icon/iconmember.png", sortOrder: 2, actions: ["VIEW", "CREATE", "UPDATE", "DELETE"] },
-      { code: "CHUCNANG", name: "Quản lý tính năng", href: "/features", icon: "/icon/iconmember.png", sortOrder: 3, actions: ["VIEW", "CREATE", "UPDATE", "DELETE"] },
-      { code: "AI_CHAT", name: "Hỏi đáp AI", href: "/genAI", icon: "/icon/iconmember.png", sortOrder: 4, actions: ["VIEW"] },
-    ]
-  },
-];
-
-// Menu mặc định cho THỦ ĐỒ / THÀNH VIÊN
-const DEFAULT_MENU: MenuItem[] = [
-  { code: "DASHBOARD", name: "Trang chủ", href: "/dashboard", icon: "/icon/iconmember.png", sortOrder: 1, actions: ["VIEW"] },
-  { code: "THANHVIEN", name: "Quản lý thành viên", href: "/family-trees", icon: "/icon/iconmember.png", sortOrder: 2, actions: ["VIEW", "CREATE", "UPDATE", "DELETE"] },
-  { code: "SUKIEN", name: "Quản lý sự kiện", href: "/manageEvents", icon: "/icon/iconmember.png", sortOrder: 3, actions: ["VIEW", "CREATE", "UPDATE", "DELETE"] },
-  { 
-    code: "TAICHINH", name: "Quản lý tài chính", href: "#", icon: "/icon/dollar.png", sortOrder: 4, actions: ["VIEW"],
-    children: [
-      { code: "TAICHINH_THU", name: "Thu", href: "/contributions", icon: "/icon/dollar.png", sortOrder: 1, actions: ["VIEW", "CREATE", "UPDATE", "DELETE"] },
-      { code: "TAICHINH_CHI", name: "Chi", href: "/contributionsDown", icon: "/icon/dollar.png", sortOrder: 2, actions: ["VIEW", "CREATE", "UPDATE", "DELETE"] },
-    ]
-  },
-  { code: "TAILIEU", name: "Quản lý tài liệu", href: "/documents", icon: "/icon/iconmember.png", sortOrder: 5, actions: ["VIEW", "CREATE", "UPDATE", "DELETE"] },
-  { code: "TINTUC", name: "Quản lý tin tức", href: "/manage-news", icon: "/icon/iconmember.png", sortOrder: 6, actions: ["VIEW", "CREATE", "UPDATE", "DELETE"] },
-  { code: "AI_CHAT", name: "Hỏi đáp AI", href: "/genAI", icon: "/icon/iconmember.png", sortOrder: 7, actions: ["VIEW"] },
+// Menu mặc định khi chưa đăng nhập
+const GUEST_MENU: MenuItem[] = [
+  { code: "HOME", name: "Trang chủ", href: "/", icon: "/icon/iconmember.png", sortOrder: 1, actions: ["VIEW"] },
 ];
 
 export default function Sidebar() {
@@ -56,24 +31,28 @@ export default function Sidebar() {
   const [sidebarItems, setSidebarItems] = useState<MenuItem[]>([]);
   const [expandedMenus, setExpandedMenus] = useState<string[]>([]);
 
-  // Build tree từ flat list
+  // Build tree từ flat list (dựa vào parentId)
   const buildMenuTree = (items: MenuItem[]): MenuItem[] => {
     const map = new Map<string, MenuItem>();
     const roots: MenuItem[] = [];
 
-    // Tạo map
+    console.log("[Sidebar] Building tree from items:", items);
+
+    // Tạo map với code làm key
     items.forEach(item => {
       map.set(item.code, { ...item, children: [] });
     });
 
-    // Build tree
+    // Build tree dựa vào parentId
     items.forEach(item => {
       const node = map.get(item.code)!;
       if (item.parentId && map.has(item.parentId)) {
+        // Có parent -> thêm vào children của parent
         const parent = map.get(item.parentId)!;
         parent.children = parent.children || [];
         parent.children.push(node);
-      } else {
+      } else if (!item.parentId) {
+        // Không có parent -> là root
         roots.push(node);
       }
     });
@@ -82,33 +61,46 @@ export default function Sidebar() {
     const sortItems = (items: MenuItem[]): MenuItem[] => {
       return items.sort((a, b) => a.sortOrder - b.sortOrder).map(item => ({
         ...item,
-        children: item.children ? sortItems(item.children) : []
+        children: item.children && item.children.length > 0 ? sortItems(item.children) : undefined
       }));
     };
 
-    return sortItems(roots);
+    const result = sortItems(roots);
+    console.log("[Sidebar] Built tree result:", result);
+    return result;
   };
 
   useEffect(() => {
     // Lấy user info từ storage
     const user = storage.getUser();
+    console.log("[Sidebar] User from storage:", user);
+    console.log("[Sidebar] Menus from storage:", user?.menus);
+    
     if (user) {
-      // Lấy menu từ storage và build tree
+      // Lấy menu từ storage - đã được build tree sẵn từ backend
       const menus = user.menus || [];
       if (menus.length > 0) {
-        const menuTree = buildMenuTree(menus);
-        setSidebarItems(menuTree);
-      } else {
-        // Fallback menu mặc định theo role
-        if (user.roleCode === "sa") {
-          setSidebarItems(ADMIN_MENU);
+        // Kiểm tra xem menu đã có children chưa (đã build tree từ backend)
+        const hasChildren = menus.some((m: MenuItem) => m.children && m.children.length > 0);
+        
+        if (hasChildren) {
+          // Menu đã build tree từ backend, dùng trực tiếp
+          console.log("[Sidebar] Using pre-built tree from backend:", menus);
+          setSidebarItems(menus);
         } else {
-          setSidebarItems(DEFAULT_MENU);
+          // Menu chưa build tree, build ở FE (fallback)
+          const menuTree = buildMenuTree(menus);
+          console.log("[Sidebar] Built menu tree at FE:", menuTree);
+          setSidebarItems(menuTree);
         }
+      } else {
+        // Không có menu từ DB - hiển thị thông báo hoặc menu rỗng
+        console.log("[Sidebar] No menus from DB, showing empty");
+        setSidebarItems([]);
       }
     } else {
-      // Chưa đăng nhập - dùng menu mặc định
-      setSidebarItems(DEFAULT_MENU);
+      // Chưa đăng nhập - dùng menu guest
+      setSidebarItems(GUEST_MENU);
     }
   }, []);
 
