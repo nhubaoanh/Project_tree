@@ -78,6 +78,8 @@ pipelines:
       - proxy:
           - action:
               serviceEndpoint: coreService
+              prependPath: false
+              ignorePath: false
 
   # Core API pipeline - cần admin auth
   coreServicePipeline:

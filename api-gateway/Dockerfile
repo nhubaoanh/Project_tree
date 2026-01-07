@@ -1,8 +1,8 @@
-FROM node:lts-alpine
+FROM node:20-alpine
 WORKDIR /gateway
 COPY package*.json ./
-RUN npm install
-COPY . . 
+RUN npm ci
+COPY . .
 ENV NODE_OPTIONS=--max-http-header-size=10485760
-EXPOSE 6688 
-CMD ["node","server"]
+EXPOSE 8080
+CMD ["node", "server.js"]

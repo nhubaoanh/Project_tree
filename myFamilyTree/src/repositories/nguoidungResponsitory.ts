@@ -34,14 +34,25 @@ export class nguoiDungReponsitory {
 
   async LoginUser(tenDangNhap: string): Promise<any> {
     try {
+      console.log("=== REPOSITORY LOGIN DEBUG ===");
+      console.log("Calling LoginUserByAccount with:", tenDangNhap);
+      
       const sql = "CALL LoginUserByAccount(? ,@err_code, @err_msg)";
       const [results] = await this.db.query(sql, [tenDangNhap]);
+      
+      console.log("LoginUserByAccount results:", results);
+      
       if (Array.isArray(results) && results.length > 0) {
         const user = results[0];
+        console.log("User found:", user);
         return user;
       }
+      console.log("No user found");
       return null;
     } catch (error: any) {
+      console.error("=== REPOSITORY LOGIN ERROR ===");
+      console.error("Error:", error);
+      console.error("Error message:", error.message);
       throw new Error(error.message);
     }
   }

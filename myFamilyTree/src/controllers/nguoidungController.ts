@@ -41,6 +41,9 @@ export class NguoiDungController {
         });
       }
     } catch (error: any) {
+      console.error("Login error:", error);
+      console.error("Error message:", error.message);
+      console.error("Error stack:", error.stack);
       res.status(500).json({ message: "Đăng nhập thất bại.", success: false });
     }
   }

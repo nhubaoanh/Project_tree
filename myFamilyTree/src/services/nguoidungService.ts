@@ -25,47 +25,68 @@ export class nguoiDungService {
   }
 
   async loginUser(tenDangNhap: string, matKhau: string): Promise<any> {
-    const md5_pass = md5(matKhau);
-    const user = await this.nguoidungResponsitory.LoginUser(tenDangNhap);
+    console.log("=== LOGIN DEBUG START ===");
+    console.log("tenDangNhap:", tenDangNhap);
+    console.log("matKhau length:", matKhau?.length);
     
-    if (user && user.matKhau === md5_pass) {
-      // Lấy danh sách functions và actions (có thể không có nếu chưa tạo stored procedure)
-      let functionTree: any[] = [];
-      let actions: any[] = [];
+    try {
+      const md5_pass = md5(matKhau);
+      console.log("md5_pass:", md5_pass);
       
-      try {
-        const functions = await this.nguoidungResponsitory.getFunctionByUserId(user.nguoiDungId);
-        functionTree = this.treeUtility.getFunctionTree(functions || [], 1, "0");
-      } catch (err) {
-        console.log("getFunctionByUserId error:", err);
-      }
+      const user = await this.nguoidungResponsitory.LoginUser(tenDangNhap);
+      console.log("user from DB:", user);
       
-      try {
-        actions = await this.nguoidungResponsitory.getActionByUserId(user.nguoiDungId);
-      } catch (err) {
-        console.log("getActionByUserId error:", err);
-      }
+      if (user && user.matKhau === md5_pass) {
+        console.log("Password match - getting functions and actions");
+        // Lấy danh sách functions và actions (có thể không có nếu chưa tạo stored procedure)
+        let functionTree: any[] = [];
+        let actions: any[] = [];
+        
+        try {
+          const functions = await this.nguoidungResponsitory.getFunctionByUserId(user.nguoiDungId);
+          functionTree = this.treeUtility.getFunctionTree(functions || [], 1, "0");
+          console.log("Functions loaded successfully");
+        } catch (err) {
+          console.log("getFunctionByUserId error:", err);
+        }
+        
+        try {
+          actions = await this.nguoidungResponsitory.getActionByUserId(user.nguoiDungId);
+          console.log("Actions loaded successfully");
+        } catch (err) {
+          console.log("getActionByUserId error:", err);
+        }
 
-      return {
-        nguoiDungId: user.nguoiDungId,
-        first_name: user.first_name,
-        middle_name: user.middle_name,
-        last_name: user.last_name,
-        full_name: user.full_name,
-        gender: user.gender,
-        date_of_birthday: user.date_of_birthday,
-        avatar: user.avatar,
-        email: user.email,
-        phone: user.phone,
-        dongHoId: user.dongHoId,
-        roleId: user.roleId,
-        roleCode: user.roleCode,
-        online_flag: user.online_flag,
-        functions: functionTree,
-        actions: actions || [],
-      };
+        console.log("=== LOGIN DEBUG END - SUCCESS ===");
+        return {
+          nguoiDungId: user.nguoiDungId,
+          first_name: user.first_name,
+          middle_name: user.middle_name,
+          last_name: user.last_name,
+          full_name: user.full_name,
+          gender: user.gender,
+          date_of_birthday: user.date_of_birthday,
+          avatar: user.avatar,
+          email: user.email,
+          phone: user.phone,
+          dongHoId: user.dongHoId,
+          roleId: user.roleId,
+          roleCode: user.roleCode,
+          online_flag: user.online_flag,
+          functions: functionTree,
+          actions: actions || [],
+        };
+      }
+      console.log("Password mismatch or user not found");
+      console.log("=== LOGIN DEBUG END - FAILED ===");
+      return null;
+    } catch (error: any) {
+      console.error("=== LOGIN SERVICE ERROR ===");
+      console.error("Error:", error);
+      console.error("Error message:", error.message);
+      console.error("Error stack:", error.stack);
+      throw error;
     }
-    return null;
   }
 
   async searchUser(
