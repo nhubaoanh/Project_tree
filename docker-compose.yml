@@ -5,10 +5,10 @@ services:
     container_name: familytree-mysql
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpassword}
-      MYSQL_DATABASE: ${MYSQL_DATABASE:-treefamily}
-      MYSQL_USER: ${MYSQL_USER:-familytree}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-familytree123}
+      MYSQL_ROOT_PASSWORD: bao123@
+      MYSQL_DATABASE: treefamily
+      MYSQL_USER: familytree
+      MYSQL_PASSWORD: familytree123
     ports:
       - "3307:3306"
     volumes:
@@ -36,8 +36,8 @@ services:
       DB_HOST: mysql
       DB_PORT: 3306
       DB_USERNAME: root
-      DB_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpassword}
-      DB_NAME: ${MYSQL_DATABASE:-treefamily}
+      DB_PASSWORD: bao123@
+      DB_NAME: treefamily
       JWT_SECRET: "thong tin cua gia dinh toi nhe 21"
       GEMINI_API_KEY: ${GEMINI_API_KEY:-}
     ports:
