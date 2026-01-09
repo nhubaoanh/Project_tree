@@ -45,13 +45,8 @@ export default function RouteGuard({ children }: RouteGuardProps) {
       // 3. Kiểm tra quyền truy cập route (dựa trên menus từ DB)
       const menus = storage.getMenus();
       
-      console.log("[RouteGuard] Checking access for:", pathname);
-      console.log("[RouteGuard] User menus:", menus);
-      console.log("[RouteGuard] Menu hrefs:", menus.map(m => m.href));
-      
       // Nếu chưa có menus (chưa load xong) => cho phép tạm
       if (menus.length === 0) {
-        console.log("[RouteGuard] No menus loaded, allowing access");
         setAuthorized(true);
         setChecking(false);
         return;
@@ -75,7 +70,6 @@ export default function RouteGuard({ children }: RouteGuardProps) {
         // Không có quyền - redirect về trang 403 trong admin
         setAuthorized(false);
         setChecking(false);
-        console.warn(`[RouteGuard] Access denied: ${pathname} for role ${user.roleCode}`);
         router.replace("/dashboard"); // Redirect về dashboard thay vì 403
         return;
       }

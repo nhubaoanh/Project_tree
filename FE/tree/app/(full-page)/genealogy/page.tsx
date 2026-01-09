@@ -4,12 +4,11 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { Header } from "@/components/ui/HeaderSub";
 import { MyFamilyTree } from "@/components/ui/tree";
 import { ViewMode } from "@/types/familytree";
-import { ChevronDown, Users } from "lucide-react";
+import { Users } from "lucide-react";
 import TinTucPage from "../news/page";
 import PhaKyPage from "../pen/page";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { getMembersByDongHo } from "@/service/member.service";
-import { getAllDongHo, IDongHo } from "@/service/dongho.service";
 import { ITreeNode } from "@/types/tree";
 import { buildTree } from "@/utils/treeUtils";
 import SuKienPage from "../events/page";
@@ -29,52 +28,36 @@ function GenealogyLoading() {
 function GenealogyContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const [activeView, setActiveView] = useState<ViewMode>(ViewMode.DIAGRAM);
+  const [activeView, setActiveView] = useState<ViewMode>(ViewMode.PHA_KY);
   
   // Lấy dongHoId từ URL
   const urlDongHoId = searchParams.get("dongHoId");
   const [selectedDongHoId, setSelectedDongHoId] = useState<string>("");
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   
   // State để tránh hydration mismatch - chỉ set sau khi mount
-  const [isAdmin, setIsAdmin] = useState(false);
   const [userDongHoId, setUserDongHoId] = useState<string | undefined>(undefined);
   const [mounted, setMounted] = useState(false);
 
   // Đọc user từ localStorage sau khi mount (client-side only)
   useEffect(() => {
     const user = storage.getUser();
-    setIsAdmin(user?.roleCode === "sa");
     setUserDongHoId(user?.dongHoId);
     setMounted(true);
   }, []);
 
-  // Fetch danh sách dòng họ - chỉ Admin mới fetch
-  const dongHoQuery = useQuery({
-    queryKey: ["dongho-list"],
-    queryFn: () => getAllDongHo(),
-    placeholderData: keepPreviousData,
-    enabled: mounted && isAdmin,
-  });
-  const dongHoList: IDongHo[] = isAdmin ? (dongHoQuery.data?.data || []) : [];
+  // Không cần fetch danh sách dòng họ nữa vì admin không chọn được
 
-  // Set initial dongHoId
+  // Set initial dongHoId - luôn dùng dongHoId của user
   useEffect(() => {
     if (!mounted) return;
     
-    // Non-Admin: luôn dùng dongHoId của user từ BA_user
-    if (!isAdmin && userDongHoId) {
-      setSelectedDongHoId(userDongHoId);
-      return;
-    }
-
-    // Admin: có thể chọn từ URL hoặc default dòng họ đầu tiên
+    // Lấy từ URL hoặc từ user
     if (urlDongHoId) {
       setSelectedDongHoId(urlDongHoId);
-    } else if (dongHoList.length > 0) {
-      setSelectedDongHoId(dongHoList[0].dongHoId);
+    } else if (userDongHoId) {
+      setSelectedDongHoId(userDongHoId);
     }
-  }, [urlDongHoId, dongHoList, isAdmin, userDongHoId, mounted]);
+  }, [urlDongHoId, userDongHoId, mounted]);
 
   // Fetch members theo dongHoId đã chọn
   const membersQuery = useQuery({
@@ -93,15 +76,7 @@ function GenealogyContent() {
     return buildTree(data);
   }, [data]);
 
-  // Xử lý chọn dòng họ - chỉ Admin mới dùng
-  const handleSelectDongHo = (dongHoId: string) => {
-    setSelectedDongHoId(dongHoId);
-    router.push(`/genealogy?dongHoId=${dongHoId}`);
-    setIsDropdownOpen(false);
-  };
-
-  // Lấy tên dòng họ đang chọn
-  const selectedDongHo = dongHoList.find(d => d.dongHoId === selectedDongHoId);
+  // Không cần xử lý chọn dòng họ nữa
 
   return (
     <div className="flex flex-col h-screen w-full bg-stone-100 font-dancing overflow-hidden">
@@ -112,56 +87,14 @@ function GenealogyContent() {
 
       {/* MAIN */}
       <main className="flex-1 relative w-full bg-stone-50 bg-[#ede5b7]">
-        {/* Dropdown chọn dòng họ - CHỈ HIỆN CHO ADMIN khi xem cây và đã mount */}
-        {mounted && activeView === ViewMode.DIAGRAM && isAdmin && (
-          <div className="absolute top-4 left-67 z-20">
-            <div className="relative">
-              <button
-                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                className="flex items-center gap-2 px-4 py-2 bg-white border-2 border-[#d4af37] rounded-lg shadow-lg hover:bg-[#fdf6e3] transition-colors min-w-[200px]"
-              >
-                <Users size={18} className="text-[#b91c1c]" />
-                <span className="flex-1 text-left font-semibold text-[#5d4037] truncate">
-                  {selectedDongHo?.tenDongHo || "Chọn dòng họ"}
-                </span>
-                <ChevronDown
-                  size={18}
-                  className={`text-[#8b5e3c] transition-transform ${
-                    isDropdownOpen ? "rotate-180" : ""
-                  }`}
-                />
-              </button>
-
-              {isDropdownOpen && (
-                <div className="absolute top-full left-0 mt-1 w-full bg-white border-2 border-[#d4af37] rounded-lg shadow-xl max-h-60 overflow-y-auto z-30">
-                  {dongHoList.length > 0 ? (
-                    dongHoList.map((dongHo) => (
-                      <button
-                        key={dongHo.dongHoId}
-                        onClick={() => handleSelectDongHo(dongHo.dongHoId)}
-                        className={`w-full px-4 py-2 text-left hover:bg-[#fdf6e3] transition-colors flex items-center gap-2 ${
-                          selectedDongHoId === dongHo.dongHoId
-                            ? "bg-[#fdf6e3] text-[#b91c1c] font-bold"
-                            : "text-[#5d4037]"
-                        }`}
-                      >
-                        <Users size={16} className="text-[#d4af37]" />
-                        <span className="truncate">{dongHo.tenDongHo}</span>
-                      </button>
-                    ))
-                  ) : (
-                    <div className="px-4 py-3 text-[#8b5e3c] italic text-center">
-                      Chưa có dòng họ nào
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
         {/* CONTENT */}
         <div className="absolute inset-0 w-full h-full z-10 bg-[#ede5b7]">
+
+          {activeView === ViewMode.PHA_KY && (
+            <div className="w-full h-full overflow-y-auto p-4 md:p-8">
+              <PhaKyPage />
+            </div>
+          )}
           {activeView === ViewMode.DIAGRAM && (
             <div className="w-full h-full overflow-hidden">
               {!selectedDongHoId ? (
@@ -186,12 +119,6 @@ function GenealogyContent() {
                   </p>
                 </div>
               )}
-            </div>
-          )}
-
-          {activeView === ViewMode.PHA_KY && (
-            <div className="w-full h-full overflow-y-auto p-4 md:p-8">
-              <PhaKyPage />
             </div>
           )}
 

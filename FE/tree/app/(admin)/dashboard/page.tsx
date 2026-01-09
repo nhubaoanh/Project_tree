@@ -43,7 +43,7 @@ import {
   getSuKienSapToi,
   IThongKeTheoDoi,
 } from "@/service/thongke.service";
-import { getAllDongHo, getDongHoById, IDongHo } from "@/service/dongho.service";
+import { getDongHoById, IDongHo } from "@/service/dongho.service";
 import storage from "@/utils/storage";
 
 const COLORS = ["#1e3a5f", "#d4af37", "#b91c1c", "#5d4037", "#2c5282", "#a16207"];
@@ -118,49 +118,48 @@ const KPICard = ({ title, value, trend, trendValue, icon: Icon, bgColor, iconBg 
 
 export default function Dashboard() {
   const [selectedDongHoId, setSelectedDongHoId] = useState<string>("");
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isReady, setIsReady] = useState(false);
-  const currentYear = new Date().getFullYear();
+  
+  // Thêm state cho bộ lọc tháng/năm
+  const [selectedMonth, setSelectedMonth] = useState<number>(new Date().getMonth() + 1);
+  const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
+  const [isMonthDropdownOpen, setIsMonthDropdownOpen] = useState(false);
+  const [isYearDropdownOpen, setIsYearDropdownOpen] = useState(false);
 
   // Lấy thông tin user
   const [user, setUser] = useState<any>(null);
-  const isAdmin = user?.roleCode === "sa";
+
+  // Tạo danh sách tháng và năm
+  const months = [
+    { value: 1, label: "Tháng 1" }, { value: 2, label: "Tháng 2" }, { value: 3, label: "Tháng 3" },
+    { value: 4, label: "Tháng 4" }, { value: 5, label: "Tháng 5" }, { value: 6, label: "Tháng 6" },
+    { value: 7, label: "Tháng 7" }, { value: 8, label: "Tháng 8" }, { value: 9, label: "Tháng 9" },
+    { value: 10, label: "Tháng 10" }, { value: 11, label: "Tháng 11" }, { value: 12, label: "Tháng 12" }
+  ];
+  
+  const years = Array.from({ length: 10 }, (_, i) => new Date().getFullYear() - i);
 
   useEffect(() => {
     const userData = storage.getUser();
     setUser(userData);
     setIsReady(true);
     
-    // Non-Admin: tự động set dongHoId của mình
-    if (userData && userData.roleCode !== "sa" && userData.dongHoId) {
+    // Tự động set dongHoId của user
+    if (userData && userData.dongHoId) {
       setSelectedDongHoId(userData.dongHoId);
     }
   }, []);
 
-  // Admin: fetch tất cả dòng họ
-  const dongHoQuery = useQuery({ 
-    queryKey: ["dongho-list"], 
-    queryFn: getAllDongHo,
-    enabled: isReady && isAdmin,
-  });
-  
-  // Non-Admin: fetch dòng họ của mình
+  // Fetch dòng họ của user
   const myDongHoQuery = useQuery({
     queryKey: ["my-dongho", user?.dongHoId],
     queryFn: () => getDongHoById(user?.dongHoId),
-    enabled: isReady && !isAdmin && !!user?.dongHoId,
+    enabled: isReady && !!user?.dongHoId,
   });
 
-  const dongHoList: IDongHo[] = isAdmin 
-    ? (dongHoQuery.data?.data || [])
-    : (myDongHoQuery.data?.data ? [myDongHoQuery.data.data] : []);
+  const dongHoList: IDongHo[] = myDongHoQuery.data?.data ? [myDongHoQuery.data.data] : [];
 
-  useEffect(() => {
-    // Admin: chọn dòng họ đầu tiên nếu chưa chọn
-    if (isAdmin && dongHoList.length > 0 && !selectedDongHoId) {
-      setSelectedDongHoId(dongHoList[0].dongHoId);
-    }
-  }, [dongHoList, selectedDongHoId, isAdmin]);
+  // Không cần logic chọn dòng họ nữa
 
   const statsQuery = useQuery({
     queryKey: ["dashboard-stats", selectedDongHoId],
@@ -179,20 +178,20 @@ export default function Dashboard() {
   });
 
   const thuChiQuery = useQuery({
-    queryKey: ["thongke-thuchi", selectedDongHoId, currentYear],
-    queryFn: () => getThongKeThuChi(selectedDongHoId, currentYear),
+    queryKey: ["thongke-thuchi", selectedDongHoId, selectedYear],
+    queryFn: () => getThongKeThuChi(selectedDongHoId, selectedYear),
     enabled: !!selectedDongHoId,
   });
 
   const thuChiTheoThangQuery = useQuery({
-    queryKey: ["thongke-thuchi-theothang", selectedDongHoId, currentYear],
-    queryFn: () => getThongKeThuChiTheoThang(selectedDongHoId, currentYear),
+    queryKey: ["thongke-thuchi-theothang", selectedDongHoId, selectedYear],
+    queryFn: () => getThongKeThuChiTheoThang(selectedDongHoId, selectedYear),
     enabled: !!selectedDongHoId,
   });
 
   const suKienQuery = useQuery({
-    queryKey: ["thongke-sukien", selectedDongHoId, currentYear],
-    queryFn: () => getThongKeSuKien(selectedDongHoId, currentYear),
+    queryKey: ["thongke-sukien", selectedDongHoId, selectedYear],
+    queryFn: () => getThongKeSuKien(selectedDongHoId, selectedYear),
     enabled: !!selectedDongHoId,
   });
 
@@ -240,42 +239,66 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-[#1e3a5f]">Tổng Quan Gia Phả</h1>
-          <p className="text-sm text-gray-500">
-            {isAdmin ? "Thống kê và quản lý dòng họ" : `Dòng họ: ${selectedDongHo?.tenDongHo || ""}`}
-          </p>
+      {/* Header với bộ lọc */}
+      <div className="flex flex-col gap-4 mb-6">
+        {/* Tiêu đề */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-[#1e3a5f]">Tổng Quan Gia Phả</h1>
+            <p className="text-sm text-gray-500">
+              Dòng họ: {selectedDongHo?.tenDongHo || ""}
+            </p>
+          </div>
         </div>
-        
-        {/* Dropdown - Chỉ Admin mới thấy */}
-        {isAdmin && (
+
+        {/* Bộ lọc tháng/năm */}
+        <div className="flex items-center gap-4 p-4 bg-white rounded-xl shadow-sm border border-gray-200">
+          <span className="text-sm font-medium text-[#1e3a5f]">Lọc theo:</span>
+          
+          {/* Dropdown tháng */}
           <div className="relative">
-            <button onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className="flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow transition-all min-w-[200px]">
-              <Users size={18} className="text-[#d4af37]" />
-              <span className="flex-1 text-left font-medium text-[#1e3a5f] truncate text-sm">
-                {selectedDongHoId ? selectedDongHo?.tenDongHo : "Tất cả dòng họ"}
+            <button onClick={() => setIsMonthDropdownOpen(!isMonthDropdownOpen)}
+              className="flex items-center gap-2 px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 transition-all min-w-[120px]">
+              <Calendar size={16} className="text-[#d4af37]" />
+              <span className="flex-1 text-left text-sm font-medium text-[#1e3a5f]">
+                {months.find(m => m.value === selectedMonth)?.label}
               </span>
-              <ChevronDown size={16} className={`text-gray-400 transition-transform ${isDropdownOpen ? "rotate-180" : ""}`} />
+              <ChevronDown size={14} className={`text-gray-400 transition-transform ${isMonthDropdownOpen ? "rotate-180" : ""}`} />
             </button>
-            {isDropdownOpen && (
-              <div className="absolute top-full right-0 mt-2 w-full bg-white border border-gray-200 rounded-xl shadow-xl max-h-60 overflow-y-auto z-50">
-                <button onClick={() => { setSelectedDongHoId(""); setIsDropdownOpen(false); }}
-                  className={`w-full px-4 py-2.5 text-left hover:bg-gray-50 text-sm ${!selectedDongHoId ? "bg-[#fdf6e3] text-[#d4af37] font-semibold" : "text-gray-700"}`}>
-                  Tất cả dòng họ
-                </button>
-                {dongHoList.map((dongHo) => (
-                  <button key={dongHo.dongHoId} onClick={() => { setSelectedDongHoId(dongHo.dongHoId); setIsDropdownOpen(false); }}
-                    className={`w-full px-4 py-2.5 text-left hover:bg-gray-50 text-sm ${selectedDongHoId === dongHo.dongHoId ? "bg-[#fdf6e3] text-[#d4af37] font-semibold" : "text-gray-700"}`}>
-                    {dongHo.tenDongHo}
+            {isMonthDropdownOpen && (
+              <div className="absolute top-full left-0 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-xl max-h-48 overflow-y-auto z-50">
+                {months.map((month) => (
+                  <button key={month.value} onClick={() => { setSelectedMonth(month.value); setIsMonthDropdownOpen(false); }}
+                    className={`w-full px-3 py-2 text-left hover:bg-gray-50 text-sm ${selectedMonth === month.value ? "bg-[#fdf6e3] text-[#d4af37] font-semibold" : "text-gray-700"}`}>
+                    {month.label}
                   </button>
                 ))}
               </div>
             )}
           </div>
-        )}
+
+          {/* Dropdown năm */}
+          <div className="relative">
+            <button onClick={() => setIsYearDropdownOpen(!isYearDropdownOpen)}
+              className="flex items-center gap-2 px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 transition-all min-w-[100px]">
+              <CalendarDays size={16} className="text-[#d4af37]" />
+              <span className="flex-1 text-left text-sm font-medium text-[#1e3a5f]">
+                {selectedYear}
+              </span>
+              <ChevronDown size={14} className={`text-gray-400 transition-transform ${isYearDropdownOpen ? "rotate-180" : ""}`} />
+            </button>
+            {isYearDropdownOpen && (
+              <div className="absolute top-full left-0 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-xl max-h-48 overflow-y-auto z-50">
+                {years.map((year) => (
+                  <button key={year} onClick={() => { setSelectedYear(year); setIsYearDropdownOpen(false); }}
+                    className={`w-full px-3 py-2 text-left hover:bg-gray-50 text-sm ${selectedYear === year ? "bg-[#fdf6e3] text-[#d4af37] font-semibold" : "text-gray-700"}`}>
+                    {year}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
       {isLoading ? (
@@ -382,7 +405,7 @@ export default function Dashboard() {
             <div className="lg:col-span-2 bg-white rounded-2xl p-5 shadow-lg border border-gray-100">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="font-bold text-[#1e3a5f]">Thu Chi Theo Tháng</h3>
-                <span className="text-xs text-gray-400">Năm {currentYear}</span>
+                <span className="text-xs text-gray-400">Năm {selectedYear}</span>
               </div>
               {thuChiChartData.length > 0 ? (
                 <div className="h-[220px]">

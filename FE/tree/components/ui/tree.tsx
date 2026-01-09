@@ -7,7 +7,7 @@ import { FamilyMemberModal } from "./FamilyMemberModal";
 import { ControlPanel } from "./tree/ControlPanel";
 import { ToolbarPanel } from "./tree/ToolbarPanel";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:6001";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
 const DEFAULT_AVATAR = "/images/vangoc.jpg";
 
 type AppFamilyNode = FamilyTree.node & {
@@ -26,11 +26,38 @@ type AppFamilyNode = FamilyTree.node & {
 // Helpers
 const getImageUrl = (img: string | null | undefined): string => {
   if (!img?.trim()) return DEFAULT_AVATAR;
-  // Nếu là URL đầy đủ
-  if (img.startsWith("http")) return img;
-  // Nếu là đường dẫn tương đối
-  const path = img.startsWith("uploads/") ? img : `uploads/${img}`;
-  return `${API_BASE_URL}/${path}`;
+  
+  try {
+    // Decode URL nếu bị encode
+    let decodedImg = decodeURIComponent(img);
+    
+    // Nếu là URL đầy đủ, kiểm tra xem có phải từ backend cũ không
+    if (decodedImg.startsWith("http")) {
+      // Nếu URL từ backend cũ (port 6001), chuyển sang gateway (port 8080)
+      if (decodedImg.includes(":6001")) {
+        decodedImg = decodedImg.replace(":6001", ":8080");
+      }
+      return decodedImg;
+    }
+    
+    // Nếu là đường dẫn tương đối, build URL qua gateway
+    const path = decodedImg.startsWith("uploads/") ? decodedImg : `uploads/${decodedImg}`;
+    return `${API_BASE_URL}/${path}`;
+  } catch (error) {
+    console.warn('Error decoding image URL:', img, error);
+    
+    // Fallback: xử lý URL gốc nếu decode lỗi
+    let fallbackImg = img;
+    if (fallbackImg.startsWith("http")) {
+      // Chuyển từ backend cũ sang gateway nếu cần
+      if (fallbackImg.includes(":6001")) {
+        fallbackImg = fallbackImg.replace(":6001", ":8080");
+      }
+      return fallbackImg;
+    }
+    const path = fallbackImg.startsWith("uploads/") ? fallbackImg : `uploads/${fallbackImg}`;
+    return `${API_BASE_URL}/${path}`;
+  }
 };
 
 // Xử lý lỗi ảnh - trả về ảnh mặc định
@@ -142,7 +169,11 @@ export const MyFamilyTree = ({ data }: Props) => {
 
     const nodes = filtered.map((n) => {
       // Xử lý ảnh - nếu không có hoặc rỗng thì dùng ảnh mặc định
-      const imgUrl = n.anhChanDung?.trim() ? getImageUrl(n.anhChanDung) : DEFAULT_AVATAR;
+      let imgUrl = n.anhChanDung?.trim() ? getImageUrl(n.anhChanDung) : DEFAULT_AVATAR;
+      
+      // Log để debug
+      console.log("Original img:", n.anhChanDung);
+      console.log("Processed img:", imgUrl);
       
       return {
         id: toNum(n.id)!,

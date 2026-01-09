@@ -35,9 +35,6 @@ export default function Sidebar() {
   const buildMenuTree = (items: MenuItem[]): MenuItem[] => {
     const map = new Map<string, MenuItem>();
     const roots: MenuItem[] = [];
-
-    console.log("[Sidebar] Building tree from items:", items);
-
     // Tạo map với code làm key
     items.forEach(item => {
       map.set(item.code, { ...item, children: [] });
@@ -66,16 +63,12 @@ export default function Sidebar() {
     };
 
     const result = sortItems(roots);
-    console.log("[Sidebar] Built tree result:", result);
     return result;
   };
 
   useEffect(() => {
     // Lấy user info từ storage
     const user = storage.getUser();
-    console.log("[Sidebar] User from storage:", user);
-    console.log("[Sidebar] Menus from storage:", user?.menus);
-    
     if (user) {
       // Lấy menu từ storage - đã được build tree sẵn từ backend
       const menus = user.menus || [];
@@ -85,17 +78,14 @@ export default function Sidebar() {
         
         if (hasChildren) {
           // Menu đã build tree từ backend, dùng trực tiếp
-          console.log("[Sidebar] Using pre-built tree from backend:", menus);
           setSidebarItems(menus);
         } else {
           // Menu chưa build tree, build ở FE (fallback)
           const menuTree = buildMenuTree(menus);
-          console.log("[Sidebar] Built menu tree at FE:", menuTree);
           setSidebarItems(menuTree);
         }
       } else {
         // Không có menu từ DB - hiển thị thông báo hoặc menu rỗng
-        console.log("[Sidebar] No menus from DB, showing empty");
         setSidebarItems([]);
       }
     } else {

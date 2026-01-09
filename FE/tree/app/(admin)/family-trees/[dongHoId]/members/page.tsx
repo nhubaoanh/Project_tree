@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useRef, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { Search, Plus, Upload, X, Loader2, ArrowLeft, Download } from "lucide-react";
+import { Search, Plus, Upload, X, Loader2, ArrowLeft, Download, GitBranch } from "lucide-react";
 import * as XLSX from "xlsx";
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 import { IMember, IMemberSearch } from "@/types/member";
@@ -235,11 +235,25 @@ export default function MembersByDongHoPage() {
                 </div>
             </div>
 
-            {/* Search */}
-            <div className="mb-6 flex items-center bg-white border border-[#d4af37] rounded-lg p-1 shadow-sm w-full md:w-1/2">
-                <div className="p-2 text-stone-400">{isLoading ? <Loader2 className="animate-spin" size={20} /> : <Search size={20} />}</div>
-                <input value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} placeholder="Tìm kiếm theo họ tên..." className="w-full p-2 outline-none bg-transparent text-[#5d4037] placeholder-stone-400" />
-                {searchTerm && <button onClick={() => setSearchTerm("")} className="p-2 text-stone-400 hover:text-[#b91c1c]"><X size={16} /></button>}
+            {/* Search và nút Xem cây gia phả */}
+            <div className="mb-6 flex items-center justify-between gap-4">
+                <div className="flex items-center bg-white border border-[#d4af37] rounded-lg p-1 shadow-sm w-full md:w-1/2">
+                    <div className="p-2 text-stone-400">{isLoading ? <Loader2 className="animate-spin" size={20} /> : <Search size={20} />}</div>
+                    <input value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} placeholder="Tìm kiếm theo họ tên..." className="w-full p-2 outline-none bg-transparent text-[#5d4037] placeholder-stone-400" />
+                    {searchTerm && <button onClick={() => setSearchTerm("")} className="p-2 text-stone-400 hover:text-[#b91c1c]"><X size={16} /></button>}
+                </div>
+
+                {/* Nút Xem cây gia phả - link đến genealogy */}
+                <button
+                    onClick={() => {
+                        // Mở trang genealogy trong tab mới với dongHoId query parameter
+                        window.open(`/genealogy?dongHoId=${dongHoId}`, '_blank');
+                    }}
+                    className="flex items-center gap-2 px-4 py-2 bg-[#d4af37] text-white rounded shadow hover:bg-[#b8962a] transition-all text-sm font-bold whitespace-nowrap"
+                >
+                    <GitBranch size={16} />
+                    <span>Xem cây gia phả</span>
+                </button>
             </div>
 
             {/* Table */}

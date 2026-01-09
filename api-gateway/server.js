@@ -123,6 +123,16 @@ app.all('/api-firework/*', verifyToken, (req, res, next) => {
   fireworkProxy(req, res, next);
 });
 
+
+// ============================================================================
+// STATIC FILES - Proxy uploads to core backend
+// ============================================================================
+app.all('/uploads/*', (req, res, next) => {
+  console.log(`[PROXY UPLOADS] -> ${URL_CORE}${req.originalUrl}`);
+  coreProxy(req, res, next);
+});
+
+
 // ============================================================================
 // 404
 // ============================================================================

@@ -173,7 +173,7 @@ export const adminOnly = (req: Request, res: Response, next: NextFunction) => {
     });
   }
 
-  if (user.roleCode !== "sa") {
+  if (user.roleCode !== "thudo") {
     return res.status(403).json({
       success: false,
       message: "Chỉ Admin mới có quyền thực hiện thao tác này",

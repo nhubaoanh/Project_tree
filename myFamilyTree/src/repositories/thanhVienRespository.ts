@@ -71,19 +71,16 @@ export class thanhVienRespository {
         thanhVien.tieuSu,
         thanhVien.anhChanDung,
         thanhVien.doiThuoc,
-        thanhVien.chaId,
-        thanhVien.meId,
-        thanhVien.voId,
-        thanhVien.chongId,
+        // thanhVien.chaId,
+        // thanhVien.meId,
+        // thanhVien.voId,
+        // thanhVien.chongId,
+        null,
+        null,
+        null,
+        null,
         thanhVien.lu_user_id,
       ]);
-      
-      // Lấy output params
-      const [outParams]: any = await this.db.query('SELECT @err_code AS err_code, @err_msg AS err_msg', []);
-      if (outParams[0]?.err_code !== 0) {
-        throw new Error(outParams[0]?.err_msg || 'Lỗi cập nhật thành viên');
-      }
-      
       return true;
     } catch (error: any) {
       console.log("error database => ", error);
