@@ -45,8 +45,6 @@ function GenealogyContent() {
     setMounted(true);
   }, []);
 
-  // Không cần fetch danh sách dòng họ nữa vì admin không chọn được
-
   // Set initial dongHoId - luôn dùng dongHoId của user
   useEffect(() => {
     if (!mounted) return;

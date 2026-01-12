@@ -48,13 +48,6 @@ export const SuKienPage: React.FC = () => {
     queryFn: () => searchEvent(searchParams),
     enabled: !!dongHoId, // Chỉ gọi API khi có dongHoId
   });
-
-  // Debug log
-  console.log("SuKienPage - dongHoId:", dongHoId);
-  console.log("SuKienPage - eventQuery:", eventQuery.data);
-  console.log("SuKienPage - isLoading:", eventQuery.isLoading);
-  console.log("SuKienPage - error:", eventQuery.error);
-
   // Sắp xếp sự kiện mới nhất lên đầu
   const sortedEvents = React.useMemo(
     () =>

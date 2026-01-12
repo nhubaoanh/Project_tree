@@ -14,6 +14,8 @@ export interface IDongHo {
     active_flag: number;
     nguoiTaoId: string;
     ngayTao: string | Date;
+    nguoiCapNhatId?: string;
+    ngayCapNhat?: string | Date;
 }
 
 export interface IDongHoCreate {
@@ -22,6 +24,16 @@ export interface IDongHoCreate {
     ngayThanhLap?: string;
     nguoiQuanLy?: string;
     ghiChu?: string;
+    nguoiTaoId?: string;
+}
+
+export interface IDongHoUpdate {
+    tenDongHo: string;
+    queQuanGoc?: string;
+    ngayThanhLap?: string;
+    nguoiQuanLy?: string;
+    ghiChu?: string;
+    nguoiCapNhatId?: string;
 }
 
 export interface IDongHoSearch {
@@ -29,8 +41,6 @@ export interface IDongHoSearch {
     pageSize: number;
     search_content?: string;
 }
-
-// Lấy tất cả dòng họ
 export const getAllDongHo = async (): Promise<any> => {
     try {
         const res = await apiClient.get(`${prefix}/getAll`);
@@ -78,8 +88,9 @@ export const createDongHo = async (data: IDongHoCreate): Promise<any> => {
     }
 };
 
+// Lấy tất cả dòng họ
 // Cập nhật dòng họ
-export const updateDongHo = async (id: string, data: Partial<IDongHoCreate>): Promise<any> => {
+export const updateDongHo = async (id: string, data: IDongHoUpdate): Promise<any> => {
     try {
         const res = await apiClient.put(`${prefix}/${id}`, data);
         return res?.data;

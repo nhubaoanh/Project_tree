@@ -1,8 +1,9 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
-import { Send, Bot, User, Sparkles, Loader2, Info, ChevronDown } from "lucide-react";
+import { Send, Bot, User, Sparkles, Loader2, Info } from "lucide-react";
 import { chatWithAI } from "@/service/ai.service";
-import { getAllDongHo, IDongHo } from "@/service/dongho.service";
+import { getDongHoById } from "@/service/dongho.service";
+import storage from "@/utils/storage";
 
 interface ChatMessage {
   role: "user" | "model";
@@ -13,52 +14,45 @@ export default function GenealogyChatPage() {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       role: "model",
-      text: 'Chào bạn! Tôi là trợ lý AI tra cứu gia phả. Hãy chọn dòng họ và hỏi tôi về quan hệ huyết thống, ví dụ:\n- "Ông A là con ai?"\n- "Con của bà B là ai?"\n- "Liệt kê tất cả thành viên"\n- "Ai thuộc đời thứ 2?"',
+      text: 'Chào bạn! Tôi là trợ lý AI tra cứu gia phả. Hãy hỏi tôi về quan hệ huyết thống, ví dụ:\n- "Ông A là con ai?"\n- "Con của bà B là ai?"\n- "Liệt kê tất cả thành viên"\n- "Ai thuộc đời thứ 2?"',
     },
   ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [dongHoList, setDongHoList] = useState<IDongHo[]>([]);
+  const [dongHoInfo, setDongHoInfo] = useState<any>(null);
   const [selectedDongHo, setSelectedDongHo] = useState<string>("");
-  const [showDropdown, setShowDropdown] = useState(false);
 
   const scrollRef = useRef<HTMLDivElement>(null);
-  const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Load danh sách dòng họ
+  // Load thông tin dòng họ của user hiện tại
   useEffect(() => {
-    const loadDongHo = async () => {
+    const loadUserDongHo = async () => {
       try {
-        const res = await getAllDongHo();
-        if (res.data && Array.isArray(res.data)) {
-          setDongHoList(res.data);
-          // Tự động chọn dòng họ đầu tiên
-          if (res.data.length > 0) {
-            setSelectedDongHo(res.data[0].dongHoId);
+        const user = storage.getUser();
+        const userDongHoId = user?.dongHoId;
+        
+        if (userDongHoId) {
+          setSelectedDongHo(userDongHoId);
+          const res = await getDongHoById(userDongHoId);
+          if (res.success && res.data) {
+            setDongHoInfo(res.data);
+            setMessages([{
+              role: "model",
+              text: `Chào bạn! Tôi là trợ lý AI tra cứu gia phả dòng họ "${res.data.tenDongHo}". Hãy hỏi tôi về quan hệ huyết thống, ví dụ:\n- "Ông A là con ai?"\n- "Con của bà B là ai?"\n- "Liệt kê tất cả thành viên"\n- "Ai thuộc đời thứ 2?"`
+            }]);
           }
         }
       } catch (error) {
-        console.error("Lỗi load dòng họ:", error);
+        console.error("Lỗi load thông tin dòng họ:", error);
       }
     };
-    loadDongHo();
+    loadUserDongHo();
   }, []);
 
   // Scroll to bottom
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
-
-  // Close dropdown when click outside
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
-        setShowDropdown(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -67,7 +61,7 @@ export default function GenealogyChatPage() {
     if (!selectedDongHo) {
       setMessages((prev) => [
         ...prev,
-        { role: "model", text: "Vui lòng chọn dòng họ trước khi hỏi." },
+        { role: "model", text: "Không tìm thấy thông tin dòng họ của bạn." },
       ]);
       return;
     }
@@ -99,8 +93,6 @@ export default function GenealogyChatPage() {
     }
   };
 
-  const selectedDongHoName = dongHoList.find(d => d.dongHoId === selectedDongHo)?.tenDongHo || "Chọn dòng họ";
-
   return (
     <div className="max-w-4xl mx-auto h-[calc(100vh-140px)] flex flex-col font-sans animate-fadeIn">
       {/* Header */}
@@ -113,42 +105,9 @@ export default function GenealogyChatPage() {
           <p className="text-xs text-green-600">Sẵn sàng hỗ trợ</p>
         </div>
         
-        {/* Dropdown chọn dòng họ */}
-        <div className="relative" ref={dropdownRef}>
-          <button
-            onClick={() => setShowDropdown(!showDropdown)}
-            className="flex items-center gap-2 px-3 py-2 bg-[#fdf6e3] border border-[#d4af37] rounded-lg text-sm text-[#5d4037] hover:bg-[#f5ecd3] transition-colors"
-          >
-            <span className="max-w-[150px] truncate">{selectedDongHoName}</span>
-            <ChevronDown size={16} className={`transition-transform ${showDropdown ? 'rotate-180' : ''}`} />
-          </button>
-          
-          {showDropdown && (
-            <div className="absolute right-0 top-full mt-1 w-64 bg-white border border-[#d4af37] rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto">
-              {dongHoList.length === 0 ? (
-                <div className="p-3 text-sm text-gray-500">Không có dòng họ nào</div>
-              ) : (
-                dongHoList.map((dh) => (
-                  <button
-                    key={dh.dongHoId}
-                    onClick={() => {
-                      setSelectedDongHo(dh.dongHoId);
-                      setShowDropdown(false);
-                      setMessages([{
-                        role: "model",
-                        text: `Đã chọn dòng họ "${dh.tenDongHo}". Bạn có thể hỏi tôi về quan hệ các thành viên trong dòng họ này.`
-                      }]);
-                    }}
-                    className={`w-full text-left px-4 py-2 text-sm hover:bg-[#fdf6e3] transition-colors ${
-                      selectedDongHo === dh.dongHoId ? 'bg-[#fdf6e3] text-[#b91c1c] font-medium' : 'text-[#5d4037]'
-                    }`}
-                  >
-                    {dh.tenDongHo}
-                  </button>
-                ))
-              )}
-            </div>
-          )}
+        {/* Hiển thị tên dòng họ (không cho chọn) */}
+        <div className="px-3 py-2 bg-gray-50 border border-[#d4af37]/50 rounded-lg text-sm text-[#5d4037] font-medium">
+          {dongHoInfo?.tenDongHo || "Đang tải..."}
         </div>
 
         <div
@@ -222,7 +181,7 @@ export default function GenealogyChatPage() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             disabled={isLoading || !selectedDongHo}
-            placeholder={selectedDongHo ? "Hỏi về quan hệ gia đình, ví dụ: Con của ông A là ai?" : "Vui lòng chọn dòng họ trước..."}
+            placeholder={selectedDongHo ? "Hỏi về quan hệ gia đình, ví dụ: Con của ông A là ai?" : "Đang tải thông tin dòng họ..."}
             className="flex-1 pl-4 pr-12 py-3 bg-[#f9f9f9] border border-[#d4af37]/30 rounded-full focus:outline-none focus:border-[#b91c1c] focus:ring-1 focus:ring-[#b91c1c] transition-all disabled:opacity-50"
           />
           <button

@@ -15,14 +15,6 @@ const connectionConfig = {
 export class Database {
   private pool: Pool;
   constructor() {
-    console.log("=== DATABASE CONFIG DEBUG ===");
-    console.log("DB_HOST:", config.db.host);
-    console.log("DB_PORT:", config.db.port);
-    console.log("DB_USERNAME:", config.db.username);
-    console.log("DB_PASSWORD:", config.db.password ? "***" : "empty");
-    console.log("DB_NAME:", config.db.database);
-    console.log("=== END DATABASE CONFIG DEBUG ===");
-    
     this.pool = createPool(connectionConfig);
     console.log("connect_database success");
   }

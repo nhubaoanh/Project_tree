@@ -1,14 +1,19 @@
 "use client";
 import React from "react";
-import { Users, Calendar, MapPin, GitBranch, UserCog } from "lucide-react";
+import { Users, Calendar, MapPin, GitBranch, UserCog, Edit, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { IDongHo } from "@/service/dongho.service";
 
 interface DongHoCardProps {
     dongHo: IDongHo;
+    canEdit?: boolean;
+    canDelete?: boolean;
+    onEdit?: () => void;
+    onDelete?: () => void;
+    isDeleting?: boolean;
 }
 
-export function DongHoCard({ dongHo }: DongHoCardProps) {
+export function DongHoCard({ dongHo, canEdit, canDelete, onEdit, onDelete, isDeleting }: DongHoCardProps) {
     const router = useRouter();
     
     const formatDate = (date: string | Date | null) => {
@@ -43,6 +48,37 @@ export function DongHoCard({ dongHo }: DongHoCardProps) {
                         </p>
                     </div>
                 </div>
+                
+                {/* Edit/Delete buttons */}
+                {(canEdit || canDelete) && (
+                    <div className="flex gap-1">
+                        {canEdit && (
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    onEdit?.();
+                                }}
+                                className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                title="Chỉnh sửa"
+                            >
+                                <Edit size={16} />
+                            </button>
+                        )}
+                        {canDelete && (
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    onDelete?.();
+                                }}
+                                disabled={isDeleting}
+                                className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
+                                title="Xóa"
+                            >
+                                <Trash2 size={16} />
+                            </button>
+                        )}
+                    </div>
+                )}
             </div>
 
             {/* Info */}

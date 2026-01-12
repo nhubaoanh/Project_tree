@@ -60,12 +60,6 @@ const getImageUrl = (img: string | null | undefined): string => {
   }
 };
 
-// Xử lý lỗi ảnh - trả về ảnh mặc định
-const handleImageError = (imgUrl: string): string => {
-  // Nếu ảnh lỗi, trả về ảnh mặc định
-  return DEFAULT_AVATAR;
-};
-
 const toNum = (v: unknown): number | undefined => {
   if (v == null) return undefined;
   const n = typeof v === "string" ? Number(v) : (v as number);
@@ -123,8 +117,8 @@ export const MyFamilyTree = ({ data }: Props) => {
   const [results, setResults] = useState<number[]>([]);
 
   // Panel visibility
-  const [showLeft, setShowLeft] = useState(true);
-  const [showRight, setShowRight] = useState(true);
+  const [showLeft, setShowLeft] = useState(false);
+  const [showRight, setShowRight] = useState(false);
 
   // Calc generations
   useEffect(() => {
@@ -171,10 +165,6 @@ export const MyFamilyTree = ({ data }: Props) => {
       // Xử lý ảnh - nếu không có hoặc rỗng thì dùng ảnh mặc định
       let imgUrl = n.anhChanDung?.trim() ? getImageUrl(n.anhChanDung) : DEFAULT_AVATAR;
       
-      // Log để debug
-      console.log("Original img:", n.anhChanDung);
-      console.log("Processed img:", imgUrl);
-      
       return {
         id: toNum(n.id)!,
         pids: (n.pids ?? []).map(toNum).filter((x): x is number => typeof x === "number"),
@@ -220,7 +210,7 @@ export const MyFamilyTree = ({ data }: Props) => {
       siblingSeparation: 50,
       subtreeSeparation: 70,
       lazyLoading: true,
-      undoRedoStorageName: "ft_history",
+      // undoRedoStorageName: "ft_history",
       anim: { func: FamilyTree.anim.outPow, duration: 200 },
       zoom: { speed: 100, smooth: 10 },
       nodeBinding: { field_0: "field_0", field_1: "field_1", field_2: "field_2", img_0: "img_0" },
@@ -232,12 +222,12 @@ export const MyFamilyTree = ({ data }: Props) => {
           onClick: (id: string | number) => tree.center(typeof id === "string" ? Number(id) : id),
         },
       },
-      menu: { pdf: { text: "📄 PDF" }, png: { text: "🖼️ PNG" }, svg: { text: "📐 SVG" } },
+      // menu: { pdf: { text: "📄 PDF" }, png: { text: "🖼️ PNG" }, svg: { text: "📐 SVG" } },
       tags:
         template === "custom"
           ? { male: { template: "male_tpl" }, female: { template: "female_tpl" }, dead: { template: "dead_tpl" } }
           : { male: { template: template }, female: { template: template } },
-      toolbar: { layout: true, zoom: true, fit: true, expandAll: true, fullScreen: true },
+      // toolbar: { layout: true, zoom: true, fit: true, expandAll: true, fullScreen: true },
     });
 
     tree.onNodeDoubleClick(function (args) {
@@ -275,7 +265,7 @@ export const MyFamilyTree = ({ data }: Props) => {
 
       {/* LEGEND */}
       {template === "custom" && (
-        <div className="absolute bottom-4 right-4 z-10 bg-white/95 rounded-lg shadow border border-amber-400 px-3 py-2 text-xs">
+        <div className="absolute bottom-16 right-4 z-10 bg-white/95 rounded-lg shadow border border-amber-400 px-3 py-2 text-xs">
           <div className="flex gap-4">
             <span className="flex items-center gap-1">
               <span className="w-3 h-3 rounded-full bg-blue-100 border-2 border-blue-600"></span>Nam
@@ -292,7 +282,9 @@ export const MyFamilyTree = ({ data }: Props) => {
 
       {/* SEARCH RESULTS */}
       {results.length > 0 && (
-        <div className="absolute bottom-4 left-4 z-10 bg-white rounded-lg shadow border border-amber-400 p-2 max-h-36 overflow-y-auto">
+        <div className={`absolute z-10 bg-white rounded-lg shadow border border-amber-400 p-2 max-h-36 overflow-y-auto transition-all duration-300 ${
+          showRight ? 'bottom-16 left-4 right-20' : 'bottom-16 left-4'
+        }`}>
           <p className="text-xs font-bold text-amber-800 mb-1">🎯 Kết quả ({results.length}):</p>
           {results.slice(0, 6).map((id) => {
             const n = allNodes.find((x) => x.id === id);

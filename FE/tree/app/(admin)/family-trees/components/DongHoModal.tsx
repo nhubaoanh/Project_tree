@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { X, Loader2, Check } from "lucide-react";
-import { IDongHoCreate } from "@/service/dongho.service";
+import { IDongHoCreate, IDongHo } from "@/service/dongho.service";
 import { FormRules, validateForm, validateField } from "@/lib/validator";
 import { useToast } from "@/service/useToas";
 
@@ -34,10 +34,11 @@ interface DongHoModalProps {
     onClose: () => void;
     onSave: (data: IDongHoCreate) => void;
     isLoading?: boolean;
-    initialData?: IDongHoCreate | null;
+    editData?: IDongHo | null;
+    mode?: "create" | "edit";
 }
 
-export function DongHoModal({ isOpen, onClose, onSave, isLoading, initialData }: DongHoModalProps) {
+export function DongHoModal({ isOpen, onClose, onSave, isLoading, editData, mode = "create" }: DongHoModalProps) {
     const { showError } = useToast();
     
     // Form state
@@ -54,17 +55,34 @@ export function DongHoModal({ isOpen, onClose, onSave, isLoading, initialData }:
     // Reset form khi modal mở
     useEffect(() => {
         if (isOpen) {
-            setFormData({
-                tenDongHo: initialData?.tenDongHo || "",
-                queQuanGoc: initialData?.queQuanGoc || "",
-                ngayThanhLap: initialData?.ngayThanhLap || "",
-                nguoiQuanLy: initialData?.nguoiQuanLy || "",
-                ghiChu: initialData?.ghiChu || "",
-            });
+            if (mode === "edit" && editData) {
+                // Format date for input field
+                const formatDateForInput = (date: string | Date | null) => {
+                    if (!date) return "";
+                    const d = new Date(date);
+                    return d.toISOString().split('T')[0];
+                };
+                
+                setFormData({
+                    tenDongHo: editData.tenDongHo || "",
+                    queQuanGoc: editData.queQuanGoc || "",
+                    ngayThanhLap: formatDateForInput(editData.ngayThanhLap) || "",
+                    nguoiQuanLy: editData.nguoiQuanLy || "",
+                    ghiChu: editData.ghiChu || "",
+                });
+            } else {
+                setFormData({
+                    tenDongHo: "",
+                    queQuanGoc: "",
+                    ngayThanhLap: "",
+                    nguoiQuanLy: "",
+                    ghiChu: "",
+                });
+            }
             setErrors({});
             setTouched({});
         }
-    }, [isOpen, initialData]);
+    }, [isOpen, editData, mode]);
 
     // Handle change với validation
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -139,7 +157,7 @@ export function DongHoModal({ isOpen, onClose, onSave, isLoading, initialData }:
                 {/* Header */}
                 <div className="bg-[#b91c1c] text-yellow-400 px-6 py-4 flex items-center justify-between">
                     <h3 className="text-xl font-bold uppercase tracking-wider">
-                        {initialData ? "Chỉnh Sửa Dòng Họ" : "Tạo Cây Gia Phả Mới"}
+                        {mode === "edit" ? "Chỉnh Sửa Dòng Họ" : "Tạo Cây Gia Phả Mới"}
                     </h3>
                     <button
                         onClick={handleClose}
@@ -286,7 +304,7 @@ export function DongHoModal({ isOpen, onClose, onSave, isLoading, initialData }:
                             ) : (
                                 <Check size={18} />
                             )}
-                            {isLoading ? "Đang tạo..." : initialData ? "Cập nhật" : "Tạo dòng họ"}
+                            {isLoading ? "Đang xử lý..." : mode === "edit" ? "Cập nhật" : "Tạo dòng họ"}
                         </button>
                     </div>
                 </form>

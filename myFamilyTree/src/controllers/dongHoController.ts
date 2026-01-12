@@ -48,7 +48,6 @@ export class dongHoController {
     async getAllDongHo(req: Request, res: Response) : Promise<void> {
         try{
             const result = await this.donghoService.getAllDongHo();
-            console.log("res", result)
             res.status(200).json({
                 message: "lay danh sach dong ho thanh cong",
                 success: true,

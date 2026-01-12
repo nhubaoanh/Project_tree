@@ -78,7 +78,6 @@ export default function RegisterPage() {
       }
     } catch (err: any) {
       showError("Kết nối thất bại. Vui lòng kiểm tra kết nối mạng.");
-      console.error("Register error:", err);
     } finally {
       setLoading(false);
     }

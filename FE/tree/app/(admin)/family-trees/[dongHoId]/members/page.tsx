@@ -24,11 +24,11 @@ export default function MembersByDongHoPage() {
     // Kiểm tra quyền truy cập
     const [hasAccess, setHasAccess] = useState(true);
     const user = storage.getUser();
-    const isAdmin = user?.roleCode === "sa";
+    const isThudo = user?.roleCode === "thudo";
 
     useEffect(() => {
-        // Nếu không phải Admin và dongHoId không khớp với dòng họ của user
-        if (user && user.roleCode !== "sa" && user.dongHoId && user.dongHoId !== dongHoId) {
+        // Nếu không phải Thudo và dongHoId không khớp với dòng họ của user
+        if (user && user.roleCode !== "thudo" && user.dongHoId && user.dongHoId !== dongHoId) {
             setHasAccess(false);
             router.push("/dashboard");
         }
@@ -209,8 +209,8 @@ export default function MembersByDongHoPage() {
             {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-end md:items-center mb-8 gap-4 border-b border-[#d4af37] pb-4">
                 <div>
-                    {/* Chỉ Admin mới thấy nút quay lại */}
-                    {isAdmin && (
+                    {/* Chỉ Thudo mới thấy nút quay lại */}
+                    {isThudo && (
                         <button onClick={handleBack} className="flex items-center gap-1 text-[#8b5e3c] hover:text-[#b91c1c] mb-2 transition-colors">
                             <ArrowLeft size={16} /><span className="text-sm">Quay lại danh sách</span>
                         </button>

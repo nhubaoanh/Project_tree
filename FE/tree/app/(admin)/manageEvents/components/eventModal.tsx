@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { X, Check, Loader2, Calendar } from "lucide-react";
 import { IEvent } from "@/types/event";
 import { useQuery } from "@tanstack/react-query";
-import { getAllDongHo } from "@/service/lineage.service";
+import { getDongHoById } from "@/service/dongho.service";
 import { searchTypeEvent } from "@/service/typeEvent.service";
 import { useToast } from "@/service/useToas";
 import { FormRules, validateForm, validateField } from "@/lib/validator";
@@ -60,19 +60,23 @@ export const EventModal: React.FC<EventModalProps> = ({
   const [touched, setTouched] = useState<Record<string, boolean>>({});
 
   // ========== LOAD DATA ==========
+  // Lấy dongHoId từ user hiện tại thay vì dropdown
+  const user = storage.getUser();
+  const userDongHoId = user?.dongHoId;
+
+  // Query để lấy thông tin dòng họ hiện tại
   const { data: dongHoData } = useQuery({
-    queryKey: ["Lineage"],
-    queryFn: getAllDongHo,
+    queryKey: ["dongho", userDongHoId],
+    queryFn: () => getDongHoById(userDongHoId!),
+    enabled: !!userDongHoId,
   });
+  const dongHoInfo = dongHoData?.data;
 
   const { data: typeEventData } = useQuery({
     queryKey: ["TypeEvent"],
     queryFn: () => searchTypeEvent({ pageIndex: 1, pageSize: 0 }),
   });
 
-  const dongHoList = Array.isArray(dongHoData)
-    ? dongHoData
-    : dongHoData?.data ?? [];
   const typeEventList = typeEventData?.data ?? [];
 
   // ========== RESET FORM KHI MODAL MỞ ==========
@@ -85,7 +89,7 @@ export const EventModal: React.FC<EventModalProps> = ({
         gioDienRa: initialData?.gioDienRa,
         diaDiem: initialData?.diaDiem || "",
         moTa: initialData?.moTa || "",
-        dongHoId: initialData?.dongHoId || "",
+        dongHoId: initialData?.dongHoId || userDongHoId || "",
         loaiSuKien: initialData?.loaiSuKien ?? 1,
         uuTien: initialData?.uuTien ?? 2,
         lapLai: initialData?.lapLai ?? 0,
@@ -95,7 +99,7 @@ export const EventModal: React.FC<EventModalProps> = ({
       setErrors({});
       setTouched({});
     }
-  }, [isOpen, initialData]);
+  }, [isOpen, initialData, userDongHoId]);
 
   // ========== HANDLE CHANGE ==========
   /**
@@ -255,20 +259,18 @@ export const EventModal: React.FC<EventModalProps> = ({
             placeholder="VD: Giỗ cụ Nguyễn Văn A"
           />
 
-          {/* Row 2: Dòng họ + Loại sự kiện */}
+          {/* Row 2: Dòng họ (hiển thị thông tin) + Loại sự kiện */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <SelectField
-              label="Dòng họ"
-              name="dongHoId"
-              required
-              value={formData.dongHoId || ""}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              options={dongHoList}
-              optionLabel="tenDongHo"
-              optionValue="dongHoId"
-              error={touched.dongHoId ? errors.dongHoId : null}
-            />
+            <div className="space-y-2">
+              <label className="text-sm font-bold text-[#8b5e3c] uppercase">
+                Dòng họ <span className="text-red-500">*</span>
+              </label>
+              <div className="w-full p-3 bg-gray-50 border border-[#d4af37]/50 rounded text-[#5d4037] font-medium">
+                {dongHoInfo?.tenDongHo || "Đang tải..."}
+              </div>
+              {/* Hidden input để gửi dongHoId */}
+              <input type="hidden" name="dongHoId" value={userDongHoId || ""} />
+            </div>
 
             <SelectField
               label="Loại sự kiện"

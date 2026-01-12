@@ -37,7 +37,6 @@ export class roleController {
         data: result,
       });
     } catch (err: any) {
-      console.error("createRole error:", err);
       res.status(500).json({ success: false, message: err.message || "Lỗi server" });
     }
   }
@@ -55,7 +54,6 @@ export class roleController {
         data: result,
       });
     } catch (err: any) {
-      console.error("updateRole error:", err);
       res.status(500).json({ success: false, message: err.message || "Lỗi server" });
     }
   }
@@ -79,7 +77,6 @@ export class roleController {
         message: "Xóa nhóm quyền thành công",
       });
     } catch (err: any) {
-      console.error("deleteRole error:", err);
       res.status(500).json({ success: false, message: err.message || "Lỗi server" });
     }
   }
@@ -94,8 +91,6 @@ export class roleController {
       }
 
       const menus = await this.role.getMenuByRole(user.roleId);
-
-      // Build menu tree (nếu có parentId)
       const menuTree = this.buildMenuTree(menus);
 
       res.status(200).json({
@@ -124,7 +119,6 @@ export class roleController {
         data: menuTree,
       });
     } catch (err: any) {
-      console.error("getMenuByRole error:", err);
       res.status(500).json({ success: false, message: "Lỗi server" });
     }
   }
@@ -180,7 +174,6 @@ export class roleController {
         data: Object.values(grouped),
       });
     } catch (err: any) {
-      console.error("getRolePermissions error:", err);
       res.status(500).json({ success: false, message: "Lỗi server" });
     }
   }

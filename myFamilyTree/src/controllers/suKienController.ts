@@ -38,7 +38,6 @@ export class suKienController {
         res.json({ message: "Không tồn tại kết quả tìm kiếm.", success: true });
       }
     } catch (error: any) {
-      console.log("error", error);
       res
         .status(500)
         .json({ message: "Tim kiếm sự kiện that bai", success: false });
@@ -48,9 +47,7 @@ export class suKienController {
   async createSuKien(req: Request, res: Response): Promise<void> {
     try {
       const sukien = req.body as suKien;
-      console.log("re", sukien);
       const results = await this.suKienService.createSuKien(sukien);
-      console.log("res", results);
       res.json({
         message: "Tạo sự kiện thành công.",
         success: true,

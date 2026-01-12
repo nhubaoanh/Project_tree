@@ -135,7 +135,6 @@ export default function SettingsPage() {
         throw new Error(result.message || 'Upload thất bại');
       }
     } catch (error: any) {
-      console.error('Upload failed:', error);
       showError(error.message || 'Upload ảnh thất bại!');
       setPreviewUrl(null);
     } finally {

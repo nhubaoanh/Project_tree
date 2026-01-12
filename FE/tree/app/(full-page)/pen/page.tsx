@@ -42,7 +42,6 @@ export default function PhaKyPage() {
         const decodedUrl = decodeURIComponent(url);
         return decodedUrl;
       } catch (error) {
-        console.warn('Error decoding URL:', url, error);
         return url;
       }
     };

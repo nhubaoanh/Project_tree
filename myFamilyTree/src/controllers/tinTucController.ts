@@ -34,7 +34,6 @@ export class TinTucController {
         ),
       });
     } catch (error: any) {
-      console.log("error", error);
       res.status(500).json({ success: false, message: "Lỗi tìm kiếm tin tức" });
     }
   }
@@ -61,7 +60,6 @@ export class TinTucController {
         data: result,
       });
     } catch (error: any) {
-      console.log("error", error);
       res.status(500).json({ success: false, message: error.message || "Lỗi tạo tin tức" });
     }
   }
@@ -86,7 +84,6 @@ export class TinTucController {
         data: result,
       });
     } catch (error: any) {
-      console.log("error", error);
       res.status(500).json({ success: false, message: error.message || "Lỗi cập nhật tin tức" });
     }
   }
@@ -104,7 +101,6 @@ export class TinTucController {
         data: result,
       });
     } catch (error: any) {
-      console.log("error", error);
       res.status(500).json({ success: false, message: "Lỗi xóa tin tức" });
     }
   }
@@ -119,7 +115,6 @@ export class TinTucController {
         message: "Xóa tin tức thành công",
       });
     } catch (error: any) {
-      console.log("error", error);
       res.status(500).json({ success: false, message: error.message || "Lỗi xóa tin tức" });
     }
   }
@@ -136,7 +131,6 @@ export class TinTucController {
 
       res.json({ success: true, data: result });
     } catch (error: any) {
-      console.log("error", error);
       res.status(500).json({ success: false, message: "Lỗi lấy tin tức" });
     }
   }

@@ -24,20 +24,12 @@ export class nguoiDungService {
     return this.nguoidungResponsitory.logUpUser(nguoiDung);
   }
 
-  async loginUser(tenDangNhap: string, matKhau: string): Promise<any> {
-    console.log("=== LOGIN DEBUG START ===");
-    console.log("tenDangNhap:", tenDangNhap);
-    console.log("matKhau length:", matKhau?.length);
-    
+  async loginUser(tenDangNhap: string, matKhau: string): Promise<any> {    
     try {
-      const md5_pass = md5(matKhau);
-      console.log("md5_pass:", md5_pass);
-      
+      const md5_pass = md5(matKhau);      
       const user = await this.nguoidungResponsitory.LoginUser(tenDangNhap);
-      console.log("user from DB:", user);
       
       if (user && user.matKhau === md5_pass) {
-        console.log("Password match - getting functions and actions");
         // Lấy danh sách functions và actions (có thể không có nếu chưa tạo stored procedure)
         let functionTree: any[] = [];
         let actions: any[] = [];
@@ -45,19 +37,15 @@ export class nguoiDungService {
         try {
           const functions = await this.nguoidungResponsitory.getFunctionByUserId(user.nguoiDungId);
           functionTree = this.treeUtility.getFunctionTree(functions || [], 1, "0");
-          console.log("Functions loaded successfully");
         } catch (err) {
           console.log("getFunctionByUserId error:", err);
         }
         
         try {
           actions = await this.nguoidungResponsitory.getActionByUserId(user.nguoiDungId);
-          console.log("Actions loaded successfully");
         } catch (err) {
           console.log("getActionByUserId error:", err);
         }
-
-        console.log("=== LOGIN DEBUG END - SUCCESS ===");
         return {
           nguoiDungId: user.nguoiDungId,
           first_name: user.first_name,
@@ -77,14 +65,8 @@ export class nguoiDungService {
           actions: actions || [],
         };
       }
-      console.log("Password mismatch or user not found");
-      console.log("=== LOGIN DEBUG END - FAILED ===");
       return null;
     } catch (error: any) {
-      console.error("=== LOGIN SERVICE ERROR ===");
-      console.error("Error:", error);
-      console.error("Error message:", error.message);
-      console.error("Error stack:", error.stack);
       throw error;
     }
   }
@@ -152,40 +134,57 @@ export class nguoiDungService {
     }
     return new_password;
   }
-
-  /**
-   * Authorize - verify token và lấy lại functions/actions từ DB
-   * Trả về format phù hợp với FE Sidebar (đã build tree)
-   */
   async authorize(token: string) {
     try {
       let user_data = verifyToken(token);
       if (user_data == null) throw new Error("Phiên đăng nhập hết hạn");
-
-      console.log("=== AUTHORIZE DEBUG ===");
-      console.log("User ID:", user_data.nguoiDungId);
-
       // Lấy functions từ DB và build tree
       let functionTree: any[] = [];
       let permissions: Record<string, string[]> = {};
 
       try {
-        const functions = await this.nguoidungResponsitory.getFunctionByUserId(user_data.nguoiDungId);
-        console.log("Functions from DB:", JSON.stringify(functions, null, 2));
-        
+        const functions = await this.nguoidungResponsitory.getFunctionByUserId(user_data.nguoiDungId);        
         if (functions && functions.length > 0) {
           // Dùng treeUtility để build tree (giống loginUser)
-          functionTree = this.treeUtility.getFunctionTree(functions, 1, "0");
-          console.log("Built function tree:", JSON.stringify(functionTree, null, 2));
+          console.log("Building function tree...");
+          
+          // Chuẩn hóa data trước khi build tree
+          const normalizedFunctions = functions.map(func => {
+            let normalizedFunc = { ...func };
+            
+            // Chuẩn hóa parent_id
+            if (func.parent_id === "" || func.parent_id === null || func.parent_id === undefined) {
+              normalizedFunc.parent_id = null;
+              normalizedFunc.level = 1; // Root level
+            } else {
+              normalizedFunc.level = 2; // Child level
+            }
+            
+            return normalizedFunc;
+          });          
+          functionTree = this.treeUtility.getFunctionTree(normalizedFunctions, 1, null);
+          // Sort tree theo sort_order
+          const sortTree = (items: any[]): any[] => {
+            return items
+              .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0))
+              .map(item => ({
+                ...item,
+                children: item.children && item.children.length > 0 
+                  ? sortTree(item.children) 
+                  : item.children
+              }));
+          };
+          
+          functionTree = sortTree(functionTree);
+        } else {
+          console.log("No functions found from DB - functionTree will be empty");
         }
       } catch (err: any) {
-        console.log("getFunctionByUserId error:", err.message);
+        console.log("Error stack:", err.stack);
       }
 
       try {
-        const actions = await this.nguoidungResponsitory.getActionByUserId(user_data.nguoiDungId);
-        console.log("Actions from DB count:", actions?.length);
-        
+        const actions = await this.nguoidungResponsitory.getActionByUserId(user_data.nguoiDungId);                
         if (actions && actions.length > 0) {
           // Group actions theo function_code
           actions.forEach((action: any) => {
@@ -197,15 +196,16 @@ export class nguoiDungService {
               permissions[code].push(action.action_code);
             }
           });
+        } else {
+          console.log("No actions found from DB - permissions will be empty");
         }
-        console.log("Permissions:", JSON.stringify(permissions, null, 2));
       } catch (err: any) {
-        console.log("getActionByUserId error:", err.message);
+        console.log("Error stack:", err.stack);
       }
 
       // Convert functionTree sang format FE Sidebar cần
       const convertToMenuFormat = (items: any[]): any[] => {
-        return items.map(item => ({
+        const result = items.map(item => ({
           code: item.code,
           name: item.title,
           href: item.url || '#',
@@ -217,12 +217,9 @@ export class nguoiDungService {
             ? convertToMenuFormat(item.children) 
             : undefined
         }));
+        return result;
       };
-
       const menus = convertToMenuFormat(functionTree);
-      console.log("Final menus:", JSON.stringify(menus, null, 2));
-      console.log("=== END AUTHORIZE DEBUG ===");
-
       return {
         nguoiDungId: user_data.nguoiDungId,
         first_name: user_data.first_name,
@@ -239,13 +236,11 @@ export class nguoiDungService {
         roleId: user_data.roleId,
         roleCode: user_data.roleCode,
         online_flag: user_data.online_flag,
-        // Format cho FE Sidebar - đã build tree sẵn
         menus: menus,
         permissions: permissions,
         canSelectAllDongHo: user_data.roleCode === 'sa',
       };
     } catch (error: any) {
-      console.error("authorize error:", error.message);
       throw error;
     }
   }

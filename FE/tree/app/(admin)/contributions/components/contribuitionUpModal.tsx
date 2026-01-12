@@ -3,7 +3,7 @@ import React, { useEffect } from "react";
 import { X, Check, Loader2, DollarSign } from "lucide-react";
 import { IContributionUp } from "@/types/contribuitionUp";
 import { useQuery } from "@tanstack/react-query";
-import { getAllDongHo } from "@/service/lineage.service";
+import { getDongHoById } from "@/service/dongho.service";
 import { useToast } from "@/service/useToas";
 import { useFormValidation } from "@/lib/useFormValidation";
 import { FormRules } from "@/lib/validator";
@@ -48,11 +48,11 @@ const DANH_MUC_LIST = [
 ];
 
 // ==================== INITIAL VALUES ====================
-const getInitialValues = (data?: IContributionUp | null): Partial<IContributionUp> => ({
+const getInitialValues = (data?: IContributionUp | null, dongHoId?: string): Partial<IContributionUp> => ({
   hoTenNguoiDong: data?.hoTenNguoiDong || "",
   ngayDong: data?.ngayDong,
   soTien: data?.soTien || 0,
-  dongHoId: data?.dongHoId || "",
+  dongHoId: data?.dongHoId || dongHoId || "",
   danhMucId: data?.danhMucId || 1,
   phuongThucThanhToan: data?.phuongThucThanhToan || "tien_mat",
   noiDung: data?.noiDung || "",
@@ -70,6 +70,11 @@ export const ContributionUpModal: React.FC<ContributionUpModalProps> = ({
 }) => {
   const { showError } = useToast();
 
+  // ========== LOAD DATA ==========
+  // Lấy dongHoId từ user hiện tại thay vì dropdown
+  const user = storage.getUser();
+  const userDongHoId = user?.dongHoId;
+
   // ========== FORM VALIDATION HOOK ==========
   const {
     values,
@@ -79,26 +84,27 @@ export const ContributionUpModal: React.FC<ContributionUpModalProps> = ({
     setValue,
     getError,
   } = useFormValidation({
-    initialValues: getInitialValues(initialData),
+    initialValues: getInitialValues(initialData, userDongHoId),
     rules,
   });
 
-  // ========== LOAD DATA ==========
+  // Query để lấy thông tin dòng họ hiện tại
   const { data: dongHoData } = useQuery({
-    queryKey: ["Lineage"],
-    queryFn: getAllDongHo,
+    queryKey: ["dongho", userDongHoId],
+    queryFn: () => getDongHoById(userDongHoId!),
+    enabled: !!userDongHoId,
   });
-  const dongHoList = Array.isArray(dongHoData) ? dongHoData : dongHoData?.data ?? [];
+  const dongHoInfo = dongHoData?.data;
 
   // ========== RESET FORM KHI MODAL MỞ ==========
   useEffect(() => {
     if (isOpen) {
       // Reset với giá trị mới
-      Object.entries(getInitialValues(initialData)).forEach(([key, val]) => {
+      Object.entries(getInitialValues(initialData, userDongHoId)).forEach(([key, val]) => {
         setValue(key as keyof IContributionUp, val);
       });
     }
-  }, [isOpen, initialData, setValue]);
+  }, [isOpen, initialData, userDongHoId, setValue]);
 
   // ========== SUBMIT ==========
   const handleSubmit = (e: React.FormEvent) => {
@@ -170,20 +176,18 @@ export const ContributionUpModal: React.FC<ContributionUpModalProps> = ({
             placeholder="Nhập họ tên người đóng góp"
           />
 
-          {/* Dòng họ + Danh mục */}
+          {/* Dòng họ (hiển thị thông tin, không cho chọn) + Danh mục */}
           <div className="grid grid-cols-2 gap-4">
-            <Select
-              label="Dòng họ"
-              name="dongHoId"
-              required
-              value={values.dongHoId || ""}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              options={dongHoList}
-              optionLabel="tenDongHo"
-              optionValue="dongHoId"
-              error={getError("dongHoId")}
-            />
+            <div className="space-y-1">
+              <label className="text-sm font-bold text-[#8b5e3c] uppercase">
+                Dòng họ <span className="text-red-500">*</span>
+              </label>
+              <div className="w-full p-3 bg-gray-50 border border-[#d4af37]/50 rounded text-[#5d4037] font-medium">
+                {dongHoInfo?.tenDongHo || "Đang tải..."}
+              </div>
+              {/* Hidden input để gửi dongHoId */}
+              <input type="hidden" name="dongHoId" value={userDongHoId || ""} />
+            </div>
             <Select
               label="Danh mục thu"
               name="danhMucId"

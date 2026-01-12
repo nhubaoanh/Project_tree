@@ -36,7 +36,6 @@ export class loaiSuKienController {
         res.json({ message: "Không tồn tại kết quả tìm kiếm.", success: true });
       }
     } catch (error: any) {
-      console.log("error", error);
       res
         .status(500)
         .json({ message: "Tim kiếm sự kiện that bai", success: false });

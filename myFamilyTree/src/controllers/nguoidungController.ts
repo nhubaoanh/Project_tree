@@ -12,8 +12,6 @@ export class NguoiDungController {
       const { tenDangNhap, matKhau } = req.body;
       const user = await this.nguoiDungService.loginUser(tenDangNhap, matKhau);
       if (user) {
-        // Token payload chỉ chứa thông tin cơ bản để giảm kích thước
-        // Functions và actions sẽ được lấy từ authorize endpoint
         let obj: any = {
           nguoiDungId: user.nguoiDungId,
           first_name: user.first_name,
@@ -41,9 +39,6 @@ export class NguoiDungController {
         });
       }
     } catch (error: any) {
-      console.error("Login error:", error);
-      console.error("Error message:", error.message);
-      console.error("Error stack:", error.stack);
       res.status(500).json({ message: "Đăng nhập thất bại.", success: false });
     }
   }
@@ -107,7 +102,6 @@ export class NguoiDungController {
         pageCount,
       });
     } catch (error: any) {
-      console.error("searchUser error:", error);
       res.status(500).json({
         success: false,
         message: error.message || "Lỗi khi tìm kiếm người dùng.",
@@ -128,7 +122,6 @@ export class NguoiDungController {
         res.json({ message: "Bản ghi không tồn tại.", success: false });
       }
     } catch (error: any) {
-      // Phiên hết hạn không phải lỗi server, trả về 401
       if (error.message === "Phiên đăng nhập hết hạn") {
         res.status(401).json({ message: error.message, success: false });
       } else {
@@ -223,7 +216,6 @@ export class NguoiDungController {
         results: results,
       });
     } catch (error: any) {
-      console.log("error", error);
       res
         .status(500)
         .json({ message: "Xoa nguoi dung that bai.", success: false });

@@ -13,6 +13,7 @@ import { EventTable } from "./components/eventTable";
 import { EventModal } from "./components/eventModal";
 import { EventDeleteModal } from "./components/eventDelete";
 import { searchEvent, createEvent, updateEvent } from "@/service/event.service";
+import storage from "@/utils/storage";
 
 export default function QuanLySuKienPage() {
   const queryClient = useQueryClient();
@@ -44,16 +45,22 @@ export default function QuanLySuKienPage() {
   }, [searchTerm]);
 
   // --- FETCHING DATA ---
+  // Lấy dongHoId từ user hiện tại để filter sự kiện
+  const user = storage.getUser();
+  const userDongHoId = user?.dongHoId;
+
   const searchParams: IsearchEvent = {
     pageIndex,
     pageSize,
     search_content: debouncedSearch,
+    dongHoId: userDongHoId, // Chỉ lấy sự kiện của dòng họ hiện tại
   };
 
   const eventQuery = useQuery({
     queryKey: ["event", searchParams],
     queryFn: () => searchEvent(searchParams),
     placeholderData: keepPreviousData,
+    enabled: !!userDongHoId, // Chỉ fetch khi có dongHoId
   });
 
   const eventData = eventQuery.data?.data || [];

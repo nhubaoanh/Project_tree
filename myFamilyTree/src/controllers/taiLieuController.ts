@@ -35,7 +35,6 @@ export class TaiLieuController {
         ),
       });
     } catch (error: any) {
-      console.log("error", error);
       res.status(500).json({ success: false, message: "Lỗi tìm kiếm tài liệu" });
     }
   }
@@ -62,7 +61,6 @@ export class TaiLieuController {
         data: result,
       });
     } catch (error: any) {
-      console.log("error", error);
       res.status(500).json({ success: false, message: error.message || "Lỗi tạo tài liệu" });
     }
   }
@@ -87,7 +85,6 @@ export class TaiLieuController {
         data: result,
       });
     } catch (error: any) {
-      console.log("error", error);
       res.status(500).json({ success: false, message: error.message || "Lỗi cập nhật tài liệu" });
     }
   }
@@ -105,7 +102,6 @@ export class TaiLieuController {
         data: result,
       });
     } catch (error: any) {
-      console.log("error", error);
       res.status(500).json({ success: false, message: "Lỗi xóa tài liệu" });
     }
   }
@@ -122,7 +118,6 @@ export class TaiLieuController {
 
       res.json({ success: true, data: result });
     } catch (error: any) {
-      console.log("error", error);
       res.status(500).json({ success: false, message: "Lỗi lấy tài liệu" });
     }
   }
@@ -133,7 +128,6 @@ export class TaiLieuController {
       const result = await this.taiLieuService.deleteMultiple(list_json, lu_user_id);
       res.json({ success: true, message: "Xóa tài liệu thành công", data: result });
     } catch (error: any) {
-      console.log("error", error);
       res.status(500).json({ success: false, message: "Lỗi xóa tài liệu" });
     }
   }

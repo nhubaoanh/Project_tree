@@ -38,7 +38,6 @@ export class taiChinhChiController {
         res.json({ message: "Không tồn tại kết quả tìm kiếm.", success: true });
       }
     } catch (error: any) {
-      console.log("error", error);
       res
         .status(500)
         .json({ message: "Tim kiếm tài chính chi that bai", success: false });
@@ -49,7 +48,6 @@ export class taiChinhChiController {
       try {
         const taiChinhChi = req.body as taiChinhChi;
         const results = await this.taiChinhChiService.createTaiChinhChi(taiChinhChi);
-        console.log("res", results);
         res.json({
           message: "Tạo tài chính chi thành công.",
           success: true,

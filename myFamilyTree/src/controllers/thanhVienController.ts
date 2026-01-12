@@ -26,7 +26,6 @@ export class thanhVienController {
         data: results,
       });
     } catch (error: any) {
-      console.log("error", error);
       res.status(500).json({ message: "Thêm thành viên thất bại", success: false });
     }
   }
@@ -49,7 +48,6 @@ export class thanhVienController {
         res.status(404).json({ success: false, message: "Không tìm thấy thành viên" });
       }
     } catch (error: any) {
-      console.log("error", error);
       res.status(500).json({ message: "Lỗi khi lấy thông tin thành viên", success: false });
     }
   }
@@ -73,7 +71,6 @@ export class thanhVienController {
         data: results,
       });
     } catch (error: any) {
-      console.log("error", error);
       res.status(500).json({ message: "Cập nhật thành viên thất bại", success: false });
     }
   }
@@ -96,7 +93,6 @@ export class thanhVienController {
         data: results,
       });
     } catch (error: any) {
-      console.log("error", error);
       res.status(500).json({ message: "Xóa thành viên thất bại", success: false });
     }
   }
@@ -108,7 +104,6 @@ export class thanhVienController {
       await this.thanhvienService.deleteMultipleThanhVien(list_json, lu_user_id);
       res.json({ message: "Xóa thành viên thành công", success: true });
     } catch (error: any) {
-      console.log("error", error);
       res.status(500).json({ message: error.message || "Xóa thành viên thất bại", success: false });
     }
   }
@@ -122,7 +117,6 @@ export class thanhVienController {
         data: results,
       });
     } catch (error: any) {
-      console.log("error", error);
       res
         .status(500)
         .json({ message: "Lay danh sach thanh vien that bai", success: false });
@@ -144,7 +138,6 @@ export class thanhVienController {
         data: results,
       });
     } catch (error: any) {
-      console.log("error", error);
       res.status(500).json({ message: "Lấy danh sách thành viên thất bại", success: false });
     }
   }
@@ -183,7 +176,6 @@ export class thanhVienController {
         res.json({ message: "Không tồn tại kết quả tìm kiếm.", success: true });
       }
     } catch (error: any) {
-      console.log("error", error);
       res
         .status(500)
         .json({ message: "Tim kiếm thanh vien that bai", success: false });
@@ -227,7 +219,6 @@ export class thanhVienController {
         res.json({ message: "Không tồn tại kết quả tìm kiếm.", success: true, data: [] });
       }
     } catch (error: any) {
-      console.log("error", error);
       res.status(500).json({ message: "Tìm kiếm thành viên thất bại", success: false });
     }
   }
@@ -545,7 +536,6 @@ export class thanhVienController {
       await workbook.xlsx.write(res);
       res.end();
     } catch (err) {
-      console.error(err);
       res.status(500).json({ success: false, message: "Lỗi tạo Excel" });
     }
   }

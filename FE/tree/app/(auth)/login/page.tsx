@@ -63,14 +63,10 @@ export default function LoginPage() {
     setLoading(true);
     try {
       const result = await loginService(form.values);
-
-      console.log("res", result);
       if (result?.token) {
         storage.setToken(result.token);
 
         const userData = await autherization(result.token);
-
-        console.log("authorize response:", userData);
         if (userData) {
           storage.setUser({
             nguoiDungId: userData.nguoiDungId,
@@ -92,7 +88,6 @@ export default function LoginPage() {
             permissions: userData.permissions || {},
             canSelectAllDongHo: userData.canSelectAllDongHo || false,
           });
-          console.log("Saved to storage - menus:", userData.menus);
         }
 
         showSuccess("Đăng nhập thành công!");

@@ -34,25 +34,14 @@ export class nguoiDungReponsitory {
 
   async LoginUser(tenDangNhap: string): Promise<any> {
     try {
-      console.log("=== REPOSITORY LOGIN DEBUG ===");
-      console.log("Calling LoginUserByAccount with:", tenDangNhap);
-      
       const sql = "CALL LoginUserByAccount(? ,@err_code, @err_msg)";
-      const [results] = await this.db.query(sql, [tenDangNhap]);
-      
-      console.log("LoginUserByAccount results:", results);
-      
+      const [results] = await this.db.query(sql, [tenDangNhap]);      
       if (Array.isArray(results) && results.length > 0) {
         const user = results[0];
-        console.log("User found:", user);
         return user;
       }
-      console.log("No user found");
       return null;
     } catch (error: any) {
-      console.error("=== REPOSITORY LOGIN ERROR ===");
-      console.error("Error:", error);
-      console.error("Error message:", error.message);
       throw new Error(error.message);
     }
   }
@@ -81,12 +70,8 @@ export class nguoiDungReponsitory {
         search_content || null,
         dongHoId || null,
       ]);
-      console.log("searchUser results:", results);
-      // Nếu results là mảng rỗng hoặc undefined, trả về []
       return Array.isArray(results) ? results : [];
     } catch (error: any) {
-      console.error("searchUser repository error:", error.message);
-      // Trả về mảng rỗng thay vì throw error để không làm crash app
       return [];
     }
   }
@@ -98,13 +83,13 @@ export class nguoiDungReponsitory {
       // Handle nested array từ stored procedure
       if (Array.isArray(results) && results.length > 0) {
         if (Array.isArray(results[0])) {
+          console.log("Returning results[0] with", results[0].length, "items");
           return results[0];
         }
         return results;
       }
       return [];
     } catch (error: any) {
-      console.error("getActionByUserId error:", error.message);
       return [];
     }
   }
@@ -112,31 +97,21 @@ export class nguoiDungReponsitory {
   async getFunctionByUserId(id: string): Promise<any[]> {
     try {
       const sql = "CALL GetFunctionsByUserId(?, @err_code, @err_msg)";
-      console.log("getFunctionByUserId - calling with id:", id);
       const results = await this.db.query(sql, [id]);
-      console.log("getFunctionByUserId - raw results type:", typeof results);
-      console.log("getFunctionByUserId - raw results:", JSON.stringify(results, null, 2));
-      console.log("getFunctionByUserId - results.length:", results?.length);
-      
       // Handle nested array từ stored procedure - MySQL trả về [[data], ResultSetHeader]
       if (Array.isArray(results) && results.length > 0) {
         // results[0] là data array
         const data = results[0];
-        console.log("getFunctionByUserId - data[0]:", JSON.stringify(data, null, 2));
         if (Array.isArray(data) && data.length > 0) {
-          console.log("getFunctionByUserId - returning data:", data.length, "items");
           return data;
         }
         // Nếu results[0] không phải array, có thể results chính là data
         if (!Array.isArray(data) && typeof data === 'object') {
-          console.log("getFunctionByUserId - results[0] is object, returning [results[0]]");
           return [data];
         }
       }
-      console.log("getFunctionByUserId - returning empty array");
       return [];
     } catch (error: any) {
-      console.error("getFunctionByUserId error:", error.message);
       return [];
     }
   }
@@ -220,7 +195,6 @@ export class nguoiDungReponsitory {
     try {
       const sql = "CALL GetUserPermissions(?)";
       const results = await this.db.query(sql, [nguoiDungId]);
-      console.log("getUserPermissions results:", results);
       return Array.isArray(results) ? results : [];
     } catch (error: any) {
       console.error("getUserPermissions error:", error.message);
@@ -235,15 +209,12 @@ export class nguoiDungReponsitory {
     try {
       const sql = "CALL GetMenuByRoleId(?)";
       const results = await this.db.query(sql, [roleId]);
-            // Kiểm tra nếu results[0] là array thì đó là data
       if (Array.isArray(results) && results.length > 0) {
         // Nếu results[0] là array (nested), lấy results[0]
         if (Array.isArray(results[0])) {
-          console.log("getMenuByRoleId - nested array, returning results[0]:", results[0]);
           return results[0];
         }
         // Nếu results[0] là object (flat), trả về results
-        console.log("getMenuByRoleId - flat array, returning results:", results);
         return results;
       }
       return [];

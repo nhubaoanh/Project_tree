@@ -17,7 +17,6 @@ export class ThongKeController {
       const data = await this.thongKeService.getThongKeTongQuan(dongHoId);
       res.json({ success: true, data });
     } catch (error: any) {
-      console.error("Error:", error);
       res.status(500).json({ success: false, message: error.message });
     }
   }
@@ -33,7 +32,6 @@ export class ThongKeController {
       const data = await this.thongKeService.getThongKeoTheoDoi(dongHoId);
       res.json({ success: true, data });
     } catch (error: any) {
-      console.error("Error:", error);
       res.status(500).json({ success: false, message: error.message });
     }
   }
@@ -49,7 +47,6 @@ export class ThongKeController {
       const data = await this.thongKeService.getThongKeoTheoChi(dongHoId);
       res.json({ success: true, data });
     } catch (error: any) {
-      console.error("Error:", error);
       res.status(500).json({ success: false, message: error.message });
     }
   }
@@ -61,7 +58,6 @@ export class ThongKeController {
       const data = await this.thongKeService.getDashboardStats(dongHoId);
       res.json({ success: true, data });
     } catch (error: any) {
-      console.error("Error:", error);
       res.status(500).json({ success: false, message: error.message });
     }
   }
@@ -74,7 +70,6 @@ export class ThongKeController {
       const data = await this.thongKeService.getThanhVienMoiNhat(dongHoId, limit);
       res.json({ success: true, data });
     } catch (error: any) {
-      console.error("Error:", error);
       res.status(500).json({ success: false, message: error.message });
     }
   }
@@ -90,7 +85,6 @@ export class ThongKeController {
       const data = await this.thongKeService.getFullStats(dongHoId);
       res.json({ success: true, data });
     } catch (error: any) {
-      console.error("Error:", error);
       res.status(500).json({ success: false, message: error.message });
     }
   }
@@ -109,7 +103,6 @@ export class ThongKeController {
       const data = await this.thongKeService.getThongKeThuChi(dongHoId, nam);
       res.json({ success: true, data });
     } catch (error: any) {
-      console.error("Error:", error);
       res.status(500).json({ success: false, message: error.message });
     }
   }
@@ -126,7 +119,6 @@ export class ThongKeController {
       const data = await this.thongKeService.getThongKeThuChiTheoThang(dongHoId, nam);
       res.json({ success: true, data });
     } catch (error: any) {
-      console.error("Error:", error);
       res.status(500).json({ success: false, message: error.message });
     }
   }
@@ -139,7 +131,6 @@ export class ThongKeController {
       const data = await this.thongKeService.getThuGanDay(dongHoId, limit);
       res.json({ success: true, data });
     } catch (error: any) {
-      console.error("Error:", error);
       res.status(500).json({ success: false, message: error.message });
     }
   }
@@ -152,14 +143,12 @@ export class ThongKeController {
       const data = await this.thongKeService.getChiGanDay(dongHoId, limit);
       res.json({ success: true, data });
     } catch (error: any) {
-      console.error("Error:", error);
       res.status(500).json({ success: false, message: error.message });
     }
   }
 
   // ========== SỰ KIỆN ==========
 
-  // GET /thongke/suKien/:dongHoId?nam=2025
   async getThongKeSuKien(req: Request, res: Response): Promise<void> {
     try {
       const { dongHoId } = req.params;
@@ -171,7 +160,6 @@ export class ThongKeController {
       const data = await this.thongKeService.getThongKeSuKien(dongHoId, nam);
       res.json({ success: true, data });
     } catch (error: any) {
-      console.error("Error:", error);
       res.status(500).json({ success: false, message: error.message });
     }
   }
@@ -184,7 +172,6 @@ export class ThongKeController {
       const data = await this.thongKeService.getSuKienSapToi(dongHoId, limit);
       res.json({ success: true, data });
     } catch (error: any) {
-      console.error("Error:", error);
       res.status(500).json({ success: false, message: error.message });
     }
   }

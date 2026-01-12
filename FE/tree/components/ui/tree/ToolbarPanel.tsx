@@ -39,31 +39,6 @@ export const ToolbarPanel = ({ show, onToggle, familyRef }: Props) => {
     familyRef.current.fit();
   };
 
-  const undo = () => familyRef.current?.undo();
-  const redo = () => familyRef.current?.redo();
-
-  const expandAll = () => {
-    if (!familyRef.current) return;
-    const nodes = familyRef.current.config.nodes || [];
-    nodes.forEach((n: any) => {
-      if (n && n.id !== undefined) {
-        familyRef.current?.expand(n.id, []);
-      }
-    });
-    familyRef.current.draw();
-  };
-
-  const collapseAll = () => {
-    if (!familyRef.current) return;
-    const nodes = familyRef.current.config.nodes || [];
-    nodes.forEach((n: any) => {
-      if (n && n.id !== undefined) {
-        familyRef.current?.collapse(n.id, []);
-      }
-    });
-    familyRef.current.draw();
-  };
-
   const exportFile = (type: "pdf" | "png" | "svg") => {
     if (!familyRef.current) return;
     const opt = { filename: `gia-pha.${type}` };
@@ -80,7 +55,7 @@ export const ToolbarPanel = ({ show, onToggle, familyRef }: Props) => {
     return (
       <button 
         onClick={onToggle} 
-        className="absolute top-4 right-4 z-10 bg-white rounded-xl shadow-lg border-2 border-amber-400 w-12 h-12 flex items-center justify-center hover:bg-amber-50 hover:scale-110 active:scale-95 transition-all duration-200"
+        className="absolute top-20 right-4 z-10 bg-white rounded-xl shadow-lg border-2 border-amber-400 w-12 h-12 flex items-center justify-center hover:bg-amber-50 hover:scale-110 active:scale-95 transition-all duration-200"
       >
         <span className="text-xl">🛠️</span>
       </button>
@@ -88,7 +63,7 @@ export const ToolbarPanel = ({ show, onToggle, familyRef }: Props) => {
   }
 
   return (
-    <div className="absolute top-4 right-4 z-10 bg-white rounded-xl shadow-xl border-2 border-amber-400 p-4 w-[220px]">
+    <div className="absolute top-18 right-4 z-10 bg-white rounded-xl shadow-xl border-2 border-amber-400 p-4 w-[220px]">
       {/* Header */}
       <div className="flex justify-between items-center mb-4 pb-2 border-b-2 border-amber-200">
         <span className="font-bold text-amber-800">🛠️ Công cụ</span>
@@ -124,44 +99,6 @@ export const ToolbarPanel = ({ show, onToggle, familyRef }: Props) => {
             className="flex-1 h-11 bg-green-500 hover:bg-green-600 active:bg-green-700 text-white rounded-lg font-bold text-lg shadow-md hover:shadow-lg transform hover:scale-105 active:scale-95 transition-all"
           >
             📐
-          </button>
-        </div>
-      </div>
-
-      {/* Expand/Collapse */}
-      <div className="mb-4">
-        <span className="text-sm text-gray-600 font-medium block mb-2">📂 Hiển thị</span>
-        <div className="flex gap-2">
-          <button 
-            onClick={expandAll}
-            className="flex-1 h-10 bg-purple-500 hover:bg-purple-600 active:bg-purple-700 text-white rounded-lg font-medium text-sm shadow-md hover:shadow-lg transform hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-1"
-          >
-            <span>⬇️</span> Mở rộng
-          </button>
-          <button 
-            onClick={collapseAll}
-            className="flex-1 h-10 bg-purple-500 hover:bg-purple-600 active:bg-purple-700 text-white rounded-lg font-medium text-sm shadow-md hover:shadow-lg transform hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-1"
-          >
-            <span>⬆️</span> Thu gọn
-          </button>
-        </div>
-      </div>
-
-      {/* Undo/Redo */}
-      <div className="mb-4">
-        <span className="text-sm text-gray-600 font-medium block mb-2">⏱️ Lịch sử</span>
-        <div className="flex gap-2">
-          <button 
-            onClick={undo}
-            className="flex-1 h-10 bg-orange-500 hover:bg-orange-600 active:bg-orange-700 text-white rounded-lg font-medium text-sm shadow-md hover:shadow-lg transform hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-1"
-          >
-            <span>↩️</span> Hoàn tác
-          </button>
-          <button 
-            onClick={redo}
-            className="flex-1 h-10 bg-orange-500 hover:bg-orange-600 active:bg-orange-700 text-white rounded-lg font-medium text-sm shadow-md hover:shadow-lg transform hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-1"
-          >
-            <span>↪️</span> Làm lại
           </button>
         </div>
       </div>
