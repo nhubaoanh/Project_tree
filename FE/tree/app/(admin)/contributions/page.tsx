@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useRef, useEffect } from "react";
-import { Search, Plus, Download, Upload, X, Loader2, Trash2 } from "lucide-react";
+import { DollarSign, Plus, Download, Upload, Trash2, Eye, Edit } from "lucide-react";
 import * as XLSX from "xlsx";
 import {
   useQuery,
@@ -9,15 +9,25 @@ import {
   keepPreviousData,
 } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
-import {
-  createUser,
-} from "@/service/user.service";
 import { IContributionUp, IsearchContributionUp } from "@/types/contribuitionUp";
-import { ContributionTable } from "./components/contribuitionUpTable";
 import { createContributionUp, deleteContributionUp, searchContributionUp, updateContributionUp } from "@/service/contribuitionUp.service";
 import { ContributionUpModal } from "./components/contribuitionUpModal";
 import { useToast } from "@/service/useToas";
 import storage from "@/utils/storage";
+import { 
+  PageLayout, 
+  DataTable, 
+  DeleteModal, 
+  DetailModal,
+  PageLoading, 
+  ErrorState,
+  NoFamilyTreeState,
+  ColumnConfig,
+  ActionConfig,
+  DetailSection,
+  DetailField
+} from "@/components/shared";
+import { User, Calendar, CreditCard, FileText, Phone, MessageSquare } from "lucide-react";
 
 export default function QuanLyTaiChinhThuPage() {
   const queryClient = useQueryClient();
@@ -44,10 +54,13 @@ export default function QuanLyTaiChinhThuPage() {
   // Selection state
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
 
+  // Modal states
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<IContributionUp | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [itemsToDelete, setItemsToDelete] = useState<IContributionUp[]>([]);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [selectedContributionForDetail, setSelectedContributionForDetail] = useState<IContributionUp | null>(null);
 
   const { showSuccess, showError } = useToast();
 
@@ -86,7 +99,7 @@ export default function QuanLyTaiChinhThuPage() {
       setIsModalOpen(false);
     },
     onError: () => {
-      toast.error("Có lỗi xảy ra khi thêm.");
+      showError("Có lỗi xảy ra khi thêm.");
     },
   });
 
@@ -116,7 +129,7 @@ export default function QuanLyTaiChinhThuPage() {
     },
   });
 
-  // Selection handlers
+  // Handlers
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
       setSelectedIds(userData.map((e: IContributionUp) => e.thuId));
@@ -125,11 +138,12 @@ export default function QuanLyTaiChinhThuPage() {
     }
   };
 
-  const handleSelectOne = (id: number, checked: boolean) => {
+  const handleSelectOne = (id: string | number, checked: boolean) => {
+    const numId = Number(id);
     if (checked) {
-      setSelectedIds((prev) => [...prev, id]);
+      setSelectedIds((prev) => [...prev, numId]);
     } else {
-      setSelectedIds((prev) => prev.filter((i) => i !== id));
+      setSelectedIds((prev) => prev.filter((i) => i !== numId));
     }
   };
 
@@ -172,6 +186,11 @@ export default function QuanLyTaiChinhThuPage() {
     }
   };
 
+  const handleViewDetail = (item: IContributionUp) => {
+    setSelectedContributionForDetail(item);
+    setIsDetailModalOpen(true);
+  };
+
   const handlePageSizeChange = (newSize: number) => {
     setPageSize(newSize);
     setPageIndex(1);
@@ -202,7 +221,7 @@ export default function QuanLyTaiChinhThuPage() {
         if (dataParsed.length > 0) {
           const promises = dataParsed.map(async (u) => {
             try {
-              await createUser(u);
+              await createContributionUp(u);
             } catch (err) {
               console.error("Import error for row", u);
             }
@@ -222,117 +241,220 @@ export default function QuanLyTaiChinhThuPage() {
   const isSaving = createMutation.isPending || updateMutation.isPending;
   const isDeleting = deleteMutation.isPending;
 
-  if (isReady && !dongHoId) {
+  // Loading states
+  if (usersQuery.isLoading) {
+    return <PageLoading message="Đang tải danh sách tài chính thu..." />;
+  }
+
+  if (usersQuery.isError) {
     return (
-      <div className="max-w-6xl mx-auto font-dancing text-[#4a4a4a] pb-20 animate-fadeIn">
-        <div className="text-center py-16">
-          <Loader2 size={64} className="mx-auto text-[#d4af37] mb-4 opacity-50" />
-          <h2 className="text-2xl font-bold text-[#b91c1c] mb-2">Chưa được gán dòng họ</h2>
-          <p className="text-[#8b5e3c] text-lg">
-            Tài khoản của bạn chưa được gán vào dòng họ nào.
-          </p>
-        </div>
-      </div>
+      <ErrorState
+        title="Lỗi tải dữ liệu"
+        message="Không thể tải danh sách tài chính thu. Vui lòng thử lại sau."
+        onRetry={() => usersQuery.refetch()}
+      />
     );
   }
 
+  if (isReady && !dongHoId) {
+    return <NoFamilyTreeState />;
+  }
+
+  // Column configuration
+  const columns: ColumnConfig<IContributionUp>[] = [
+    {
+      key: "hoTenNguoiDong",
+      label: "Người đóng góp",
+      clickable: false, // Bỏ clickable vì đã có nút Eye
+    },
+    {
+      key: "soTien",
+      label: "Số tiền",
+      render: (value) => new Intl.NumberFormat('vi-VN', { 
+        style: 'currency', 
+        currency: 'VND' 
+      }).format(value || 0),
+      align: "right",
+    },
+    {
+      key: "ngayDong",
+      label: "Ngày đóng",
+      render: (value) => value ? new Date(value).toLocaleDateString("vi-VN") : "-",
+    },
+    {
+      key: "phuongThucThanhToan",
+      label: "Phương thức",
+      render: (value) => {
+        const methods: Record<string, string> = {
+          "tien_mat": "Tiền mặt",
+          "chuyen_khoan": "Chuyển khoản",
+          "khac": "Khác"
+        };
+        return methods[value] || value || "-";
+      },
+    },
+    {
+      key: "noiDung",
+      label: "Nội dung",
+      render: (value) => value || "-",
+    },
+  ];
+
+  // Action configuration
+  const customActions: ActionConfig<IContributionUp>[] = [
+    {
+      icon: Eye,
+      label: "Xem chi tiết",
+      onClick: handleViewDetail,
+      color: "green",
+    },
+    {
+      icon: Edit,
+      label: "Sửa",
+      onClick: handleEdit,
+      color: "blue",
+    },
+    {
+      icon: Trash2,
+      label: "Xóa",
+      onClick: handleDeleteClick,
+      color: "red",
+    },
+  ];
+
+  // Page actions
+  const pageActions = [
+    ...(selectedIds.length > 0 ? [{
+      icon: Trash2,
+      label: "Xóa",
+      onClick: handleDeleteSelected,
+      variant: "danger" as const,
+      count: selectedIds.length,
+    }] : []),
+    {
+      icon: Download,
+      label: "Xuất Excel",
+      onClick: handleExportExcel,
+      variant: "secondary" as const,
+    },
+    {
+      icon: Upload,
+      label: "Nhập Excel",
+      onClick: () => fileInputRef.current?.click(),
+      variant: "success" as const,
+    },
+    {
+      icon: Plus,
+      label: "Thêm Mới",
+      onClick: handleAdd,
+      variant: "primary" as const,
+    },
+  ];
+
+  // Detail modal sections
+  const getDetailSections = (contribution: IContributionUp): DetailSection[] => [
+    {
+      title: "Thông tin cơ bản",
+      fields: [
+        {
+          icon: User,
+          label: "Người đóng góp",
+          value: contribution.hoTenNguoiDong,
+        } as DetailField,
+        {
+          icon: DollarSign,
+          label: "Số tiền",
+          value: contribution.soTien,
+          render: (value) => new Intl.NumberFormat('vi-VN', { 
+            style: 'currency', 
+            currency: 'VND' 
+          }).format(value || 0),
+          colorClass: "text-green-600 font-bold",
+        } as DetailField,
+        {
+          icon: Calendar,
+          label: "Ngày đóng",
+          value: contribution.ngayDong,
+          render: (value) => value ? new Date(value).toLocaleDateString("vi-VN") : "-",
+        } as DetailField,
+      ],
+    },
+    {
+      title: "Chi tiết thanh toán",
+      fields: [
+        {
+          icon: CreditCard,
+          label: "Phương thức thanh toán",
+          value: contribution.phuongThucThanhToan,
+          render: (value) => {
+            const methods: Record<string, string> = {
+              "tien_mat": "Tiền mặt",
+              "chuyen_khoan": "Chuyển khoản", 
+              "khac": "Khác"
+            };
+            return methods[value] || value || "-";
+          },
+        } as DetailField,
+        {
+          icon: FileText,
+          label: "Nội dung",
+          value: contribution.noiDung || "Không có",
+        } as DetailField,
+        {
+          icon: Phone,
+          label: "SĐT người nhập",
+          value: contribution.soDienThoaiNguoiNhap || "Không có",
+        } as DetailField,
+        {
+          icon: MessageSquare,
+          label: "Ghi chú",
+          value: contribution.ghiChu || "Không có",
+        } as DetailField,
+      ],
+    },
+  ];
+
   return (
-    <div className="max-w-6xl mx-auto font-dancing text-[#4a4a4a] pb-20 animate-fadeIn">
-      {/* Header & Toolbar */}
-      <div className="flex flex-col md:flex-row justify-between items-end md:items-center mb-8 gap-4 border-b border-[#d4af37] pb-4">
-        <div>
-          <h2 className="text-3xl font-display font-bold text-[#b91c1c] uppercase drop-shadow-sm">
-            Quản Lý Tài Chính Thu
-          </h2>
-          <p className="text-[#8b5e3c] italic text-sm">
-            Danh sách các khoản thu tài chính
-          </p>
-        </div>
+    <PageLayout
+      title="Quản Lý Tài Chính Thu"
+      subtitle="Danh sách các khoản thu tài chính"
+      icon={DollarSign}
+      actions={pageActions}
+    >
+      {/* Hidden file input */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".xlsx, .xls"
+        onChange={handleImportExcel}
+        className="hidden"
+      />
 
-        <div className="flex gap-2 flex-wrap justify-end">
-          {selectedIds.length > 0 && (
-            <button
-              onClick={handleDeleteSelected}
-              className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded shadow hover:bg-red-700 transition-all text-sm font-bold"
-            >
-              <Trash2 size={16} />
-              <span>Xóa ({selectedIds.length})</span>
-            </button>
-          )}
-          <button
-            onClick={handleExportExcel}
-            className="flex items-center gap-2 px-4 py-2 bg-[#2c5282] text-white rounded shadow hover:bg-[#2a4365] transition-all text-sm font-bold"
-          >
-            <Download size={16} />
-            <span className="hidden sm:inline">Xuất Excel</span>
-          </button>
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            className="flex items-center gap-2 px-4 py-2 bg-[#276749] text-white rounded shadow hover:bg-[#22543d] transition-all text-sm font-bold relative overflow-hidden"
-          >
-            <Upload size={16} />
-            <span className="hidden sm:inline">Nhập Excel</span>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept=".xlsx, .xls"
-              onChange={handleImportExcel}
-              className="absolute inset-0 opacity-0 cursor-pointer"
-            />
-          </button>
-          <button
-            onClick={handleAdd}
-            className="flex items-center gap-2 px-4 py-2 bg-[#b91c1c] text-white rounded shadow hover:bg-[#991b1b] transition-all text-sm font-bold ml-2"
-          >
-            <Plus size={16} />
-            <span className="hidden sm:inline">Thêm Mới</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Search Bar */}
-      <div className="mb-6 flex items-center bg-white border border-[#d4af37] rounded-lg p-1 shadow-sm w-full md:w-1/2 transition-all focus-within:ring-2 ring-[#d4af37]/50">
-        <div className="p-2 text-stone-400">
-          {isLoading ? (
-            <Loader2 className="animate-spin" size={20} />
-          ) : (
-            <Search size={20} />
-          )}
-        </div>
-        <input
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          placeholder="Tìm kiếm..."
-          className="w-full p-2 outline-none bg-transparent text-[#5d4037] placeholder-stone-400"
-        />
-        {searchTerm && (
-          <button
-            onClick={() => setSearchTerm("")}
-            className="p-2 text-stone-400 hover:text-[#b91c1c]"
-          >
-            <X size={16} />
-          </button>
-        )}
-      </div>
-
-      {/* Table Component */}
-      <ContributionTable
+      {/* Table */}
+      <DataTable
         data={userData}
-        isLoading={isLoading}
+        columns={columns}
+        keyField="thuId"
         pageIndex={pageIndex}
         pageSize={pageSize}
         totalRecords={totalRecords}
         totalPages={totalPages}
         onPageChange={setPageIndex}
         onPageSizeChange={handlePageSizeChange}
-        onEdit={handleEdit}
-        onDelete={handleDeleteClick}
+        isLoading={isLoading}
+        enableSelection={true}
         selectedIds={selectedIds}
         onSelectAll={handleSelectAll}
         onSelectOne={handleSelectOne}
+        onViewDetail={undefined} // Bỏ onViewDetail vì đã có nút Eye
+        customActions={customActions}
+        searchValue={searchTerm}
+        onSearchChange={setSearchTerm}
+        searchPlaceholder="Tìm kiếm theo tên người đóng góp..."
+        emptyMessage="Chưa có khoản thu nào được tạo"
       />
 
-      {/* Modals */}
+      {/* Form Modal */}
       <ContributionUpModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
@@ -341,35 +463,40 @@ export default function QuanLyTaiChinhThuPage() {
         isLoading={isSaving}
       />
 
-      {/* Delete Confirmation Modal */}
-      {isDeleteModalOpen && itemsToDelete.length > 0 && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full">
-            <h3 className="text-lg font-bold text-[#5d4037] mb-4">Xác nhận xóa</h3>
-            <p className="text-gray-600 mb-6">
-              Bạn có chắc chắn muốn xóa {itemsToDelete.length} khoản thu đã chọn?
-            </p>
-            <div className="flex justify-end gap-2">
-              <button
-                onClick={() => {
-                  setIsDeleteModalOpen(false);
-                  setItemsToDelete([]);
-                }}
-                className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-50"
-              >
-                Hủy
-              </button>
-              <button
-                onClick={handleConfirmDelete}
-                disabled={isDeleting}
-                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50"
-              >
-                {isDeleting ? "Đang xóa..." : "Xóa"}
-              </button>
-            </div>
-          </div>
-        </div>
+      {/* Detail Modal */}
+      {selectedContributionForDetail && (
+        <DetailModal
+          isOpen={isDetailModalOpen}
+          onClose={() => setIsDetailModalOpen(false)}
+          title={selectedContributionForDetail.hoTenNguoiDong}
+          subtitle={`Khoản thu ngày ${selectedContributionForDetail.ngayDong ? new Date(selectedContributionForDetail.ngayDong).toLocaleDateString("vi-VN") : "N/A"}`}
+          badge={new Intl.NumberFormat('vi-VN', { 
+            style: 'currency', 
+            currency: 'VND' 
+          }).format(selectedContributionForDetail.soTien || 0)}
+          gradient="green-yellow"
+          sections={getDetailSections(selectedContributionForDetail)}
+          notes={selectedContributionForDetail.ghiChu}
+        />
       )}
-    </div>
+
+      {/* Delete Modal */}
+      <DeleteModal
+        isOpen={isDeleteModalOpen}
+        items={itemsToDelete}
+        onClose={() => {
+          setIsDeleteModalOpen(false);
+          setItemsToDelete([]);
+        }}
+        onConfirm={handleConfirmDelete}
+        isLoading={isDeleting}
+        itemDisplayField="hoTenNguoiDong"
+        title={itemsToDelete.length === 1 ? "Xác nhận xóa khoản thu" : `Xác nhận xóa ${itemsToDelete.length} khoản thu`}
+        message={itemsToDelete.length === 1 ? 
+          "Bạn có chắc chắn muốn xóa khoản thu này? Hành động này không thể hoàn tác." :
+          `Bạn có chắc chắn muốn xóa ${itemsToDelete.length} khoản thu đã chọn? Hành động này không thể hoàn tác.`
+        }
+      />
+    </PageLayout>
   );
 }

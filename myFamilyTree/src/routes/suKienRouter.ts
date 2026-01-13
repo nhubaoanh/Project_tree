@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { container } from "tsyringe";
 import { suKienController } from "../controllers/suKienController";
+import { authenticate, adminOnly } from "../middlewares/authMiddleware";
 
 const suKienRouter = Router();
 
@@ -18,19 +19,23 @@ const eventcontroller = container.resolve(suKienController);
 
 suKienRouter.post(
   "/search",
+  authenticate,
   eventcontroller.searchSuKien.bind(eventcontroller)
 );
 suKienRouter.post(
   "/create",
+  authenticate,
   eventcontroller.createSuKien.bind(eventcontroller)
 );
 suKienRouter.post(
   "/update",
+  authenticate,
   eventcontroller.updateSuKien.bind(eventcontroller)
 );
 
 suKienRouter.post(
   "/delete",
+  authenticate,
   eventcontroller.deleteSuKien.bind(eventcontroller)
 );
 

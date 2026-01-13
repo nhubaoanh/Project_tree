@@ -19,7 +19,7 @@ import { container } from "tsyringe";
 import { NguoiDungController } from "../controllers/nguoidungController";
 
 // Auth Middleware
-import { authenticate, adminOnly, checkDongHoAccess } from "../middlewares/authMiddleware";
+import { authenticate, adminOnly} from "../middlewares/authMiddleware";
 
 // Rate Limiters
 import {

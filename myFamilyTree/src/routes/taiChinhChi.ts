@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { container } from "tsyringe";
 import { taiChinhChiController } from "../controllers/taiChinhChiController";
+import { authenticate, adminOnly } from "../middlewares/authMiddleware";
 
 const taiChinhChiRouter = Router();
 
@@ -21,19 +22,23 @@ const TaiChinhChiController = container.resolve(taiChinhChiController);
 
 taiChinhChiRouter.post(
   "/search",
+  authenticate,
   TaiChinhChiController.searchTaiChinhChi.bind(TaiChinhChiController)
 );
 taiChinhChiRouter.post(
   "/create",
+  authenticate,
   TaiChinhChiController.createTaiChinhChi.bind(TaiChinhChiController)
 );
 
 taiChinhChiRouter.post(
   "/update",
+  authenticate,
   TaiChinhChiController.updateTaiChinhChi.bind(TaiChinhChiController)
 );
 taiChinhChiRouter.post(
   "/delete",
+  authenticate,
   TaiChinhChiController.deleteTaiChinhChi.bind(TaiChinhChiController)
 );
 

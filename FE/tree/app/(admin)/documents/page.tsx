@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { Search, Plus, X, Loader2, FileText, Edit, Trash2, Filter, ChevronLeft, ChevronRight } from "lucide-react";
+import { Plus, Trash2, Filter, Edit } from "lucide-react";
 import {
   useQuery,
   useMutation,
@@ -18,6 +18,8 @@ import {
   LOAI_TAI_LIEU,
 } from "@/service/tailieu.service";
 import { TaiLieuModal } from "./components/TaiLieuModal";
+import { DocumentDetailModal } from "./components/DocumentDetailModal";
+import { DataTable, ColumnConfig } from "@/components/shared";
 import storage from "@/utils/storage";
 
 export default function QuanLyTaiLieuPage() {
@@ -33,10 +35,15 @@ export default function QuanLyTaiLieuPage() {
   // Selection state
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
+  // Modal states
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<ITaiLieu | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [itemsToDelete, setItemsToDelete] = useState<ITaiLieu[]>([]);
+
+  // Detail modal state
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [selectedDocument, setSelectedDocument] = useState<ITaiLieu | null>(null);
 
   const { showSuccess, showError } = useToast();
 
@@ -108,7 +115,7 @@ export default function QuanLyTaiLieuPage() {
     onError: (error: any) => showError(error.message || "Không thể xóa."),
   });
 
-  // Selection handlers
+  // Handlers
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
       setSelectedIds(dataList.map((item: ITaiLieu) => item.taiLieuId!));
@@ -117,11 +124,11 @@ export default function QuanLyTaiLieuPage() {
     }
   };
 
-  const handleSelectOne = (id: string, checked: boolean) => {
+  const handleSelectOne = (id: string | number, checked: boolean) => {
     if (checked) {
-      setSelectedIds((prev) => [...prev, id]);
+      setSelectedIds((prev) => [...prev, String(id)]);
     } else {
-      setSelectedIds((prev) => prev.filter((i) => i !== id));
+      setSelectedIds((prev) => prev.filter((i) => i !== String(id)));
     }
   };
 
@@ -133,6 +140,11 @@ export default function QuanLyTaiLieuPage() {
   const handleEdit = (item: ITaiLieu) => {
     setEditingItem(item);
     setIsModalOpen(true);
+  };
+
+  const handleViewDetail = (item: ITaiLieu) => {
+    setSelectedDocument(item);
+    setIsDetailModalOpen(true);
   };
 
   const handleDeleteClick = (item: ITaiLieu) => {
@@ -170,8 +182,39 @@ export default function QuanLyTaiLieuPage() {
 
   const isSaving = createMutation.isPending || updateMutation.isPending;
   const isDeleting = deleteMutation.isPending;
-  const allSelected = dataList.length > 0 && dataList.every((i: ITaiLieu) => selectedIds.includes(i.taiLieuId!));
-  const someSelected = dataList.some((i: ITaiLieu) => selectedIds.includes(i.taiLieuId!));
+
+  // Column configuration for DataTable
+  const columns: ColumnConfig<ITaiLieu>[] = [
+    {
+      key: "tenTaiLieu",
+      label: "Tên tài liệu",
+      clickable: true,
+      align: "left",
+    },
+    {
+      key: "loaiTaiLieu",
+      label: "Loại",
+      align: "left",
+      render: (value) => (
+        <span className="px-2 py-1 bg-[#f5e6d3] text-[#8b5e3c] text-xs rounded">{value || "-"}</span>
+      ),
+    },
+    {
+      key: "tacGia",
+      label: "Tác giả",
+      align: "left",
+    },
+    {
+      key: "namSangTac",
+      label: "Năm",
+      align: "center",
+    },
+    {
+      key: "nguonGoc",
+      label: "Nguồn gốc",
+      align: "left",
+    },
+  ];
 
   if (!dongHoId) {
     return (
@@ -211,153 +254,62 @@ export default function QuanLyTaiLieuPage() {
         </div>
       </div>
 
-      {/* Search & Filter */}
-      <div className="mb-6 flex flex-col md:flex-row gap-4">
-        <div className="flex items-center bg-white border border-[#d4af37] rounded-lg p-1 shadow-sm flex-1">
-          <div className="p-2 text-stone-400">
-            {isLoading ? <Loader2 className="animate-spin" size={20} /> : <Search size={20} />}
-          </div>
-          <input
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Tìm kiếm theo tên tài liệu..."
-            className="w-full p-2 outline-none bg-transparent text-[#5d4037]"
-          />
-          {searchTerm && (
-            <button onClick={() => setSearchTerm("")} className="p-2 text-stone-400 hover:text-[#b91c1c]">
-              <X size={16} />
-            </button>
-          )}
-        </div>
-        <div className="flex items-center gap-2">
-          <Filter size={16} className="text-[#8b5e3c]" />
-          <select
-            value={filterLoai}
-            onChange={(e) => { setFilterLoai(e.target.value); setPageIndex(1); }}
-            className="px-3 py-2 border border-[#d4af37] rounded bg-white text-[#5d4037]"
-          >
-            <option value="">Tất cả loại</option>
-            {LOAI_TAI_LIEU.map((loai) => (
-              <option key={loai} value={loai}>{loai}</option>
-            ))}
-          </select>
-        </div>
+      {/* Filter */}
+      <div className="mb-6 flex items-center gap-2">
+        <Filter size={16} className="text-[#8b5e3c]" />
+        <select
+          value={filterLoai}
+          onChange={(e) => { setFilterLoai(e.target.value); setPageIndex(1); }}
+          className="px-3 py-2 border border-[#d4af37] rounded bg-white text-[#5d4037]"
+        >
+          <option value="">Tất cả loại</option>
+          {LOAI_TAI_LIEU.map((loai) => (
+            <option key={loai} value={loai}>{loai}</option>
+          ))}
+        </select>
       </div>
 
-      {/* Table */}
-      <div className="bg-white rounded-lg shadow border border-[#d4af37] overflow-hidden">
-        <table className="w-full">
-          <thead className="bg-gradient-to-r from-[#f5e6d3] to-[#e8d4b8]">
-            <tr>
-              <th className="px-4 py-3 w-12">
-                <input
-                  type="checkbox"
-                  checked={allSelected}
-                  ref={(el) => { if (el) el.indeterminate = someSelected && !allSelected; }}
-                  onChange={(e) => handleSelectAll(e.target.checked)}
-                  className="w-4 h-4 accent-[#b91c1c]"
-                />
-              </th>
-              <th className="px-4 py-3 text-left text-sm font-bold text-[#5d4037]">Tên tài liệu</th>
-              <th className="px-4 py-3 text-left text-sm font-bold text-[#5d4037]">Loại</th>
-              <th className="px-4 py-3 text-left text-sm font-bold text-[#5d4037]">Tác giả</th>
-              <th className="px-4 py-3 text-center text-sm font-bold text-[#5d4037]">Năm</th>
-              <th className="px-4 py-3 text-left text-sm font-bold text-[#5d4037]">Nguồn gốc</th>
-              <th className="px-4 py-3 text-center text-sm font-bold text-[#5d4037]">Thao tác</th>
-            </tr>
-          </thead>
-          <tbody>
-            {isLoading ? (
-              <tr>
-                <td colSpan={7} className="px-4 py-12 text-center">
-                  <Loader2 className="animate-spin mx-auto text-[#d4af37]" size={32} />
-                </td>
-              </tr>
-            ) : dataList.length === 0 ? (
-              <tr>
-                <td colSpan={7} className="px-4 py-8 text-center text-gray-500">Chưa có tài liệu nào</td>
-              </tr>
-            ) : (
-              dataList.map((item: ITaiLieu) => (
-                <tr
-                  key={item.taiLieuId}
-                  className={`border-t border-[#e8d4b8] hover:bg-[#faf6f0] ${selectedIds.includes(item.taiLieuId!) ? "bg-[#fff8e1]" : ""}`}
-                >
-                  <td className="px-4 py-3">
-                    <input
-                      type="checkbox"
-                      checked={selectedIds.includes(item.taiLieuId!)}
-                      onChange={(e) => handleSelectOne(item.taiLieuId!, e.target.checked)}
-                      className="w-4 h-4 accent-[#b91c1c]"
-                    />
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-2">
-                      <FileText size={16} className="text-[#d4af37]" />
-                      <div>
-                        <div className="font-medium text-[#5d4037]">{item.tenTaiLieu}</div>
-                        {item.moTa && <div className="text-xs text-gray-500 line-clamp-1">{item.moTa}</div>}
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-4 py-3">
-                    <span className="px-2 py-1 bg-[#f5e6d3] text-[#8b5e3c] text-xs rounded">{item.loaiTaiLieu || "-"}</span>
-                  </td>
-                  <td className="px-4 py-3 text-sm">{item.tacGia || "-"}</td>
-                  <td className="px-4 py-3 text-center text-sm">{item.namSangTac || "-"}</td>
-                  <td className="px-4 py-3 text-sm">{item.nguonGoc || "-"}</td>
-                  <td className="px-4 py-3">
-                    <div className="flex justify-center gap-2">
-                      <button onClick={() => handleEdit(item)} className="p-2 text-blue-600 hover:bg-blue-50 rounded">
-                        <Edit size={16} />
-                      </button>
-                      <button onClick={() => handleDeleteClick(item)} className="p-2 text-red-600 hover:bg-red-50 rounded">
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+      {/* DataTable Component */}
+      <DataTable
+        data={dataList}
+        columns={columns}
+        keyField="taiLieuId"
+        pageIndex={pageIndex}
+        pageSize={pageSize}
+        totalRecords={totalRecords}
+        totalPages={totalPages}
+        onPageChange={setPageIndex}
+        onPageSizeChange={setPageSize}
+        isLoading={isLoading}
+        emptyMessage="Chưa có tài liệu nào"
+        enableSelection={true}
+        selectedIds={selectedIds}
+        onSelectAll={handleSelectAll}
+        onSelectOne={handleSelectOne}
+        onViewDetail={handleViewDetail}
+        customActions={[
+          { icon: Edit, label: "Sửa", onClick: handleEdit, color: "blue" },
+          { icon: Trash2, label: "Xóa", onClick: handleDeleteClick, color: "red" },
+        ]}
+        searchValue={searchTerm}
+        onSearchChange={setSearchTerm}
+        searchPlaceholder="Tìm kiếm theo tên tài liệu..."
+      />
 
-        {/* Pagination */}
-        <div className="bg-[#fdf6e3] p-4 border-t border-[#d4af37] flex items-center justify-between">
-          <div className="text-sm text-[#8b5e3c]">
-            {selectedIds.length > 0 && <span className="mr-4 text-[#b91c1c] font-bold">Đã chọn {selectedIds.length}</span>}
-            Hiển thị <span className="font-bold">{dataList.length}</span> / Tổng <span className="font-bold">{totalRecords}</span>
-          </div>
-          <div className="flex gap-1 items-center">
-            <select
-              value={pageSize}
-              onChange={(e) => { setPageSize(Number(e.target.value)); setPageIndex(1); }}
-              className="mr-4 bg-white border border-[#d4af37] rounded px-2 py-1 text-sm text-[#5d4037]"
-            >
-              <option value={5}>5 dòng/trang</option>
-              <option value={10}>10 dòng/trang</option>
-              <option value={20}>20 dòng/trang</option>
-            </select>
-            <button
-              onClick={() => setPageIndex((p) => Math.max(1, p - 1))}
-              disabled={pageIndex === 1}
-              className="p-2 border border-[#d4af37] rounded bg-white disabled:opacity-50 hover:bg-[#fff8e1]"
-            >
-              <ChevronLeft size={16} />
-            </button>
-            <span className="px-4 text-sm font-bold text-[#5d4037]">Trang {pageIndex} / {totalPages || 1}</span>
-            <button
-              onClick={() => setPageIndex((p) => Math.min(totalPages, p + 1))}
-              disabled={pageIndex === totalPages || totalPages === 0}
-              className="p-2 border border-[#d4af37] rounded bg-white disabled:opacity-50 hover:bg-[#fff8e1]"
-            >
-              <ChevronRight size={16} />
-            </button>
-          </div>
-        </div>
-      </div>
+      {/* Modals */}
+      <TaiLieuModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSubmit={handleSave}
+        initialData={editingItem}
+        isLoading={isSaving}
+      />
 
-      <TaiLieuModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onSubmit={handleSave} initialData={editingItem} isLoading={isSaving} />
+      <DocumentDetailModal
+        isOpen={isDetailModalOpen}
+        onClose={() => setIsDetailModalOpen(false)}
+        document={selectedDocument}
+      />
 
       {/* Delete Modal */}
       {isDeleteModalOpen && itemsToDelete.length > 0 && (
@@ -373,8 +325,7 @@ export default function QuanLyTaiLieuPage() {
             </p>
             <div className="flex justify-end gap-3">
               <button onClick={() => { setIsDeleteModalOpen(false); setItemsToDelete([]); }} className="px-4 py-2 border rounded hover:bg-gray-50">Hủy</button>
-              <button onClick={handleConfirmDelete} disabled={isDeleting} className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50 flex items-center gap-2">
-                {isDeleting && <Loader2 className="animate-spin" size={16} />}
+              <button onClick={handleConfirmDelete} disabled={isDeleting} className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50">
                 {isDeleting ? "Đang xóa..." : "Xóa"}
               </button>
             </div>

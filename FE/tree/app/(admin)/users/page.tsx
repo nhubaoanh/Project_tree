@@ -20,6 +20,7 @@ import {
 import { getAllDongHo, IDongHo } from "@/service/dongho.service";
 import { MemberTable } from "./components/userTable";
 import { UserModal } from "./components/userModal";
+import { UserDetailModal } from "./components/UserDetailModal";
 import { ConfirmDeleteModal } from "./components/userDelete";
 import { useToast } from "@/service/useToas";
 import storage from "@/utils/storage";
@@ -34,7 +35,7 @@ export default function QuanLyThanhVienPage() {
   const [pageSize, setPageSize] = useState(5);
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
-  
+
   // --- STATE FOR DONG HO FILTER (chỉ SA mới dùng) ---
   const [dongHoList, setDongHoList] = useState<IDongHo[]>([]);
   const [selectedDongHo, setSelectedDongHo] = useState<string>("");
@@ -46,6 +47,10 @@ export default function QuanLyThanhVienPage() {
   const [editingUser, setEditingUser] = useState<IUser | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<IUser | null>(null);
+
+  // New Detail Modal State
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [selectedUserForDetail, setSelectedUserForDetail] = useState<IUser | null>(null);
 
   const { showSuccess, showError } = useToast();
 
@@ -176,6 +181,11 @@ export default function QuanLyThanhVienPage() {
     }
   };
 
+  const handleViewDetail = (user: IUser) => {
+    setSelectedUserForDetail(user);
+    setIsDetailModalOpen(true);
+  };
+
   const handlePageSizeChange = (newSize: number) => {
     setPageSize(newSize);
     setPageIndex(1);
@@ -291,6 +301,7 @@ export default function QuanLyThanhVienPage() {
         onPageSizeChange={handlePageSizeChange}
         onEdit={handleEdit}
         onDelete={handleDeleteClick}
+        onViewDetail={handleViewDetail}
       />
 
       {/* Modals */}
@@ -300,6 +311,12 @@ export default function QuanLyThanhVienPage() {
         onSubmit={handleSaveUser}
         initialData={editingUser}
         isLoading={isSaving}
+      />
+
+      <UserDetailModal
+        isOpen={isDetailModalOpen}
+        onClose={() => setIsDetailModalOpen(false)}
+        user={selectedUserForDetail}
       />
 
       <ConfirmDeleteModal

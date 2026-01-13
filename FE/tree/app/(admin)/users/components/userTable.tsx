@@ -8,6 +8,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Loader2,
+  Eye,
 } from "lucide-react";
 import { IUser } from "@/types/user";
 
@@ -22,6 +23,7 @@ interface MemberTableProps {
   onPageSizeChange: (size: number) => void;
   onEdit: (user: IUser) => void;
   onDelete: (user: IUser) => void;
+  onViewDetail?: (user: IUser) => void;
 }
 
 export const MemberTable: React.FC<MemberTableProps> = ({
@@ -35,6 +37,7 @@ export const MemberTable: React.FC<MemberTableProps> = ({
   onPageSizeChange,
   onEdit,
   onDelete,
+  onViewDetail,
 }) => {
   return (
     <div className="bg-white rounded-lg border border-[#d4af37] shadow-lg overflow-hidden relative min-h-[400px] flex flex-col">
@@ -78,99 +81,105 @@ export const MemberTable: React.FC<MemberTableProps> = ({
           <tbody className="divide-y divide-[#eaddcf]">
             {data.length > 0
               ? data.map((user, index) => (
-                  <tr
-                    key={user.nguoiDungId}
-                    className="hover:bg-[#fffdf5] transition-colors group"
-                  >
-                    {/* Cột # cố định */}
-                    <td className="p-4 w-12 text-center text-stone-400 font-mono text-xs">
-                      {(pageIndex - 1) * pageSize + index + 1}
-                    </td>
+                <tr
+                  key={user.nguoiDungId}
+                  className="hover:bg-[#fffdf5] transition-colors group"
+                >
+                  {/* Cột # cố định */}
+                  <td className="p-4 w-12 text-center text-stone-400 font-mono text-xs">
+                    {(pageIndex - 1) * pageSize + index + 1}
+                  </td>
 
-                    {/* THAY ĐỔI: Thêm min-w tương ứng, bỏ truncate */}
-                    <td className="p-4 text-center font-bold text-[#5d4037] group-hover:text-[#b91c1c] min-w-[250px]">
-                      {user.full_name}
-                    </td>
-                    <td className="p-4 text-center font-bold text-[#5d4037] group-hover:text-[#b91c1c] min-w-[150px]">
-                      {user.tenDongHo}
-                    </td>
-                    <td className="p-4 text-center font-bold text-[#5d4037] hidden md:table-cell min-w-[180px]">
-                      {user.email || "-"}
-                    </td>
-                    <td className="p-4 text-center font-bold text-[#5d4037] group-hover:text-[#b91c1c] min-w-[150px]">
-                      {user.phone}
-                    </td>
-                    <td className="p-4 text-center font-bold text-[#5d4037] min-w-[150px]">
-                      {user.tenDangNhap}
-                    </td>
-                    {/* <td className="p-4 text-center font-bold text-[#5d4037] group-hover:text-[#b91c1c] min-w-[120px]">
+                  {/* THAY ĐỔI: Thêm min-w tương ứng, bỏ truncate */}
+                  <td className="p-4 text-center font-bold text-[#5d4037] group-hover:text-[#b91c1c] min-w-[250px]">
+                    {user.full_name}
+                  </td>
+                  <td className="p-4 text-center font-bold text-[#5d4037] group-hover:text-[#b91c1c] min-w-[150px]">
+                    {user.tenDongHo}
+                  </td>
+                  <td className="p-4 text-center font-bold text-[#5d4037] hidden md:table-cell min-w-[180px]">
+                    {user.email || "-"}
+                  </td>
+                  <td className="p-4 text-center font-bold text-[#5d4037] group-hover:text-[#b91c1c] min-w-[150px]">
+                    {user.phone}
+                  </td>
+                  <td className="p-4 text-center font-bold text-[#5d4037] min-w-[150px]">
+                    {user.tenDangNhap}
+                  </td>
+                  {/* <td className="p-4 text-center font-bold text-[#5d4037] group-hover:text-[#b91c1c] min-w-[120px]">
                       {user.matKhau}
                     </td> */}
-                    {/* <td className="p-4 text-center font-bold text-[#5d4037] group-hover:text-[#b91c1c] min-w-[120px]">
+                  {/* <td className="p-4 text-center font-bold text-[#5d4037] group-hover:text-[#b91c1c] min-w-[120px]">
                       {user.anhDaiDien}
                     </td> */}
 
-                    {/* Cột Vai Trò cố định */}
-                    <td className="p-4 text-center min-w-[200px] hidden md:table-cell">
-                      <span
-                        className={`px-3 py-1 rounded-full text-xs font-bold border ${
-                          user.roleCode === "sa"
-                            ? "bg-red-100 text-red-800 border-red-200"
-                            : user.roleCode === "thanhvien"
-                            ? "bg-blue-100 text-blue-800 border-blue-200"
-                            : "bg-green-100 text-green-800 border-green-200"
+                  {/* Cột Vai Trò cố định */}
+                  <td className="p-4 text-center min-w-[200px] hidden md:table-cell">
+                    <span
+                      className={`px-3 py-1 rounded-full text-xs font-bold border ${user.roleCode === "sa"
+                        ? "bg-red-100 text-red-800 border-red-200"
+                        : user.roleCode === "thanhvien"
+                          ? "bg-blue-100 text-blue-800 border-blue-200"
+                          : "bg-green-100 text-green-800 border-green-200"
                         }`}
-                      >
-                        {user.roleCode === "sa"
-                          ? "Quản Trị Viên"
-                          : user.roleCode === "thanhvien"
+                    >
+                      {user.roleCode === "sa"
+                        ? "Quản Trị Viên"
+                        : user.roleCode === "thanhvien"
                           ? "Thành Viên"
                           : "Thư đồ"}
-                      </span>
-                    </td>
-                    <td className="p-4 font-bold text-[#5d4037] group-hover:text-[#b91c1c] min-w-[120px]">
-                      {user.ngayTao
-                        ? new Date(user.ngayTao).toLocaleDateString()
-                        : "N/A"}
-                    </td>
+                    </span>
+                  </td>
+                  <td className="p-4 font-bold text-[#5d4037] group-hover:text-[#b91c1c] min-w-[120px] text-center">
+                    {user.ngayTao
+                      ? new Date(user.ngayTao).toLocaleDateString()
+                      : "N/A"}
+                  </td>
 
-                    {/* Cột Hành Động cố định */}
-                    <td className="p-4 min-w-[120px] text-center">
-                      <div className="flex justify-center gap-2 opacity-80 group-hover:opacity-100 transition-opacity">
-                        <button
-                          onClick={() => onEdit(user)}
-                          className="p-2 text-blue-600 hover:bg-blue-50 rounded transition-colors"
-                          title="Sửa"
-                        >
-                          <Edit size={18} />
-                        </button>
-                        <button
-                          onClick={() => onDelete(user)}
-                          className="p-2 text-red-600 hover:bg-red-50 rounded transition-colors"
-                          title="Xóa"
-                        >
-                          <Trash2 size={18} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
+                  {/* Cột Hành Động cố định */}
+                  <td className="p-4 min-w-[120px] text-center">
+                    <div className="flex justify-center gap-2 opacity-80 group-hover:opacity-100 transition-opacity">
+                      <button
+                        onClick={() => onViewDetail?.(user)}
+                        className="p-2 text-green-600 hover:bg-green-50 rounded transition-colors"
+                        title="Xem chi tiết"
+                      >
+                        <Eye size={18} />
+                      </button>
+                      <button
+                        onClick={() => onEdit(user)}
+                        className="p-2 text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                        title="Sửa"
+                      >
+                        <Edit size={18} />
+                      </button>
+                      <button
+                        onClick={() => onDelete(user)}
+                        className="p-2 text-red-600 hover:bg-red-50 rounded transition-colors"
+                        title="Xóa"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
               : !isLoading && (
-                  <tr>
-                    <td
-                      colSpan={11}
-                      className="p-12 text-center text-stone-500 italic"
-                    >
-                      <div className="flex flex-col items-center">
-                        <FileSpreadsheet
-                          size={48}
-                          className="mb-4 opacity-20"
-                        />
-                        Không tìm thấy thành viên nào phù hợp.
-                      </div>
-                    </td>
-                  </tr>
-                )}
+                <tr>
+                  <td
+                    colSpan={11}
+                    className="p-12 text-center text-stone-500 italic"
+                  >
+                    <div className="flex flex-col items-center">
+                      <FileSpreadsheet
+                        size={48}
+                        className="mb-4 opacity-20"
+                      />
+                      Không tìm thấy thành viên nào phù hợp.
+                    </div>
+                  </td>
+                </tr>
+              )}
           </tbody>
         </table>
       </div>

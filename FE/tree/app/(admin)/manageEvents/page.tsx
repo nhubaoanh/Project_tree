@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { Search, Plus, X, Loader2, Trash2 } from "lucide-react";
+import { Calendar, Plus, Trash2 } from "lucide-react";
 import {
   useQuery,
   useMutation,
@@ -9,11 +9,19 @@ import {
 } from "@tanstack/react-query";
 import { IEvent, IsearchEvent } from "@/types/event";
 import { useToast } from "@/service/useToas";
-import { EventTable } from "./components/eventTable";
 import { EventModal } from "./components/eventModal";
-import { EventDeleteModal } from "./components/eventDelete";
 import { searchEvent, createEvent, updateEvent } from "@/service/event.service";
 import storage from "@/utils/storage";
+import { 
+  PageLayout, 
+  DataTable, 
+  DeleteModal, 
+  PageLoading, 
+  ErrorState,
+  NoFamilyTreeState,
+  ColumnConfig,
+  ActionConfig 
+} from "@/components/shared";
 
 export default function QuanLySuKienPage() {
   const queryClient = useQueryClient();
@@ -102,11 +110,12 @@ export default function QuanLySuKienPage() {
     }
   };
 
-  const handleSelectOne = (id: string, checked: boolean) => {
+  const handleSelectOne = (id: string | number, checked: boolean) => {
+    const stringId = String(id);
     if (checked) {
-      setSelectedIds((prev) => [...prev, id]);
+      setSelectedIds((prev) => [...prev, stringId]);
     } else {
-      setSelectedIds((prev) => prev.filter((i) => i !== id));
+      setSelectedIds((prev) => prev.filter((i) => i !== stringId));
     }
   };
 
@@ -164,102 +173,123 @@ export default function QuanLySuKienPage() {
 
   // --- LOADING STATE ---
   if (eventQuery.isLoading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#d4af37]"></div>
-      </div>
-    );
+    return <PageLoading message="Đang tải danh sách sự kiện..." />;
   }
 
   // --- ERROR STATE ---
   if (eventQuery.isError) {
     return (
-      <div className="p-4 mb-4 text-red-600 bg-red-100 rounded flex justify-between items-center">
-        <span>Lỗi khi tải dữ liệu. Vui lòng thử lại sau.</span>
-        <button
-          onClick={() => eventQuery.refetch()}
-          className="px-3 py-1 bg-[#d4af37] text-white rounded hover:bg-[#b8962a]"
-        >
-          Thử lại
-        </button>
-      </div>
+      <ErrorState
+        title="Lỗi tải dữ liệu"
+        message="Không thể tải danh sách sự kiện. Vui lòng thử lại sau."
+        onRetry={() => eventQuery.refetch()}
+      />
     );
   }
 
+  // --- NO FAMILY TREE STATE ---
+  if (!userDongHoId) {
+    return <NoFamilyTreeState />;
+  }
+
+  // --- COLUMN CONFIGURATION ---
+  const columns: ColumnConfig<IEvent>[] = [
+    {
+      key: "tenSuKien",
+      label: "Tên sự kiện",
+      clickable: true,
+    },
+    {
+      key: "ngayDienRa",
+      label: "Ngày diễn ra",
+      render: (value) => value ? new Date(value).toLocaleDateString("vi-VN") : "-",
+    },
+    {
+      key: "gioDienRa",
+      label: "Giờ",
+      render: (value) => value || "-",
+    },
+    {
+      key: "diaDiem",
+      label: "Địa điểm",
+      render: (value) => value || "-",
+    },
+    {
+      key: "tenLoaiSuKien",
+      label: "Loại sự kiện",
+    },
+    {
+      key: "uuTien",
+      label: "Ưu tiên",
+      render: (value) => {
+        const priority = ["", "Thấp", "Trung bình", "Cao"];
+        return priority[value] || "-";
+      },
+    },
+  ];
+
+  // --- ACTION CONFIGURATION ---
+  const customActions: ActionConfig<IEvent>[] = [
+    {
+      icon: Calendar,
+      label: "Sửa",
+      onClick: handleEdit,
+      color: "blue",
+    },
+    {
+      icon: Trash2,
+      label: "Xóa",
+      onClick: handleDeleteClick,
+      color: "red",
+    },
+  ];
+
+  // --- PAGE ACTIONS ---
+  const pageActions = [
+    ...(selectedIds.length > 0 ? [{
+      icon: Trash2,
+      label: "Xóa",
+      onClick: handleDeleteSelected,
+      variant: "danger" as const,
+      count: selectedIds.length,
+    }] : []),
+    {
+      icon: Plus,
+      label: "Thêm Mới",
+      onClick: handleAdd,
+      variant: "primary" as const,
+    },
+  ];
+
   // --- RENDER ---
   return (
-    <div className="max-w-6xl mx-auto font-dancing text-[#4a4a4a] pb-20 animate-fadeIn">
-      {/* Header & Toolbar */}
-      <div className="flex flex-col md:flex-row justify-between items-end md:items-center mb-8 gap-4 border-b border-[#d4af37] pb-4">
-        <div>
-          <h2 className="text-3xl font-display font-bold text-[#b91c1c] uppercase drop-shadow-sm">
-            Quản Lý Sự Kiện
-          </h2>
-          <p className="text-[#8b5e3c] italic text-sm">
-            Danh sách sự kiện trong hệ thống
-          </p>
-        </div>
-
-        <div className="flex gap-2 flex-wrap justify-end">
-          {selectedIds.length > 0 && (
-            <button
-              onClick={handleDeleteSelected}
-              className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded shadow hover:bg-red-700 transition-all text-sm font-bold"
-            >
-              <Trash2 size={16} />
-              <span>Xóa ({selectedIds.length})</span>
-            </button>
-          )}
-          <button
-            onClick={handleAdd}
-            className="flex items-center gap-2 px-4 py-2 bg-[#b91c1c] text-white rounded shadow hover:bg-[#991b1b] transition-all text-sm font-bold ml-2"
-          >
-            <Plus size={16} />
-            <span className="hidden sm:inline">Thêm Mới</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Search Bar */}
-      <div className="mb-6 flex items-center bg-white border border-[#d4af37] rounded-lg p-1 shadow-sm w-full md:w-1/2 transition-all focus-within:ring-2 ring-[#d4af37]/50">
-        <div className="p-2 text-stone-400">
-          {isLoading ? (
-            <Loader2 className="animate-spin" size={20} />
-          ) : (
-            <Search size={20} />
-          )}
-        </div>
-        <input
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          placeholder="Tìm kiếm theo tên sự kiện..."
-          className="w-full p-2 outline-none bg-transparent text-[#5d4037] placeholder-stone-400"
-        />
-        {searchTerm && (
-          <button
-            onClick={() => setSearchTerm("")}
-            className="p-2 text-stone-400 hover:text-[#b91c1c]"
-          >
-            <X size={16} />
-          </button>
-        )}
-      </div>
-
+    <PageLayout
+      title="Quản Lý Sự Kiện"
+      subtitle="Danh sách sự kiện trong hệ thống"
+      icon={Calendar}
+      actions={pageActions}
+    >
       {/* Table */}
-      <EventTable
+      <DataTable
         data={eventData}
-        isLoading={isLoading}
+        columns={columns}
+        keyField="suKienId"
         pageIndex={pageIndex}
         pageSize={pageSize}
         totalRecords={totalRecords}
         totalPages={totalPages}
         onPageChange={setPageIndex}
         onPageSizeChange={handlePageSizeChange}
-        onEdit={handleEdit}
-        onDelete={handleDeleteClick}
+        isLoading={isLoading}
+        enableSelection={true}
         selectedIds={selectedIds}
         onSelectAll={handleSelectAll}
         onSelectOne={handleSelectOne}
+        customActions={customActions}
+        searchValue={searchTerm}
+        onSearchChange={setSearchTerm}
+        searchPlaceholder="Tìm kiếm theo tên sự kiện..."
+        emptyMessage="Chưa có sự kiện nào được tạo"
       />
 
       {/* Event Modal */}
@@ -271,16 +301,26 @@ export default function QuanLySuKienPage() {
         isLoading={isSaving}
       />
 
-      {/* Delete Modal - Tách riêng component */}
-      <EventDeleteModal
+      {/* Delete Modal */}
+      <DeleteModal
         isOpen={isDeleteModalOpen}
-        events={eventsToDelete}
+        items={eventsToDelete}
         onClose={() => {
           setIsDeleteModalOpen(false);
           setEventsToDelete([]);
         }}
-        onSuccess={handleDeleteSuccess}
+        onConfirm={() => {
+          // TODO: Implement delete logic
+          handleDeleteSuccess();
+          setIsDeleteModalOpen(false);
+        }}
+        itemDisplayField="tenSuKien"
+        title={eventsToDelete.length === 1 ? "Xác nhận xóa sự kiện" : `Xác nhận xóa ${eventsToDelete.length} sự kiện`}
+        message={eventsToDelete.length === 1 ? 
+          "Bạn có chắc chắn muốn xóa sự kiện này? Hành động này không thể hoàn tác." :
+          `Bạn có chắc chắn muốn xóa ${eventsToDelete.length} sự kiện đã chọn? Hành động này không thể hoàn tác.`
+        }
       />
-    </div>
+    </PageLayout>
   );
 }

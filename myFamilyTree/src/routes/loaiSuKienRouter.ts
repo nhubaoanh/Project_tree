@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { container } from "tsyringe";
 import { loaiSuKienController } from "../controllers/loaiSuKienController";
+import { authenticate, adminOnly } from "../middlewares/authMiddleware";
 
 const loaiSuKienRouter = Router();
 
@@ -20,7 +21,7 @@ loaiSuKienRouter.use((req, res, next) => {
 const eventcontroller = container.resolve(loaiSuKienController);
 
 loaiSuKienRouter.post(
-  "/search",
+  "/search", authenticate,
   eventcontroller.searchSuKien.bind(eventcontroller)
 );
 
