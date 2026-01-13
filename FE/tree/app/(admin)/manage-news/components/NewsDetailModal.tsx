@@ -54,16 +54,20 @@ export function NewsDetailModal({ isOpen, onClose, news }: NewsDetailModalProps)
     ];
 
     return (
-        <DetailModal
-            isOpen={isOpen}
-            onClose={onClose}
-            title={news.tieuDe || "Tin tức"}
-            subtitle={news.tacGia}
-            badge={news.ghim ? "📌 Đã ghim" : undefined}
-            badgeColor="yellow-500/30"
-            gradient="blue-yellow"
-            sections={sections}
-            notes={news.tomTat ? `Tóm tắt: ${news.tomTat}\n\n${news.noiDung || ""}` : news.noiDung}
-        />
+      <DetailModal
+        isOpen={isOpen}
+        onClose={onClose}
+        title={news.tieuDe || "Tin tức"}
+        subtitle={news.tacGia}
+        badge={news.ghim ? "📌 Đã ghim" : undefined}
+        badgeColor="yellow-500/30"
+        gradient="red-yellow"
+        sections={sections}
+        notes={
+          news.tomTat
+            ? `Tóm tắt: ${news.tomTat}\n\n${news.noiDung || ""}`
+            : news.noiDung
+        }
+      />
     );
 }

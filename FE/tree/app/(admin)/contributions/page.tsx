@@ -469,12 +469,18 @@ export default function QuanLyTaiChinhThuPage() {
           isOpen={isDetailModalOpen}
           onClose={() => setIsDetailModalOpen(false)}
           title={selectedContributionForDetail.hoTenNguoiDong}
-          subtitle={`Khoản thu ngày ${selectedContributionForDetail.ngayDong ? new Date(selectedContributionForDetail.ngayDong).toLocaleDateString("vi-VN") : "N/A"}`}
-          badge={new Intl.NumberFormat('vi-VN', { 
-            style: 'currency', 
-            currency: 'VND' 
+          subtitle={`Khoản thu ngày ${
+            selectedContributionForDetail.ngayDong
+              ? new Date(
+                  selectedContributionForDetail.ngayDong
+                ).toLocaleDateString("vi-VN")
+              : "N/A"
+          }`}
+          badge={new Intl.NumberFormat("vi-VN", {
+            style: "currency",
+            currency: "VND",
           }).format(selectedContributionForDetail.soTien || 0)}
-          gradient="green-yellow"
+          gradient="red-yellow"
           sections={getDetailSections(selectedContributionForDetail)}
           notes={selectedContributionForDetail.ghiChu}
         />
@@ -491,10 +497,15 @@ export default function QuanLyTaiChinhThuPage() {
         onConfirm={handleConfirmDelete}
         isLoading={isDeleting}
         itemDisplayField="hoTenNguoiDong"
-        title={itemsToDelete.length === 1 ? "Xác nhận xóa khoản thu" : `Xác nhận xóa ${itemsToDelete.length} khoản thu`}
-        message={itemsToDelete.length === 1 ? 
-          "Bạn có chắc chắn muốn xóa khoản thu này? Hành động này không thể hoàn tác." :
-          `Bạn có chắc chắn muốn xóa ${itemsToDelete.length} khoản thu đã chọn? Hành động này không thể hoàn tác.`
+        title={
+          itemsToDelete.length === 1
+            ? "Xác nhận xóa khoản thu"
+            : `Xác nhận xóa ${itemsToDelete.length} khoản thu`
+        }
+        message={
+          itemsToDelete.length === 1
+            ? "Bạn có chắc chắn muốn xóa khoản thu này? Hành động này không thể hoàn tác."
+            : `Bạn có chắc chắn muốn xóa ${itemsToDelete.length} khoản thu đã chọn? Hành động này không thể hoàn tác.`
         }
       />
     </PageLayout>

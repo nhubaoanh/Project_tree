@@ -3,13 +3,13 @@
 import React from "react";
 import { User, Mail, Phone, Shield, Calendar, MapPin, Briefcase } from "lucide-react";
 import { DetailModal, DetailSection } from "@/components/shared";
-import { INguoiDung } from "@/service/nguoidung.service";
-import { API_DOWNLOAD } from "@/service/api";
+import { IUser } from "@/types/user";
+import { API_DOWNLOAD } from "@/constant/config";
 
 interface UserDetailModalProps {
   isOpen: boolean;
   onClose: () => void;
-  user: INguoiDung | null;
+  user: IUser | null;
 }
 
 export function UserDetailModal({ isOpen, onClose, user }: UserDetailModalProps) {
@@ -28,17 +28,17 @@ export function UserDetailModal({ isOpen, onClose, user }: UserDetailModalProps)
     {
       title: "Thông tin cá nhân",
       fields: [
-        { icon: User, label: "Họ và tên", value: user.hoTen },
+        { icon: User, label: "Họ và tên", value: user.full_name },
         { icon: Mail, label: "Email", value: user.email },
-        { icon: Phone, label: "Số điện thoại", value: user.soDienThoai },
+        { icon: Phone, label: "Số điện thoại", value: user.phone },
       ]
     },
     {
       title: "Thông tin hệ thống",
       fields: [
-        { icon: Shield, label: "Vai trò", value: user.vaiTro },
+        { icon: Shield, label: "Vai trò", value: user.roleCode },
         { icon: Calendar, label: "Ngày tạo", value: formatDate(user.ngayTao) },
-        { icon: Briefcase, label: "Trạng thái", value: user.trangThai || "Hoạt động" },
+        // { icon: Briefcase, label: "Trạng thái", value: user. || "Hoạt động" },
       ]
     }
   ];
@@ -47,9 +47,9 @@ export function UserDetailModal({ isOpen, onClose, user }: UserDetailModalProps)
     <DetailModal
       isOpen={isOpen}
       onClose={onClose}
-      title={user.hoTen || "Người dùng"}
+      title={user.full_name || "Người dùng"}
       subtitle={user.email}
-      badge={user.vaiTro}
+      badge={user.roleCode}
       gradient="red-yellow"
       avatar={user.anhDaiDien ? `${API_DOWNLOAD}/${user.anhDaiDien}` : undefined}
       avatarFallback={<User size={48} className="text-white/80" />}

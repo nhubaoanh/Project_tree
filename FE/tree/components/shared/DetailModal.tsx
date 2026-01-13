@@ -51,13 +51,13 @@ export function DetailModal({
     );
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-10 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
+        <div className="fixed inset-0 bg-opacity-10 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
             <div className="bg-white rounded-3xl w-full max-w-2xl overflow-hidden shadow-2xl border border-yellow-200 max-h-[90vh] flex flex-col">
                 {/* Header Section */}
                 <div className={`relative ${getGradientClass()} p-8 text-white flex-shrink-0`}>
                     <button
                         onClick={onClose}
-                        className="absolute top-6 right-6 p-2.5 hover:bg-white hover:bg-opacity-20 rounded-2xl transition-all"
+                        className="absolute top-6 right-6 p-2.5 hover:bg-opacity-20 rounded-2xl transition-all"
                         aria-label="Đóng"
                     >
                         <X size={20} />
@@ -82,13 +82,13 @@ export function DetailModal({
                         <div className="text-center md:text-left flex-1">
                             <h2 className="text-3xl font-black tracking-tight">{title}</h2>
                             {subtitle && <p className="text-white text-opacity-80 text-sm font-medium mt-2">{subtitle}</p>}
-                            {badge && (
+                            {/* {badge && (
                                 <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 mt-3">
                                     <span className="px-4 py-1.5 bg-white bg-opacity-20 backdrop-blur-md rounded-full text-xs font-bold uppercase tracking-wider border border-white border-opacity-20">
                                         {badge}
                                     </span>
                                 </div>
-                            )}
+                            )} */}
                         </div>
                     </div>
                 </div>

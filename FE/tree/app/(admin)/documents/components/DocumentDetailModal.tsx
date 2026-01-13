@@ -42,15 +42,15 @@ export function DocumentDetailModal({ isOpen, onClose, document }: DocumentDetai
     ];
 
     return (
-        <DetailModal
-            isOpen={isOpen}
-            onClose={onClose}
-            title={document.tenTaiLieu || "Tài liệu"}
-            subtitle={document.loaiTaiLieu}
-            badge={`Năm ${document.namSangTac || "N/A"}`}
-            gradient="green-yellow"
-            sections={sections}
-            notes={document.moTa}
-        />
+      <DetailModal
+        isOpen={isOpen}
+        onClose={onClose}
+        title={document.tenTaiLieu || "Tài liệu"}
+        subtitle={document.loaiTaiLieu}
+        badge={`Năm ${document.namSangTac || "N/A"}`}
+        gradient="red-yellow"
+        sections={sections}
+        notes={document.moTa}
+      />
     );
 }

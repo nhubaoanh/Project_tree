@@ -75,13 +75,18 @@ export const updateUser = async (data: Partial<IUser>): Promise<any> => {
   }
 };
 
-export const UpdateMyProfile = async (data: IUserProfile): Promise<any> => {
+export const UpdateMyProfile = async (data: Partial<IUserProfile>): Promise<any> => {
   try {
-    const res = await apiClient.post(`${prefix}/update-user-profile`, data);
+    // Loại bỏ các trường có giá trị null hoặc undefined để tránh lỗi database
+    const cleanData = Object.fromEntries(
+      Object.entries(data).filter(([_, value]) => value !== null && value !== undefined && value !== '')
+    );
+    
+    const res = await apiClient.post(`${prefix}/update-user-profile`, cleanData);
     return res?.data;
   } catch (error: any) {
     const err = parseApiError(error);
-    console.error(`[updateUser] ${err.message}`);
+    console.error(`[UpdateMyProfile] ${err.message}`);
     throw new Error(err.message);
   }
 };
@@ -135,45 +140,3 @@ export const checkUsernameExist = async (value: string): Promise<any> => {
   }
 };
 
-
-
-const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-
-// Mock Data with Relationship Structure (Tree)
-// Đời 1: Cụ Tổ (User 1)
-// Đời 2: User 2, 3 (Con User 1)
-// Đời 3: User 4, 5 (Con User 2) ...
-let MOCK_USERS: IUserss[] = Array.from({ length: 25 }).map((_, i) => {
-  let parentId = null;
-  let doiThu = 1;
-
-  if (i > 0) {
-    // Giả lập quan hệ đơn giản: Người sau là con người trước (chia nhóm)
-    // i=1,2 là con i=0. i=3,4 là con i=1...
-    const parentIndex = Math.floor((i - 1) / 2);
-    parentId = `USER_${parentIndex + 1}`;
-    doiThu = Math.floor(Math.log2(i + 1)) + 1;
-  }
-
-  return {
-    nguoiDungId: `USER_${i + 1}`,
-    dongHoId: "DH_01",
-    tenDangNhap: `user${i + 1}`,
-    hoTen:
-      i === 0
-        ? "Nguyễn Văn Tổ (Cụ Tổ)"
-        : `Nguyễn Văn ${String.fromCharCode(65 + (i % 26))} (Đời ${doiThu})`,
-    email: `user${i + 1}@example.com`,
-    soDienThoai: `09${Math.floor(Math.random() * 100000000)}`,
-    roleId: i % 3,
-    ngayTao: new Date().toISOString(),
-    parentId: parentId,
-    doiThu: doiThu,
-  };
-});
-//mẫu 
-// Hàm lấy toàn bộ dữ liệu để nạp context cho AI
-export const getAllUsersForAI = async (): Promise<IUserss[]> => {
-  await delay(100);
-  return MOCK_USERS;
-};

@@ -230,9 +230,9 @@ export default function QuanLyTaiLieuPage() {
       <div className="flex flex-col md:flex-row justify-between items-end md:items-center mb-8 gap-4 border-b border-[#d4af37] pb-4">
         <div>
           <h2 className="text-3xl font-display font-bold text-[#b91c1c] uppercase drop-shadow-sm">
-            Quản Lý Phả Ký
+            Quản Lý Tài Liệu
           </h2>
-          <p className="text-[#8b5e3c] italic text-sm">Tài liệu và phả ký của dòng họ</p>
+          <p className="text-[#8b5e3c] italic text-sm">Tài liệu của dòng họ</p>
         </div>
         <div className="flex gap-2">
           {selectedIds.length > 0 && (

@@ -18,7 +18,7 @@ function MainContent({ children }: { children: React.ReactNode }) {
       <main className="flex-1 overflow-auto relative">
         {/* Trống đồng - căn giữa theo content area */}
         <div 
-          className={`fixed inset-0 flex items-center justify-center pointer-events-none z-0 transition-all duration-300 ${
+          className={`fixed inset-0 mt-20 flex items-center justify-center pointer-events-none z-0 transition-all duration-300 ${
             isSidebarOpen ? "ml-64" : "ml-20"
           }`}
         >

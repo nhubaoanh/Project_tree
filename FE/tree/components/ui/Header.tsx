@@ -6,8 +6,9 @@ import { useRouter } from "next/navigation";
 import storage from "@/utils/storage";
 import Link from "next/link";
 
+import { getAvatarUrl } from "@/utils/imageUtils";
+
 const DEFAULT_AVATAR = "/images/vangoc.jpg";
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:6001";
 
 
 export default function Header() {
@@ -23,28 +24,34 @@ export default function Header() {
     router.push("/login");
   };
 
-  const getImageUrl = (anhChanDung: string | null | undefined): string => {
-  if (!anhChanDung || anhChanDung.trim() === "") {
-    return DEFAULT_AVATAR;
-  }
-  if (anhChanDung.startsWith("http")) {
-    return anhChanDung;
-  }
-  const cleanPath = anhChanDung.startsWith("uploads/") 
-    ? anhChanDung 
-    : `uploads/${anhChanDung}`;
-  return `${API_BASE_URL}/${cleanPath}`;
-};
-
-  useEffect(() => {
-    // Lấy thông tin user từ localStorage
+  const refreshUserData = () => {
     const user = storage.getUser();
     if (user) {
       setUserData({ 
         full_name: user.full_name || '', 
-        email: user.email
-        });
+        email: user.email,
+        avatar: user.avatar // Chỉ cần lấy avatar từ user data
+      });
     }
+  };
+
+  useEffect(() => {
+    // Lấy thông tin user từ localStorage
+    refreshUserData();
+    
+    // Listen for storage changes để update khi user thay đổi avatar
+    const handleStorageChange = () => {
+      refreshUserData();
+    };
+    
+    window.addEventListener('storage', handleStorageChange);
+    // Custom event cho cùng tab
+    window.addEventListener('userDataUpdated', handleStorageChange);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('userDataUpdated', handleStorageChange);
+    };
   }, []);
 
   useEffect(() => {
@@ -80,7 +87,7 @@ export default function Header() {
             className="flex items-center gap-2 hover:opacity-80 transition-opacity"
           >
             <img
-              src={getImageUrl(userData?.avatar)}
+              src={getAvatarUrl(userData?.avatar)}
               alt="avatar"
               className="w-10 h-10 rounded-full ring-2 ring-white/50 shadow-md object-cover"
               onError={(e) => {

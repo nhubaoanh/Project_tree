@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useSidebar } from "@/context/SidebarContext";
 import Image from "next/image";
 import storage from "@/utils/storage";
-import { ChevronDown, ChevronRight } from "lucide-react";
+import { ChevronDown, ChevronRight, Home } from "lucide-react";
 
 // Menu item từ DB - match với format từ GetMenuByRoleId stored procedure
 interface MenuItem {
@@ -22,7 +22,7 @@ interface MenuItem {
 
 // Menu mặc định khi chưa đăng nhập
 const GUEST_MENU: MenuItem[] = [
-  { code: "HOME", name: "Trang chủ", href: "/", icon: "/icon/iconmember.png", sortOrder: 1, actions: ["VIEW"] },
+  { code: "HOME", name: "Trang chủ", href: "/", icon: "/icon/home.png", sortOrder: 1, actions: ["VIEW"] },
 ];
 
 export default function Sidebar() {
@@ -123,14 +123,14 @@ export default function Sidebar() {
                 width={22}
                 height={22}
                 alt={item.name}
-                className="object-contain"
+                className="object-contain brightness-0 invert"
               />
               {isSidebarOpen && (
                 <span className="whitespace-nowrap text-sm">{item.name}</span>
               )}
             </div>
             {isSidebarOpen && (
-              isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />
+              isExpanded ? <ChevronDown size={16} className="text-white" /> : <ChevronRight size={16} className="text-white" />
             )}
           </button>
           
@@ -148,17 +148,25 @@ export default function Sidebar() {
         key={item.code}
         href={item.href || "#"}
         className={`flex items-center gap-3 px-4 py-2 rounded-md transition-colors ${
-          active ? "bg-white/20 text-white font-medium" : "text-gray-200 hover:bg-white/10"
+          active 
+            ? item.code === "HOME"
+              ? "text-white font-medium" // Home chỉ có text trắng, không có background
+              : "bg-white/20 text-white font-medium" // Các item khác có background
+            : "text-gray-200 hover:bg-white/10"
         }`}
         style={{ paddingLeft: `${16 + level * 12}px` }}
       >
-        <Image
-          src={item.icon || "/icon/iconmember.png"}
-          width={22}
-          height={22}
-          alt={item.name}
-          className="object-contain"
-        />
+        {item.code === "HOME" ? (
+          <Home size={22} className="text-white" />
+        ) : (
+          <Image
+            src={item.icon || "/icon/iconmember.png"}
+            width={22}
+            height={22}
+            alt={item.name}
+            className="object-contain brightness-0 invert"
+          />
+        )}
         {isSidebarOpen && (
           <span className="whitespace-nowrap text-sm">{item.name}</span>
         )}

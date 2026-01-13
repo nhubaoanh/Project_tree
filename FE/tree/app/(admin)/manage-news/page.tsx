@@ -187,12 +187,12 @@ export default function QuanLyTinTucPage() {
       label: "Tiêu đề",
       clickable: true,
       align: "left",
-      render: (value, row) => (
-        <div>
-          <div className="font-medium text-[#5d4037] line-clamp-2">{value}</div>
-          {row.tomTat && <div className="text-xs text-gray-500 line-clamp-1 mt-1">{row.tomTat}</div>}
-        </div>
-      ),
+      // render: (value, row) => (
+      //   <div>
+      //     <div className="font-medium text-[#5d4037] line-clamp-2">{value}</div>
+      //     {row.tomTat && <div className="text-xs text-gray-500 line-clamp-1 mt-1">{row.tomTat}</div>}
+      //   </div>
+      // ),
     },
     {
       key: "tacGia",

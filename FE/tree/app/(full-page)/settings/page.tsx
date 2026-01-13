@@ -13,7 +13,7 @@ import { UpdateMyProfile } from '@/service/user.service';
 import { uploadFile } from '@/service/upload.service';
 import { useToast } from '@/service/useToas';
 import storage from '@/utils/storage';
-import { API_DOWNLOAD } from '@/constant/config';
+import { getAvatarUrl } from '@/utils/imageUtils';
 import { IUserProfile } from '@/types/user';
 
 export default function SettingsPage() {
@@ -58,10 +58,13 @@ export default function SettingsPage() {
         avatar: user.avatar || '',
         lu_user_id: user.nguoiDungId,
       }));
-      // Set preview URL nếu có avatar
-      if (user.avatar) {
-        setPreviewUrl(`${API_DOWNLOAD}/${user.avatar}`);
-      }
+      // Set preview URL nếu có avatar - không cần set preview URL nữa vì AuthenticatedImage sẽ handle
+      // if (user.avatar) {
+      //   const avatarUrl = getAvatarUrl(user.avatar);
+      //   console.log('BASE_URL from env:', process.env.NEXT_PUBLIC_API_BASE_URL);
+      //   console.log('Setting preview URL:', avatarUrl); // Debug log
+      //   setPreviewUrl(avatarUrl);
+      // }
     }
   }, []);
 
@@ -73,7 +76,7 @@ export default function SettingsPage() {
       // Update localStorage
       const user = storage.getUser();
       if (user) {
-        storage.setUser({
+        const updatedUser = {
           ...user,
           first_name: formData.first_name,
           middle_name: formData.middle_name,
@@ -84,7 +87,11 @@ export default function SettingsPage() {
           gender: formData.gender,
           date_of_birthday: formData.date_of_birthday,
           avatar: formData.avatar,
-        });
+        };
+        storage.setUser(updatedUser);
+        
+        // Trigger event để header update
+        window.dispatchEvent(new Event('userDataUpdated'));
       }
     },
     onError: () => {
@@ -159,21 +166,23 @@ export default function SettingsPage() {
       return;
     }
 
-    // Format date to YYYY-MM-DD for MySQL
-    const formatDateForDB = (date: Date | string | undefined): string => {
-      if (!date) return '';
+    // Format date to YYYY-MM-DD for MySQL or null if empty
+    const formatDateForDB = (date: Date | string | undefined): string | null => {
+      if (!date || date === '') return null;
       if (typeof date === 'string') {
         // Nếu đã là format YYYY-MM-DD thì giữ nguyên
         if (/^\d{4}-\d{2}-\d{2}$/.test(date)) return date;
         // Nếu là ISO string thì lấy phần date
         const d = new Date(date);
-        if (isNaN(d.getTime())) return '';
+        if (isNaN(d.getTime())) return null;
         return d.toISOString().split('T')[0];
       }
       return date.toISOString().split('T')[0];
     };
 
-    const submitData: IUserProfile = {
+    const formattedDate = formatDateForDB(formData.date_of_birthday);
+    
+    const submitData: Partial<IUserProfile> = {
       userId: formData.userId,
       tenDangNhap: formData.tenDangNhap || '',
       matKhau: formData.matKhau || '',
@@ -183,7 +192,6 @@ export default function SettingsPage() {
       full_name: `${formData.last_name} ${formData.middle_name} ${formData.first_name}`.trim(),
       avatar: formData.avatar || '',
       gender: formData.gender ?? 1,
-      date_of_birthday: formatDateForDB(formData.date_of_birthday),
       email: formData.email || '',
       phone: formData.phone || '',
       active_flag: 1,
@@ -193,7 +201,12 @@ export default function SettingsPage() {
       lu_user_id: formData.userId,
     };
 
-    updateMutation.mutate(submitData);
+    // Chỉ thêm date_of_birthday nếu có giá trị hợp lệ
+    if (formattedDate) {
+      submitData.date_of_birthday = formattedDate;
+    }
+
+    updateMutation.mutate(submitData as IUserProfile);
   };
 
   // Get initials for avatar fallback
@@ -211,8 +224,8 @@ export default function SettingsPage() {
         </h1>
 
         <Card className="shadow-xl border-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm">
-          <CardHeader className="border-b pb-6">
-            <CardTitle className="text-xl flex items-center gap-2">
+          <CardHeader className="border-b pb-6 ">
+            <CardTitle className="text-xl flex items-center gap-2 ">
               <UserCircle className="text-primary" size={24} />
               Thông tin cá nhân
             </CardTitle>
@@ -224,8 +237,11 @@ export default function SettingsPage() {
                 <div className="relative group">
                   <Avatar className="w-28 h-28 border-4 border-primary/20 shadow-lg">
                     <AvatarImage 
-                      src={previewUrl || (formData.avatar ? `${API_DOWNLOAD}/${formData.avatar}` : '')} 
-                      alt="Avatar" 
+                      src={previewUrl || getAvatarUrl(formData.avatar)} 
+                      alt="Avatar"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = '/images/vangoc.jpg';
+                      }}
                     />
                     <AvatarFallback className="bg-gradient-to-br from-primary/20 to-primary/10 text-2xl font-semibold">
                       {getInitials()}

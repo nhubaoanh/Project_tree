@@ -273,12 +273,6 @@ export default function QuanLyTaiChinhChiPage() {
   // Action configuration
   const customActions: ActionConfig<IContributionDown>[] = [
     {
-      icon: Eye,
-      label: "Xem chi tiết",
-      onClick: handleViewDetail,
-      color: "green",
-    },
-    {
       icon: Edit,
       label: "Sửa",
       onClick: handleEdit,
