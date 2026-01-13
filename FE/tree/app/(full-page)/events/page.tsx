@@ -59,6 +59,8 @@ export const SuKienPage: React.FC = () => {
     [eventQuery.data?.data]
   );
 
+
+  console.log("sortedEvents", sortedEvents);
   // Chỉ hiển thị số lượng sự kiện theo visibleCount
   const displayedEvents = sortedEvents.slice(0, visibleCount);
 
@@ -190,7 +192,7 @@ export const SuKienPage: React.FC = () => {
                 <div className="text-center">
                   <p className="text-xs text-[#8b5e3c] italic">Người tạo</p>
                   <p className="text-sm font-bold text-[#5d4037] italic">
-                    {item.hoTen || "Không rõ"}
+                    {item.full_name || "Không rõ"}
                   </p>
                 </div>
               </div>

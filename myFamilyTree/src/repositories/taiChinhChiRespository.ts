@@ -1,7 +1,7 @@
 import { injectable } from "tsyringe";
 import { taiChinhChi } from "../models/TaiChinhChi";
 import { Database } from "../config/database";
-import taiChinhThu from "../routes/taiChinhThu";
+import { ITaiChinhChiImport } from "../services/taiChinhChiService";
 
 @injectable()
 export class taiChinhChiRespository {
@@ -81,6 +81,57 @@ export class taiChinhChiRespository {
     } catch (error: any) {
       console.log("error database => ", error);
       throw new Error(error.message);
+    }
+  }
+
+  // Import từ JSON - sử dụng procedure mới (theo pattern thành viên)
+  async importFromJson(
+    data: ITaiChinhChiImport[],
+    dongHoId: string,
+    nguoiTaoId: string
+  ): Promise<any> {
+    const connection = await this.db.getRawConnection();
+    try {
+      const jsonData = JSON.stringify(data);
+      // Gọi stored procedure với OUT params
+      await connection.query(
+        'CALL ImportTaiChinhChiFromJson(?, ?, ?, @err_code, @err_msg)',
+        [jsonData, dongHoId, nguoiTaoId]
+      );
+
+      // Lấy output params
+      const [outParams]: any = await connection.query(
+        'SELECT @err_code AS err_code, @err_msg AS err_msg'
+      );
+
+      const errorCode = outParams[0].err_code;
+      const message = outParams[0].err_msg;
+
+      // Xử lý các trường hợp khác nhau
+      if (errorCode === 0) {
+        // Thành công hoàn toàn
+        return { 
+          success: true, 
+          count: data.length,
+          message: message 
+        };
+      } else if (errorCode === 1001) {
+        // Thành công một phần (có lỗi nhưng vẫn import được một số dòng)
+        return { 
+          success: true, 
+          partial: true,
+          count: data.length,
+          message: message 
+        };
+      } else {
+        // Lỗi hoàn toàn
+        throw new Error(message || 'Lỗi khi import dữ liệu chi');
+      }
+    } catch (error: any) {
+      console.error("❌ Import CHI error:", error.message);
+      throw error;
+    } finally {
+      connection.release();
     }
   }
 }

@@ -71,8 +71,18 @@ export const getDongHoById = async (id: string): Promise<any> => {
         return res?.data;
     } catch (error: any) {
         const err = parseApiError(error);
-        console.error(`[getDongHoById] ${err.message}`);
-        return { success: false, data: null, message: err.message };
+        
+        // Không log error cho trường hợp không tìm thấy dữ liệu (404) hoặc không có quyền (403)
+        const isNotFound = err.message?.includes("Không tìm thấy") || 
+                          err.message?.includes("không tồn tại") ||
+                          error?.response?.status === 404;
+        const is403 = error?.response?.status === 403;
+        
+        if (!isNotFound && !is403) {
+            console.error(`[getDongHoById] ${err.message}`);
+        }
+        
+        return { success: false, data: null, message: err.message, isNotFound, is403 };
     }
 };
 

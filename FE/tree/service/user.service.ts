@@ -77,11 +77,17 @@ export const updateUser = async (data: Partial<IUser>): Promise<any> => {
 
 export const UpdateMyProfile = async (data: Partial<IUserProfile>): Promise<any> => {
   try {
-    // Loại bỏ các trường có giá trị null hoặc undefined để tránh lỗi database
+    // Loại bỏ các trường có giá trị null, undefined hoặc empty string
     const cleanData = Object.fromEntries(
-      Object.entries(data).filter(([_, value]) => value !== null && value !== undefined && value !== '')
-    );
-    
+      Object.entries(data).filter(([key, value]) => {
+        // Đặc biệt xử lý mật khẩu: chỉ gửi nếu có giá trị thực sự
+        if (key === 'matKhau') {
+          return value && typeof value === 'string' && value.trim() !== '';
+        }
+        // Các trường khác: loại bỏ null, undefined, empty string
+        return value !== null && value !== undefined && value !== '';
+      })
+    );    
     const res = await apiClient.post(`${prefix}/update-user-profile`, cleanData);
     return res?.data;
   } catch (error: any) {

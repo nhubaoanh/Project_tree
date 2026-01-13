@@ -3,7 +3,7 @@
 import React from "react";
 import { X, User, Calendar, MapPin, Briefcase, GraduationCap, Home, Heart, Users } from "lucide-react";
 import { IMember } from "@/types/member";
-import { API_DOWNLOAD } from "@/constant/config";
+import { getImageUrl } from "@/utils/imageUtils";
 
 interface MemberDetailModalProps {
     isOpen: boolean;
@@ -46,9 +46,12 @@ export const MemberDetailModal: React.FC<MemberDetailModalProps> = ({ isOpen, on
               <div className="w-24 h-24 rounded-full border-4 border-white/30 overflow-hidden bg-white/20 flex-shrink-0">
                 {member.anhChanDung ? (
                   <img
-                    src={`${API_DOWNLOAD}/${member.anhChanDung}`}
+                    src={getImageUrl(member.anhChanDung)}
                     alt={member.hoTen}
                     className="w-full h-full object-cover"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = '/images/vangoc.jpg';
+                    }}
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center">

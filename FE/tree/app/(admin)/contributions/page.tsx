@@ -10,11 +10,11 @@ import {
 } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
 import { IContributionUp, IsearchContributionUp } from "@/types/contribuitionUp";
-import { createContributionUp, deleteContributionUp, searchContributionUp, updateContributionUp } from "@/service/contribuitionUp.service";
+import { createContributionUp, deleteContributionUp, searchContributionUp, updateContributionUp, downloadTemplate, downloadTemplateWithSample, importFromExcel } from "@/service/contribuitionUp.service";
 import { ContributionUpModal } from "./components/contribuitionUpModal";
 import { useToast } from "@/service/useToas";
 import storage from "@/utils/storage";
-import { 
+import {
   PageLayout, 
   DataTable, 
   DeleteModal, 
@@ -22,6 +22,7 @@ import {
   PageLoading, 
   ErrorState,
   NoFamilyTreeState,
+  ValidationErrorModal,
   ColumnConfig,
   ActionConfig,
   DetailSection,
@@ -61,6 +62,10 @@ export default function QuanLyTaiChinhThuPage() {
   const [itemsToDelete, setItemsToDelete] = useState<IContributionUp[]>([]);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [selectedContributionForDetail, setSelectedContributionForDetail] = useState<IContributionUp | null>(null);
+  const [isValidationErrorModalOpen, setIsValidationErrorModalOpen] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<any[]>([]);
+  const [validationWarnings, setValidationWarnings] = useState<any[]>([]);
+  const [validationSummary, setValidationSummary] = useState({ validCount: 0, totalCount: 0 });
 
   const { showSuccess, showError } = useToast();
 
@@ -207,34 +212,112 @@ export default function QuanLyTaiChinhThuPage() {
     XLSX.writeFile(workbook, `TaiChinhThu_Trang${pageIndex}.xlsx`);
   };
 
-  const handleImportExcel = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleDownloadTemplate = async () => {
+    try {
+      const blob = await downloadTemplate();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'Template_TaiChinhThu.xlsx';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      showSuccess("Đã tải template thành công!");
+    } catch (error) {
+      showError("Không thể tải template. Vui lòng thử lại.");
+    }
+  };
+
+  const handleDownloadTemplateWithSample = async () => {
+    try {
+      const blob = await downloadTemplateWithSample();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'MauNhap_TaiChinhThu.xlsx';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      showSuccess("Đã tải file mẫu thành công!");
+    } catch (error) {
+      showError("Không thể tải file mẫu. Vui lòng thử lại.");
+    }
+  };
+
+  const handleImportExcel = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (evt) => {
-        const bstr = evt.target?.result;
-        const wb = XLSX.read(bstr, { type: "binary" });
-        const wsname = wb.SheetNames[0];
-        const ws = wb.Sheets[wsname];
-        const dataParsed = XLSX.utils.sheet_to_json(ws) as IContributionUp[];
+    if (!file) return;
 
-        if (dataParsed.length > 0) {
-          const promises = dataParsed.map(async (u) => {
-            try {
-              await createContributionUp(u);
-            } catch (err) {
-              console.error("Import error for row", u);
-            }
-          });
+    // Validate file type
+    const allowedTypes = [
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'application/vnd.ms-excel'
+    ];
+    
+    if (!allowedTypes.includes(file.type)) {
+      showError("Chỉ chấp nhận file Excel (.xlsx, .xls)");
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      return;
+    }
 
-          Promise.all(promises).then(() => {
-            queryClient.invalidateQueries({ queryKey: ["contribuitionUp"] });
-            toast.success(`Đã xử lý nhập ${dataParsed.length} dòng.`);
-            if (fileInputRef.current) fileInputRef.current.value = "";
+    // Validate file size (10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      showError("File quá lớn. Kích thước tối đa 10MB");
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      return;
+    }
+
+    try {
+      toast("Đang xử lý file Excel...", { icon: "⏳" });
+      const result = await importFromExcel(file);
+      
+      if (result.success) {
+        queryClient.invalidateQueries({ queryKey: ["contribuitionUp"] });
+        showSuccess(result.message || "Import thành công!");
+      } else {
+        // Hiển thị modal validation errors
+        if (result.errors && result.errors.length > 0) {
+          setValidationErrors(result.errors);
+          setValidationWarnings(result.warnings || []);
+          setValidationSummary({
+            validCount: result.validCount || 0,
+            totalCount: result.totalCount || 0
           });
+          setIsValidationErrorModalOpen(true);
+        } else {
+          showError(result.message || "Import thất bại");
         }
-      };
-      reader.readAsBinaryString(file);
+      }
+    } catch (error: any) {
+      console.error("Import error:", error);
+      
+      // Kiểm tra nếu error response có validation errors
+      if (error.response?.data?.errors) {
+        setValidationErrors(error.response.data.errors);
+        setValidationWarnings(error.response.data.warnings || []);
+        setValidationSummary({
+          validCount: error.response.data.validCount || 0,
+          totalCount: error.response.data.totalCount || 0
+        });
+        setIsValidationErrorModalOpen(true);
+      } else if (error.response?.status === 500) {
+        // Lỗi 500 - hiển thị modal với thông báo lỗi server
+        setValidationErrors([{
+          row: 0,
+          field: "Server Error",
+          message: error.response?.data?.message || "Lỗi server khi xử lý file Excel. Vui lòng kiểm tra định dạng file và thử lại.",
+          value: "HTTP 500"
+        }]);
+        setValidationWarnings([]);
+        setValidationSummary({ validCount: 0, totalCount: 1 });
+        setIsValidationErrorModalOpen(true);
+      } else {
+        showError(error.response?.data?.message || "Có lỗi xảy ra khi import file Excel");
+      }
+    } finally {
+      if (fileInputRef.current) fileInputRef.current.value = "";
     }
   };
 
@@ -333,15 +416,21 @@ export default function QuanLyTaiChinhThuPage() {
     }] : []),
     {
       icon: Download,
+      label: "Tải file mẫu",
+      onClick: handleDownloadTemplateWithSample,
+      variant: "secondary" as const,
+    },
+    {
+      icon: Download,
       label: "Xuất Excel",
       onClick: handleExportExcel,
-      variant: "secondary" as const,
+      variant: "success" as const,
     },
     {
       icon: Upload,
       label: "Nhập Excel",
       onClick: () => fileInputRef.current?.click(),
-      variant: "success" as const,
+      variant: "primary" as const,
     },
     {
       icon: Plus,
@@ -507,6 +596,17 @@ export default function QuanLyTaiChinhThuPage() {
             ? "Bạn có chắc chắn muốn xóa khoản thu này? Hành động này không thể hoàn tác."
             : `Bạn có chắc chắn muốn xóa ${itemsToDelete.length} khoản thu đã chọn? Hành động này không thể hoàn tác.`
         }
+      />
+
+      {/* Validation Error Modal */}
+      <ValidationErrorModal
+        isOpen={isValidationErrorModalOpen}
+        onClose={() => setIsValidationErrorModalOpen(false)}
+        title="Lỗi Import File Excel"
+        errors={validationErrors}
+        warnings={validationWarnings}
+        validCount={validationSummary.validCount}
+        totalCount={validationSummary.totalCount}
       />
     </PageLayout>
   );

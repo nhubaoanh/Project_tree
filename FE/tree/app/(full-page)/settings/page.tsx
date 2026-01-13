@@ -185,7 +185,6 @@ export default function SettingsPage() {
     const submitData: Partial<IUserProfile> = {
       userId: formData.userId,
       tenDangNhap: formData.tenDangNhap || '',
-      matKhau: formData.matKhau || '',
       first_name: formData.first_name || '',
       middle_name: formData.middle_name || '',
       last_name: formData.last_name || '',
@@ -200,6 +199,11 @@ export default function SettingsPage() {
       lu_updated: new Date(),
       lu_user_id: formData.userId,
     };
+
+    // Chỉ thêm matKhau nếu có giá trị (không rỗng)
+    if (formData.matKhau && formData.matKhau.trim() !== '') {
+      submitData.matKhau = formData.matKhau;
+    }
 
     // Chỉ thêm date_of_birthday nếu có giá trị hợp lệ
     if (formattedDate) {

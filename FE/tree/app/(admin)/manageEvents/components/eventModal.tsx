@@ -93,7 +93,7 @@ export const EventModal: React.FC<EventModalProps> = ({
         loaiSuKien: initialData?.loaiSuKien ?? 1,
         uuTien: initialData?.uuTien ?? 2,
         lapLai: initialData?.lapLai ?? 0,
-        nguoiTaoId: initialData?.nguoiTaoId || "",
+        nguoiTaoId: user?.nguoiDungId || "",
       });
       // Reset errors và touched
       setErrors({});
@@ -190,9 +190,11 @@ export const EventModal: React.FC<EventModalProps> = ({
     const eventData = {
       ...formData,
       suKienId: initialData?.suKienId,
-      nguoiTaoId: initialData?.nguoiTaoId,
+      nguoiTaoId: user?.nguoiDungId || "",
       lu_user_id: user?.nguoiDungId || null,
     };
+
+    console.log("Submitting event data:", eventData);
 
     onSubmit(eventData as Partial<IEvent>);
   };

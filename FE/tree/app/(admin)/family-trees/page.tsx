@@ -49,9 +49,15 @@ export default function FamilyTreesPage() {
 
     // Danh sách dòng họ hiển thị - Tất cả user chỉ thấy dòng họ của mình
     const dongHoList: IDongHo[] = myDongHoQuery.data?.data ? [myDongHoQuery.data.data] : [];
-
+    
     const isLoading = myDongHoQuery.isLoading;
     const isError = myDongHoQuery.isError;
+    const errorData = myDongHoQuery.error as any;
+    
+    // Kiểm tra xem có phải lỗi "không tìm thấy dòng họ" không
+    const isNotFoundError = myDongHoQuery.data?.isNotFound || 
+                           myDongHoQuery.data?.message?.includes("Không tìm thấy") ||
+                           myDongHoQuery.data?.message?.includes("không tồn tại");
     
     // Chỉ thudo mới được tạo dòng họ mới (không giới hạn)
     const canCreateNew = isThudo;
@@ -71,7 +77,7 @@ export default function FamilyTreesPage() {
             // Thêm thông tin người tạo
             const dataWithCreator = {
                 ...data,
-                nguoiTaoId: user?.userId || user?.id,
+                nguoiTaoId: user?.nguoiDungId || 'system',
             };
             
             return createDongHo(dataWithCreator);
@@ -204,16 +210,46 @@ export default function FamilyTreesPage() {
         );
     }
 
-    if (isError) {
+    // Xử lý trường hợp không tìm thấy dòng họ (404) - hiển thị thông báo thân thiện
+    if (isNotFoundError || (dongHoList.length === 0 && !isLoading && !isError)) {
         return (
-            <div className="p-4 mb-4 text-red-600 bg-red-100 rounded flex justify-between items-center">
-                <span>Lỗi khi tải dữ liệu. Vui lòng thử lại sau.</span>
-                <button
-                    onClick={() => myDongHoQuery.refetch()}
-                    className="px-3 py-1 bg-[#d4af37] text-white rounded hover:bg-[#b8962a]"
-                >
-                    Thử lại
-                </button>
+            <div className="max-w-6xl mx-auto font-dancing text-[#4a4a4a] pb-20 animate-fadeIn">
+                <div className="text-center py-16">
+                    <Users size={64} className="mx-auto text-[#d4af37] mb-4 opacity-50" />
+                    <h2 className="text-2xl font-bold text-[#b91c1c] mb-2">Chưa có dòng họ</h2>
+                    <p className="text-[#8b5e3c] text-lg mb-4">
+                        {isThudo 
+                            ? "Bạn chưa tạo dòng họ nào. Hãy tạo dòng họ đầu tiên để bắt đầu xây dựng cây gia phả!"
+                            : "Dòng họ của bạn chưa được thiết lập. Vui lòng liên hệ Thủ thư để được hỗ trợ tạo dòng họ."
+                        }
+                    </p>
+                    {isThudo && (
+                        <button
+                            onClick={() => setIsModalOpen(true)}
+                            className="inline-flex items-center gap-2 px-6 py-3 bg-[#b91c1c] text-white rounded-lg shadow hover:bg-[#991b1b] transition-all font-bold"
+                        >
+                            <Plus size={20} />
+                            <span>Tạo dòng họ đầu tiên</span>
+                        </button>
+                    )}
+                </div>
+            </div>
+        );
+    }
+
+    // Xử lý lỗi khác (không phải 404)
+    if (isError && !isNotFoundError) {
+        return (
+            <div className="max-w-6xl mx-auto font-dancing text-[#4a4a4a] pb-20 animate-fadeIn">
+                <div className="p-4 mb-4 text-red-600 bg-red-100 rounded flex justify-between items-center">
+                    <span>Lỗi khi tải dữ liệu. Vui lòng thử lại sau.</span>
+                    <button
+                        onClick={() => myDongHoQuery.refetch()}
+                        className="px-3 py-1 bg-[#d4af37] text-white rounded hover:bg-[#b8962a]"
+                    >
+                        Thử lại
+                    </button>
+                </div>
             </div>
         );
     }

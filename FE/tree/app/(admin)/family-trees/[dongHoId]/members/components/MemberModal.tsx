@@ -4,7 +4,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { X, Upload, Loader2, Image as ImageIcon, Trash2, Plus } from "lucide-react";
 import { uploadFile, uploadFiles } from "@/service/upload.service";
 import { IMember } from "@/types/member";
-import { API_DOWNLOAD } from "@/constant/config";
+import { getImageUrl } from "@/utils/imageUtils";
 import { FormRules, validateForm, validateField } from "@/lib/validator";
 import storage from "@/utils/storage";
 
@@ -66,7 +66,7 @@ export const MemberModal: React.FC<MemberModalProps> = ({
         voId: member?.voId,
         chongId: member?.chongId,
       });
-      setPreviewUrl(member?.anhChanDung ? `${API_DOWNLOAD}/${member.anhChanDung}` : null);
+      setPreviewUrl(member?.anhChanDung ? getImageUrl(member.anhChanDung) : null);
       setExtraImages([]);
       setErrors({});
       setTouched({});
@@ -191,7 +191,20 @@ export const MemberModal: React.FC<MemberModalProps> = ({
             <label className="block text-sm font-medium text-[#5d4037]">Ảnh chân dung</label>
             <div className="flex items-start gap-4">
               <div className="w-32 h-32 border-2 border-dashed border-[#d4af37] rounded-lg overflow-hidden flex items-center justify-center bg-[#fdf6e3]">
-                {uploading ? <Loader2 className="w-8 h-8 animate-spin text-[#d4af37]" /> : previewUrl ? <img src={previewUrl} alt="Preview" className="w-full h-full object-cover" /> : <ImageIcon className="w-12 h-12 text-[#d4af37] opacity-50" />}
+                {uploading ? (
+                  <Loader2 className="w-8 h-8 animate-spin text-[#d4af37]" />
+                ) : previewUrl ? (
+                  <img 
+                    src={previewUrl} 
+                    alt="Preview" 
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = '/images/vangoc.jpg';
+                    }}
+                  />
+                ) : (
+                  <ImageIcon className="w-12 h-12 text-[#d4af37] opacity-50" />
+                )}
               </div>
               <div className="flex flex-col gap-2">
                 <input ref={fileInputRef} type="file" accept="image/*" onChange={handleSingleUpload} className="hidden" />
@@ -209,7 +222,14 @@ export const MemberModal: React.FC<MemberModalProps> = ({
             <div className="flex flex-wrap gap-3">
               {extraImages.map((path, index) => (
                 <div key={index} className="relative w-24 h-24 group">
-                  <img src={`${API_DOWNLOAD}/${path}`} alt={`Extra ${index + 1}`} className="w-full h-full object-cover rounded-lg border border-[#d4af37]" />
+                  <img 
+                    src={getImageUrl(path)} 
+                    alt={`Extra ${index + 1}`} 
+                    className="w-full h-full object-cover rounded-lg border border-[#d4af37]"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = '/images/vangoc.jpg';
+                    }}
+                  />
                   <button type="button" onClick={() => handleRemoveExtraImage(index)} className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"><X size={14} /></button>
                 </div>
               ))}
