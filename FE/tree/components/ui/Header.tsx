@@ -101,16 +101,6 @@ export default function Header() {
                 <p className="font-semibold text-gray-900">{userData?.full_name || 'Người dùng'}</p>
                 <p className="text-sm text-gray-600">{userData?.email || ''}</p>
               </div>
-
-              <Link
-                href="#"
-                className="w-full flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition-colors rounded-lg"
-                onClick={() => setOpen(false)}
-              >
-                <User size={18} className="flex-shrink-0" />
-                <span>Trang cá nhân</span>
-              </Link>
-
               <Link
                 href="/settings"
                 className="w-full flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition-colors rounded-lg"

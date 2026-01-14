@@ -20,6 +20,14 @@ const dancing = Dancing_Script({
 export const metadata: Metadata = {
   title: "Gia Phả Việt",
   description: "Hệ thống quản lý gia phả dòng họ Việt Nam",
+  icons: {
+    icon: [
+      { url: '/images/logo1.png', sizes: '32x32', type: 'image/png' },
+      { url: '/images/logo1.png', sizes: '16x16', type: 'image/png' },
+    ],
+    apple: '/images/logo1.png',
+    shortcut: '/images/logo1.png',
+  },
 };
 
 export default function RootLayout({

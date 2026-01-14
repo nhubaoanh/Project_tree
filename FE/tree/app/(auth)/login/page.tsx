@@ -88,10 +88,22 @@ export default function LoginPage() {
             permissions: userData.permissions || {},
             canSelectAllDongHo: userData.canSelectAllDongHo || false,
           });
-        }
 
-        showSuccess("Đăng nhập thành công!");
-        router.push("/dashboard");
+          showSuccess("Đăng nhập thành công!");
+
+          // Redirect dựa trên roleCode
+          // Thủ Đô (TD) → Dashboard
+          // Thành viên (TV) → Giữ nguyên URL hoặc về trang genealogy
+          if (userData.roleCode === "thudo" || userData.roleCode === "sa") {
+            router.push("/dashboard");
+          } else {
+            // Thành viên: redirect về trang genealogy
+            router.push("/genealogy");
+          }
+        } else {
+          showSuccess("Đăng nhập thành công!");
+          router.push("/dashboard");
+        }
       } else {
         showError(result?.message || "Đăng nhập thất bại. Vui lòng thử lại.");
       }

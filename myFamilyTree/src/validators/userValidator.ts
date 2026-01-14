@@ -62,9 +62,11 @@ export const signupRules: ValidationChain[] = [
  * Validate dữ liệu reset mật khẩu
  *
  * Fields:
- * - email: Bắt buộc, format email
+ * - tenDangNhap: Bắt buộc, 3-50 ký tự (username hoặc email)
  */
-export const resetPasswordRules: ValidationChain[] = [emailRule("email")];
+export const resetPasswordRules: ValidationChain[] = [
+  stringLength("tenDangNhap", "Tên đăng nhập", 3, 50)
+];
 
 // ============================================================================
 // UPDATE USER VALIDATOR

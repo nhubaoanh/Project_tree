@@ -56,17 +56,20 @@ const ForgotPassword = () => {
 
     setIsLoading(true);
     try {
-      const response = await resetPasswordUser(form.values);
+      // Backend expects "tenDangNhap" field (username or email)
+      const response = await resetPasswordUser({
+        tenDangNhap: form.values.tenDangNhap
+      });
 
       if (response.success) {
         setMessage("✅ Email reset mật khẩu đã được gửi.");
         showSuccess("Vui lòng kiểm tra email.");
         form.reset();
       } else {
-        showError(response.message);
+        showError(response.message || "Không thể gửi email reset mật khẩu.");
       }
     } catch (error: any) {
-      showError("Lỗi kết nối. Vui lòng thử lại sau.");
+      showError(error.message || "Lỗi kết nối. Vui lòng thử lại sau.");
       console.error("reset:", error);
     } finally {
       setIsLoading(false);
