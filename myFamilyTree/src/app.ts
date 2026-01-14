@@ -55,8 +55,43 @@ app.use("/uploads", (req, res, next) => {
   // Cho phép CORS cho static files
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
+  
+  // Set Content-Type để browser hiển thị file thay vì download
+  const ext = path.extname(req.path).toLowerCase();
+  
+  // Các loại file hiển thị inline (xem trong browser)
+  const inlineTypes: { [key: string]: string } = {
+    '.pdf': 'application/pdf',
+    '.jpg': 'image/jpeg',
+    '.jpeg': 'image/jpeg',
+    '.png': 'image/png',
+    '.gif': 'image/gif',
+    '.webp': 'image/webp',
+    '.svg': 'image/svg+xml',
+    '.txt': 'text/plain',
+  };
+  
+  if (inlineTypes[ext]) {
+    res.setHeader('Content-Type', inlineTypes[ext]);
+    res.setHeader('Content-Disposition', 'inline'); // Hiển thị trong browser
+  }
+  
   next();
-}, express.static(path.join(__dirname, "..", "uploads")));
+}, express.static(path.join(__dirname, "..", "uploads"), {
+  setHeaders: (res, filePath) => {
+    const ext = path.extname(filePath).toLowerCase();
+    
+    // Các loại file hiển thị inline
+    const inlineExts = ['.pdf', '.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg', '.txt'];
+    
+    if (inlineExts.includes(ext)) {
+      res.setHeader('Content-Disposition', 'inline');
+    } else {
+      // Các file khác (doc, xls, etc.) vẫn download
+      res.setHeader('Content-Disposition', 'attachment');
+    }
+  }
+}));
 
 // ============================================================================
 // 1. CORS - Cho phép cross-origin requests

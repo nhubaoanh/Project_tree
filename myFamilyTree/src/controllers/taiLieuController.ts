@@ -94,15 +94,35 @@ export class TaiLieuController {
       const taiLieuId = req.params.id;
       const luUserId = (req as any).user?.userId || "";
 
+      if (!taiLieuId) {
+        res.status(400).json({ 
+          success: false, 
+          message: "Thiếu ID tài liệu" 
+        });
+        return;
+      }
+
       const result = await this.taiLieuService.delete(taiLieuId, luUserId);
 
-      res.json({
-        success: true,
-        message: "Xóa tài liệu thành công",
-        data: result,
-      });
+      // Kiểm tra kết quả từ service
+      if (result && result.success !== false) {
+        res.json({
+          success: true,
+          message: "Xóa tài liệu thành công",
+          data: result,
+        });
+      } else {
+        res.status(500).json({ 
+          success: false, 
+          message: result?.message || "Không thể xóa tài liệu" 
+        });
+      }
     } catch (error: any) {
-      res.status(500).json({ success: false, message: "Lỗi xóa tài liệu" });
+      console.error("Delete error:", error);
+      res.status(500).json({ 
+        success: false, 
+        message: error.message || "Lỗi xóa tài liệu" 
+      });
     }
   }
 
@@ -125,10 +145,45 @@ export class TaiLieuController {
   async deleteMultiple(req: Request, res: Response): Promise<void> {
     try {
       const { list_json, lu_user_id } = req.body;
+      
+      // Validate input
+      if (!list_json || !Array.isArray(list_json) || list_json.length === 0) {
+        res.status(400).json({ 
+          success: false, 
+          message: "Danh sách tài liệu không hợp lệ" 
+        });
+        return;
+      }
+
+      if (!lu_user_id) {
+        res.status(400).json({ 
+          success: false, 
+          message: "Thiếu thông tin người dùng" 
+        });
+        return;
+      }
+
       const result = await this.taiLieuService.deleteMultiple(list_json, lu_user_id);
-      res.json({ success: true, message: "Xóa tài liệu thành công", data: result });
+      
+      // Kiểm tra kết quả từ service
+      if (result && result.success !== false) {
+        res.json({ 
+          success: true, 
+          message: `Đã xóa ${list_json.length} tài liệu thành công`, 
+          data: result 
+        });
+      } else {
+        res.status(500).json({ 
+          success: false, 
+          message: result?.message || "Không thể xóa tài liệu" 
+        });
+      }
     } catch (error: any) {
-      res.status(500).json({ success: false, message: "Lỗi xóa tài liệu" });
+      console.error("Delete multiple error:", error);
+      res.status(500).json({ 
+        success: false, 
+        message: error.message || "Lỗi xóa tài liệu" 
+      });
     }
   }
 }

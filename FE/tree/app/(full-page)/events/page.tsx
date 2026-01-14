@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Calendar, MapPin, ChevronDown, ArrowUp } from "lucide-react";
+import { Calendar, MapPin, ChevronDown, ArrowUp, Filter } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { searchEvent } from "@/service/event.service";
 import { IsearchEvent } from "@/types/event";
@@ -9,8 +9,26 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import storage from "@/utils/storage";
 
+// Interface cho event data
+interface EventData {
+  suKienId: string;
+  tenSuKien: string;
+  tenLoaiSuKien: string;
+  ngayDienRa: string;
+  gioDienRa: string;
+  diaDiem: string;
+  moTa: string;
+  uuTien: number;
+  full_name: string;
+}
 
 const getBadgeColor = (type: string) => {
   switch (type) {
@@ -28,6 +46,7 @@ const getBadgeColor = (type: string) => {
 export const SuKienPage: React.FC = () => {
   const [visibleCount, setVisibleCount] = useState(3);
   const [dongHoId, setDongHoId] = useState<string>("");
+  const [selectedType, setSelectedType] = useState<string>("ALL");
 
   // Lấy dongHoId từ user đã đăng nhập
   useEffect(() => {
@@ -48,19 +67,29 @@ export const SuKienPage: React.FC = () => {
     queryFn: () => searchEvent(searchParams),
     enabled: !!dongHoId, // Chỉ gọi API khi có dongHoId
   });
-  // Sắp xếp sự kiện mới nhất lên đầu
+
+  // Lấy danh sách loại sự kiện duy nhất
+  const eventTypes = React.useMemo(() => {
+    const events = (eventQuery.data?.data || []) as EventData[];
+    const types = new Set(events.map((e) => e.tenLoaiSuKien));
+    return Array.from(types);
+  }, [eventQuery.data?.data]);
+
+  // Sắp xếp và lọc sự kiện
   const sortedEvents = React.useMemo(
-    () =>
-      [...(eventQuery.data?.data || [])].sort(
-        (a, b) =>
-          new Date(b.ngayDienRa + "T" + b.gioDienRa).getTime() -
-          new Date(a.ngayDienRa + "T" + a.gioDienRa).getTime()
-      ),
-    [eventQuery.data?.data]
+    () => {
+      const events = (eventQuery.data?.data || []) as EventData[];
+      return [...events]
+        .filter((event) => selectedType === "ALL" || event.tenLoaiSuKien === selectedType)
+        .sort(
+          (a, b) =>
+            new Date(b.ngayDienRa + "T" + b.gioDienRa).getTime() -
+            new Date(a.ngayDienRa + "T" + a.gioDienRa).getTime()
+        );
+    },
+    [eventQuery.data?.data, selectedType]
   );
 
-
-  console.log("sortedEvents", sortedEvents);
   // Chỉ hiển thị số lượng sự kiện theo visibleCount
   const displayedEvents = sortedEvents.slice(0, visibleCount);
 
@@ -69,21 +98,82 @@ export const SuKienPage: React.FC = () => {
     setVisibleCount((prev) => Math.min(prev + 3, sortedEvents.length));
   };
 
-  // Hàm cuộn lên đầu trang
+  // Hàm cuộn lên đầu trang và thu lại về 3 sự kiện
   const scrollToTop = () => {
+    setVisibleCount(3);
     window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  // Hàm lấy tên hiển thị cho loại sự kiện
+  const getEventTypeLabel = (type: string) => {
+    if (type === "ALL") return "Tất cả sự kiện";
+    return type;
+  };
+
+  // Hàm đếm số lượng sự kiện theo loại
+  const getEventCount = (type: string) => {
+    const events = (eventQuery.data?.data || []) as EventData[];
+    if (type === "ALL") return events.length;
+    return events.filter((e) => e.tenLoaiSuKien === type).length;
   };
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
-      {/* Tiêu đề trang */}
-      <div className="text-center mb-12">
+      {/* Tiêu đề trang và Bộ lọc */}
+      <div className="text-center mb-8">
         <h1 className="text-4xl font-bold text-[#b91c1c] mb-2">
           Bảng Tin Dòng Họ
         </h1>
-        <p className="text-[#8b5e3c]">
+        <p className="text-[#8b5e3c] mb-4">
           Cập nhật thông tin mới nhất về dòng họ
         </p>
+
+        {/* Dropdown bộ lọc */}
+        {dongHoId && eventTypes.length > 0 && (
+          <div className="flex justify-center">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="px-6 py-2">
+                  <Filter className="mr-2 h-4 w-4" />
+                  {getEventTypeLabel(selectedType)} ({getEventCount(selectedType)})
+                  <ChevronDown className="ml-2 h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="center" className="w-56">
+                <DropdownMenuItem
+                  onClick={() => {
+                    setSelectedType("ALL");
+                    setVisibleCount(3);
+                  }}
+                  className={selectedType === "ALL" ? "bg-accent" : ""}
+                >
+                  <span className="flex-1">Tất cả sự kiện</span>
+                  <Badge variant="secondary" className="ml-2">
+                    {getEventCount("ALL")}
+                  </Badge>
+                </DropdownMenuItem>
+                {eventTypes.map((type) => (
+                  <DropdownMenuItem
+                    key={type}
+                    onClick={() => {
+                      setSelectedType(type);
+                      setVisibleCount(3);
+                    }}
+                    className={selectedType === type ? "bg-accent" : ""}
+                  >
+                    <span className="flex-1">{type}</span>
+                    <Badge 
+                      variant="secondary" 
+                      className={`ml-2 ${getBadgeColor(type)}`}
+                    >
+                      {getEventCount(type)}
+                    </Badge>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        )}
       </div>
 
       {/* Danh sách sự kiện */}
@@ -212,7 +302,7 @@ export const SuKienPage: React.FC = () => {
         )}
       </div>
 
-      {/* Nút Xem thêm / Quay lại đầu trang */}
+      {/* Nút Xem thêm / Thu lại */}
       <div className="mt-12 text-center">
         {visibleCount < sortedEvents.length ? (
           // Nút Xem thêm khi còn sự kiện
@@ -221,23 +311,25 @@ export const SuKienPage: React.FC = () => {
             <ChevronDown className="ml-2 h-4 w-4" />
           </Button>
         ) : sortedEvents.length > 3 ? (
-          // Nút Quay lại đầu trang khi đã xem hết sự kiện
+          // Nút Thu lại khi đã xem hết sự kiện
           <Button
             variant="outline"
             onClick={scrollToTop}
             className="px-6 py-4 text-base"
           >
             <ArrowUp className="mr-2 h-4 w-4" />
-            Quay lại đầu trang
+            Thu lại và quay về đầu
           </Button>
         ) : null}
 
-        {/* Hiển thị số lượng sự kiện */}
+        {/* Hiển thị số lượng sự kiện - với background để không bị che */}
         {sortedEvents.length > 0 && (
-          <p className="mt-2 text-sm text-muted-foreground">
-            Đang hiển thị {Math.min(visibleCount, sortedEvents.length)} trong tổng số{" "}
-            {sortedEvents.length} sự kiện
-          </p>
+          <div className="relative z-20 mt-4">
+            <p className="inline-block px-4 py-2 text-sm text-muted-foreground bg-white/90 backdrop-blur-sm rounded-lg shadow-sm">
+              Đang hiển thị {Math.min(visibleCount, sortedEvents.length)} trong tổng số{" "}
+              {sortedEvents.length} sự kiện
+            </p>
+          </div>
         )}
       </div>
     </div>

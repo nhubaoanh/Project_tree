@@ -436,7 +436,7 @@ CREATE TABLE `tailieu` (
 
 LOCK TABLES `tailieu` WRITE;
 /*!40000 ALTER TABLE `tailieu` DISABLE KEYS */;
-INSERT INTO `tailieu` VALUES ('1d9ff248-7528-4ab5-a407-fe4a13df55fc','025721a4-bd0d-4447-9b9b-505d174de937','sắc phong',NULL,'Từ năm 2009 đến năm 2019, Sở Văn hóa và Thể thao đã chỉ đạo Thư viện Tổng hợp Thừa Thiên Huế hợp tác với Thư viện Khoa học Tổng hợp thành phố Hồ Chí Minh (từ năm 2018 có thêm Trung tâm Bảo tồn di tích Cố đô Huế tham gia phối hợp) tổ chức khảo sát, sưu tầm và số hóa tài liệu Hán – Nôm làng xã và tư gia ở Thừa Thiên Huế tại 14 phủ đệ, 118 làng, đền thờ và nhà vườn thuộc 516 gia đình, họ tộc. Cũng trong thời gian trên, Thư viện đã thực hiện đề tài nghiên cứu khoa học cấp cơ sở (2011 – 2013), và đề tài nghiên cứu khoa khoa học cấp tỉnh (2014) liên quan trực tiếp đến vấn đề số hóa các tư liệu làng xã tại địa phương. Đến nay, tổng số tài liệu Hán Nôm sưu tầm, số hóa là 263.848 trang, trong đó có hàng chục ngàn sắc phong, chế phong, chiếu chỉ, lệnh chỉ.\nNăm 2018, Thư viện Tổng hợp Thừa Thiên Huế đã phối hợp cùng Trung tâm Bảo tồn Di tích Cố đô Huế và Thư viện Khoa học Tổng hợp Thành phố Hồ Chí Minh biên tập, xuất bản cuốn Thư mục đề yếu sắc phong triều Nguyễn ở Thừa Thiên Huế, giới thiệu nội dung tóm tắt hơn 2.171 sắc phong, sắc chỉ thời Nguyễn. Cuốn sách đã nhận được sự quan tâm đặc biệt của các nhà nghiên cứu và bạn đọc gần xa. Kế tục thành quả trên, lần này chúng tôi tuyển chọn và giới thiệu đầy đủ nội dung 300 tài liệu Hán – Nôm quý, bao gồm 181 sắc phong (phần 1); 100 chế phong (phần 2); và 19 chiếu (phần 3) trong tập sách SẮC PHONG, CHẾ PHONG, CHIẾU THỜI NGUYỄN TẠI THỪA THIÊN HUẾ','Sắc phong',1967,'Trần Bảo Anh','tại nhà thờ họ','nhớ ơn ông cha và ghi nhận công lao','2026-01-13',1,NULL,'2026-01-13 09:17:45',NULL),('c3fa16f6-853a-44ce-8edd-c5f65b52c63e','e9022e64-cbae-11f0-8020-a8934a9bae74','Cúng tổ họ',NULL,'đây là là một trong những trtuyeenf thống tốt đẹp của ông cha ta ','Văn bản cổ',1930,'Nhữ Bảo Anh','tại nhà thờ','yêu nước','2025-12-29',0,NULL,'2026-01-05 10:28:49',''),('f5a4e294-eb4f-4625-ab0f-0fa987c8102c','025721a4-bd0d-4447-9b9b-505d174de937','yêu em',NULL,'yêu yêu','Sắc phong',1920,'bin bin','nhà chính','hhhh','2026-01-01',1,NULL,'2026-01-01 21:30:44',NULL),('TL001','e9022e64-cbae-11f0-8020-a8934a9bae74','Gia phả dòng họ - Bản gốc',NULL,'Gia phả ghi chép từ đời thứ nhất đến đời thứ 5 của dòng họ. Bản viết tay bằng chữ Hán Nôm, được lưu giữ cẩn thận qua nhiều thế hệ.','Gia phả',1920,'Cụ tổ đời thứ 5','Lưu trữ tại nhà thờ họ',NULL,'2025-12-29',0,NULL,'2026-01-05 11:26:49','89fd6f88-c909-11f0-8020-a8934a9bae74'),('TL002','e9022e64-cbae-11f0-8020-a8934a9bae74','Sắc phong triều Nguyễn',NULL,'Sắc phong của vua Tự Đức ban cho cụ tổ năm 1865, ghi nhận công lao đóng góp cho triều đình.','Sắc phong',1865,'Triều đình nhà Nguyễn','Lưu trữ tại bảo tàng tỉnh',NULL,'2025-12-29',0,NULL,'2026-01-05 11:26:49','89fd6f88-c909-11f0-8020-a8934a9bae74'),('TL003','e9022e64-cbae-11f0-8020-a8934a9bae74','Hình ảnh nhà thờ họ xưa',NULL,'Bộ ảnh chụp nhà thờ họ từ năm 1950, ghi lại kiến trúc cổ trước khi được tu bổ.','Hình ảnh',1950,'Không rõ','Sưu tầm từ gia đình',NULL,'2025-12-29',0,NULL,'2026-01-06 18:49:28','6aa26582-bd12-4fdb-95d8-4e09fdb2f102'),('TL004','e9022e64-cbae-11f0-8020-a8934a9bae74','Văn tế tổ tiên',NULL,'Bài văn tế được đọc trong các dịp giỗ tổ, lễ tết. Nội dung ca ngợi công đức tổ tiên.','Văn bản cổ',1900,'Cụ tổ đời thứ 4','Truyền khẩu trong dòng họ',NULL,'2025-12-29',0,NULL,'2026-01-09 22:26:27','89fd6f88-c909-11f0-8020-a8934a9bae74'),('TL005','e9022e64-cbae-11f0-8020-a8934a9bae74','Gia phả bổ sung - Đời 6 đến 10',NULL,'Phần bổ sung gia phả, ghi chép các đời từ thứ 6 đến thứ 10 của dòng họ.','Gia phả',1980,'Ông Nguyễn Văn B','Biên soạn mới',NULL,'2025-12-29',1,NULL,NULL,NULL),('TL006','e9022e64-cbae-11f0-8020-a8934a9bae74','Hình ảnh lễ giỗ tổ 2020',NULL,'Bộ ảnh ghi lại lễ giỗ tổ năm 2020 với sự tham gia của hơn 200 con cháu.','Hình ảnh',2020,'Ban tổ chức','Chụp tại lễ giỗ tổ',NULL,'2025-12-29',1,NULL,NULL,NULL);
+INSERT INTO `tailieu` VALUES ('1d9ff248-7528-4ab5-a407-fe4a13df55fc','025721a4-bd0d-4447-9b9b-505d174de937','sắc phong','uploads/2026/01/14/hungVuong-1768380729874-99310858.docx','Từ năm 2009 đến năm 2019, Sở Văn hóa và Thể thao đã chỉ đạo Thư viện Tổng hợp Thừa Thiên Huế hợp tác với Thư viện Khoa học Tổng hợp thành phố Hồ Chí Minh (từ năm 2018 có thêm Trung tâm Bảo tồn di tích Cố đô Huế tham gia phối hợp) tổ chức khảo sát, sưu tầm và số hóa tài liệu Hán – Nôm làng xã và tư gia ở Thừa Thiên Huế tại 14 phủ đệ, 118 làng, đền thờ và nhà vườn thuộc 516 gia đình, họ tộc. Cũng trong thời gian trên, Thư viện đã thực hiện đề tài nghiên cứu khoa học cấp cơ sở (2011 – 2013), và đề tài nghiên cứu khoa khoa học cấp tỉnh (2014) liên quan trực tiếp đến vấn đề số hóa các tư liệu làng xã tại địa phương. Đến nay, tổng số tài liệu Hán Nôm sưu tầm, số hóa là 263.848 trang, trong đó có hàng chục ngàn sắc phong, chế phong, chiếu chỉ, lệnh chỉ.\nNăm 2018, Thư viện Tổng hợp Thừa Thiên Huế đã phối hợp cùng Trung tâm Bảo tồn Di tích Cố đô Huế và Thư viện Khoa học Tổng hợp Thành phố Hồ Chí Minh biên tập, xuất bản cuốn Thư mục đề yếu sắc phong triều Nguyễn ở Thừa Thiên Huế, giới thiệu nội dung tóm tắt hơn 2.171 sắc phong, sắc chỉ thời Nguyễn. Cuốn sách đã nhận được sự quan tâm đặc biệt của các nhà nghiên cứu và bạn đọc gần xa. Kế tục thành quả trên, lần này chúng tôi tuyển chọn và giới thiệu đầy đủ nội dung 300 tài liệu Hán – Nôm quý, bao gồm 181 sắc phong (phần 1); 100 chế phong (phần 2); và 19 chiếu (phần 3) trong tập sách SẮC PHONG, CHẾ PHONG, CHIẾU THỜI NGUYỄN TẠI THỪA THIÊN HUẾ','Văn bản cổ',1967,'Trần Bảo Anh','tại nhà thờ họ','nhớ ơn ông cha và ghi nhận công lao','2026-01-13',1,NULL,'2026-01-14 15:54:40',NULL),('c3fa16f6-853a-44ce-8edd-c5f65b52c63e','e9022e64-cbae-11f0-8020-a8934a9bae74','Cúng tổ họ',NULL,'đây là là một trong những trtuyeenf thống tốt đẹp của ông cha ta ','Văn bản cổ',1930,'Nhữ Bảo Anh','tại nhà thờ','yêu nước','2025-12-29',0,NULL,'2026-01-05 10:28:49',''),('f5a4e294-eb4f-4625-ab0f-0fa987c8102c','025721a4-bd0d-4447-9b9b-505d174de937','yêu em',NULL,'yêu yêu','Sắc phong',1920,'bin bin','nhà chính','hhhh','2026-01-01',1,NULL,'2026-01-01 21:30:44',NULL),('TL001','e9022e64-cbae-11f0-8020-a8934a9bae74','Gia phả dòng họ - Bản gốc',NULL,'Gia phả ghi chép từ đời thứ nhất đến đời thứ 5 của dòng họ. Bản viết tay bằng chữ Hán Nôm, được lưu giữ cẩn thận qua nhiều thế hệ.','Gia phả',1920,'Cụ tổ đời thứ 5','Lưu trữ tại nhà thờ họ',NULL,'2025-12-29',0,NULL,'2026-01-05 11:26:49','89fd6f88-c909-11f0-8020-a8934a9bae74'),('TL002','e9022e64-cbae-11f0-8020-a8934a9bae74','Sắc phong triều Nguyễn',NULL,'Sắc phong của vua Tự Đức ban cho cụ tổ năm 1865, ghi nhận công lao đóng góp cho triều đình.','Sắc phong',1865,'Triều đình nhà Nguyễn','Lưu trữ tại bảo tàng tỉnh',NULL,'2025-12-29',0,NULL,'2026-01-05 11:26:49','89fd6f88-c909-11f0-8020-a8934a9bae74'),('TL003','e9022e64-cbae-11f0-8020-a8934a9bae74','Hình ảnh nhà thờ họ xưa',NULL,'Bộ ảnh chụp nhà thờ họ từ năm 1950, ghi lại kiến trúc cổ trước khi được tu bổ.','Hình ảnh',1950,'Không rõ','Sưu tầm từ gia đình',NULL,'2025-12-29',0,NULL,'2026-01-06 18:49:28','6aa26582-bd12-4fdb-95d8-4e09fdb2f102'),('TL004','e9022e64-cbae-11f0-8020-a8934a9bae74','Văn tế tổ tiên',NULL,'Bài văn tế được đọc trong các dịp giỗ tổ, lễ tết. Nội dung ca ngợi công đức tổ tiên.','Văn bản cổ',1900,'Cụ tổ đời thứ 4','Truyền khẩu trong dòng họ',NULL,'2025-12-29',0,NULL,'2026-01-09 22:26:27','89fd6f88-c909-11f0-8020-a8934a9bae74'),('TL005','e9022e64-cbae-11f0-8020-a8934a9bae74','Gia phả bổ sung - Đời 6 đến 10',NULL,'Phần bổ sung gia phả, ghi chép các đời từ thứ 6 đến thứ 10 của dòng họ.','Gia phả',1980,'Ông Nguyễn Văn B','Biên soạn mới',NULL,'2025-12-29',1,NULL,NULL,NULL),('TL006','e9022e64-cbae-11f0-8020-a8934a9bae74','Hình ảnh lễ giỗ tổ 2020',NULL,'Bộ ảnh ghi lại lễ giỗ tổ năm 2020 với sự tham gia của hơn 200 con cháu.','Hình ảnh',2020,'Ban tổ chức','Chụp tại lễ giỗ tổ',NULL,'2025-12-29',1,NULL,NULL,NULL);
 /*!40000 ALTER TABLE `tailieu` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -6088,37 +6088,56 @@ DELIMITER ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
 CREATE DEFINER=`root`@`%` PROCEDURE `UpdateTaiLieu`(
-  IN p_taiLieuId VARCHAR(50),
-  IN p_dongHoId VARCHAR(50),
-  IN p_tenTaiLieu VARCHAR(255),
-  IN p_duongDan VARCHAR(255),
-  IN p_moTa TEXT,
-  IN p_loaiTaiLieu VARCHAR(100),
-  IN p_namSangTac INT,
-  IN p_tacGia VARCHAR(255),
-  IN p_nguonGoc VARCHAR(255),
-  IN p_ghiChu TEXT,
-  IN p_lu_user_id VARCHAR(50),
-  OUT p_err_code INT,
-  OUT p_err_msg VARCHAR(255)
+    IN p_taiLieuId VARCHAR(50),
+    IN p_dongHoId VARCHAR(50),
+    IN p_tenTaiLieu VARCHAR(255),
+    IN p_duongDan VARCHAR(255),
+    IN p_moTa TEXT,
+    IN p_loaiTaiLieu VARCHAR(100),
+    IN p_namSangTac INT,
+    IN p_tacGia VARCHAR(255),
+    IN p_nguonGoc VARCHAR(255),
+    IN p_ghiChu TEXT,
+    IN p_lu_user_id VARCHAR(50),
+    OUT p_err_code INT,
+    OUT p_err_msg VARCHAR(255)
 )
 BEGIN
-  UPDATE tailieu SET
-    dongHoId = p_dongHoId,
-    tenTaiLieu = p_tenTaiLieu,
-    duongDan = IFNULL(p_duongDan, duongDan),
-    moTa = p_moTa,
-    loaiTaiLieu = p_loaiTaiLieu,
-    namSangTac = p_namSangTac,
-    tacGia = p_tacGia,
-    nguonGoc = p_nguonGoc,
-    ghiChu = p_ghiChu,
-    lu_updated = NOW(),
-    lu_user_id = p_lu_user_id
-  WHERE taiLieuId = p_taiLieuId;
-  
-  SET p_err_code = 0;
-  SET p_err_msg = 'Success';
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        GET DIAGNOSTICS CONDITION 1 
+            p_err_code = RETURNED_SQLSTATE, 
+            p_err_msg = MESSAGE_TEXT;
+        ROLLBACK;
+    END;
+
+    SET p_err_code = 0;
+    SET p_err_msg = 'Success';
+
+    -- Cập nhật tài liệu
+    -- Lưu ý: Không dùng IFNULL cho duongDan để có thể cập nhật file mới
+    UPDATE tailieu 
+    SET
+        dongHoId = p_dongHoId,
+        tenTaiLieu = p_tenTaiLieu,
+        duongDan = p_duongDan,  -- Cập nhật trực tiếp, không dùng IFNULL
+        moTa = p_moTa,
+        loaiTaiLieu = p_loaiTaiLieu,
+        namSangTac = p_namSangTac,
+        tacGia = p_tacGia,
+        nguonGoc = p_nguonGoc,
+        ghiChu = p_ghiChu,
+        lu_updated = NOW(),
+        lu_user_id = p_lu_user_id
+    WHERE taiLieuId = p_taiLieuId
+      AND active_flag = 1;
+
+    -- Kiểm tra có cập nhật được không
+    IF ROW_COUNT() = 0 THEN
+        SET p_err_code = 1;
+        SET p_err_msg = 'Không tìm thấy tài liệu hoặc tài liệu đã bị xóa';
+    END IF;
+
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -6394,4 +6413,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-01-14 11:50:53
+-- Dump completed on 2026-01-14 15:58:54

@@ -1,9 +1,10 @@
 "use client";
 
 import React from "react";
-import { X, FileText, User, Calendar, Tag, BookOpen, MapPin } from "lucide-react";
+import { X, FileText, User, Calendar, Tag, BookOpen, MapPin, Download, ExternalLink } from "lucide-react";
 import { DetailModal, DetailSection } from "@/components/shared";
 import { ITaiLieu } from "@/service/tailieu.service";
+import { getImageUrl } from "@/utils/imageUtils";
 
 interface DocumentDetailModalProps {
     isOpen: boolean;
@@ -21,6 +22,24 @@ export function DocumentDetailModal({ isOpen, onClose, document }: DocumentDetai
             month: "2-digit",
             year: "numeric"
         });
+    };
+
+    const getFileIcon = (fileName: string) => {
+        const ext = fileName.split('.').pop()?.toLowerCase();
+        if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext || '')) {
+            return '🖼️';
+        } else if (['pdf'].includes(ext || '')) {
+            return '📄';
+        } else if (['doc', 'docx'].includes(ext || '')) {
+            return '📝';
+        } else if (['xls', 'xlsx'].includes(ext || '')) {
+            return '📊';
+        }
+        return '📎';
+    };
+
+    const getFileName = (path: string) => {
+        return path.split('/').pop() || path;
     };
 
     const sections: DetailSection[] = [
@@ -41,6 +60,48 @@ export function DocumentDetailModal({ isOpen, onClose, document }: DocumentDetai
         }
     ];
 
+    // Footer content for file display
+    const footerContent = document.duongDan ? (
+        <div className="w-full space-y-3">
+            <div className="bg-[#fdf6e3] border border-[#d4af37] rounded-lg p-4">
+                <div className="flex items-center gap-3 mb-3">
+                    <span className="text-3xl">{getFileIcon(document.duongDan)}</span>
+                    <div className="flex-1 min-w-0">
+                        <p className="text-xs text-[#8b5e3c] uppercase font-bold">File đính kèm</p>
+                        <p className="text-sm font-medium text-[#5d4037] truncate">
+                            {getFileName(document.duongDan)}
+                        </p>
+                    </div>
+                </div>
+                <div className="flex gap-2">
+                    <a
+                        href={getImageUrl(document.duongDan)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-[#d4af37] text-white rounded hover:bg-[#b8962f] transition-colors text-sm font-bold"
+                    >
+                        <ExternalLink size={14} />
+                        Xem file
+                    </a>
+                    <a
+                        href={getImageUrl(document.duongDan)}
+                        download
+                        className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-[#b91c1c] text-white rounded hover:bg-[#991b1b] transition-colors text-sm font-bold"
+                    >
+                        <Download size={14} />
+                        Tải xuống
+                    </a>
+                </div>
+            </div>
+            <button
+                onClick={onClose}
+                className="w-full py-3.5 bg-gradient-to-r from-yellow-800 to-yellow-900 text-white rounded-2xl hover:shadow-lg transition-all font-bold text-sm tracking-widest uppercase"
+            >
+                Đóng thông tin
+            </button>
+        </div>
+    ) : undefined;
+
     return (
       <DetailModal
         isOpen={isOpen}
@@ -51,6 +112,7 @@ export function DocumentDetailModal({ isOpen, onClose, document }: DocumentDetai
         gradient="red-yellow"
         sections={sections}
         notes={document.moTa}
+        footerContent={footerContent}
       />
     );
 }

@@ -80,7 +80,7 @@ export class TaiLieuRepository {
   async delete(taiLieuId: string, luUserId: string): Promise<any> {
     try {
       const sql = `CALL DeleteTaiLieu(?,?, @err_code, @err_msg)`;
-      await this.db.query(sql, [taiLieuId, luUserId]);
+      await this.db.query(sql, [JSON.stringify([{ taiLieuId }]), luUserId]);
       return { success: true };
     } catch (error: any) {
       console.error("DeleteTaiLieu error:", error.message);
