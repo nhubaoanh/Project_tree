@@ -12,7 +12,6 @@ import {
 export interface ITaiChinhChiImport {
   stt: number;
   ngay_chi: string; // DD/MM/YYYY
-  danh_muc: string;
   so_tien: number;
   phuong_thuc_thanh_toan?: string;
   noi_dung?: string;
@@ -74,7 +73,6 @@ export class taiChinhChiService {
     const convertedData = validation.validData.map(item => ({
       stt: item.stt || 0,
       ngay_chi: item.ngay_chi,
-      danh_muc: item.danh_muc,
       so_tien: item.so_tien,
       phuong_thuc_thanh_toan: item.phuong_thuc_thanh_toan,
       noi_dung: item.noi_dung,

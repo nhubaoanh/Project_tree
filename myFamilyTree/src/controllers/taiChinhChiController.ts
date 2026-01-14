@@ -102,9 +102,9 @@ export class taiChinhChiController {
         const workbook = new ExcelJS.Workbook();
         const sheet = workbook.addWorksheet("Nhập liệu CHI");
 
-        // Header
+        // Header - 7 cột (STT chính là chiId)
         const headers = [
-          "STT", "Ngày chi", "Danh mục", "Số tiền", "Phương thức thanh toán",
+          "STT", "Ngày chi", "Số tiền", "Phương thức thanh toán",
           "Nội dung", "Người nhận", "Ghi chú"
         ];
 
@@ -124,7 +124,7 @@ export class taiChinhChiController {
 
         // Row 2: Gợi ý nhập liệu
         const hints = [
-          "Số TT", "DD/MM/YYYY", "Tên danh mục", "Số tiền (VND)", "Tiền mặt/Chuyển khoản",
+          "Số TT", "DD/MM/YYYY", "Số tiền (VND)", "Tiền mặt/Chuyển khoản",
           "Mô tả chi tiết", "Tên người nhận", "Ghi chú thêm"
         ];
         const hintRow = sheet.addRow(hints);
@@ -141,8 +141,8 @@ export class taiChinhChiController {
 
         // Row 3-4: Dữ liệu mẫu
         const samples = [
-          [1, "01/01/2025", "Chi giỗ tổ", 800000, "Tiền mặt", "Chi tổ chức giỗ tổ", "Nhà hàng ABC", ""],
-          [2, "02/01/2025", "Chi sửa mộ", 1200000, "Chuyển khoản", "Sửa chữa mộ tổ", "Thợ xây Nguyễn A", "Đã thanh toán"],
+          [1, "01/01/2025", 800000, "Tiền mặt", "Chi tổ chức giỗ tổ", "Nhà hàng ABC", ""],
+          [2, "02/01/2025", 1200000, "Chuyển khoản", "Sửa chữa mộ tổ", "Thợ xây Nguyễn A", "Đã thanh toán"],
         ];
         samples.forEach(sample => {
           const row = sheet.addRow(sample);
@@ -162,23 +162,19 @@ export class taiChinhChiController {
           { text: "📖 HƯỚNG DẪN NHẬP LIỆU CHI", bold: true, size: 14, color: "DC2626" },
           { text: "" },
           { text: "1. CỘT BẮT BUỘC:", bold: true },
-          { text: "   - STT: Số thứ tự" },
+          { text: "   - STT: Số thứ tự (là ID)" },
           { text: "   - Ngày chi: DD/MM/YYYY" },
-          { text: "   - Danh mục: Tên danh mục có sẵn" },
           { text: "   - Số tiền: Số tiền > 0" },
+          { text: "   - Nội dung: Mô tả khoản chi" },
+          { text: "   - Người nhận: Tên người nhận" },
           { text: "" },
-          { text: "2. DANH MỤC:", bold: true },
-          { text: "   - Nhập tên danh mục tùy ý" },
-          { text: "   - Ví dụ: Chi giỗ tổ, Chi sửa mộ..." },
-          { text: "" },
-          { text: "3. PHƯƠNG THỨC THANH TOÁN:", bold: true },
+          { text: "2. PHƯƠNG THỨC THANH TOÁN:", bold: true },
           { text: "   - Tiền mặt" },
           { text: "   - Chuyển khoản" },
           { text: "" },
           { text: "⚠️ LƯU Ý:", bold: true, color: "C00000" },
-          { text: "   - Xóa dòng mẫu trước khi nhập thật" },
-          { text: "   - Chỉ import 8 cột đầu" },
-          { text: "   - Chỉ chọn 1 file Excel (.xlsx)" },
+          { text: "   - Xóa dòng mẫu trước khi nhập" },
+          { text: "   - Xuất Excel → Sửa → Import lại" },
         ];
 
         guideLines.forEach((line, idx) => {
@@ -195,17 +191,16 @@ export class taiChinhChiController {
         // Column widths
         sheet.getColumn(1).width = 6;   // STT
         sheet.getColumn(2).width = 12;  // Ngày
-        sheet.getColumn(3).width = 20;  // Danh mục
-        sheet.getColumn(4).width = 15;  // Số tiền
-        sheet.getColumn(5).width = 18;  // Phương thức
-        sheet.getColumn(6).width = 25;  // Nội dung
-        sheet.getColumn(7).width = 20;  // Người nhận
-        sheet.getColumn(8).width = 20;  // Ghi chú
-        sheet.getColumn(9).width = 3;   // Cột trống
-        sheet.getColumn(10).width = 40; // Hướng dẫn
+        sheet.getColumn(3).width = 15;  // Số tiền
+        sheet.getColumn(4).width = 18;  // Phương thức
+        sheet.getColumn(5).width = 30;  // Nội dung
+        sheet.getColumn(6).width = 20;  // Người nhận
+        sheet.getColumn(7).width = 20;  // Ghi chú
+        sheet.getColumn(8).width = 3;   // Cột trống
+        sheet.getColumn(9).width = 40;  // Hướng dẫn
 
         // Format số tiền
-        sheet.getColumn(4).numFmt = '#,##0';
+        sheet.getColumn(3).numFmt = '#,##0';
         sheet.getColumn(2).numFmt = '@'; // Format ngày là text
 
         res.setHeader("Content-Disposition", 'attachment; filename="MauNhap_TaiChinhChi.xlsx"');
@@ -216,6 +211,137 @@ export class taiChinhChiController {
       } catch (err) {
         console.error("Export template CHI error:", err);
         res.status(500).json({ success: false, message: "Lỗi tạo template CHI" });
+      }
+    }
+
+    // ============================================================================
+    // EXPORT EXCEL VỚI DỮ LIỆU THẬT (GIỐNG TEMPLATE)
+    // ============================================================================
+    async exportExcel(req: Request, res: Response): Promise<void> {
+      try {
+        const dongHoId = (req as any).user?.dongHoId;
+        if (!dongHoId) {
+          res.status(400).json({ success: false, message: "Không tìm thấy thông tin dòng họ" });
+          return;
+        }
+
+        // Lấy dữ liệu từ service - searchTaiChinhChi trả về array trực tiếp
+        const data = await this.taiChinhChiService.searchTaiChinhChi(
+          1,      // pageIndex
+          10000,  // pageSize - lấy tất cả
+          '',     // search_content - không filter
+          dongHoId
+        );
+
+        if (!data || data.length === 0) {
+          res.status(400).json({ success: false, message: "Không có dữ liệu để xuất" });
+          return;
+        }
+
+        const workbook = new ExcelJS.Workbook();
+        const sheet = workbook.addWorksheet("Tài chính CHI");
+
+        // Header - 7 cột
+        const headers = [
+          "STT", "Ngày chi", "Số tiền", "Phương thức thanh toán",
+          "Nội dung", "Người nhận", "Ghi chú"
+        ];
+
+        sheet.addRow(headers);
+        const headerRow = sheet.getRow(1);
+        headerRow.height = 28;
+        headerRow.eachCell((cell) => {
+          cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "DC2626" } };
+          cell.font = { bold: true, color: { argb: "FFFFFF" }, size: 11 };
+          cell.alignment = { horizontal: "center", vertical: "middle", wrapText: true };
+          cell.border = { 
+            top: { style: "thin" }, bottom: { style: "thin" }, 
+            left: { style: "thin" }, right: { style: "thin" } 
+          };
+        });
+
+        // Row 2: Gợi ý
+        const hints = [
+          "Số TT", "DD/MM/YYYY", "Số tiền (VND)", "Tiền mặt/Chuyển khoản",
+          "Mô tả chi tiết", "Tên người nhận", "Ghi chú thêm"
+        ];
+        const hintRow = sheet.addRow(hints);
+        hintRow.height = 30;
+        hintRow.eachCell((cell) => {
+          cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FEE2E2" } };
+          cell.font = { italic: true, size: 9, color: { argb: "991B1B" } };
+          cell.alignment = { horizontal: "center", vertical: "middle", wrapText: true };
+          cell.border = { 
+            top: { style: "thin" }, bottom: { style: "thin" }, 
+            left: { style: "thin" }, right: { style: "thin" } 
+          };
+        });
+
+        // Dữ liệu thật
+        data.forEach((item: any) => {
+          const rowData = [
+            item.chiId,
+            item.ngayChi ? new Date(item.ngayChi).toLocaleDateString('vi-VN') : "",
+            item.soTien || 0,
+            item.phuongThucThanhToan || "",
+            item.noiDung || "",
+            item.nguoiNhan || "",
+            item.ghiChu || ""
+          ];
+          const row = sheet.addRow(rowData);
+          row.height = 22;
+          row.eachCell((cell) => {
+            cell.alignment = { horizontal: "center", vertical: "middle" };
+            cell.border = { 
+              top: { style: "thin" }, bottom: { style: "thin" }, 
+              left: { style: "thin" }, right: { style: "thin" } 
+            };
+          });
+        });
+
+        // Hướng dẫn
+        const guideCol = 9;
+        const guideLines = [
+          { text: "📖 HƯỚNG DẪN", bold: true, size: 14, color: "DC2626" },
+          { text: "" },
+          { text: "Sửa dữ liệu rồi Import lại" },
+          { text: "STT đã có → Cập nhật" },
+          { text: "STT mới → Thêm mới" },
+        ];
+        guideLines.forEach((line, idx) => {
+          const cell = sheet.getCell(idx + 1, guideCol);
+          cell.value = line.text;
+          cell.font = {
+            bold: line.bold || false,
+            size: line.size || 11,
+            color: line.color ? { argb: line.color } : undefined
+          };
+        });
+
+        // Column widths
+        sheet.getColumn(1).width = 6;
+        sheet.getColumn(2).width = 12;
+        sheet.getColumn(3).width = 15;
+        sheet.getColumn(4).width = 18;
+        sheet.getColumn(5).width = 30;
+        sheet.getColumn(6).width = 20;
+        sheet.getColumn(7).width = 20;
+        sheet.getColumn(8).width = 3;
+        sheet.getColumn(9).width = 40;
+
+        sheet.getColumn(3).numFmt = '#,##0';
+        sheet.getColumn(2).numFmt = '@';
+        sheet.getColumn(1).numFmt = '0';
+
+        const fileName = `TaiChinhChi_${new Date().toLocaleDateString('vi-VN').replace(/\//g, '-')}.xlsx`;
+        res.setHeader("Content-Disposition", `attachment; filename="${fileName}"`);
+        res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+
+        await workbook.xlsx.write(res);
+        res.end();
+      } catch (err) {
+        console.error("Export Excel CHI error:", err);
+        res.status(500).json({ success: false, message: "Lỗi xuất Excel CHI" });
       }
     }
 
@@ -296,31 +422,16 @@ export class taiChinhChiController {
         // Validate header
         const headerRow = worksheet.getRow(1);
         const expectedHeaders = [
-          "STT", "Ngày chi", "Danh mục", "Số tiền", "Phương thức thanh toán",
+          "STT", "Ngày chi", "Số tiền", "Phương thức thanh toán",
           "Nội dung", "Người nhận", "Ghi chú"
         ];
 
         const actualHeaders: string[] = [];
         headerRow.eachCell((cell, colNumber) => {
-          if (colNumber <= 8) {
+          if (colNumber <= 7) {
             actualHeaders.push(cell.value?.toString() || '');
           }
         });
-
-        const headerValid = expectedHeaders.every((header, index) => 
-          actualHeaders[index]?.toLowerCase().includes(header.toLowerCase().split(' ')[0])
-        );
-
-        if (!headerValid) {
-          if (fs.existsSync(req.file.path)) {
-            fs.unlinkSync(req.file.path);
-          }
-          res.status(400).json({
-            success: false,
-            message: "File Excel không đúng định dạng template. Vui lòng tải template mẫu và sử dụng đúng format."
-          });
-          return;
-        }
 
         // Parse data từ Excel
         const data: FinanceChiImportData[] = [];
@@ -329,19 +440,20 @@ export class taiChinhChiController {
         worksheet.eachRow((row, rowNumber) => {
           if (rowNumber <= 2) return; // Bỏ qua header và gợi ý
 
-          const rowData = {
-            stt: row.getCell(1).value ? Number(row.getCell(1).value) : null,
+          // Format: STT | Ngày chi | Số tiền | Phương thức | Nội dung | Người nhận | Ghi chú
+          // STT chính là chiId
+          const rowData: FinanceChiImportData = {
+            stt: row.getCell(1).value ? Number(row.getCell(1).value) : null,  // STT = chiId
             ngay_chi: this.parseExcelDate(row.getCell(2).value) || '',
-            danh_muc: row.getCell(3).value?.toString() || '',
-            so_tien: row.getCell(4).value ? Number(row.getCell(4).value) : 0,
-            phuong_thuc_thanh_toan: row.getCell(5).value?.toString() || 'Tiền mặt',
-            noi_dung: row.getCell(6).value?.toString() || '',
-            nguoi_nhan: row.getCell(7).value?.toString() || '',
-            ghi_chu: row.getCell(8).value?.toString() || ''
+            so_tien: row.getCell(3).value ? Number(row.getCell(3).value) : 0,
+            phuong_thuc_thanh_toan: row.getCell(4).value?.toString() || 'Tiền mặt',
+            noi_dung: row.getCell(5).value?.toString() || '',
+            nguoi_nhan: row.getCell(6).value?.toString() || '',
+            ghi_chu: row.getCell(7).value?.toString() || ''
           };
 
           // Kiểm tra dòng trống
-          if (!rowData.danh_muc && !rowData.so_tien) {
+          if (!rowData.so_tien) {
             return; // Bỏ qua dòng trống
           }
 
@@ -546,9 +658,9 @@ export class taiChinhChiController {
         const workbook = new ExcelJS.Workbook();
         const sheet = workbook.addWorksheet("Nhập liệu CHI");
 
-        // Header
+        // Header (removed "Danh mục" - not needed anymore)
         const headers = [
-          "STT", "Ngày chi", "Danh mục", "Số tiền", "Phương thức thanh toán",
+          "STT", "Ngày chi", "Số tiền", "Phương thức thanh toán",
           "Nội dung", "Người nhận", "Ghi chú"
         ];
 
@@ -568,7 +680,7 @@ export class taiChinhChiController {
 
         // Row 2: Gợi ý nhập liệu
         const hints = [
-          "Số TT", "DD/MM/YYYY", "Tên danh mục", "Số tiền (VND)", "Tiền mặt/Chuyển khoản",
+          "Số TT", "DD/MM/YYYY", "Số tiền (VND)", "Tiền mặt/Chuyển khoản",
           "Mô tả chi tiết", "Tên người nhận", "Ghi chú thêm"
         ];
         const hintRow = sheet.addRow(hints);
@@ -585,11 +697,11 @@ export class taiChinhChiController {
 
         // Row 3-7: Dữ liệu mẫu
         const samples = [
-          [1, "01/01/2025", "Chi giỗ tổ", 800000, "Tiền mặt", "Chi tổ chức giỗ tổ", "Nhà hàng ABC", ""],
-          [2, "02/01/2025", "Chi sửa mộ", 1200000, "Chuyển khoản", "Sửa chữa mộ tổ", "Thợ xây Nguyễn A", "Đã thanh toán"],
-          [3, "03/01/2025", "Chi họp họ", 500000, "Tiền mặt", "Chi phí tổ chức họp họ", "Ban tổ chức", ""],
-          [4, "04/01/2025", "Chi khác", 300000, "Chuyển khoản", "Chi phí in ấn tài liệu", "Công ty in ABC", ""],
-          [5, "05/01/2025", "Chi giỗ tổ", 600000, "Tiền mặt", "Mua hoa quả cúng", "Chợ truyền thống", "Đã mua"],
+          [1, "01/01/2025", 800000, "Tiền mặt", "Chi tổ chức giỗ tổ", "Nhà hàng ABC", ""],
+          [2, "02/01/2025", 1200000, "Chuyển khoản", "Sửa chữa mộ tổ", "Thợ xây Nguyễn A", "Đã thanh toán"],
+          [3, "03/01/2025", 500000, "Tiền mặt", "Chi phí tổ chức họp họ", "Ban tổ chức", ""],
+          [4, "04/01/2025", 300000, "Chuyển khoản", "Chi phí in ấn tài liệu", "Công ty in ABC", ""],
+          [5, "05/01/2025", 600000, "Tiền mặt", "Mua hoa quả cúng", "Chợ truyền thống", "Đã mua"],
         ];
         samples.forEach(sample => {
           const row = sheet.addRow(sample);
@@ -604,27 +716,23 @@ export class taiChinhChiController {
         });
 
         // Hướng dẫn bên phải
-        const guideCol = 10;
+        const guideCol = 9;
         const guideLines = [
           { text: "📖 HƯỚNG DẪN NHẬP LIỆU CHI", bold: true, size: 14, color: "DC2626" },
           { text: "" },
           { text: "1. CỘT BẮT BUỘC:", bold: true },
           { text: "   - STT: Số thứ tự" },
           { text: "   - Ngày chi: DD/MM/YYYY" },
-          { text: "   - Danh mục: Tên danh mục có sẵn" },
           { text: "   - Số tiền: Số tiền > 0" },
+          { text: "   - Nội dung: Mô tả khoản chi" },
           { text: "" },
-          { text: "2. DANH MỤC:", bold: true },
-          { text: "   - Nhập tên danh mục tùy ý" },
-          { text: "   - Ví dụ: Chi giỗ tổ, Chi sửa mộ..." },
-          { text: "" },
-          { text: "3. PHƯƠNG THỨC THANH TOÁN:", bold: true },
+          { text: "2. PHƯƠNG THỨC THANH TOÁN:", bold: true },
           { text: "   - Tiền mặt" },
           { text: "   - Chuyển khoản" },
           { text: "" },
           { text: "⚠️ LƯU Ý:", bold: true, color: "C00000" },
           { text: "   - XÓA DỮ LIỆU MẪU trước khi nhập thật" },
-          { text: "   - Chỉ import 8 cột đầu" },
+          { text: "   - Chỉ import 7 cột đầu" },
           { text: "   - Chỉ chọn 1 file Excel (.xlsx)" },
         ];
 
@@ -642,17 +750,16 @@ export class taiChinhChiController {
         // Column widths
         sheet.getColumn(1).width = 6;   // STT
         sheet.getColumn(2).width = 12;  // Ngày
-        sheet.getColumn(3).width = 20;  // Danh mục
-        sheet.getColumn(4).width = 15;  // Số tiền
-        sheet.getColumn(5).width = 18;  // Phương thức
-        sheet.getColumn(6).width = 25;  // Nội dung
-        sheet.getColumn(7).width = 20;  // Người nhận
-        sheet.getColumn(8).width = 20;  // Ghi chú
-        sheet.getColumn(9).width = 3;   // Cột trống
-        sheet.getColumn(10).width = 40; // Hướng dẫn
+        sheet.getColumn(3).width = 15;  // Số tiền
+        sheet.getColumn(4).width = 18;  // Phương thức
+        sheet.getColumn(5).width = 30;  // Nội dung
+        sheet.getColumn(6).width = 20;  // Người nhận
+        sheet.getColumn(7).width = 20;  // Ghi chú
+        sheet.getColumn(8).width = 3;   // Cột trống
+        sheet.getColumn(9).width = 40;  // Hướng dẫn
 
         // Format số tiền
-        sheet.getColumn(4).numFmt = '#,##0';
+        sheet.getColumn(3).numFmt = '#,##0';
         sheet.getColumn(2).numFmt = '@'; // Format ngày là text
 
         res.setHeader("Content-Disposition", 'attachment; filename="MauNhap_TaiChinhChi.xlsx"');

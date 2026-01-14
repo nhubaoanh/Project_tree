@@ -134,6 +134,13 @@ taiChinhThuRouter.get(
   TaiChinhThuController.exportTemplateWithSample.bind(TaiChinhThuController)
 );
 
+// Export Excel với dữ liệu thật - Tất cả user có thể xuất
+taiChinhThuRouter.get(
+  "/export-excel",
+  authenticate,
+  TaiChinhThuController.exportExcel.bind(TaiChinhThuController)
+);
+
 // Import Excel - Chỉ admin và thủ đồ
 taiChinhThuRouter.post(
   "/import-excel",

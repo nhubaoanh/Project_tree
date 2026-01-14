@@ -14,7 +14,6 @@ export interface ITaiChinhThuImport {
   stt: number;
   ho_ten_nguoi_dong: string;
   ngay_dong: string; // DD/MM/YYYY
-  danh_muc: string;
   so_tien: number;
   phuong_thuc_thanh_toan?: string;
   noi_dung?: string;
@@ -76,7 +75,6 @@ export class taiChinhThuService {
       stt: item.stt || 0,
       ho_ten_nguoi_dong: item.ho_ten_nguoi_dong,
       ngay_dong: item.ngay_dong,
-      danh_muc: item.danh_muc,
       so_tien: item.so_tien,
       phuong_thuc_thanh_toan: item.phuong_thuc_thanh_toan,
       noi_dung: item.noi_dung,

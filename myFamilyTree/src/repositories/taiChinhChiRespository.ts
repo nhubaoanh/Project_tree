@@ -29,12 +29,12 @@ export class taiChinhChiRespository {
   }
 
   async createTaiChinhChi(taiChinhChi: taiChinhChi): Promise<any> {
+    const connection = await this.db.getRawConnection();
     try {
       const sql =
-        "CALL InsertTaiChinhChi(?,?,?,?,?,?,?,?,?, @err_code, @err_msg)";
-      await this.db.query(sql, [
+        "CALL InsertTaiChinhChi(?,?,?,?,?,?,?,?, @chiId, @err_code, @err_msg)";
+      await connection.query(sql, [
         taiChinhChi.dongHoId,
-        taiChinhChi.danhMucId,
         taiChinhChi.ngayChi,
         taiChinhChi.soTien,
         taiChinhChi.phuongThucThanhToan,
@@ -43,21 +43,36 @@ export class taiChinhChiRespository {
         taiChinhChi.ghiChu,
         taiChinhChi.nguoiNhapId,
       ]);
-      return true;
+      
+      // Lấy chiId vừa tạo
+      const [outParams]: any = await connection.query(
+        'SELECT @chiId AS chiId, @err_code AS err_code, @err_msg AS err_msg'
+      );
+      
+      const chiId = outParams[0].chiId;
+      const errorCode = outParams[0].err_code;
+      const message = outParams[0].err_msg;
+      
+      if (errorCode !== 0) {
+        throw new Error(message || 'Lỗi khi tạo khoản chi');
+      }
+      
+      return { chiId, dongHoId: taiChinhChi.dongHoId };
     } catch (error: any) {
       console.log("error database => ", error);
       throw new Error(error.message);
+    } finally {
+      connection.release();
     }
   }
 
   async UpdateTaiChinhChi(taiChinhChi: taiChinhChi): Promise<any> {
     try {
       const sql =
-        "CALL UpdateTaiChinhChi(?,?,?,?,?,?,?,?,?,?, @err_code, @err_msg)";
+        "CALL UpdateTaiChinhChi(?,?,?,?,?,?,?,?,?, @err_code, @err_msg)";
       await this.db.query(sql, [
         taiChinhChi.chiId,
         taiChinhChi.dongHoId,
-        taiChinhChi.danhMucId,
         taiChinhChi.ngayChi,
         taiChinhChi.soTien,
         taiChinhChi.phuongThucThanhToan,

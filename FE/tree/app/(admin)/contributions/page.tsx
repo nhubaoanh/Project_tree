@@ -10,7 +10,7 @@ import {
 } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
 import { IContributionUp, IsearchContributionUp } from "@/types/contribuitionUp";
-import { createContributionUp, deleteContributionUp, searchContributionUp, updateContributionUp, downloadTemplate, downloadTemplateWithSample, importFromExcel } from "@/service/contribuitionUp.service";
+import { createContributionUp, deleteContributionUp, searchContributionUp, updateContributionUp, downloadTemplate, downloadTemplateWithSample, exportExcel, importFromExcel } from "@/service/contribuitionUp.service";
 import { ContributionUpModal } from "./components/contribuitionUpModal";
 import { useToast } from "@/service/useToas";
 import storage from "@/utils/storage";
@@ -201,15 +201,49 @@ export default function QuanLyTaiChinhThuPage() {
     setPageIndex(1);
   };
 
-  const handleExportExcel = () => {
+  const handleExportExcel = async () => {
     if (userData.length === 0) {
       toast("Không có dữ liệu để xuất");
       return;
     }
-    const worksheet = XLSX.utils.json_to_sheet(userData);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "TaiChinhThu");
-    XLSX.writeFile(workbook, `TaiChinhThu_Trang${pageIndex}.xlsx`);
+    
+    try {
+      console.log('🔵 Bắt đầu export Excel...');
+      // Gọi API backend để export Excel (có format template)
+      const blob = await exportExcel();
+      console.log('✅ Nhận được blob:', blob.size, 'bytes');
+      
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `TaiChinhThu_${new Date().toLocaleDateString('vi-VN').replace(/\//g, '-')}.xlsx`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      showSuccess("Đã xuất dữ liệu thành công!");
+    } catch (error: any) {
+      console.error('❌ Export Excel error:', error);
+      console.error('Error response:', error.response);
+      console.error('Error response data:', error.response?.data);
+      console.error('Error message:', error.message);
+      
+      // Nếu response data là Blob, đọc nội dung
+      if (error.response?.data instanceof Blob) {
+        const text = await error.response.data.text();
+        console.error('Error response text:', text);
+        try {
+          const json = JSON.parse(text);
+          console.error('Error response JSON:', json);
+          showError(json.message || "Không thể xuất dữ liệu. Vui lòng thử lại.");
+          return;
+        } catch (e) {
+          console.error('Cannot parse error as JSON');
+        }
+      }
+      
+      showError("Không thể xuất dữ liệu. Vui lòng thử lại.");
+    }
   };
 
   const handleDownloadTemplate = async () => {

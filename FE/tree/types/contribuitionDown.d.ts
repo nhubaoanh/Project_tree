@@ -2,14 +2,14 @@ export interface IContributionDown {
   chiId: number;
 
   dongHoId: string;
-  danhMucId: number;
-  tenDanhMuc?: string;
+  // danhMucId: number;  // ❌ REMOVED - không cần danh mục nữa
+  // tenDanhMuc?: string;  // ❌ REMOVED
 
   ngayChi: Date;
   soTien: number;
 
   phuongThucThanhToan: string;
-  noiDung: string;
+  noiDung: string;  // Dùng noiDung thay cho danh mục
   nguoiNhan: string;
   ghiChu: string;
 

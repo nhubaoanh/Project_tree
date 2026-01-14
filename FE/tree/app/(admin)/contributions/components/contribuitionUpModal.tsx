@@ -24,28 +24,22 @@ const rules: FormRules = {
   ngayDong: { label: "Ngày đóng", rules: ["required", "date"] },
   soTien: { label: "Số tiền", rules: ["required", "number", "positive"] },
   dongHoId: { label: "Dòng họ", rules: ["required"] },
-  danhMucId: { label: "Danh mục", rules: ["required"] },
+  // danhMucId: { label: "Danh mục", rules: ["required"] },  // ❌ REMOVED
   phuongThucThanhToan: { label: "Phương thức thanh toán", rules: ["required"] },
-  noiDung: { label: "Nội dung", rules: [{ max: 500 }] },
+  noiDung: { label: "Nội dung", rules: ["required", { max: 500 }] },  // ✅ Bắt buộc thay cho danh mục
   ghiChu: { label: "Ghi chú", rules: [{ max: 300 }] },
   soDienThoaiNguoiNhap: { label: "SĐT người nhập", rules: ["phone"] },
 };
 
 // ==================== PAYMENT METHODS ====================
 const PAYMENT_METHODS = [
-  { value: "tien_mat", label: "Tiền mặt" },
-  { value: "chuyen_khoan", label: "Chuyển khoản" },
-  { value: "khac", label: "Khác" },
+  { value: "Tiền mặt", label: "Tiền mặt" },
+  { value: "Chuyển khoản", label: "Chuyển khoản" },
+  { value: "Khác", label: "Khác" },
 ];
 
-// ==================== DANH MỤC THU ====================
-const DANH_MUC_LIST = [
-  { value: 1, label: "Đóng góp xây dựng" },
-  { value: 2, label: "Quỹ từ thiện" },
-  { value: 3, label: "Phí thường niên" },
-  { value: 4, label: "Đóng góp sự kiện" },
-  { value: 5, label: "Khác" },
-];
+// ❌ REMOVED - Không cần danh mục nữa, dùng trường "Nội dung" thay thế
+// const DANH_MUC_LIST = [...];
 
 // ==================== INITIAL VALUES ====================
 const getInitialValues = (data?: IContributionUp | null, dongHoId?: string): Partial<IContributionUp> => ({
@@ -53,8 +47,8 @@ const getInitialValues = (data?: IContributionUp | null, dongHoId?: string): Par
   ngayDong: data?.ngayDong,
   soTien: data?.soTien || 0,
   dongHoId: data?.dongHoId || dongHoId || "",
-  danhMucId: data?.danhMucId || 1,
-  phuongThucThanhToan: data?.phuongThucThanhToan || "tien_mat",
+  // danhMucId: data?.danhMucId || 1,  // ❌ REMOVED
+  phuongThucThanhToan: data?.phuongThucThanhToan || "Tiền mặt",
   noiDung: data?.noiDung || "",
   ghiChu: data?.ghiChu || "",
   soDienThoaiNguoiNhap: data?.soDienThoaiNguoiNhap || "",
@@ -176,30 +170,16 @@ export const ContributionUpModal: React.FC<ContributionUpModalProps> = ({
             placeholder="Nhập họ tên người đóng góp"
           />
 
-          {/* Dòng họ (hiển thị thông tin, không cho chọn) + Danh mục */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1">
-              <label className="text-sm font-bold text-[#8b5e3c] uppercase">
-                Dòng họ <span className="text-red-500">*</span>
-              </label>
-              <div className="w-full p-3 bg-gray-50 border border-[#d4af37]/50 rounded text-[#5d4037] font-medium">
-                {dongHoInfo?.tenDongHo || "Đang tải..."}
-              </div>
-              {/* Hidden input để gửi dongHoId */}
-              <input type="hidden" name="dongHoId" value={userDongHoId || ""} />
+          {/* Dòng họ (hiển thị thông tin, không cho chọn) */}
+          <div className="space-y-1">
+            <label className="text-sm font-bold text-[#8b5e3c] uppercase">
+              Dòng họ <span className="text-red-500">*</span>
+            </label>
+            <div className="w-full p-3 bg-gray-50 border border-[#d4af37]/50 rounded text-[#5d4037] font-medium">
+              {dongHoInfo?.tenDongHo || "Đang tải..."}
             </div>
-            <Select
-              label="Danh mục thu"
-              name="danhMucId"
-              required
-              value={values.danhMucId ?? 1}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              options={DANH_MUC_LIST}
-              optionLabel="label"
-              optionValue="value"
-              error={getError("danhMucId")}
-            />
+            {/* Hidden input để gửi dongHoId */}
+            <input type="hidden" name="dongHoId" value={userDongHoId || ""} />
           </div>
 
           {/* Số tiền + Ngày đóng */}
@@ -232,7 +212,7 @@ export const ContributionUpModal: React.FC<ContributionUpModalProps> = ({
             label="Phương thức thanh toán"
             name="phuongThucThanhToan"
             required
-            value={values.phuongThucThanhToan || "tien_mat"}
+            value={values.phuongThucThanhToan || "Tiền mặt"}
             onChange={handleChange}
             onBlur={handleBlur}
             options={PAYMENT_METHODS}
@@ -241,15 +221,16 @@ export const ContributionUpModal: React.FC<ContributionUpModalProps> = ({
             error={getError("phuongThucThanhToan")}
           />
 
-          {/* Nội dung */}
+          {/* Nội dung - Thay thế cho danh mục */}
           <TextArea
             label="Nội dung"
             name="noiDung"
+            required
             value={values.noiDung || ""}
             onChange={handleChange}
             onBlur={handleBlur}
             error={getError("noiDung")}
-            placeholder="VD: Đóng góp xây dựng nhà thờ họ"
+            placeholder="VD: Đóng góp xây dựng nhà thờ họ, Đóng góp giỗ tổ, Quỹ từ thiện..."
             rows={2}
           />
 

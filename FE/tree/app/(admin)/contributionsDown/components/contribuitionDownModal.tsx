@@ -37,17 +37,14 @@ const rules: FormRules = {
     label: "Dòng họ",
     rules: ["required"],
   },
-  danhMucId: {
-    label: "Danh mục",
-    rules: ["required"],
-  },
+  // danhMucId: { label: "Danh mục", rules: ["required"] },  // ❌ REMOVED
   phuongThucThanhToan: {
     label: "Phương thức thanh toán",
     rules: ["required"],
   },
   noiDung: {
     label: "Nội dung",
-    rules: [{ max: 500 }],
+    rules: ["required", { max: 500 }],  // ✅ Bắt buộc thay cho danh mục
   },
   ghiChu: {
     label: "Ghi chú",
@@ -57,27 +54,21 @@ const rules: FormRules = {
 
 // ==================== PAYMENT METHODS ====================
 const PAYMENT_METHODS = [
-  { value: "tien_mat", label: "Tiền mặt" },
-  { value: "chuyen_khoan", label: "Chuyển khoản" },
-  { value: "khac", label: "Khác" },
+  { value: "Tiền mặt", label: "Tiền mặt" },
+  { value: "Chuyển khoản", label: "Chuyển khoản" },
+  { value: "Khác", label: "Khác" },
 ];
 
-// ==================== DANH MỤC CHI ====================
-const DANH_MUC_LIST = [
-  { value: 1, label: "Chi xây dựng" },
-  { value: 2, label: "Chi sự kiện" },
-  { value: 3, label: "Chi từ thiện" },
-  { value: 4, label: "Chi vận hành" },
-  { value: 5, label: "Khác" },
-];
+// ❌ REMOVED - Không cần danh mục nữa, dùng trường "Nội dung" thay thế
+// const DANH_MUC_LIST = [...];
 
 // ==================== INITIAL VALUES ====================
 const getInitialValues = (data?: IContributionDown | null, dongHoId?: string): Partial<IContributionDown> => ({
   dongHoId: data?.dongHoId || dongHoId || "",
-  danhMucId: data?.danhMucId || 1,
+  // danhMucId: data?.danhMucId || 1,  // ❌ REMOVED
   ngayChi: data?.ngayChi || new Date(),
   soTien: data?.soTien || 0,
-  phuongThucThanhToan: data?.phuongThucThanhToan || "tien_mat",
+  phuongThucThanhToan: data?.phuongThucThanhToan || "Tiền mặt",
   noiDung: data?.noiDung || "",
   nguoiNhan: data?.nguoiNhan || "",
   ghiChu: data?.ghiChu || "",
@@ -142,7 +133,7 @@ export const ContributionUpModal: React.FC<ContributionUpModalProps> = ({
     onSubmit({
       chiId: initialData?.chiId,
       dongHoId: values.dongHoId,
-      danhMucId: values.danhMucId,
+      // danhMucId: values.danhMucId,  // ❌ REMOVED
       ngayChi: formatDateForServer(values.ngayChi) as unknown as Date,
       soTien: values.soTien,
       phuongThucThanhToan: values.phuongThucThanhToan,
@@ -204,30 +195,16 @@ export const ContributionUpModal: React.FC<ContributionUpModalProps> = ({
             placeholder="Nhập tên người nhận"
           />
 
-          {/* Dòng họ (hiển thị thông tin, không cho chọn) + Danh mục */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1">
-              <label className="text-sm font-bold text-[#8b5e3c] uppercase">
-                Dòng họ <span className="text-red-500">*</span>
-              </label>
-              <div className="w-full p-3 bg-gray-50 border border-[#d4af37]/50 rounded text-[#5d4037] font-medium">
-                {dongHoInfo?.tenDongHo || "Đang tải..."}
-              </div>
-              {/* Hidden input để gửi dongHoId */}
-              <input type="hidden" name="dongHoId" value={userDongHoId || ""} />
+          {/* Dòng họ (hiển thị thông tin, không cho chọn) */}
+          <div className="space-y-1">
+            <label className="text-sm font-bold text-[#8b5e3c] uppercase">
+              Dòng họ <span className="text-red-500">*</span>
+            </label>
+            <div className="w-full p-3 bg-gray-50 border border-[#d4af37]/50 rounded text-[#5d4037] font-medium">
+              {dongHoInfo?.tenDongHo || "Đang tải..."}
             </div>
-            <Select
-              label="Danh mục chi"
-              name="danhMucId"
-              required
-              value={values.danhMucId ?? 1}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              options={DANH_MUC_LIST}
-              optionLabel="label"
-              optionValue="value"
-              error={getError("danhMucId")}
-            />
+            {/* Hidden input để gửi dongHoId */}
+            <input type="hidden" name="dongHoId" value={userDongHoId || ""} />
           </div>
 
           {/* Số tiền + Ngày chi */}
@@ -260,7 +237,7 @@ export const ContributionUpModal: React.FC<ContributionUpModalProps> = ({
             label="Phương thức thanh toán"
             name="phuongThucThanhToan"
             required
-            value={values.phuongThucThanhToan || "tien_mat"}
+            value={values.phuongThucThanhToan || "Tiền mặt"}
             onChange={handleChange}
             onBlur={handleBlur}
             options={PAYMENT_METHODS}
@@ -269,15 +246,16 @@ export const ContributionUpModal: React.FC<ContributionUpModalProps> = ({
             error={getError("phuongThucThanhToan")}
           />
 
-          {/* Nội dung */}
+          {/* Nội dung - Thay thế cho danh mục */}
           <TextArea
             label="Nội dung"
             name="noiDung"
+            required
             value={values.noiDung || ""}
             onChange={handleChange}
             onBlur={handleBlur}
             error={getError("noiDung")}
-            placeholder="VD: Chi phí tổ chức sự kiện"
+            placeholder="VD: Chi xây dựng nhà thờ họ, Chi tổ chức sự kiện, Chi từ thiện..."
             rows={2}
           />
 

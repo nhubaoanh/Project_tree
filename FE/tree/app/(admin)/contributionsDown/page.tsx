@@ -10,7 +10,7 @@ import {
 } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
 import { ContributionUpModal } from "./components/contribuitionDownModal";
-import { createContributionDown, deleteContributionDown, searchContributionDown, updateContributionDown, downloadTemplate, downloadTemplateWithSample, importFromExcel } from "@/service/contribuitionDown.service";
+import { createContributionDown, deleteContributionDown, searchContributionDown, updateContributionDown, downloadTemplate, downloadTemplateWithSample, exportExcel, importFromExcel } from "@/service/contribuitionDown.service";
 import { IContributionDown, IsearchContributionDown } from "@/types/contribuitionDown";
 import { useToast } from "@/service/useToas";
 import storage from "@/utils/storage";
@@ -202,15 +202,33 @@ export default function QuanLyTaiChinhChiPage() {
     setPageIndex(1);
   };
 
-  const handleExportExcel = () => {
+  const handleExportExcel = async () => {
     if (userData.length === 0) {
       toast("Không có dữ liệu để xuất");
       return;
     }
-    const worksheet = XLSX.utils.json_to_sheet(userData);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "TaiChinhChi");
-    XLSX.writeFile(workbook, `TaiChinhChi_Trang${pageIndex}.xlsx`);
+    
+    try {
+      console.log('🔵 Bắt đầu export Excel CHI...');
+      // Gọi API backend để export Excel (có format template)
+      const blob = await exportExcel();
+      console.log('✅ Nhận được blob:', blob.size, 'bytes');
+      
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `TaiChinhChi_${new Date().toLocaleDateString('vi-VN').replace(/\//g, '-')}.xlsx`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      showSuccess("Đã xuất dữ liệu thành công!");
+    } catch (error: any) {
+      console.error('❌ Export Excel CHI error:', error);
+      console.error('Error response:', error.response);
+      console.error('Error message:', error.message);
+      showError("Không thể xuất dữ liệu. Vui lòng thử lại.");
+    }
   };
 
   const handleDownloadTemplate = async () => {

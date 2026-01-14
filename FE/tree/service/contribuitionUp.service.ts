@@ -80,6 +80,20 @@ export const downloadTemplateWithSample = async (): Promise<Blob> => {
 };
 
 /**
+ * Export Excel với dữ liệu thật (có format template)
+ */
+export const exportExcel = async (): Promise<Blob> => {
+  try {
+    const res = await apiClient.get(`${prefix}/export-excel`, {
+      responseType: 'blob',
+    });
+    return res.data;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
+/**
  * Import dữ liệu THU từ file Excel
  */
 export const importFromExcel = async (file: File): Promise<any> => {

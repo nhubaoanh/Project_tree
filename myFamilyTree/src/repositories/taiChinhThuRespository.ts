@@ -29,12 +29,12 @@ export class taiChinhThuRespository {
   }
 
   async createTaiChinhThu(taiChinhThu: taiChinhThu): Promise<any> {
+    const connection = await this.db.getRawConnection();
     try {
       const sql =
-        "CALL InsertTaiChinhThu(?,?,?,?,?,?,?,?,?, @err_code, @err_msg)";
-      await this.db.query(sql, [
+        "CALL InsertTaiChinhThu(?,?,?,?,?,?,?,?, @thuId, @err_code, @err_msg)";
+      await connection.query(sql, [
         taiChinhThu.dongHoId,
-        taiChinhThu.danhMucId,
         taiChinhThu.hoTenNguoiDong,
         taiChinhThu.ngayDong,
         taiChinhThu.soTien,
@@ -43,21 +43,36 @@ export class taiChinhThuRespository {
         taiChinhThu.ghiChu,
         taiChinhThu.nguoiNhapId,
       ]);
-      return true;
+      
+      // Lấy thuId vừa tạo
+      const [outParams]: any = await connection.query(
+        'SELECT @thuId AS thuId, @err_code AS err_code, @err_msg AS err_msg'
+      );
+      
+      const thuId = outParams[0].thuId;
+      const errorCode = outParams[0].err_code;
+      const message = outParams[0].err_msg;
+      
+      if (errorCode !== 0) {
+        throw new Error(message || 'Lỗi khi tạo khoản thu');
+      }
+      
+      return { thuId, dongHoId: taiChinhThu.dongHoId };
     } catch (error: any) {
       console.log("error database => ", error);
       throw new Error(error.message);
+    } finally {
+      connection.release();
     }
   }
 
   async UpdateTaiChinhThu(taiChinhThu: taiChinhThu): Promise<any> {
     try {
       const sql =
-        "CALL UpdateTaiChinhThu(?,?,?,?,?,?,?,?,?,?, @err_code, @err_msg)";
+        "CALL UpdateTaiChinhThu(?,?,?,?,?,?,?,?,?, @err_code, @err_msg)";
       await this.db.query(sql, [
         taiChinhThu.thuId,
         taiChinhThu.dongHoId,
-        taiChinhThu.danhMucId,
         taiChinhThu.hoTenNguoiDong,
         taiChinhThu.ngayDong,
         taiChinhThu.soTien,
@@ -92,14 +107,7 @@ export class taiChinhThuRespository {
   ): Promise<any> {
     const connection = await this.db.getRawConnection();
     try {
-      console.log("🔍 Debug import THU:");
-      console.log("- Data length:", data.length);
-      console.log("- Sample data:", JSON.stringify(data[0], null, 2));
-      console.log("- dongHoId:", dongHoId);
-      console.log("- nguoiTaoId:", nguoiTaoId);
-
       const jsonData = JSON.stringify(data);
-      console.log("- JSON data:", jsonData);
 
       // Gọi stored procedure với OUT params
       await connection.query(
@@ -112,15 +120,12 @@ export class taiChinhThuRespository {
         'SELECT @err_code AS err_code, @err_msg AS err_msg'
       );
 
-      console.log("- Stored procedure result:", outParams[0]);
-
       const errorCode = outParams[0].err_code;
       const message = outParams[0].err_msg;
 
       // Xử lý các trường hợp khác nhau
       if (errorCode === 0) {
         // Thành công hoàn toàn
-        console.log("✅ Import THU thành công hoàn toàn");
         return { 
           success: true, 
           count: data.length,
@@ -128,7 +133,6 @@ export class taiChinhThuRespository {
         };
       } else if (errorCode === 1001) {
         // Thành công một phần (có lỗi nhưng vẫn import được một số dòng)
-        console.log("⚠️ Import THU thành công một phần");
         return { 
           success: true, 
           partial: true,
@@ -137,7 +141,6 @@ export class taiChinhThuRespository {
         };
       } else {
         // Lỗi hoàn toàn
-        console.log("❌ Import THU thất bại:", message);
         throw new Error(message || 'Lỗi khi import dữ liệu thu');
       }
     } catch (error: any) {

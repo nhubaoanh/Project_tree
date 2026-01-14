@@ -2,15 +2,15 @@ export interface IContributionUp {
   thuId: number;
 
   dongHoId: string;
-  danhMucId: number;
-  tenDanhMuc?: string;
+  // danhMucId: number;  // ❌ REMOVED - không cần danh mục nữa
+  // tenDanhMuc?: string;  // ❌ REMOVED
 
   hoTenNguoiDong: string;
   ngayDong?: Date;
   soTien: number;
 
   phuongThucThanhToan: string;
-  noiDung: string;
+  noiDung: string;  // Dùng noiDung thay cho danh mục
   ghiChu: string;
 
   nguoiNhapId: string;

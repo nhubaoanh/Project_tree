@@ -4,10 +4,10 @@
  */
 
 export interface FinanceThuImportData {
+  thu_id?: number;  // Optional - nếu có thì UPDATE, không có thì INSERT
   stt: number | null;
   ho_ten_nguoi_dong: string;
   ngay_dong: string;
-  danh_muc: string;
   so_tien: number;
   phuong_thuc_thanh_toan: string;
   noi_dung: string;
@@ -15,9 +15,9 @@ export interface FinanceThuImportData {
 }
 
 export interface FinanceChiImportData {
+  chi_id?: number;  // Optional - nếu có thì UPDATE, không có thì INSERT
   stt: number | null;
   ngay_chi: string;
-  danh_muc: string;
   so_tien: number;
   phuong_thuc_thanh_toan: string;
   noi_dung: string;
@@ -187,23 +187,7 @@ function validateSingleFinanceThu(
     }
   }
 
-  // 4. Danh mục - Bắt buộc (bỏ validation danh mục cụ thể vì có bảng riêng)
-  if (!item.danh_muc || item.danh_muc.trim() === "") {
-    errors.push({
-      row,
-      field: "Danh mục",
-      message: "Danh mục không được để trống"
-    });
-  } else if (item.danh_muc.length > 255) {
-    warnings.push({
-      row,
-      field: "Danh mục",
-      message: "Tên danh mục quá dài (nên dưới 255 ký tự)",
-      value: item.danh_muc.length
-    });
-  }
-
-  // 5. Số tiền - Bắt buộc và phải là số dương
+  // 4. Số tiền - Bắt buộc và phải là số dương
   if (item.so_tien === null || item.so_tien === undefined) {
     errors.push({
       row,
@@ -226,7 +210,7 @@ function validateSingleFinanceThu(
     });
   }
 
-  // 6. Phương thức thanh toán - Validate nếu có
+  // 5. Phương thức thanh toán - Validate nếu có
   if (item.phuong_thuc_thanh_toan && item.phuong_thuc_thanh_toan.trim() !== "") {
     const isValidMethod = VALID_PAYMENT_METHODS.some(method => 
       method.toLowerCase().includes(item.phuong_thuc_thanh_toan.toLowerCase().trim()) ||
@@ -242,7 +226,7 @@ function validateSingleFinanceThu(
     }
   }
 
-  // 7. Nội dung - Kiểm tra độ dài
+  // 6. Nội dung - Kiểm tra độ dài
   if (item.noi_dung && item.noi_dung.length > 1000) {
     warnings.push({
       row,
@@ -311,23 +295,7 @@ function validateSingleFinanceChi(
     }
   }
 
-  // 3. Danh mục - Bắt buộc (bỏ validation danh mục cụ thể vì có bảng riêng)
-  if (!item.danh_muc || item.danh_muc.trim() === "") {
-    errors.push({
-      row,
-      field: "Danh mục",
-      message: "Danh mục không được để trống"
-    });
-  } else if (item.danh_muc.length > 255) {
-    warnings.push({
-      row,
-      field: "Danh mục",
-      message: "Tên danh mục quá dài (nên dưới 255 ký tự)",
-      value: item.danh_muc.length
-    });
-  }
-
-  // 4. Số tiền - Bắt buộc và phải là số dương
+  // 3. Số tiền - Bắt buộc và phải là số dương
   if (item.so_tien === null || item.so_tien === undefined) {
     errors.push({
       row,
@@ -376,7 +344,7 @@ function validateSingleFinanceChi(
     });
   }
 
-  // 7. Người nhận - Kiểm tra độ dài
+  // 6. Người nhận - Kiểm tra độ dài
   if (item.nguoi_nhan && item.nguoi_nhan.length > 255) {
     warnings.push({
       row,
