@@ -172,7 +172,7 @@ CREATE TABLE `nguoidung` (
 
 LOCK TABLES `nguoidung` WRITE;
 /*!40000 ALTER TABLE `nguoidung` DISABLE KEYS */;
-INSERT INTO `nguoidung` VALUES ('15e5e9b2-b293-4f18-b0f4-86548bbda3b0','025721a4-bd0d-4447-9b9b-505d174de937','0437a931-cf5e-11f0-8020-a8934a9bae74','nguyenvanbao123@gmail.com','ac851ed86b5f55eda6daf977344b8e84','2025-12-19 11:22:31',0,1,NULL,'2026-01-14 09:27:21','15e5e9b2-b293-4f18-b0f4-86548bbda3b0'),('61ef80c1-d2fa-4675-9323-bec58d33ed19','e9022e64-cbae-11f0-8020-a8934a9bae74','0aa1a174-c8ed-11f0-8020-a8934a9bae74','nhubaoanh221@gmail.com','bc9ae919caed0fc37d2db4f70f19c45e','2025-12-22 21:27:02',0,1,'89fd6f88-c909-11f0-8020-a8934a9bae74','2025-12-22 21:27:02','89fd6f88-c909-11f0-8020-a8934a9bae74'),('6aa26582-bd12-4fdb-95d8-4e09fdb2f102','e9022e64-cbae-11f0-8020-a8934a9bae74','0aa1a174-c8ed-11f0-8020-a8934a9bae74','minh123@gmail.com','ddc83bf88c241349a4211172137545e0','2025-12-22 21:16:56',0,1,NULL,'2025-12-22 21:16:56','system'),('77f83890-6765-4c19-8139-31a29071fac3','e9022e64-cbae-11f0-8020-a8934a9bae74','0aa1a174-c8ed-11f0-8020-a8934a9bae74','baoanh222@gmail.com','3a9df786cd4b24e2ff195aea08e654ea','2025-11-27 23:34:46',0,1,'c2ed095e-c905-11f0-8020-a8934a9bae74','2025-12-02 17:20:04',NULL),('89fd6f88-c909-11f0-8020-a8934a9bae74','e9022e64-cbae-11f0-8020-a8934a9bae74','c2ed095e-c905-11f0-8020-a8934a9bae74','nhubaoanh111@gmail.com','0192023a7bbd73250516f069df18b500','2025-11-24 14:45:25',1,1,'admin','2025-12-03 10:00:08',NULL),('a20a6246-4800-4992-af5c-adcd6e898ee6','9d494063-537a-45aa-9bbc-1203f6728d55','0aa1a174-c8ed-11f0-8020-a8934a9bae74','minh111@gmail.com','3be22b661340b185abcade7d4a7dd2ac','2025-12-19 15:51:04',0,0,NULL,'2025-12-19 22:06:29','system'),('b9b116b0-3d3c-4187-b1a9-fd8247274d64','9d494063-537a-45aa-9bbc-1203f6728d55','0437a931-cf5e-11f0-8020-a8934a9bae74','nguyenvanbao222@gmail.com','014663e57b654fd69a2352969e57e2e6','2025-12-22 21:11:25',0,1,NULL,'2026-01-14 16:06:45','b9b116b0-3d3c-4187-b1a9-fd8247274d64'),('ec9d0e50-7c5a-48a9-b606-daeb591230a1','9d494063-537a-45aa-9bbc-1203f6728d55','0aa1a174-c8ed-11f0-8020-a8934a9bae74','phamthithuylinh11@gmail.aom','0e854e0e782231a4597e79befaab7dc2','2026-01-07 00:14:28',0,1,'89fd6f88-c909-11f0-8020-a8934a9bae74','2026-01-07 00:14:28','89fd6f88-c909-11f0-8020-a8934a9bae74');
+INSERT INTO `nguoidung` VALUES ('15e5e9b2-b293-4f18-b0f4-86548bbda3b0','025721a4-bd0d-4447-9b9b-505d174de937','0437a931-cf5e-11f0-8020-a8934a9bae74','nguyenvanbao123@gmail.com','ac851ed86b5f55eda6daf977344b8e84','2025-12-19 11:22:31',1,1,NULL,'2026-01-15 09:43:58','15e5e9b2-b293-4f18-b0f4-86548bbda3b0'),('61ef80c1-d2fa-4675-9323-bec58d33ed19','e9022e64-cbae-11f0-8020-a8934a9bae74','0aa1a174-c8ed-11f0-8020-a8934a9bae74','nhubaoanh221@gmail.com','bc9ae919caed0fc37d2db4f70f19c45e','2025-12-22 21:27:02',0,1,'89fd6f88-c909-11f0-8020-a8934a9bae74','2025-12-22 21:27:02','89fd6f88-c909-11f0-8020-a8934a9bae74'),('6aa26582-bd12-4fdb-95d8-4e09fdb2f102','e9022e64-cbae-11f0-8020-a8934a9bae74','0aa1a174-c8ed-11f0-8020-a8934a9bae74','minh123@gmail.com','ddc83bf88c241349a4211172137545e0','2025-12-22 21:16:56',0,1,NULL,'2025-12-22 21:16:56','system'),('77f83890-6765-4c19-8139-31a29071fac3','e9022e64-cbae-11f0-8020-a8934a9bae74','0aa1a174-c8ed-11f0-8020-a8934a9bae74','baoanh222@gmail.com','3a9df786cd4b24e2ff195aea08e654ea','2025-11-27 23:34:46',0,1,'c2ed095e-c905-11f0-8020-a8934a9bae74','2025-12-02 17:20:04',NULL),('89fd6f88-c909-11f0-8020-a8934a9bae74','e9022e64-cbae-11f0-8020-a8934a9bae74','c2ed095e-c905-11f0-8020-a8934a9bae74','nhubaoanh111@gmail.com','0192023a7bbd73250516f069df18b500','2025-11-24 14:45:25',0,1,'admin','2025-12-03 10:00:08',NULL),('a20a6246-4800-4992-af5c-adcd6e898ee6','9d494063-537a-45aa-9bbc-1203f6728d55','0aa1a174-c8ed-11f0-8020-a8934a9bae74','minh111@gmail.com','3be22b661340b185abcade7d4a7dd2ac','2025-12-19 15:51:04',0,0,NULL,'2025-12-19 22:06:29','system'),('b9b116b0-3d3c-4187-b1a9-fd8247274d64','9d494063-537a-45aa-9bbc-1203f6728d55','0437a931-cf5e-11f0-8020-a8934a9bae74','nguyenvanbao222@gmail.com','014663e57b654fd69a2352969e57e2e6','2025-12-22 21:11:25',0,1,NULL,'2026-01-14 16:06:45','b9b116b0-3d3c-4187-b1a9-fd8247274d64'),('de2e63a8-53ce-4c57-9500-305e9933a092','025721a4-bd0d-4447-9b9b-505d174de937','0aa1a174-c8ed-11f0-8020-a8934a9bae74','nguyenvanbao111@gmail.com','c386274cf818d5b6d27c13fd026c53c9','2026-01-15 10:38:05',1,0,'15e5e9b2-b293-4f18-b0f4-86548bbda3b0','2026-01-15 11:15:40','system'),('ec9d0e50-7c5a-48a9-b606-daeb591230a1','9d494063-537a-45aa-9bbc-1203f6728d55','0aa1a174-c8ed-11f0-8020-a8934a9bae74','phamthithuylinh11@gmail.aom','0e854e0e782231a4597e79befaab7dc2','2026-01-07 00:14:28',0,1,'89fd6f88-c909-11f0-8020-a8934a9bae74','2026-01-07 00:14:28','89fd6f88-c909-11f0-8020-a8934a9bae74');
 /*!40000 ALTER TABLE `nguoidung` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -320,7 +320,7 @@ CREATE TABLE `sukien` (
 
 LOCK TABLES `sukien` WRITE;
 /*!40000 ALTER TABLE `sukien` DISABLE KEYS */;
-INSERT INTO `sukien` VALUES ('04858a2b-2c82-4186-806d-dd1c9197df4a','e9022e64-cbae-11f0-8020-a8934a9bae74','giỗ bình hoa','2025-12-16','21:52:00','fgfgfggfgf','gdfggdbgdbgdbd',1,1,NULL,'2026-01-05 10:56:45',1,2,'89fd6f88-c909-11f0-8020-a8934a9bae74'),('3080754f-fa0e-4929-9666-d8df6f45b019','e9022e64-cbae-11f0-8020-a8934a9bae74','cưới bảo anh','2025-12-22','20:55:00','Phòng họp B','quý hóa quá đi ',1,1,NULL,'2026-01-05 10:49:54',2,1,'89fd6f88-c909-11f0-8020-a8934a9bae74'),('3f878c40-e04e-47f4-b0af-9e57aa20959b','025721a4-bd0d-4447-9b9b-505d174de937','Cưới cháu minh anh','2026-01-15','23:23:00','tại nhà cháu trên đường 392','mọi người nhớ đến chung vui với gia đình',0,1,NULL,'2026-01-13 21:24:15',1,3,NULL),('517b932f-96a1-4074-a27f-a47dd0ccfa98','9d494063-537a-45aa-9bbc-1203f6728d55','Họp gia đình mình','2026-01-21','00:09:00','Phòng họp B','ddde',0,1,'b9b116b0-3d3c-4187-b1a9-fd8247274d64','2026-01-14 10:09:54',1,2,'b9b116b0-3d3c-4187-b1a9-fd8247274d64'),('65d4efeb-9d30-4d55-ba85-ad8b880536fe','025721a4-bd0d-4447-9b9b-505d174de937','giỗ bình kkkkkk','2026-01-06','17:15:00','Phòng họp B','yêu em',1,1,NULL,'2026-01-12 16:59:20',1,2,'15e5e9b2-b293-4f18-b0f4-86548bbda3b0'),('6c56bc31-19be-4b49-b233-ba4404b7b375','e9022e64-cbae-11f0-8020-a8934a9bae74','giỗ bình hoa','2025-12-18','17:26:00','fgfgfggfgf','svvbvbv',1,1,NULL,'2026-01-05 10:54:04',1,2,'89fd6f88-c909-11f0-8020-a8934a9bae74'),('7cefd591-5d64-4e41-bc8a-26b3a157fc2e','e9022e64-cbae-11f0-8020-a8934a9bae74','giỗ bình hoa','2025-12-19','16:42:00','Phòng họp 2','sfgheweqdii75uygrf',1,1,NULL,'2026-01-05 10:53:09',1,2,'89fd6f88-c909-11f0-8020-a8934a9bae74'),('7ea48f93-4806-4cee-93ea-4a970d261454','e9022e64-cbae-11f0-8020-a8934a9bae74','cưới minh','2025-12-21','16:43:00','Phòng họp B','fghryjytyut',1,1,NULL,'2026-01-05 10:50:09',1,2,'89fd6f88-c909-11f0-8020-a8934a9bae74'),('8a91536e-9df6-43b9-8b82-738b31d86c16','025721a4-bd0d-4447-9b9b-505d174de937','Họp gia đình','2026-01-15',NULL,'ndqehdqjhd','cdhđ',0,1,NULL,'2026-01-13 21:30:55',1,2,NULL),('91abf57f-d584-4570-a927-d0dad9e16839','e9022e64-cbae-11f0-8020-a8934a9bae74','Họp kế hoạch','2025-12-20','09:00:00','Phòng họp Bcb','Họp quý',1,1,'89fd6f88-c909-11f0-8020-a8934a9bae74','2026-01-05 10:50:23',2,1,'89fd6f88-c909-11f0-8020-a8934a9bae74'),('9e742b9e-b430-4be1-8621-b7b63bf5efd4','e9022e64-cbae-11f0-8020-a8934a9bae74','cưới minh','2025-12-17','10:32:00','nahf thờ','vff',1,1,NULL,'2026-01-05 10:54:41',2,2,'89fd6f88-c909-11f0-8020-a8934a9bae74'),('9f362e5b-8339-46ab-bb6d-f0e9c85e321c','025721a4-bd0d-4447-9b9b-505d174de937','Giỗ cụ tổ','2026-01-17','11:28:00','tại nhà bác cả trần đức chinh','mọi người chú ý thời gian',0,1,NULL,'2026-01-13 21:29:11',3,2,NULL),('afba8a12-2995-4649-981d-7b36f3371a86','e9022e64-cbae-11f0-8020-a8934a9bae74','giỗ bình hoa','2025-12-17','09:06:00','fgfgfggfgf','ccadcacad',1,1,NULL,'2026-01-05 10:56:36',1,2,'89fd6f88-c909-11f0-8020-a8934a9bae74'),('e4602605-12d4-41ba-84e3-e6d794834f4c','e9022e64-cbae-11f0-8020-a8934a9bae74','giỗ bình hoa','2025-12-17','22:08:00','ffdgfg','fgfgf',1,1,NULL,'2026-01-05 10:56:36',1,2,'89fd6f88-c909-11f0-8020-a8934a9bae74'),('fc634f02-2a09-45ae-a341-bdd5657a8821','025721a4-bd0d-4447-9b9b-505d174de937','Họp gia đình','2026-01-23','21:34:00','Phòng họp B','frgr',0,1,'15e5e9b2-b293-4f18-b0f4-86548bbda3b0','2026-01-13 21:32:11',1,2,NULL),('SK001','e9022e64-cbae-11f0-8020-a8934a9bae74','Họp gia đình','2025-12-11','18:17:24','Phòng họp 2','Họp gia đình',0,1,NULL,'2026-01-05 10:56:45',1,0,'89fd6f88-c909-11f0-8020-a8934a9bae74'),('SK002','e9022e64-cbae-11f0-8020-a8934a9bae74','Giỗ dòng họ','2025-12-11','18:17:47','Công viên trung tâm','Giỗ dòng họ',1,1,NULL,NULL,2,1,NULL),('SK003','e9022e64-cbae-11f0-8020-a8934a9bae74','Mừng năm mới','2025-12-11','18:17:47','Nhà hàng ABC','mừng măn mới',1,1,NULL,NULL,3,2,NULL);
+INSERT INTO `sukien` VALUES ('04858a2b-2c82-4186-806d-dd1c9197df4a','e9022e64-cbae-11f0-8020-a8934a9bae74','giỗ bình hoa','2025-12-16','21:52:00','fgfgfggfgf','gdfggdbgdbgdbd',1,1,NULL,'2026-01-05 10:56:45',1,2,'89fd6f88-c909-11f0-8020-a8934a9bae74'),('3080754f-fa0e-4929-9666-d8df6f45b019','e9022e64-cbae-11f0-8020-a8934a9bae74','cưới bảo anh','2025-12-22','20:55:00','Phòng họp B','quý hóa quá đi ',1,1,NULL,'2026-01-05 10:49:54',2,1,'89fd6f88-c909-11f0-8020-a8934a9bae74'),('3f878c40-e04e-47f4-b0af-9e57aa20959b','025721a4-bd0d-4447-9b9b-505d174de937','Cưới cháu minh anh','2026-01-15','23:23:00','tại nhà cháu trên đường 392','mọi người nhớ đến chung vui với gia đình',0,1,NULL,'2026-01-13 21:24:15',1,3,NULL),('517b932f-96a1-4074-a27f-a47dd0ccfa98','9d494063-537a-45aa-9bbc-1203f6728d55','Họp gia đình mình','2026-01-21','00:09:00','Phòng họp B','ddde',0,1,'b9b116b0-3d3c-4187-b1a9-fd8247274d64','2026-01-14 10:09:54',1,2,'b9b116b0-3d3c-4187-b1a9-fd8247274d64'),('65d4efeb-9d30-4d55-ba85-ad8b880536fe','025721a4-bd0d-4447-9b9b-505d174de937','giỗ bình kkkkkk','2026-01-06','17:15:00','Phòng họp B','yêu em',1,1,NULL,'2026-01-12 16:59:20',1,2,'15e5e9b2-b293-4f18-b0f4-86548bbda3b0'),('6c56bc31-19be-4b49-b233-ba4404b7b375','e9022e64-cbae-11f0-8020-a8934a9bae74','giỗ bình hoa','2025-12-18','17:26:00','fgfgfggfgf','svvbvbv',1,1,NULL,'2026-01-05 10:54:04',1,2,'89fd6f88-c909-11f0-8020-a8934a9bae74'),('7cefd591-5d64-4e41-bc8a-26b3a157fc2e','e9022e64-cbae-11f0-8020-a8934a9bae74','giỗ bình hoa','2025-12-19','16:42:00','Phòng họp 2','sfgheweqdii75uygrf',1,1,NULL,'2026-01-05 10:53:09',1,2,'89fd6f88-c909-11f0-8020-a8934a9bae74'),('7ea48f93-4806-4cee-93ea-4a970d261454','e9022e64-cbae-11f0-8020-a8934a9bae74','cưới minh','2025-12-21','16:43:00','Phòng họp B','fghryjytyut',1,1,NULL,'2026-01-05 10:50:09',1,2,'89fd6f88-c909-11f0-8020-a8934a9bae74'),('8a91536e-9df6-43b9-8b82-738b31d86c16','025721a4-bd0d-4447-9b9b-505d174de937','Họp gia đình','2026-01-15',NULL,'ndqehdqjhd','cdhđ',0,1,NULL,'2026-01-13 21:30:55',1,2,NULL),('91abf57f-d584-4570-a927-d0dad9e16839','e9022e64-cbae-11f0-8020-a8934a9bae74','Họp kế hoạch','2025-12-20','09:00:00','Phòng họp Bcb','Họp quý',1,1,'89fd6f88-c909-11f0-8020-a8934a9bae74','2026-01-05 10:50:23',2,1,'89fd6f88-c909-11f0-8020-a8934a9bae74'),('9e742b9e-b430-4be1-8621-b7b63bf5efd4','e9022e64-cbae-11f0-8020-a8934a9bae74','cưới minh','2025-12-17','10:32:00','nahf thờ','vff',1,1,NULL,'2026-01-05 10:54:41',2,2,'89fd6f88-c909-11f0-8020-a8934a9bae74'),('9f362e5b-8339-46ab-bb6d-f0e9c85e321c','025721a4-bd0d-4447-9b9b-505d174de937','Giỗ cụ tổ','2026-01-17','11:28:00','tại nhà bác cả trần đức chinh','mọi người chú ý thời gian',0,0,NULL,'2026-01-15 11:21:47',3,2,'15e5e9b2-b293-4f18-b0f4-86548bbda3b0'),('afba8a12-2995-4649-981d-7b36f3371a86','e9022e64-cbae-11f0-8020-a8934a9bae74','giỗ bình hoa','2025-12-17','09:06:00','fgfgfggfgf','ccadcacad',1,1,NULL,'2026-01-05 10:56:36',1,2,'89fd6f88-c909-11f0-8020-a8934a9bae74'),('e4602605-12d4-41ba-84e3-e6d794834f4c','e9022e64-cbae-11f0-8020-a8934a9bae74','giỗ bình hoa','2025-12-17','22:08:00','ffdgfg','fgfgf',1,1,NULL,'2026-01-05 10:56:36',1,2,'89fd6f88-c909-11f0-8020-a8934a9bae74'),('fc634f02-2a09-45ae-a341-bdd5657a8821','025721a4-bd0d-4447-9b9b-505d174de937','Họp gia đình mình','2026-01-22','21:34:00','Phòng họp B','frgr',0,0,'15e5e9b2-b293-4f18-b0f4-86548bbda3b0','2026-01-15 11:21:37',1,2,'15e5e9b2-b293-4f18-b0f4-86548bbda3b0'),('SK001','e9022e64-cbae-11f0-8020-a8934a9bae74','Họp gia đình','2025-12-11','18:17:24','Phòng họp 2','Họp gia đình',0,1,NULL,'2026-01-05 10:56:45',1,0,'89fd6f88-c909-11f0-8020-a8934a9bae74'),('SK002','e9022e64-cbae-11f0-8020-a8934a9bae74','Giỗ dòng họ','2025-12-11','18:17:47','Công viên trung tâm','Giỗ dòng họ',1,1,NULL,NULL,2,1,NULL),('SK003','e9022e64-cbae-11f0-8020-a8934a9bae74','Mừng năm mới','2025-12-11','18:17:47','Nhà hàng ABC','mừng măn mới',1,1,NULL,NULL,3,2,NULL);
 /*!40000 ALTER TABLE `sukien` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -359,7 +359,7 @@ CREATE TABLE `taichinhchi` (
 
 LOCK TABLES `taichinhchi` WRITE;
 /*!40000 ALTER TABLE `taichinhchi` DISABLE KEYS */;
-INSERT INTO `taichinhchi` VALUES (1,'9d494063-537a-45aa-9bbc-1203f6728d55','2025-01-01',800000.00,'Tiền mặt','Chi tổ chức giỗ tổ','Nhà hàng ABC','','2026-01-14 11:02:51','b9b116b0-3d3c-4187-b1a9-fd8247274d64',1,'2026-01-14 11:14:46','b9b116b0-3d3c-4187-b1a9-fd8247274d64'),(2,'9d494063-537a-45aa-9bbc-1203f6728d55','2025-01-02',1200000.00,'Chuyển khoản','Sửa chữa mộ tổ','Thợ xây Nguyễn A','Đã thanh toán','2026-01-14 11:02:51','b9b116b0-3d3c-4187-b1a9-fd8247274d64',1,'2026-01-14 11:14:46','b9b116b0-3d3c-4187-b1a9-fd8247274d64'),(3,'9d494063-537a-45aa-9bbc-1203f6728d55','2025-01-03',500000.00,'Tiền mặt','Chi phí tổ chức họp họ','Ban tổ chức','','2026-01-14 11:02:51','b9b116b0-3d3c-4187-b1a9-fd8247274d64',1,'2026-01-14 11:14:46','b9b116b0-3d3c-4187-b1a9-fd8247274d64'),(4,'9d494063-537a-45aa-9bbc-1203f6728d55','2025-01-04',300000.00,'Chuyển khoản','Chi phí in ấn tài liệu','Công ty in ABC','','2026-01-14 11:02:51','b9b116b0-3d3c-4187-b1a9-fd8247274d64',1,'2026-01-14 11:14:46','b9b116b0-3d3c-4187-b1a9-fd8247274d64'),(5,'9d494063-537a-45aa-9bbc-1203f6728d55','2025-01-05',600000.00,'Tiền mặt','Mua hoa quả cúng hdbbdhfdhfbjdjfdjfdfj','Chợ truyền thống','Đã mua','2026-01-14 11:02:51','b9b116b0-3d3c-4187-b1a9-fd8247274d64',1,'2026-01-14 11:14:46','b9b116b0-3d3c-4187-b1a9-fd8247274d64'),(6,'9d494063-537a-45aa-9bbc-1203f6728d55','2025-01-01',800000.00,'Tiền mặt','Chi tổ chức giỗ tổ','Nhà hàng ABC','','2026-01-14 11:08:47','b9b116b0-3d3c-4187-b1a9-fd8247274d64',1,NULL,NULL),(7,'9d494063-537a-45aa-9bbc-1203f6728d55','2025-01-02',1200000.00,'Chuyển khoản','Sửa chữa mộ tổ','Thợ xây Nguyễn A','Đã thanh toán','2026-01-14 11:08:47','b9b116b0-3d3c-4187-b1a9-fd8247274d64',1,NULL,NULL),(8,'9d494063-537a-45aa-9bbc-1203f6728d55','2025-01-03',500000.00,'Tiền mặt','Chi phí tổ chức họp họ','Ban tổ chức','','2026-01-14 11:08:47','b9b116b0-3d3c-4187-b1a9-fd8247274d64',1,NULL,NULL),(9,'9d494063-537a-45aa-9bbc-1203f6728d55','2025-01-04',300000.00,'Chuyển khoản','Chi phí in ấn tài liệu','Công ty in ABC','','2026-01-14 11:08:47','b9b116b0-3d3c-4187-b1a9-fd8247274d64',1,NULL,NULL),(10,'9d494063-537a-45aa-9bbc-1203f6728d55','2025-01-05',600000.00,'Tiền mặt','Mua hoa quả cúng hdbbdhfdhfb','Chợ truyền thống','Đã mua','2026-01-14 11:08:47','b9b116b0-3d3c-4187-b1a9-fd8247274d64',1,NULL,NULL);
+INSERT INTO `taichinhchi` VALUES (1,'025721a4-bd0d-4447-9b9b-505d174de937','2025-01-01',800000.00,'Tiền mặt','Chi tổ chức giỗ tổ','Nhà hàng ABC','','2026-01-15 10:19:35','15e5e9b2-b293-4f18-b0f4-86548bbda3b0',0,'2026-01-15 11:19:59','15e5e9b2-b293-4f18-b0f4-86548bbda3b0'),(1,'9d494063-537a-45aa-9bbc-1203f6728d55','2025-01-01',800000.00,'Tiền mặt','Chi tổ chức giỗ tổ','Nhà hàng ABC','','2026-01-14 11:02:51','b9b116b0-3d3c-4187-b1a9-fd8247274d64',1,'2026-01-14 11:14:46','b9b116b0-3d3c-4187-b1a9-fd8247274d64'),(2,'025721a4-bd0d-4447-9b9b-505d174de937','2025-01-02',1200000.00,'Chuyển khoản','Sửa chữa mộ tổ','Thợ xây Nguyễn A','Đã thanh toán','2026-01-15 10:19:35','15e5e9b2-b293-4f18-b0f4-86548bbda3b0',0,'2026-01-15 11:20:03','15e5e9b2-b293-4f18-b0f4-86548bbda3b0'),(2,'9d494063-537a-45aa-9bbc-1203f6728d55','2025-01-02',1200000.00,'Chuyển khoản','Sửa chữa mộ tổ','Thợ xây Nguyễn A','Đã thanh toán','2026-01-14 11:02:51','b9b116b0-3d3c-4187-b1a9-fd8247274d64',1,'2026-01-14 11:14:46','b9b116b0-3d3c-4187-b1a9-fd8247274d64'),(3,'025721a4-bd0d-4447-9b9b-505d174de937','2025-01-03',500000.00,'Tiền mặt','Chi phí tổ chức họp họ','Ban tổ chức','','2026-01-15 10:19:35','15e5e9b2-b293-4f18-b0f4-86548bbda3b0',1,NULL,NULL),(3,'9d494063-537a-45aa-9bbc-1203f6728d55','2025-01-03',500000.00,'Tiền mặt','Chi phí tổ chức họp họ','Ban tổ chức','','2026-01-14 11:02:51','b9b116b0-3d3c-4187-b1a9-fd8247274d64',1,'2026-01-14 11:14:46','b9b116b0-3d3c-4187-b1a9-fd8247274d64'),(4,'025721a4-bd0d-4447-9b9b-505d174de937','2025-01-04',300000.00,'Chuyển khoản','Chi phí in ấn tài liệu','Công ty in ABC','','2026-01-15 10:19:35','15e5e9b2-b293-4f18-b0f4-86548bbda3b0',1,NULL,NULL),(4,'9d494063-537a-45aa-9bbc-1203f6728d55','2025-01-04',300000.00,'Chuyển khoản','Chi phí in ấn tài liệu','Công ty in ABC','','2026-01-14 11:02:51','b9b116b0-3d3c-4187-b1a9-fd8247274d64',1,'2026-01-14 11:14:46','b9b116b0-3d3c-4187-b1a9-fd8247274d64'),(5,'025721a4-bd0d-4447-9b9b-505d174de937','2025-01-05',600000.00,'Tiền mặt','Mua hoa quả cúng','Chợ truyền thống','Đã mua','2026-01-15 10:19:35','15e5e9b2-b293-4f18-b0f4-86548bbda3b0',1,NULL,NULL),(5,'9d494063-537a-45aa-9bbc-1203f6728d55','2025-01-05',600000.00,'Tiền mặt','Mua hoa quả cúng hdbbdhfdhfbjdjfdjfdfj','Chợ truyền thống','Đã mua','2026-01-14 11:02:51','b9b116b0-3d3c-4187-b1a9-fd8247274d64',1,'2026-01-14 11:14:46','b9b116b0-3d3c-4187-b1a9-fd8247274d64'),(6,'9d494063-537a-45aa-9bbc-1203f6728d55','2025-01-01',800000.00,'Tiền mặt','Chi tổ chức giỗ tổ','Nhà hàng ABC','','2026-01-14 11:08:47','b9b116b0-3d3c-4187-b1a9-fd8247274d64',1,NULL,NULL),(7,'9d494063-537a-45aa-9bbc-1203f6728d55','2025-01-02',1200000.00,'Chuyển khoản','Sửa chữa mộ tổ','Thợ xây Nguyễn A','Đã thanh toán','2026-01-14 11:08:47','b9b116b0-3d3c-4187-b1a9-fd8247274d64',1,NULL,NULL),(8,'9d494063-537a-45aa-9bbc-1203f6728d55','2025-01-03',500000.00,'Tiền mặt','Chi phí tổ chức họp họ','Ban tổ chức','','2026-01-14 11:08:47','b9b116b0-3d3c-4187-b1a9-fd8247274d64',1,NULL,NULL),(9,'9d494063-537a-45aa-9bbc-1203f6728d55','2025-01-04',300000.00,'Chuyển khoản','Chi phí in ấn tài liệu','Công ty in ABC','','2026-01-14 11:08:47','b9b116b0-3d3c-4187-b1a9-fd8247274d64',1,NULL,NULL),(10,'9d494063-537a-45aa-9bbc-1203f6728d55','2025-01-05',600000.00,'Tiền mặt','Mua hoa quả cúng hdbbdhfdhfb','Chợ truyền thống','Đã mua','2026-01-14 11:08:47','b9b116b0-3d3c-4187-b1a9-fd8247274d64',1,NULL,NULL);
 /*!40000 ALTER TABLE `taichinhchi` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -398,7 +398,7 @@ CREATE TABLE `taichinhthu` (
 
 LOCK TABLES `taichinhthu` WRITE;
 /*!40000 ALTER TABLE `taichinhthu` DISABLE KEYS */;
-INSERT INTO `taichinhthu` VALUES (1,'9d494063-537a-45aa-9bbc-1203f6728d55','Nguyễn Văn A','2025-01-01',500000.00,'Tiền mặt','Đóng góp cho lễ giỗ tổ','','b9b116b0-3d3c-4187-b1a9-fd8247274d64','2026-01-14 11:02:41',1,'2026-01-14 11:15:34','b9b116b0-3d3c-4187-b1a9-fd8247274d64'),(2,'9d494063-537a-45aa-9bbc-1203f6728d55','Trần Thị B','2025-01-02',1000000.00,'Chuyển khoản','Đóng góp xây nhà thờ họ','Đã chuyển khoản','b9b116b0-3d3c-4187-b1a9-fd8247274d64','2026-01-14 11:02:41',1,'2026-01-14 11:15:34','b9b116b0-3d3c-4187-b1a9-fd8247274d64'),(3,'9d494063-537a-45aa-9bbc-1203f6728d55','Lê Văn C','2025-01-03',300000.00,'Tiền mặt','Hỗ trợ gia đình khó khăn','','b9b116b0-3d3c-4187-b1a9-fd8247274d64','2026-01-14 11:02:41',1,'2026-01-14 11:15:34','b9b116b0-3d3c-4187-b1a9-fd8247274d64'),(4,'9d494063-537a-45aa-9bbc-1203f6728d55','Phạm Thị D','2025-01-04',200000.00,'Chuyển khoản','Thu từ bán sách phả','','b9b116b0-3d3c-4187-b1a9-fd8247274d64','2026-01-14 11:02:41',1,'2026-01-14 11:15:34','b9b116b0-3d3c-4187-b1a9-fd8247274d64'),(5,'9d494063-537a-45aa-9bbc-1203f6728d55','Hoàng Văn E','2025-01-05',800000.00,'Tiền mặt','Đóng góp tổ chức họp họ','Đã thanh toán','b9b116b0-3d3c-4187-b1a9-fd8247274d64','2026-01-14 11:15:25',1,'2026-01-14 11:15:34','b9b116b0-3d3c-4187-b1a9-fd8247274d64');
+INSERT INTO `taichinhthu` VALUES (1,'025721a4-bd0d-4447-9b9b-505d174de937','Nguyễn Văn A','2025-01-01',500000.00,'Tiền mặt','Đóng góp cho lễ giỗ tổ','','15e5e9b2-b293-4f18-b0f4-86548bbda3b0','2026-01-15 10:19:49',0,'2026-01-15 11:19:39','15e5e9b2-b293-4f18-b0f4-86548bbda3b0'),(1,'9d494063-537a-45aa-9bbc-1203f6728d55','Nguyễn Văn A','2025-01-01',500000.00,'Tiền mặt','Đóng góp cho lễ giỗ tổ','','b9b116b0-3d3c-4187-b1a9-fd8247274d64','2026-01-14 11:02:41',1,'2026-01-14 11:15:34','b9b116b0-3d3c-4187-b1a9-fd8247274d64'),(2,'025721a4-bd0d-4447-9b9b-505d174de937','Trần Thị B','2025-01-02',1000000.00,'Chuyển khoản','Đóng góp xây nhà thờ họ','Đã chuyển khoản','15e5e9b2-b293-4f18-b0f4-86548bbda3b0','2026-01-15 10:19:49',0,'2026-01-15 11:19:49','15e5e9b2-b293-4f18-b0f4-86548bbda3b0'),(2,'9d494063-537a-45aa-9bbc-1203f6728d55','Trần Thị B','2025-01-02',1000000.00,'Chuyển khoản','Đóng góp xây nhà thờ họ','Đã chuyển khoản','b9b116b0-3d3c-4187-b1a9-fd8247274d64','2026-01-14 11:02:41',1,'2026-01-14 11:15:34','b9b116b0-3d3c-4187-b1a9-fd8247274d64'),(3,'025721a4-bd0d-4447-9b9b-505d174de937','Lê Văn C','2025-01-03',300000.00,'Tiền mặt','Hỗ trợ gia đình khó khăn','','15e5e9b2-b293-4f18-b0f4-86548bbda3b0','2026-01-15 10:19:49',1,NULL,NULL),(3,'9d494063-537a-45aa-9bbc-1203f6728d55','Lê Văn C','2025-01-03',300000.00,'Tiền mặt','Hỗ trợ gia đình khó khăn','','b9b116b0-3d3c-4187-b1a9-fd8247274d64','2026-01-14 11:02:41',1,'2026-01-14 11:15:34','b9b116b0-3d3c-4187-b1a9-fd8247274d64'),(4,'025721a4-bd0d-4447-9b9b-505d174de937','Phạm Thị D','2025-01-04',200000.00,'Chuyển khoản','Thu từ bán sách phả','','15e5e9b2-b293-4f18-b0f4-86548bbda3b0','2026-01-15 10:19:49',1,NULL,NULL),(4,'9d494063-537a-45aa-9bbc-1203f6728d55','Phạm Thị D','2025-01-04',200000.00,'Chuyển khoản','Thu từ bán sách phả','','b9b116b0-3d3c-4187-b1a9-fd8247274d64','2026-01-14 11:02:41',1,'2026-01-14 11:15:34','b9b116b0-3d3c-4187-b1a9-fd8247274d64'),(5,'025721a4-bd0d-4447-9b9b-505d174de937','Hoàng Văn E','2025-01-05',800000.00,'Tiền mặt','Đóng góp tổ chức họp họ','Đã thanh toán','15e5e9b2-b293-4f18-b0f4-86548bbda3b0','2026-01-15 10:19:49',1,NULL,NULL),(5,'9d494063-537a-45aa-9bbc-1203f6728d55','Hoàng Văn E','2025-01-05',800000.00,'Tiền mặt','Đóng góp tổ chức họp họ','Đã thanh toán','b9b116b0-3d3c-4187-b1a9-fd8247274d64','2026-01-14 11:15:25',1,'2026-01-14 11:15:34','b9b116b0-3d3c-4187-b1a9-fd8247274d64');
 /*!40000 ALTER TABLE `taichinhthu` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -436,7 +436,7 @@ CREATE TABLE `tailieu` (
 
 LOCK TABLES `tailieu` WRITE;
 /*!40000 ALTER TABLE `tailieu` DISABLE KEYS */;
-INSERT INTO `tailieu` VALUES ('1d9ff248-7528-4ab5-a407-fe4a13df55fc','025721a4-bd0d-4447-9b9b-505d174de937','sắc phong','uploads/2026/01/14/hungVuong-1768380729874-99310858.docx','Từ năm 2009 đến năm 2019, Sở Văn hóa và Thể thao đã chỉ đạo Thư viện Tổng hợp Thừa Thiên Huế hợp tác với Thư viện Khoa học Tổng hợp thành phố Hồ Chí Minh (từ năm 2018 có thêm Trung tâm Bảo tồn di tích Cố đô Huế tham gia phối hợp) tổ chức khảo sát, sưu tầm và số hóa tài liệu Hán – Nôm làng xã và tư gia ở Thừa Thiên Huế tại 14 phủ đệ, 118 làng, đền thờ và nhà vườn thuộc 516 gia đình, họ tộc. Cũng trong thời gian trên, Thư viện đã thực hiện đề tài nghiên cứu khoa học cấp cơ sở (2011 – 2013), và đề tài nghiên cứu khoa khoa học cấp tỉnh (2014) liên quan trực tiếp đến vấn đề số hóa các tư liệu làng xã tại địa phương. Đến nay, tổng số tài liệu Hán Nôm sưu tầm, số hóa là 263.848 trang, trong đó có hàng chục ngàn sắc phong, chế phong, chiếu chỉ, lệnh chỉ.\nNăm 2018, Thư viện Tổng hợp Thừa Thiên Huế đã phối hợp cùng Trung tâm Bảo tồn Di tích Cố đô Huế và Thư viện Khoa học Tổng hợp Thành phố Hồ Chí Minh biên tập, xuất bản cuốn Thư mục đề yếu sắc phong triều Nguyễn ở Thừa Thiên Huế, giới thiệu nội dung tóm tắt hơn 2.171 sắc phong, sắc chỉ thời Nguyễn. Cuốn sách đã nhận được sự quan tâm đặc biệt của các nhà nghiên cứu và bạn đọc gần xa. Kế tục thành quả trên, lần này chúng tôi tuyển chọn và giới thiệu đầy đủ nội dung 300 tài liệu Hán – Nôm quý, bao gồm 181 sắc phong (phần 1); 100 chế phong (phần 2); và 19 chiếu (phần 3) trong tập sách SẮC PHONG, CHẾ PHONG, CHIẾU THỜI NGUYỄN TẠI THỪA THIÊN HUẾ','Văn bản cổ',1967,'Trần Bảo Anh','tại nhà thờ họ','nhớ ơn ông cha và ghi nhận công lao','2026-01-13',1,NULL,'2026-01-14 15:54:40',NULL),('c3fa16f6-853a-44ce-8edd-c5f65b52c63e','e9022e64-cbae-11f0-8020-a8934a9bae74','Cúng tổ họ',NULL,'đây là là một trong những trtuyeenf thống tốt đẹp của ông cha ta ','Văn bản cổ',1930,'Nhữ Bảo Anh','tại nhà thờ','yêu nước','2025-12-29',0,NULL,'2026-01-05 10:28:49',''),('f5a4e294-eb4f-4625-ab0f-0fa987c8102c','025721a4-bd0d-4447-9b9b-505d174de937','yêu em',NULL,'yêu yêu','Sắc phong',1920,'bin bin','nhà chính','hhhh','2026-01-01',1,NULL,'2026-01-01 21:30:44',NULL),('TL001','e9022e64-cbae-11f0-8020-a8934a9bae74','Gia phả dòng họ - Bản gốc',NULL,'Gia phả ghi chép từ đời thứ nhất đến đời thứ 5 của dòng họ. Bản viết tay bằng chữ Hán Nôm, được lưu giữ cẩn thận qua nhiều thế hệ.','Gia phả',1920,'Cụ tổ đời thứ 5','Lưu trữ tại nhà thờ họ',NULL,'2025-12-29',0,NULL,'2026-01-05 11:26:49','89fd6f88-c909-11f0-8020-a8934a9bae74'),('TL002','e9022e64-cbae-11f0-8020-a8934a9bae74','Sắc phong triều Nguyễn',NULL,'Sắc phong của vua Tự Đức ban cho cụ tổ năm 1865, ghi nhận công lao đóng góp cho triều đình.','Sắc phong',1865,'Triều đình nhà Nguyễn','Lưu trữ tại bảo tàng tỉnh',NULL,'2025-12-29',0,NULL,'2026-01-05 11:26:49','89fd6f88-c909-11f0-8020-a8934a9bae74'),('TL003','e9022e64-cbae-11f0-8020-a8934a9bae74','Hình ảnh nhà thờ họ xưa',NULL,'Bộ ảnh chụp nhà thờ họ từ năm 1950, ghi lại kiến trúc cổ trước khi được tu bổ.','Hình ảnh',1950,'Không rõ','Sưu tầm từ gia đình',NULL,'2025-12-29',0,NULL,'2026-01-06 18:49:28','6aa26582-bd12-4fdb-95d8-4e09fdb2f102'),('TL004','e9022e64-cbae-11f0-8020-a8934a9bae74','Văn tế tổ tiên',NULL,'Bài văn tế được đọc trong các dịp giỗ tổ, lễ tết. Nội dung ca ngợi công đức tổ tiên.','Văn bản cổ',1900,'Cụ tổ đời thứ 4','Truyền khẩu trong dòng họ',NULL,'2025-12-29',0,NULL,'2026-01-09 22:26:27','89fd6f88-c909-11f0-8020-a8934a9bae74'),('TL005','e9022e64-cbae-11f0-8020-a8934a9bae74','Gia phả bổ sung - Đời 6 đến 10',NULL,'Phần bổ sung gia phả, ghi chép các đời từ thứ 6 đến thứ 10 của dòng họ.','Gia phả',1980,'Ông Nguyễn Văn B','Biên soạn mới',NULL,'2025-12-29',1,NULL,NULL,NULL),('TL006','e9022e64-cbae-11f0-8020-a8934a9bae74','Hình ảnh lễ giỗ tổ 2020',NULL,'Bộ ảnh ghi lại lễ giỗ tổ năm 2020 với sự tham gia của hơn 200 con cháu.','Hình ảnh',2020,'Ban tổ chức','Chụp tại lễ giỗ tổ',NULL,'2025-12-29',1,NULL,NULL,NULL);
+INSERT INTO `tailieu` VALUES ('1d9ff248-7528-4ab5-a407-fe4a13df55fc','025721a4-bd0d-4447-9b9b-505d174de937','sắc phong','uploads/2026/01/14/hungVuong-1768380729874-99310858.docx','Từ năm 2009 đến năm 2019, Sở Văn hóa và Thể thao đã chỉ đạo Thư viện Tổng hợp Thừa Thiên Huế hợp tác với Thư viện Khoa học Tổng hợp thành phố Hồ Chí Minh (từ năm 2018 có thêm Trung tâm Bảo tồn di tích Cố đô Huế tham gia phối hợp) tổ chức khảo sát, sưu tầm và số hóa tài liệu Hán – Nôm làng xã và tư gia ở Thừa Thiên Huế tại 14 phủ đệ, 118 làng, đền thờ và nhà vườn thuộc 516 gia đình, họ tộc. Cũng trong thời gian trên, Thư viện đã thực hiện đề tài nghiên cứu khoa học cấp cơ sở (2011 – 2013), và đề tài nghiên cứu khoa khoa học cấp tỉnh (2014) liên quan trực tiếp đến vấn đề số hóa các tư liệu làng xã tại địa phương. Đến nay, tổng số tài liệu Hán Nôm sưu tầm, số hóa là 263.848 trang, trong đó có hàng chục ngàn sắc phong, chế phong, chiếu chỉ, lệnh chỉ.\nNăm 2018, Thư viện Tổng hợp Thừa Thiên Huế đã phối hợp cùng Trung tâm Bảo tồn Di tích Cố đô Huế và Thư viện Khoa học Tổng hợp Thành phố Hồ Chí Minh biên tập, xuất bản cuốn Thư mục đề yếu sắc phong triều Nguyễn ở Thừa Thiên Huế, giới thiệu nội dung tóm tắt hơn 2.171 sắc phong, sắc chỉ thời Nguyễn. Cuốn sách đã nhận được sự quan tâm đặc biệt của các nhà nghiên cứu và bạn đọc gần xa. Kế tục thành quả trên, lần này chúng tôi tuyển chọn và giới thiệu đầy đủ nội dung 300 tài liệu Hán – Nôm quý, bao gồm 181 sắc phong (phần 1); 100 chế phong (phần 2); và 19 chiếu (phần 3) trong tập sách SẮC PHONG, CHẾ PHONG, CHIẾU THỜI NGUYỄN TẠI THỪA THIÊN HUẾ','Văn bản cổ',1967,'Trần Bảo Anh','tại nhà thờ họ','nhớ ơn ông cha và ghi nhận công lao','2026-01-13',1,NULL,'2026-01-15 11:15:08','15e5e9b2-b293-4f18-b0f4-86548bbda3b0'),('c3fa16f6-853a-44ce-8edd-c5f65b52c63e','e9022e64-cbae-11f0-8020-a8934a9bae74','Cúng tổ họ',NULL,'đây là là một trong những trtuyeenf thống tốt đẹp của ông cha ta ','Văn bản cổ',1930,'Nhữ Bảo Anh','tại nhà thờ','yêu nước','2025-12-29',1,NULL,'2026-01-05 10:28:49',''),('f5a4e294-eb4f-4625-ab0f-0fa987c8102c','025721a4-bd0d-4447-9b9b-505d174de937','yêu em',NULL,'yêu yêu','Sắc phong',1920,'bin bin','nhà chính','hhhh','2026-01-01',1,NULL,'2026-01-15 11:17:48','15e5e9b2-b293-4f18-b0f4-86548bbda3b0'),('TL001','e9022e64-cbae-11f0-8020-a8934a9bae74','Gia phả dòng họ - Bản gốc',NULL,'Gia phả ghi chép từ đời thứ nhất đến đời thứ 5 của dòng họ. Bản viết tay bằng chữ Hán Nôm, được lưu giữ cẩn thận qua nhiều thế hệ.','Gia phả',1920,'Cụ tổ đời thứ 5','Lưu trữ tại nhà thờ họ',NULL,'2025-12-29',1,NULL,'2026-01-05 11:26:49','89fd6f88-c909-11f0-8020-a8934a9bae74'),('TL002','e9022e64-cbae-11f0-8020-a8934a9bae74','Sắc phong triều Nguyễn',NULL,'Sắc phong của vua Tự Đức ban cho cụ tổ năm 1865, ghi nhận công lao đóng góp cho triều đình.','Sắc phong',1865,'Triều đình nhà Nguyễn','Lưu trữ tại bảo tàng tỉnh',NULL,'2025-12-29',1,NULL,'2026-01-05 11:26:49','89fd6f88-c909-11f0-8020-a8934a9bae74'),('TL003','e9022e64-cbae-11f0-8020-a8934a9bae74','Hình ảnh nhà thờ họ xưa',NULL,'Bộ ảnh chụp nhà thờ họ từ năm 1950, ghi lại kiến trúc cổ trước khi được tu bổ.','Hình ảnh',1950,'Không rõ','Sưu tầm từ gia đình',NULL,'2025-12-29',1,NULL,'2026-01-06 18:49:28','6aa26582-bd12-4fdb-95d8-4e09fdb2f102'),('TL004','e9022e64-cbae-11f0-8020-a8934a9bae74','Văn tế tổ tiên',NULL,'Bài văn tế được đọc trong các dịp giỗ tổ, lễ tết. Nội dung ca ngợi công đức tổ tiên.','Văn bản cổ',1900,'Cụ tổ đời thứ 4','Truyền khẩu trong dòng họ',NULL,'2025-12-29',1,NULL,'2026-01-09 22:26:27','89fd6f88-c909-11f0-8020-a8934a9bae74'),('TL005','e9022e64-cbae-11f0-8020-a8934a9bae74','Gia phả bổ sung - Đời 6 đến 10',NULL,'Phần bổ sung gia phả, ghi chép các đời từ thứ 6 đến thứ 10 của dòng họ.','Gia phả',1980,'Ông Nguyễn Văn B','Biên soạn mới',NULL,'2025-12-29',1,NULL,NULL,NULL),('TL006','e9022e64-cbae-11f0-8020-a8934a9bae74','Hình ảnh lễ giỗ tổ 2020',NULL,'Bộ ảnh ghi lại lễ giỗ tổ năm 2020 với sự tham gia của hơn 200 con cháu.','Hình ảnh',2020,'Ban tổ chức','Chụp tại lễ giỗ tổ',NULL,'2025-12-29',1,NULL,NULL,NULL);
 /*!40000 ALTER TABLE `tailieu` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -629,7 +629,7 @@ CREATE TABLE `tintuc` (
 
 LOCK TABLES `tintuc` WRITE;
 /*!40000 ALTER TABLE `tintuc` DISABLE KEYS */;
-INSERT INTO `tintuc` VALUES ('849bf3ee-674a-43bf-97f2-4024c10ea072','025721a4-bd0d-4447-9b9b-505d174de937','Giỗ tổ lão','hãy nhớ ơn và trả ơn đền ơn đáp nghĩa','ngày mà các con cháu nhớ đến công lao của tổ tiên và biết ơn công lao của các vị anh hùng',NULL,'Trần Bảo Anh','2026-01-13 09:15:09',0,1,1,NULL,'2026-01-13 09:15:09',NULL),('TT001','e9022e64-cbae-11f0-8020-a8934a9bae74','Thông báo họp họ cuối năm 2025','Kính mời toàn thể bà con trong dòng họ tham dự buổi họp họ cuối năm 2025. Thời gian: 10h ngày 28/12/2025. Địa điểm: Nhà thờ họ. Nội dung: Tổng kết hoạt động năm 2025, kế hoạch năm 2026, trao học bổng cho con cháu học giỏi.','Thông báo họp họ cuối năm 2025 tại nhà thờ họ',NULL,'Ban quản lý dòng họ','2025-12-29 16:02:10',0,1,1,NULL,NULL,NULL),('TT002','e9022e64-cbae-11f0-8020-a8934a9bae74','Chúc mừng cháu Nguyễn Văn A đỗ đại học','Dòng họ xin chúc mừng cháu Nguyễn Văn A đã xuất sắc đỗ vào trường Đại học Bách Khoa Hà Nội năm 2025 với số điểm cao. Đây là niềm tự hào của cả dòng họ.','Chúc mừng thành viên đỗ đại học',NULL,'Ban quản lý dòng họ','2025-12-24 16:02:10',0,0,0,NULL,'2026-01-09 22:26:47','89fd6f88-c909-11f0-8020-a8934a9bae74'),('TT003','e9022e64-cbae-11f0-8020-a8934a9bae74','Lễ giỗ tổ Hùng Vương năm 2025','Thông báo lịch tổ chức lễ giỗ tổ Hùng Vương năm 2025. Thời gian: Mùng 10 tháng 3 âm lịch. Địa điểm: Đền thờ họ. Mong bà con sắp xếp thời gian tham dự.','Lễ giỗ tổ Hùng Vương năm 2025',NULL,'Ban tổ chức','2025-12-19 16:02:10',0,1,1,NULL,NULL,NULL),('TT004','e9022e64-cbae-11f0-8020-a8934a9bae74','Kế hoạch tu bổ nhà thờ họ','Ban quản lý dòng họ thông báo kế hoạch tu bổ, nâng cấp nhà thờ họ trong năm 2025. Dự kiến kinh phí: 500 triệu đồng. Kêu gọi bà con đóng góp.','Kế hoạch tu bổ nhà thờ họ năm 2025',NULL,'Ban quản lý','2025-12-14 16:02:10',0,0,0,NULL,'2026-01-05 10:29:07',''),('TT005','e9022e64-cbae-11f0-8020-a8934a9bae74','Hỗ trợ học bổng cho con cháu','Dòng họ triển khai chương trình học bổng hỗ trợ con cháu có hoàn cảnh khó khăn học giỏi. Mức hỗ trợ: 2-5 triệu đồng/năm học.','Chương trình học bổng dòng họ',NULL,'Ban khuyến học','2025-12-09 16:02:10',0,0,1,NULL,NULL,NULL);
+INSERT INTO `tintuc` VALUES ('849bf3ee-674a-43bf-97f2-4024c10ea072','025721a4-bd0d-4447-9b9b-505d174de937','Giỗ tổ lão','hãy nhớ ơn và trả ơn đền ơn đáp nghĩa','ngày mà các con cháu nhớ đến công lao của tổ tiên và biết ơn công lao của các vị anh hùng',NULL,'Trần Bảo Anh','2026-01-13 09:15:09',0,1,1,NULL,'2026-01-15 11:15:18','15e5e9b2-b293-4f18-b0f4-86548bbda3b0'),('TT001','e9022e64-cbae-11f0-8020-a8934a9bae74','Thông báo họp họ cuối năm 2025','Kính mời toàn thể bà con trong dòng họ tham dự buổi họp họ cuối năm 2025. Thời gian: 10h ngày 28/12/2025. Địa điểm: Nhà thờ họ. Nội dung: Tổng kết hoạt động năm 2025, kế hoạch năm 2026, trao học bổng cho con cháu học giỏi.','Thông báo họp họ cuối năm 2025 tại nhà thờ họ',NULL,'Ban quản lý dòng họ','2025-12-29 16:02:10',0,1,1,NULL,NULL,NULL),('TT002','e9022e64-cbae-11f0-8020-a8934a9bae74','Chúc mừng cháu Nguyễn Văn A đỗ đại học','Dòng họ xin chúc mừng cháu Nguyễn Văn A đã xuất sắc đỗ vào trường Đại học Bách Khoa Hà Nội năm 2025 với số điểm cao. Đây là niềm tự hào của cả dòng họ.','Chúc mừng thành viên đỗ đại học',NULL,'Ban quản lý dòng họ','2025-12-24 16:02:10',0,0,1,NULL,'2026-01-09 22:26:47','89fd6f88-c909-11f0-8020-a8934a9bae74'),('TT003','e9022e64-cbae-11f0-8020-a8934a9bae74','Lễ giỗ tổ Hùng Vương năm 2025','Thông báo lịch tổ chức lễ giỗ tổ Hùng Vương năm 2025. Thời gian: Mùng 10 tháng 3 âm lịch. Địa điểm: Đền thờ họ. Mong bà con sắp xếp thời gian tham dự.','Lễ giỗ tổ Hùng Vương năm 2025',NULL,'Ban tổ chức','2025-12-19 16:02:10',0,1,1,NULL,NULL,NULL),('TT004','e9022e64-cbae-11f0-8020-a8934a9bae74','Kế hoạch tu bổ nhà thờ họ','Ban quản lý dòng họ thông báo kế hoạch tu bổ, nâng cấp nhà thờ họ trong năm 2025. Dự kiến kinh phí: 500 triệu đồng. Kêu gọi bà con đóng góp.','Kế hoạch tu bổ nhà thờ họ năm 2025',NULL,'Ban quản lý','2025-12-14 16:02:10',0,0,1,NULL,'2026-01-05 10:29:07',''),('TT005','e9022e64-cbae-11f0-8020-a8934a9bae74','Hỗ trợ học bổng cho con cháu','Dòng họ triển khai chương trình học bổng hỗ trợ con cháu có hoàn cảnh khó khăn học giỏi. Mức hỗ trợ: 2-5 triệu đồng/năm học.','Chương trình học bổng dòng họ',NULL,'Ban khuyến học','2025-12-09 16:02:10',0,0,1,NULL,NULL,NULL);
 /*!40000 ALTER TABLE `tintuc` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -667,7 +667,7 @@ CREATE TABLE `user_profile` (
 
 LOCK TABLES `user_profile` WRITE;
 /*!40000 ALTER TABLE `user_profile` DISABLE KEYS */;
-INSERT INTO `user_profile` VALUES ('15e5e9b2-b293-4f18-b0f4-86548bbda3b0','Bảo','Văn','Trần','Trần Văn Bảo','uploads/2026/01/14/baoanh-68498658.jpg',1,'2002-10-14','nguyenvanbao123@gmail.com','0966469703',1,NULL,'2025-12-19 11:22:31','2026-01-14 09:27:21','15e5e9b2-b293-4f18-b0f4-86548bbda3b0'),('61ef80c1-d2fa-4675-9323-bec58d33ed19',NULL,NULL,NULL,'Nhữ Hoàng Ka',NULL,NULL,NULL,'nhubaoanh221@gmail.com','0987654321',1,'89fd6f88-c909-11f0-8020-a8934a9bae74','2025-12-22 21:27:02','2025-12-22 21:27:02','89fd6f88-c909-11f0-8020-a8934a9bae74'),('6aa26582-bd12-4fdb-95d8-4e09fdb2f102',NULL,NULL,NULL,'Ngyễn Văn Hiếu',NULL,NULL,NULL,'minh123@gmail.com','0966469703',1,NULL,'2025-12-22 21:16:56','2025-12-22 21:16:56',NULL),('77f83890-6765-4c19-8139-31a29071fac3','Sơn','Hoàng','Nguyễn','Nguyễn Hoàng Sơn',NULL,1,'2004-10-30','nhubaoanh111@gmail.com','0987654321',1,NULL,'2025-12-19 10:50:19',NULL,NULL),('89fd6f88-c909-11f0-8020-a8934a9bae74','Anh','Bảo','Nhữ','Nhữ Bảo Anh',NULL,1,'2004-10-30','nhubaoanh111@gmail.com','0987654321',1,NULL,'2025-12-19 10:49:26',NULL,NULL),('a20a6246-4800-4992-af5c-adcd6e898ee6','Anh','Bảo ','Nhữ','Nhữ Bảo  Anh','uploads/2025/12/19/H22-146122795.jpg',1,'2004-10-30','minh111@gmail.com','0966469703',1,NULL,'2025-12-19 15:51:04','2025-12-19 22:06:18',NULL),('b9b116b0-3d3c-4187-b1a9-fd8247274d64','Anh','Bảo','Phạm','Phạm Bảo Anh','uploads/2026/01/14/baoanh-1768381575832-963900514.jpg',1,NULL,'nguyenvanbao222@gmail.com','0987654321',1,NULL,'2025-12-22 21:11:25','2026-01-14 16:06:45','b9b116b0-3d3c-4187-b1a9-fd8247274d64'),('ec9d0e50-7c5a-48a9-b606-daeb591230a1',NULL,NULL,NULL,'Nhữ Hoàng Kalllll',NULL,NULL,NULL,'phamthithuylinh11@gmail.aom','0966469703',1,'89fd6f88-c909-11f0-8020-a8934a9bae74','2026-01-07 00:14:28','2026-01-07 00:14:28','89fd6f88-c909-11f0-8020-a8934a9bae74');
+INSERT INTO `user_profile` VALUES ('15e5e9b2-b293-4f18-b0f4-86548bbda3b0','Bảo','Văn','Trần','Trần Văn Bảo','uploads/2026/01/14/baoanh-68498658.jpg',1,'2002-10-14','nguyenvanbao123@gmail.com','0966469702',1,NULL,'2025-12-19 11:22:31','2026-01-15 09:43:58','15e5e9b2-b293-4f18-b0f4-86548bbda3b0'),('61ef80c1-d2fa-4675-9323-bec58d33ed19',NULL,NULL,NULL,'Nhữ Hoàng Ka',NULL,NULL,NULL,'nhubaoanh221@gmail.com','0987654321',1,'89fd6f88-c909-11f0-8020-a8934a9bae74','2025-12-22 21:27:02','2025-12-22 21:27:02','89fd6f88-c909-11f0-8020-a8934a9bae74'),('6aa26582-bd12-4fdb-95d8-4e09fdb2f102',NULL,NULL,NULL,'Ngyễn Văn Hiếu',NULL,NULL,NULL,'minh123@gmail.com','0966469703',1,NULL,'2025-12-22 21:16:56','2025-12-22 21:16:56',NULL),('77f83890-6765-4c19-8139-31a29071fac3','Sơn','Hoàng','Nguyễn','Nguyễn Hoàng Sơn',NULL,1,'2004-10-30','nhubaoanh111@gmail.com','0987654321',1,NULL,'2025-12-19 10:50:19',NULL,NULL),('89fd6f88-c909-11f0-8020-a8934a9bae74','Anh','Bảo','Nhữ','Nhữ Bảo Anh',NULL,1,'2004-10-30','nhubaoanh111@gmail.com','0987654321',1,NULL,'2025-12-19 10:49:26',NULL,NULL),('a20a6246-4800-4992-af5c-adcd6e898ee6','Anh','Bảo ','Nhữ','Nhữ Bảo  Anh','uploads/2025/12/19/H22-146122795.jpg',1,'2004-10-30','minh111@gmail.com','0966469703',1,NULL,'2025-12-19 15:51:04','2025-12-19 22:06:18',NULL),('b9b116b0-3d3c-4187-b1a9-fd8247274d64','Anh','Bảo','Phạm','Phạm Bảo Anh','uploads/2026/01/14/baoanh-1768381575832-963900514.jpg',1,NULL,'nguyenvanbao222@gmail.com','0987654321',1,NULL,'2025-12-22 21:11:25','2026-01-14 16:06:45','b9b116b0-3d3c-4187-b1a9-fd8247274d64'),('de2e63a8-53ce-4c57-9500-305e9933a092',NULL,NULL,NULL,'Trần Văn Bảo Bình',NULL,1,NULL,'nguyenvanbao111@gmail.com','0987654321',1,'15e5e9b2-b293-4f18-b0f4-86548bbda3b0','2026-01-15 10:38:05','2026-01-15 10:38:05','15e5e9b2-b293-4f18-b0f4-86548bbda3b0'),('ec9d0e50-7c5a-48a9-b606-daeb591230a1',NULL,NULL,NULL,'Nhữ Hoàng Kalllll',NULL,NULL,NULL,'phamthithuylinh11@gmail.aom','0966469703',1,'89fd6f88-c909-11f0-8020-a8934a9bae74','2026-01-07 00:14:28','2026-01-07 00:14:28','89fd6f88-c909-11f0-8020-a8934a9bae74');
 /*!40000 ALTER TABLE `user_profile` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -3822,8 +3822,9 @@ CREATE DEFINER=`root`@`%` PROCEDURE `InsertUser`(
    IN p_roleId VARCHAR(50),
    IN p_tenDangNhap VARCHAR(100),
    IN p_matKhau VARCHAR(255),
-   IN p_hoTen VARCHAR(255), -- Sẽ được dùng để tách tên vào profile
+   IN p_hoTen VARCHAR(255),
    IN p_soDienThoai VARCHAR(20),
+   IN p_gender TINYINT,
    IN p_nguoiTaoId VARCHAR(50),
    OUT p_error_code INT, 
    OUT p_error_message VARCHAR(500)
@@ -3831,7 +3832,9 @@ CREATE DEFINER=`root`@`%` PROCEDURE `InsertUser`(
 BEGIN
     DECLARE EXIT HANDLER FOR SQLEXCEPTION
     BEGIN
-         GET DIAGNOSTICS CONDITION 1 p_error_code = RETURNED_SQLSTATE, p_error_message = MESSAGE_TEXT;
+         GET DIAGNOSTICS CONDITION 1 
+            p_error_code = RETURNED_SQLSTATE, 
+            p_error_message = MESSAGE_TEXT;
          ROLLBACK;
     END; 
 
@@ -3840,68 +3843,31 @@ BEGIN
 
     START TRANSACTION;
 
-    -- 1. Kiểm tra trùng lặp tài khoản
     IF EXISTS (SELECT 1 FROM NguoiDung WHERE tenDangNhap = p_tenDangNhap) THEN
         SET p_error_message = 'Tài khoản người dùng này đã tồn tại!';
         SET p_error_code = -1;
         ROLLBACK;
     ELSE
-        -- 2. Chèn vào bảng NguoiDung (Bảng hệ thống)
         INSERT INTO NguoiDung(
-            nguoiDungId,
-            dongHoId,
-            roleId,
-            tenDangNhap,
-            matKhau,
-            ngayTao,
-            online_flag,
-            active_flag,
-            nguoiTaoId,
-            lu_updated,
-            lu_user_id
+            nguoiDungId, dongHoId, roleId, tenDangNhap, matKhau,
+            ngayTao, online_flag, active_flag, nguoiTaoId, lu_updated, lu_user_id
         )
         VALUES (
-            p_nguoiDungId,
-            p_dongHoId,
-            p_roleId,
-            p_tenDangNhap,
-            p_matKhau,
-            NOW(),
-            0,
-            1,
-            p_nguoiTaoId,
-            NOW(),
-            p_nguoiTaoId
+            p_nguoiDungId, p_dongHoId, p_roleId, p_tenDangNhap, p_matKhau,
+            NOW(), 0, 1, p_nguoiTaoId, NOW(), p_nguoiTaoId
         );
 
-        -- 3. Chèn vào bảng user_profile (Bảng thông tin chi tiết)
-        -- Sử dụng SUBSTRING_INDEX để tách tạm thời họ và tên từ p_hoTen
         INSERT INTO user_profile (
-            userId, 
-            full_name, 
-            phone, 
-            email, 
-            active_flag, 
-            created_by_user_id, 
-            create_date, 
-            lu_updated, 
-            lu_user_id
+            userId, full_name, phone, email, gender, active_flag,
+            created_by_user_id, create_date, lu_updated, lu_user_id
         )
         VALUES (
-            p_nguoiDungId,     -- Khóa ngoại cắm vào NguoiDungId
-            p_hoTen, 
-            p_soDienThoai, 
-            p_tenDangNhap,     -- Tạm thời lấy username làm email nếu chưa có
-            1, 
-            p_nguoiTaoId, 
-            NOW(), 
-            NOW(), 
-            p_nguoiTaoId
+            p_nguoiDungId, p_hoTen, p_soDienThoai, p_tenDangNhap,
+            COALESCE(p_gender, 1), 1, p_nguoiTaoId, NOW(), NOW(), p_nguoiTaoId
         );
 
         COMMIT;
     END IF;
-
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -3950,6 +3916,9 @@ BEGIN
         SET p_error_message = 'Tài khoản không tồn tại hoặc đã bị vô hiệu hóa';
         SELECT p_error_code AS error_code, p_error_message AS error_message;
     ELSE
+		UPDATE nguoidung
+        SET online_flag = 1
+        WHERE nguoiDungId = v_nguoiDungId;
         -- Trả về thông tin user
         SELECT 
             nd.nguoiDungId,
@@ -4482,86 +4451,114 @@ DELIMITER ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
 CREATE DEFINER=`root`@`%` PROCEDURE `SearchNguoiDung`(
-    IN p_pageIndex INT,              -- Trang hiện tại
-    IN p_pageSize INT,               -- Số bản ghi mỗi trang
-    IN p_search_content VARCHAR(500),-- Từ khóa tìm kiếm (họ tên, sđt, email, tên đăng nhập)
-    IN p_dongHoId VARCHAR(50),       -- Lọc theo dòng họ (nếu có)
-    OUT p_error_code INT,            -- Mã lỗi (0 = không lỗi)
-    OUT p_error_message VARCHAR(500) -- Thông điệp lỗi
+    IN p_pageIndex INT,
+    IN p_pageSize INT,
+    IN p_search_content VARCHAR(500),
+    IN p_dongHoId VARCHAR(50),
+    OUT p_error_code INT,
+    OUT p_error_message VARCHAR(500)
 )
 BEGIN
-    DECLARE p_total_row INT DEFAULT 0;
-
-    -- Bắt lỗi SQL
+    DECLARE p_total_row INT;
+    
     DECLARE EXIT HANDLER FOR SQLEXCEPTION
     BEGIN
-        SET p_error_code = 1;
-        SET p_error_message = 'Lỗi khi truy vấn dữ liệu người dùng.';
-        ROLLBACK;
+        GET DIAGNOSTICS CONDITION 1
+            p_error_code = RETURNED_SQLSTATE,
+            p_error_message = MESSAGE_TEXT;
     END;
-
-    -- Mặc định không lỗi
+    
     SET p_error_code = 0;
     SET p_error_message = '';
 
-    -- Gán biến tạm row number
-    SET @row_number := 0;
+    IF p_pageSize <> 0 THEN
+        DROP TEMPORARY TABLE IF EXISTS Results;
+        
+        CREATE TEMPORARY TABLE Results AS
+        SELECT 
+            (@row_number := @row_number + 1) AS RowNumber,
+            t.*
+        FROM (
+            SELECT 
+                nd.nguoiDungId, nd.tenDangNhap, nd.matKhau,
+                up.first_name, up.middle_name, up.last_name, up.full_name,
+                up.gender, up.date_of_birthday, up.email, up.phone,
+                nd.roleId, nd.dongHoId, dh.tenDongHo,
+                rl.roleCode, rl.roleName, nd.ngayTao,
+                COALESCE(nd.online_flag, 0) AS online_flag,
+                nd.active_flag, nd.lu_updated, nd.lu_user_id
+            FROM NguoiDung nd
+            LEFT JOIN user_profile up ON nd.nguoiDungId = up.userId
+            LEFT JOIN DongHo dh ON nd.dongHoId = dh.dongHoId
+            LEFT JOIN role rl ON nd.roleId = rl.roleId
+            WHERE nd.active_flag = 1
+              AND (p_dongHoId IS NULL OR p_dongHoId = '' OR nd.dongHoId = p_dongHoId)
+              AND (
+                    p_search_content IS NULL OR p_search_content = ''
+                    OR LOWER(CONCAT(
+                        COALESCE(nd.tenDangNhap, ''),
+                        COALESCE(up.full_name, ''),
+                        COALESCE(up.email, ''),
+                        COALESCE(up.phone, ''),
+                        COALESCE(dh.tenDongHo, '')
+                    )) LIKE CONCAT('%', LOWER(TRIM(p_search_content)), '%')
+              )
+            ORDER BY nd.ngayTao DESC
+        ) t
+        CROSS JOIN (SELECT @row_number := 0) r;
 
-	DROP TEMPORARY TABLE IF EXISTS Results;
-    -- Truy vấn kết quả chính
-    CREATE TEMPORARY TABLE IF NOT EXISTS Results AS
-    SELECT 
-        (@row_number := @row_number + 1) AS RowNumber,
-        nd.nguoiDungId,
-            nd.tenDangNhap,
-            nd.matKhau,
-            up.first_name,
-            up.middle_name,
-            up.last_name,
-            up.full_name,
-            up.gender,
-            up.date_of_birthday,
-            up.email,
-            up.phone,
-            nd.roleId,
-            nd.dongHoId,
-            dh.tenDongHo,
-            rl.roleCode,
-            rl.roleName,
-            nd.ngayTao
-        FROM NguoiDung nd
-        LEFT JOIN user_profile up ON nd.nguoiDungId = up.userId
-        LEFT JOIN DongHo dh ON nd.dongHoId = dh.dongHoId
-        LEFT JOIN role rl ON nd.roleId = rl.roleId
-    WHERE nd.active_flag = 1
-      AND (p_dongHoId IS NULL OR nd.dongHoId = p_dongHoId)
-      AND (
-            p_search_content IS NULL
-            OR p_search_content = ''
-            OR LOWER(CONCAT(
-                COALESCE(nd.tenDangNhap, ''),
-                COALESCE(up.full_name, ''),
-                COALESCE(up.email, ''),
-                COALESCE(up.phone, ''),
-                COALESCE(dh.tenDongHo, '')
-            )) LIKE CONCAT('%', LOWER(TRIM(p_search_content)), '%')
-      );
+        SELECT COUNT(*) INTO p_total_row FROM Results;
 
-    -- Lấy tổng số dòng
-    SELECT COUNT(*) INTO p_total_row FROM Results;
+        SELECT *, p_total_row AS RecordCount
+        FROM Results
+        WHERE RowNumber BETWEEN ((p_pageIndex - 1) * p_pageSize) + 1 
+                            AND (p_pageIndex * p_pageSize);
 
-    -- Trả kết quả phân trang
-    SELECT 
-        *,
-        p_total_row AS RecordCount
-    FROM Results
-    WHERE RowNumber BETWEEN ((p_pageIndex - 1) * p_pageSize) + 1
-                         AND (p_pageIndex * p_pageSize)
-    ORDER BY ngayTao DESC;
+        DROP TEMPORARY TABLE Results;
+        
+    ELSE
+        DROP TEMPORARY TABLE IF EXISTS Results;
+        
+        CREATE TEMPORARY TABLE Results AS
+        SELECT 
+            (@row_number := @row_number + 1) AS RowNumber,
+            t.*
+        FROM (
+            SELECT 
+                nd.nguoiDungId, nd.tenDangNhap, nd.matKhau,
+                up.first_name, up.middle_name, up.last_name, up.full_name,
+                up.gender, up.date_of_birthday, up.email, up.phone,
+                nd.roleId, nd.dongHoId, dh.tenDongHo,
+                rl.roleCode, rl.roleName, nd.ngayTao,
+                COALESCE(nd.online_flag, 0) AS online_flag,
+                nd.active_flag, nd.lu_updated, nd.lu_user_id
+            FROM NguoiDung nd
+            LEFT JOIN user_profile up ON nd.nguoiDungId = up.userId
+            LEFT JOIN DongHo dh ON nd.dongHoId = dh.dongHoId
+            LEFT JOIN role rl ON nd.roleId = rl.roleId
+            WHERE nd.active_flag = 1
+              AND (p_dongHoId IS NULL OR p_dongHoId = '' OR nd.dongHoId = p_dongHoId)
+              AND (
+                    p_search_content IS NULL OR p_search_content = ''
+                    OR LOWER(CONCAT(
+                        COALESCE(nd.tenDangNhap, ''),
+                        COALESCE(up.full_name, ''),
+                        COALESCE(up.email, ''),
+                        COALESCE(up.phone, ''),
+                        COALESCE(dh.tenDongHo, '')
+                    )) LIKE CONCAT('%', LOWER(TRIM(p_search_content)), '%')
+              )
+            ORDER BY nd.ngayTao DESC
+        ) t
+        CROSS JOIN (SELECT @row_number := 0) r;
 
-    -- ✅ Di chuyển dòng xóa bảng tạm xuống **sau khi client đã nhận kết quả**
-    -- nhưng vẫn đảm bảo MySQL không lỗi khi return
-    DROP TEMPORARY TABLE IF EXISTS Results;
+        SELECT COUNT(*) INTO p_total_row FROM Results;
+
+        SELECT *, p_total_row AS RecordCount FROM Results;
+
+        DROP TEMPORARY TABLE Results;
+        
+    END IF;
 
 END ;;
 DELIMITER ;
@@ -6288,15 +6285,18 @@ CREATE DEFINER=`root`@`%` PROCEDURE `UpdateUser`(
    IN p_matKhau VARCHAR(255),
    IN p_hoTen VARCHAR(255),
    IN p_soDienThoai VARCHAR(20),
+   IN p_email VARCHAR(100),
+   IN p_gender TINYINT,
    IN p_lu_user_id VARCHAR(50),
    OUT p_error_code INT, 
    OUT p_error_message VARCHAR(500)
 )
 BEGIN
-    -- Bắt lỗi SQL nếu có vấn đề xảy ra
     DECLARE EXIT HANDLER FOR SQLEXCEPTION
     BEGIN
-         GET DIAGNOSTICS CONDITION 1 p_error_code = RETURNED_SQLSTATE, p_error_message = MESSAGE_TEXT;
+         GET DIAGNOSTICS CONDITION 1 
+            p_error_code = RETURNED_SQLSTATE, 
+            p_error_message = MESSAGE_TEXT;
          ROLLBACK;
     END; 
 
@@ -6304,23 +6304,25 @@ BEGIN
     SET p_error_message = '';
 
     START TRANSACTION;
-        -- 1. Cập nhật bảng NguoiDung (Tài khoản)
         UPDATE NguoiDung
         SET
             dongHoId = p_dongHoId,
             roleId = p_roleId,
             tenDangNhap = p_tenDangNhap,
-            matKhau = p_matKhau,
+            matKhau = CASE 
+                WHEN p_matKhau IS NULL THEN matKhau 
+                ELSE p_matKhau 
+            END,
             lu_updated = NOW(),
             lu_user_id = p_lu_user_id
         WHERE nguoiDungId = p_nguoiDungId;
 
-        -- 2. Cập nhật thẳng bảng user_profile (Thông tin cá nhân)
         UPDATE user_profile
         SET
             full_name = p_hoTen,
             phone = p_soDienThoai,
-            email = p_tenDangNhap, -- Hoặc cột email riêng nếu bạn có truyền vào
+            email = COALESCE(p_email, p_tenDangNhap),
+            gender = p_gender,
             lu_updated = NOW(),
             lu_user_id = p_lu_user_id
         WHERE userId = p_nguoiDungId;
@@ -6414,4 +6416,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-01-14 16:47:58
+-- Dump completed on 2026-01-15 11:25:25

@@ -180,7 +180,10 @@ export default function QuanLyTaiChinhChiPage() {
   };
 
   const handleConfirmDelete = () => {
-    const listJson = itemsToDelete.map((item) => ({ chiId: item.chiId }));
+    const listJson = itemsToDelete.map((item) => ({ 
+      chiId: item.chiId,
+      dongHoId: item.dongHoId 
+    }));
     deleteMutation.mutate(listJson);
   };
 

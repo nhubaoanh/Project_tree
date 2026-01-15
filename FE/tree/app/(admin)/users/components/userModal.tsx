@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { X, Check, Loader2 } from "lucide-react";
 import { IUser } from "@/types/user";
 import { useQuery } from "@tanstack/react-query";
-import { getAllDongHo } from "@/service/lineage.service";
+import { getDongHoById } from "@/service/dongho.service";
 import { getAllRoles } from "@/service/role.service";
 import { useToast } from "@/service/useToas";
 import { checkUsernameExist } from "@/service/user.service";
@@ -24,9 +24,20 @@ const userRules: FormRules = {
   full_name: { label: "Họ và tên", rules: ["required", "fullName"] },
   tenDangNhap: { label: "Tên đăng nhập", rules: ["required", "email"] },
   matKhau: { label: "Mật khẩu", rules: ["required", "password"] },
-  email: { label: "Email", rules: ["email"] },
-  phone: { label: "Số điện thoại", rules: ["phone"] },
+  email: { label: "Email", rules: ["required", "email"] },
+  phone: { label: "Số điện thoại", rules: ["required", "phone"] },
   dongHoId: { label: "Dòng họ", rules: ["required"] },
+  roleId: { label: "Vai trò", rules: ["required"] },
+};
+
+// Rules cho edit (mật khẩu không bắt buộc)
+const editUserRules: FormRules = {
+  full_name: { label: "Họ và tên", rules: ["required", "fullName"] },
+  tenDangNhap: { label: "Tên đăng nhập", rules: ["required", "email"] },
+  email: { label: "Email", rules: ["required", "email"] },
+  phone: { label: "Số điện thoại", rules: ["required", "phone"] },
+  dongHoId: { label: "Dòng họ", rules: ["required"] },
+  roleId: { label: "Vai trò", rules: ["required"] },
 };
 
 export const UserModal: React.FC<UserModalProps> = ({
@@ -43,23 +54,37 @@ export const UserModal: React.FC<UserModalProps> = ({
   const [errors, setErrors] = useState<Record<string, string | null>>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
 
+  // Password change state
+  const [showPasswordChange, setShowPasswordChange] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
+
   // Username check state
   const [checking, setChecking] = useState(false);
   const [usernameError, setUsernameError] = useState<string | null>(null);
 
   // Load data
-  const { data: dongHoData } = useQuery({
-    queryKey: ["Lineage"],
-    queryFn: getAllDongHo,
-  });
+  const user = storage.getUser();
+  const userDongHoId = user?.dongHoId;
 
-  const { data: roleData } = useQuery({
-    queryKey: ["Role"],
+  // Query để lấy thông tin dòng họ hiện tại
+  const { data: dongHoData } = useQuery({
+    queryKey: ["dongho", userDongHoId],
+    queryFn: () => getDongHoById(userDongHoId!),
+    enabled: !!userDongHoId,
+  });
+  const dongHoInfo = dongHoData?.data;
+
+  // Query để lấy danh sách roles từ API
+  const { data: rolesData } = useQuery({
+    queryKey: ["roles"],
     queryFn: getAllRoles,
   });
 
-  const dongHoList = Array.isArray(dongHoData) ? dongHoData : dongHoData?.data ?? [];
-  const roleList = Array.isArray(roleData) ? roleData : roleData?.data ?? [];
+  // Lọc chỉ lấy Thủ Đồ và Thành Viên, không hiển thị Admin (sa)
+  const allRoles = rolesData?.data || [];
+  const roleList = allRoles.filter((role: any) => 
+    role.roleCode === 'thudo' || role.roleCode === 'thanhvien'
+  );
 
   // Reset form khi modal mở
   useEffect(() => {
@@ -70,18 +95,20 @@ export const UserModal: React.FC<UserModalProps> = ({
         matKhau: initialData?.matKhau || "",
         email: initialData?.email || "",
         phone: initialData?.phone || "",
-        dongHoId: initialData?.dongHoId || "",
+        dongHoId: initialData?.dongHoId || userDongHoId || "", // Luôn dùng dongHoId của user hiện tại
         roleId: initialData?.roleId || "",
+        gender: initialData?.gender ?? 1, // Default to male (1)
+        active_flag: initialData?.active_flag ?? 1, // Default to active (1)
       });
       setErrors({});
       setTouched({});
       setUsernameError(null);
-      const currentUser = storage.getUser();
-    console.log("currr", currentUser?.nguoiDungId)
+      setShowPasswordChange(false);
+      setNewPassword("");
     }
-  }, [isOpen, initialData]);
+  }, [isOpen, initialData, userDongHoId]);
 
-  // Handle change + chặn nhập số vào họ tên
+  // Handle change + chặn nhập số vào họ tên + validate email realtime
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     let newValue = value;
@@ -91,11 +118,22 @@ export const UserModal: React.FC<UserModalProps> = ({
       newValue = value.replace(/\d/g, "");
     }
     
+    // Validate email realtime
+    if (name === "email" && newValue) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(newValue)) {
+        setErrors(prev => ({ ...prev, email: "Email không đúng định dạng (VD: user@example.com)" }));
+      } else {
+        setErrors(prev => ({ ...prev, email: null }));
+      }
+    }
+    
     setFormData((prev) => ({ ...prev, [name]: newValue }));
 
     // Validate lại nếu đã touched
-    if (touched[name]) {
-      const error = validateField(name, newValue, userRules, formData);
+    if (touched[name] && name !== "email") { // Email đã validate ở trên
+      const currentRules = initialData ? editUserRules : userRules;
+      const error = validateField(name, newValue, currentRules, formData);
       setErrors((prev) => ({ ...prev, [name]: error }));
     }
   };
@@ -140,12 +178,49 @@ export const UserModal: React.FC<UserModalProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Chọn rules phù hợp
+    const currentRules = initialData ? editUserRules : userRules;
+
     // Validate toàn bộ form
-    const { isValid, errors: formErrors } = validateForm(formData, userRules);
+    const { isValid, errors: formErrors } = validateForm(formData, currentRules);
     setErrors(formErrors);
     setTouched(
-      Object.keys(userRules).reduce((acc, key) => ({ ...acc, [key]: true }), {})
+      Object.keys(currentRules).reduce((acc, key) => ({ ...acc, [key]: true }), {})
     );
+
+    // Validate giới tính riêng (vì có thể là 0 - falsy)
+    if (formData.gender === undefined || formData.gender === null) {
+      setErrors(prev => ({ ...prev, gender: "Vui lòng chọn giới tính" }));
+      setTouched(prev => ({ ...prev, gender: true }));
+      showError("Vui lòng chọn giới tính!");
+      return;
+    }
+
+    // Validate active_flag riêng (vì có thể là 0 - falsy)
+    if (formData.active_flag === undefined || formData.active_flag === null) {
+      setErrors(prev => ({ ...prev, active_flag: "Vui lòng chọn tình trạng hoạt động" }));
+      setTouched(prev => ({ ...prev, active_flag: true }));
+      showError("Vui lòng chọn tình trạng hoạt động!");
+      return;
+    }
+
+    // Validate mật khẩu mới nếu đang thay đổi
+    if (showPasswordChange && (!newPassword || newPassword.trim() === "")) {
+      setErrors(prev => ({ ...prev, newPassword: "Vui lòng nhập mật khẩu mới" }));
+      setTouched(prev => ({ ...prev, newPassword: true }));
+      showError("Vui lòng nhập mật khẩu mới!");
+      return;
+    }
+
+    // Validate độ mạnh mật khẩu mới
+    if (showPasswordChange && newPassword) {
+      if (newPassword.length < 6) {
+        setErrors(prev => ({ ...prev, newPassword: "Mật khẩu phải có ít nhất 6 ký tự" }));
+        setTouched(prev => ({ ...prev, newPassword: true }));
+        showError("Mật khẩu phải có ít nhất 6 ký tự!");
+        return;
+      }
+    }
 
     if (!isValid) {
       showError("Vui lòng kiểm tra lại thông tin!");
@@ -163,12 +238,16 @@ export const UserModal: React.FC<UserModalProps> = ({
     }
 
     const currentUser = storage.getUser();
-    console.log("currr", currentUser?.nguoiDungId)
     const user = {
       ...formData,
-      nguoiDungId: initialData?.nguoiDungId, // Chỉ có giá trị khi edit, undefined khi thêm mới
-      nguoiTaoId: initialData ? initialData.nguoiTaoId : currentUser?.nguoiDungId, // Khi thêm mới, người tạo là user hiện tại
+      dongHoId: userDongHoId, // Đảm bảo luôn dùng dongHoId của user hiện tại
+      nguoiDungId: initialData?.nguoiDungId,
+      nguoiTaoId: initialData ? initialData.nguoiTaoId : currentUser?.nguoiDungId,
       lu_user_id: currentUser?.nguoiDungId || null,
+      // Chỉ gửi mật khẩu mới nếu đang thay đổi
+      ...(showPasswordChange && newPassword ? { matKhau: newPassword } : {}),
+      // Nếu không thay đổi mật khẩu và đang edit, xóa field matKhau
+      ...(initialData && !showPasswordChange ? { matKhau: undefined } : {}),
     };
 
     onSubmit(user as Partial<IUser>);
@@ -211,20 +290,17 @@ export const UserModal: React.FC<UserModalProps> = ({
               error={touched.full_name ? errors.full_name : null}
             />
 
-            {/* Dòng họ */}
-            <SelectField
-              label="Dòng họ"
-              name="dongHoId"
-              required
-              value={formData.dongHoId || ""}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              disabled={isLoading}
-              options={dongHoList}
-              optionLabel="tenDongHo"
-              optionValue="dongHoId"
-              error={touched.dongHoId ? errors.dongHoId : null}
-            />
+            {/* Dòng họ - Hiển thị thông tin (read-only) */}
+            <div className="space-y-2">
+              <label className="text-sm font-bold text-[#8b5e3c] uppercase">
+                Dòng họ <span className="text-red-500">*</span>
+              </label>
+              <div className="w-full p-3 bg-gray-50 border border-[#d4af37]/50 rounded text-[#5d4037] font-medium">
+                {dongHoInfo?.tenDongHo || "Đang tải..."}
+              </div>
+              {/* Hidden input để gửi dongHoId */}
+              <input type="hidden" name="dongHoId" value={userDongHoId || ""} />
+            </div>
 
             {/* Tên đăng nhập */}
             <div className="space-y-2">
@@ -259,22 +335,71 @@ export const UserModal: React.FC<UserModalProps> = ({
             </div>
 
             {/* Mật khẩu */}
-            <InputField
-              label="Mật khẩu"
-              name="matKhau"
-              type="password"
-              required
-              value={formData.matKhau || ""}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              error={touched.matKhau ? errors.matKhau : null}
-            />
+            {!initialData ? (
+              // Thêm mới: hiển thị field mật khẩu bắt buộc
+              <InputField
+                label="Mật khẩu"
+                name="matKhau"
+                type="password"
+                required
+                value={formData.matKhau || ""}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                error={touched.matKhau ? errors.matKhau : null}
+              />
+            ) : (
+              // Chỉnh sửa: hiển thị nút thay đổi mật khẩu
+              <div className="space-y-2">
+                <label className="text-sm font-bold text-[#8b5e3c] uppercase">
+                  Mật khẩu
+                </label>
+                {!showPasswordChange ? (
+                  <button
+                    type="button"
+                    onClick={() => setShowPasswordChange(true)}
+                    className="w-full p-3 bg-gray-100 border border-[#d4af37]/50 rounded text-left text-gray-600 hover:bg-gray-200 transition-colors"
+                  >
+                    Nhấn để thay đổi mật khẩu
+                  </button>
+                ) : (
+                  <div className="space-y-2">
+                    <input
+                      type="password"
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      placeholder="Nhập mật khẩu mới"
+                      className={`w-full p-3 bg-white border rounded shadow-inner focus:outline-none ${
+                        touched.newPassword && errors.newPassword
+                          ? "border-red-500"
+                          : "border-[#d4af37]/50 focus:border-[#b91c1c]"
+                      }`}
+                    />
+                    {touched.newPassword && errors.newPassword && (
+                      <p className="text-red-500 text-xs">{errors.newPassword}</p>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowPasswordChange(false);
+                        setNewPassword("");
+                        setErrors(prev => ({ ...prev, newPassword: null }));
+                        setTouched(prev => ({ ...prev, newPassword: false }));
+                      }}
+                      className="text-sm text-gray-500 hover:text-red-600"
+                    >
+                      Hủy thay đổi mật khẩu
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Email */}
             <InputField
               label="Email"
               name="email"
               type="email"
+              required
               value={formData.email || ""}
               onChange={handleChange}
               onBlur={handleBlur}
@@ -285,23 +410,96 @@ export const UserModal: React.FC<UserModalProps> = ({
             <InputField
               label="Số điện thoại"
               name="phone"
+              required
               value={formData.phone || ""}
               onChange={handleChange}
               onBlur={handleBlur}
               error={touched.phone ? errors.phone : null}
             />
 
+            {/* Giới tính */}
+            <div className="space-y-2">
+              <label className="text-sm font-bold text-[#8b5e3c] uppercase">
+                Giới tính <span className="text-red-500">*</span>
+              </label>
+              <div className="flex gap-4 p-3 bg-white border border-[#d4af37]/50 rounded">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="gender"
+                    value="1"
+                    checked={formData.gender === 1}
+                    onChange={() => setFormData(prev => ({ ...prev, gender: 1 }))}
+                    className="w-4 h-4 text-[#b91c1c] focus:ring-[#b91c1c]"
+                  />
+                  <span className="text-[#5d4037]">Nam</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="gender"
+                    value="0"
+                    checked={formData.gender === 0}
+                    onChange={() => setFormData(prev => ({ ...prev, gender: 0 }))}
+                    className="w-4 h-4 text-[#b91c1c] focus:ring-[#b91c1c]"
+                  />
+                  <span className="text-[#5d4037]">Nữ</span>
+                </label>
+              </div>
+              {/* Validation message cho gender */}
+              {formData.gender === undefined && (
+                <p className="text-red-500 text-xs">Vui lòng chọn giới tính</p>
+              )}
+            </div>
+
             {/* Vai trò */}
             <SelectField
               label="Vai trò"
               name="roleId"
+              required
               value={formData.roleId || ""}
               onChange={handleChange}
               onBlur={handleBlur}
               options={roleList}
               optionLabel="roleName"
               optionValue="roleId"
+              error={touched.roleId ? errors.roleId : null}
             />
+
+            {/* Tình trạng hoạt động */}
+            <div className="space-y-2">
+              <label className="text-sm font-bold text-[#8b5e3c] uppercase">
+                Tình trạng hoạt động <span className="text-red-500">*</span>
+              </label>
+              <div className="flex gap-4 p-3 bg-white border border-[#d4af37]/50 rounded">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="active_flag"
+                    value="1"
+                    checked={formData.active_flag === 1}
+                    onChange={() => setFormData(prev => ({ ...prev, active_flag: 1 }))}
+                    className="w-4 h-4 text-[#b91c1c] focus:ring-[#b91c1c]"
+                  />
+                  <span className="text-[#5d4037]">Hoạt động</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="active_flag"
+                    value="0"
+                    checked={formData.active_flag === 0}
+                    onChange={() => setFormData(prev => ({ ...prev, active_flag: 0 }))}
+                    className="w-4 h-4 text-[#b91c1c] focus:ring-[#b91c1c]"
+                  />
+                  <span className="text-[#5d4037]">Ngưng hoạt động</span>
+                </label>
+              </div>
+              {/* Validation message cho active_flag */}
+              {formData.active_flag === undefined && (
+                <p className="text-red-500 text-xs">Vui lòng chọn tình trạng hoạt động</p>
+              )}
+            </div>
           </div>
         </form>
 

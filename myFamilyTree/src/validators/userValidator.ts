@@ -75,16 +75,18 @@ export const resetPasswordRules: ValidationChain[] = [
  * Validate dữ liệu cập nhật user
  *
  * Fields:
- * - id: Bắt buộc, số nguyên dương
+ * - nguoiDungId: Bắt buộc (UUID)
  * - email: Tùy chọn
- * - hoTen: Tùy chọn
- * - soDienThoai: Tùy chọn
+ * - full_name: Tùy chọn
+ * - phone: Tùy chọn
+ * - gender: Tùy chọn (0 hoặc 1)
  */
 export const updateUserRules: ValidationChain[] = [
-  requiredId("id", "ID"),
+  stringLength("nguoiDungId", "ID người dùng", 1, 50),
   optionalEmail("email"),
-  optionalStringLength("hoTen", "Họ tên", 100),
-  optionalPhone("soDienThoai"),
+  optionalStringLength("full_name", "Họ tên", 100),
+  optionalPhone("phone"),
+  // Không validate gender vì có thể là 0 (falsy)
 ];
 
 // ============================================================================

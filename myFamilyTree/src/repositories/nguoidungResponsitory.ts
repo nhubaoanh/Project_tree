@@ -118,7 +118,7 @@ export class nguoiDungReponsitory {
 
   async insertUser(nguoidung: nguoiDung): Promise<any> {
     try {
-      const sql = "CALL InsertUser(?,?,?,?,?,?,?,?, @err_code, @err_msg)";
+      const sql = "CALL InsertUser(?,?,?,?,?,?,?,?,?, @err_code, @err_msg)";
       await this.db.query(sql, [
         nguoidung.nguoiDungId,
         nguoidung.dongHoId,
@@ -127,6 +127,7 @@ export class nguoiDungReponsitory {
         nguoidung.matKhau,
         nguoidung.full_name,
         nguoidung.phone,
+        nguoidung.gender ?? 1, // gender (default to 1 if not provided)
         nguoidung.nguoiTaoId,
       ]);
       return true;
@@ -137,15 +138,17 @@ export class nguoiDungReponsitory {
 
   async updateUser(nguoidung: nguoiDung): Promise<any> {
     try {
-      const sql = "CALL UpdateUser(?,?,?,?,?,?,?,?, @err_code, @err_msg)";
+      const sql = "CALL UpdateUser(?,?,?,?,?,?,?,?,?,?, @err_code, @err_msg)";
       await this.db.query(sql, [
         nguoidung.nguoiDungId,
         nguoidung.dongHoId,
         nguoidung.roleId,
         nguoidung.tenDangNhap,
-        nguoidung.matKhau,
+        nguoidung.matKhau || null, // Gửi null nếu không có mật khẩu mới
         nguoidung.full_name,
         nguoidung.phone,
+        nguoidung.email || nguoidung.tenDangNhap,
+        nguoidung.gender ?? 1,
         nguoidung.lu_user_id,
       ]);
       return true;

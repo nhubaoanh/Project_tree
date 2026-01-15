@@ -99,20 +99,20 @@ export function TinTucModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-xl border border-[#d4af37]">
-        <div className="flex justify-between items-center p-4 border-b border-[#d4af37] bg-gradient-to-r from-[#f5e6d3] to-[#e8d4b8]">
-          <h3 className="text-xl font-bold text-[#5d4037]">
+    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-fadeIn">
+      <div className="bg-[#fffdf5] rounded-lg w-full max-w-2xl max-h-[90vh] overflow-hidden shadow-2xl border border-[#d4af37] flex flex-col">
+        <div className="bg-[#b91c1c] text-yellow-400 px-6 py-4 flex justify-between items-center">
+          <h3 className="text-xl font-bold uppercase tracking-wider">
             {initialData ? "Chỉnh sửa tin tức" : "Thêm tin tức mới"}
           </h3>
-          <button onClick={onClose} className="p-1 hover:bg-white/50 rounded">
-            <X size={20} />
+          <button onClick={onClose} className="hover:text-white transition-colors">
+            <X size={24} />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="p-6 space-y-4 overflow-y-auto">
           <div>
-            <label className="block text-sm font-medium text-[#5d4037] mb-1">
+            <label className="block text-sm font-bold text-[#8b5e3c] uppercase mb-1">
               Tiêu đề <span className="text-red-500">*</span>
             </label>
             <input
@@ -121,8 +121,8 @@ export function TinTucModal({
               value={formData.tieuDe || ""}
               onChange={handleChange}
               onBlur={handleBlur}
-              className={`w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#d4af37]/50 ${
-                touched.tieuDe && errors.tieuDe ? "border-red-500" : "border-[#d4af37]"
+              className={`w-full px-3 py-2.5 bg-white border rounded shadow-inner focus:outline-none transition-colors ${
+                touched.tieuDe && errors.tieuDe ? "border-red-500" : "border-[#d4af37]/50 focus:border-[#b91c1c]"
               }`}
               placeholder="Nhập tiêu đề tin tức"
             />
@@ -132,15 +132,15 @@ export function TinTucModal({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-[#5d4037] mb-1">Tóm tắt</label>
+            <label className="block text-sm font-bold text-[#8b5e3c] uppercase mb-1">Tóm tắt</label>
             <textarea
               name="tomTat"
               value={formData.tomTat || ""}
               onChange={handleChange}
               onBlur={handleBlur}
               rows={2}
-              className={`w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#d4af37]/50 ${
-                touched.tomTat && errors.tomTat ? "border-red-500" : "border-[#d4af37]"
+              className={`w-full px-3 py-2.5 bg-white border rounded shadow-inner focus:outline-none resize-none transition-colors ${
+                touched.tomTat && errors.tomTat ? "border-red-500" : "border-[#d4af37]/50 focus:border-[#b91c1c]"
               }`}
               placeholder="Tóm tắt ngắn gọn nội dung"
             />
@@ -150,15 +150,15 @@ export function TinTucModal({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-[#5d4037] mb-1">Nội dung</label>
+            <label className="block text-sm font-bold text-[#8b5e3c] uppercase mb-1">Nội dung</label>
             <textarea
               name="noiDung"
               value={formData.noiDung || ""}
               onChange={handleChange}
               onBlur={handleBlur}
               rows={6}
-              className={`w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#d4af37]/50 ${
-                touched.noiDung && errors.noiDung ? "border-red-500" : "border-[#d4af37]"
+              className={`w-full px-3 py-2.5 bg-white border rounded shadow-inner focus:outline-none resize-none transition-colors ${
+                touched.noiDung && errors.noiDung ? "border-red-500" : "border-[#d4af37]/50 focus:border-[#b91c1c]"
               }`}
               placeholder="Nội dung chi tiết của tin tức"
             />
@@ -169,15 +169,15 @@ export function TinTucModal({
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-[#5d4037] mb-1">Tác giả</label>
+              <label className="block text-sm font-bold text-[#8b5e3c] uppercase mb-1">Tác giả</label>
               <input
                 type="text"
                 name="tacGia"
                 value={formData.tacGia || ""}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                className={`w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#d4af37]/50 ${
-                  touched.tacGia && errors.tacGia ? "border-red-500" : "border-[#d4af37]"
+                className={`w-full px-3 py-2.5 bg-white border rounded shadow-inner focus:outline-none transition-colors ${
+                  touched.tacGia && errors.tacGia ? "border-red-500" : "border-[#d4af37]/50 focus:border-[#b91c1c]"
                 }`}
                 placeholder="Tên tác giả (không nhập số)"
               />
@@ -186,15 +186,15 @@ export function TinTucModal({
               )}
             </div>
             <div>
-              <label className="block text-sm font-medium text-[#5d4037] mb-1">Ảnh đại diện</label>
+              <label className="block text-sm font-bold text-[#8b5e3c] uppercase mb-1">Ảnh đại diện</label>
               <input
                 type="text"
                 name="anhDaiDien"
                 value={formData.anhDaiDien || ""}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                className={`w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#d4af37]/50 ${
-                  touched.anhDaiDien && errors.anhDaiDien ? "border-red-500" : "border-[#d4af37]"
+                className={`w-full px-3 py-2.5 bg-white border rounded shadow-inner focus:outline-none transition-colors ${
+                  touched.anhDaiDien && errors.anhDaiDien ? "border-red-500" : "border-[#d4af37]/50 focus:border-[#b91c1c]"
                 }`}
                 placeholder="URL ảnh đại diện"
               />
@@ -210,31 +210,33 @@ export function TinTucModal({
               id="ghim"
               checked={formData.ghim === 1}
               onChange={(e) => setFormData({ ...formData, ghim: e.target.checked ? 1 : 0 })}
-              className="w-4 h-4 text-[#d4af37] border-[#d4af37] rounded focus:ring-[#d4af37]"
+              className="w-4 h-4 text-[#b91c1c] border-[#d4af37] rounded focus:ring-[#b91c1c]"
             />
             <label htmlFor="ghim" className="text-sm text-[#5d4037]">
               Ghim tin tức này lên đầu
             </label>
           </div>
-
-          <div className="flex justify-end gap-3 pt-4 border-t">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-50"
-            >
-              Hủy
-            </button>
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="px-4 py-2 bg-[#b91c1c] text-white rounded hover:bg-[#991b1b] disabled:opacity-50 flex items-center gap-2"
-            >
-              {isLoading && <Loader2 className="animate-spin" size={16} />}
-              {isLoading ? "Đang lưu..." : initialData ? "Cập nhật" : "Thêm mới"}
-            </button>
-          </div>
         </form>
+
+        <div className="p-6 bg-[#fdf6e3] border-t border-[#d4af37]/30 flex justify-end gap-4">
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-6 py-2 text-[#5d4037] font-bold hover:text-[#b91c1c] transition-colors"
+          >
+            Đóng
+          </button>
+          <button
+            type="submit"
+            form="tinTucForm"
+            onClick={handleSubmit}
+            disabled={isLoading}
+            className="px-8 py-2 bg-[#b91c1c] text-white font-bold rounded shadow hover:bg-[#991b1b] disabled:opacity-50 flex items-center gap-2 transition-colors"
+          >
+            {isLoading && <Loader2 className="animate-spin" size={18} />}
+            {isLoading ? "Đang lưu..." : initialData ? "Cập nhật" : "Thêm mới"}
+          </button>
+        </div>
       </div>
     </div>
   );

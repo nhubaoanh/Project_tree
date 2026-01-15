@@ -224,9 +224,9 @@ export default function MembersByDongHoPage() {
                         <Upload size={16} /><span className="hidden sm:inline">Nhập Excel</span>
                         <input ref={fileInputRef} type="file" accept=".xlsx, .xls" onChange={handleImportExcel} className="hidden" />
                     </button>
-                    <button onClick={handleAdd} className="flex items-center gap-2 px-4 py-2 bg-[#b91c1c] text-white rounded shadow hover:bg-[#991b1b] text-sm font-bold">
+                    {/* <button onClick={handleAdd} className="flex items-center gap-2 px-4 py-2 bg-[#b91c1c] text-white rounded shadow hover:bg-[#991b1b] text-sm font-bold">
                         <Plus size={16} /><span className="hidden sm:inline">Thêm Mới</span>
-                    </button>
+                    </button> */}
                 </div>
             </div>
 

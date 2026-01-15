@@ -37,7 +37,9 @@ const publicPaths = [
   '/api-core/users/signup',
   '/api-core/users/authorize',
   '/api-core/users/checkuser',
-  '/api-firework/dongho/get-all'
+  '/api-firework/dongho/get-all',
+  '/api-core/ollama/health',  // Ollama health check
+  '/api-core/ollama/models'    // Ollama models list
 ];
 
 const isPublicPath = (url) => {

@@ -22,6 +22,7 @@ interface UserData {
   email: string;
   phone?: string;
   dongHoId?: string;
+  tenDongHo?: string;
   roleId?: string;
   roleCode?: string;
   online_flag?: number;

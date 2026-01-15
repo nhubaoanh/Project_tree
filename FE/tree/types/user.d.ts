@@ -14,6 +14,9 @@ export interface IUser extends IBaseData {
   tenDongHo: string;
   ngayTao: Date | null;
   nguoiTaoId: string;
+  gender?: number; // 0: Nữ, 1: Nam
+  online_flag?: number; // 0: Offline, 1: Online
+  active_flag?: number; // 0: Ngưng hoạt động, 1: Hoạt động
 }
 
 export interface IUserSearch{

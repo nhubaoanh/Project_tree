@@ -12,6 +12,7 @@ export interface nguoiDung {
   nguoiTaoId: string;
   active_flag: number;
   lu_user_id: string;
+  gender?: number; // 0: Nữ, 1: Nam, 2: Khác
 }
 
 export interface UserProfile extends nguoiDung {

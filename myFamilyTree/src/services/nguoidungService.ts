@@ -58,6 +58,7 @@ export class nguoiDungService {
           email: user.email,
           phone: user.phone,
           dongHoId: user.dongHoId,
+          tenDongHo: user.tenDongHo,
           roleId: user.roleId,
           roleCode: user.roleCode,
           online_flag: user.online_flag,
@@ -253,7 +254,13 @@ export class nguoiDungService {
   }
 
   async updateUser(nguoidung: nguoiDung): Promise<any> {
-    nguoidung.matKhau = md5(nguoidung.matKhau);
+    // Chỉ hash mật khẩu nếu có mật khẩu mới
+    if (nguoidung.matKhau && nguoidung.matKhau.trim() !== "") {
+      nguoidung.matKhau = md5(nguoidung.matKhau);
+    } else {
+      // Nếu không có mật khẩu mới, gửi null để stored procedure giữ nguyên mật khẩu cũ
+      nguoidung.matKhau = null as any;
+    }
     return this.nguoidungResponsitory.updateUser(nguoidung);
   }
 

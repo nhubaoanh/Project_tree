@@ -109,7 +109,7 @@ export function DataTable<T = any>({
                                     return (
                                         <th
                                             key={col.key}
-                                            className={`p-4 ${alignClass} ${col.className || ""}`}
+                                            className={`p-4 whitespace-nowrap ${alignClass} ${col.className || ""}`}
                                         >
                                             {col.label}
                                         </th>
@@ -146,7 +146,7 @@ export function DataTable<T = any>({
                                             return (
                                                 <td
                                                     key={col.key}
-                                                    className={`p-4 ${alignClass} group-hover:text-red-700 ${col.className || ""}`}
+                                                    className={`p-4 whitespace-nowrap ${alignClass} group-hover:text-red-700 ${col.className || ""}`}
                                                 >
                                                     {renderCellContent(col, row)}
                                                 </td>

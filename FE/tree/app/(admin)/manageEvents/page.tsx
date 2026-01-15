@@ -10,7 +10,8 @@ import {
 import { IEvent, IsearchEvent } from "@/types/event";
 import { useToast } from "@/service/useToas";
 import { EventModal } from "./components/eventModal";
-import { searchEvent, createEvent, updateEvent } from "@/service/event.service";
+import { EventDetailModal } from "./components/EventDetailModal";
+import { searchEvent, createEvent, updateEvent, deleteEvent } from "@/service/event.service";
 import storage from "@/utils/storage";
 import { 
   PageLayout, 
@@ -40,6 +41,10 @@ export default function QuanLySuKienPage() {
   const [editingEvent, setEditingEvent] = useState<IEvent | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [eventsToDelete, setEventsToDelete] = useState<IEvent[]>([]);
+
+  // Detail Modal State
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [selectedEventForDetail, setSelectedEventForDetail] = useState<IEvent | null>(null);
 
   const { showSuccess, showError } = useToast();
 
@@ -101,6 +106,20 @@ export default function QuanLySuKienPage() {
     },
   });
 
+  const deleteMutation = useMutation({
+    mutationFn: (listJson: { suKienId: string }[]) => deleteEvent(listJson, user?.nguoiDungId || ""),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["event"] });
+      showSuccess("Đã xóa sự kiện thành công.");
+      setIsDeleteModalOpen(false);
+      setEventsToDelete([]);
+      setSelectedIds([]);
+    },
+    onError: (error: any) => {
+      showError(error.message || "Không thể xóa sự kiện.");
+    },
+  });
+
   // --- SELECTION HANDLERS ---
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
@@ -156,6 +175,11 @@ export default function QuanLySuKienPage() {
     setEventsToDelete([]);
   };
 
+  const handleConfirmDelete = () => {
+    const listJson = eventsToDelete.map((event) => ({ suKienId: event.suKienId }));
+    deleteMutation.mutate(listJson);
+  };
+
   const handleSaveEvent = (event: Partial<IEvent>) => {
     if (editingEvent) {
       updateMutation.mutate(event as IEvent);
@@ -164,12 +188,18 @@ export default function QuanLySuKienPage() {
     }
   };
 
+  const handleViewDetail = (event: IEvent) => {
+    setSelectedEventForDetail(event);
+    setIsDetailModalOpen(true);
+  };
+
   const handlePageSizeChange = (newSize: number) => {
     setPageSize(newSize);
     setPageIndex(1);
   };
 
   const isSaving = createMutation.isPending || updateMutation.isPending;
+  const isDeleting = deleteMutation.isPending;
 
   // --- LOADING STATE ---
   if (eventQuery.isLoading) {
@@ -290,6 +320,7 @@ export default function QuanLySuKienPage() {
         onSearchChange={setSearchTerm}
         searchPlaceholder="Tìm kiếm theo tên sự kiện..."
         emptyMessage="Chưa có sự kiện nào được tạo"
+        onViewDetail={handleViewDetail}
       />
 
       {/* Event Modal */}
@@ -301,6 +332,13 @@ export default function QuanLySuKienPage() {
         isLoading={isSaving}
       />
 
+      {/* Event Detail Modal */}
+      <EventDetailModal
+        isOpen={isDetailModalOpen}
+        onClose={() => setIsDetailModalOpen(false)}
+        event={selectedEventForDetail}
+      />
+
       {/* Delete Modal */}
       <DeleteModal
         isOpen={isDeleteModalOpen}
@@ -309,11 +347,8 @@ export default function QuanLySuKienPage() {
           setIsDeleteModalOpen(false);
           setEventsToDelete([]);
         }}
-        onConfirm={() => {
-          // TODO: Implement delete logic
-          handleDeleteSuccess();
-          setIsDeleteModalOpen(false);
-        }}
+        onConfirm={handleConfirmDelete}
+        isLoading={isDeleting}
         itemDisplayField="tenSuKien"
         title={eventsToDelete.length === 1 ? "Xác nhận xóa sự kiện" : `Xác nhận xóa ${eventsToDelete.length} sự kiện`}
         message={eventsToDelete.length === 1 ? 

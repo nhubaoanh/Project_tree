@@ -10,6 +10,7 @@ import loaiSuKienRouter from "./loaiSuKienRouter";
 import thongKeRouter from "./thongKeRouter";
 import tinTucRouter from "./tinTucRouter";
 import taiLieuRouter from "./taiLieuRouter";
+import ollamaRouter from "./ollamaRouter";
 
 const router = Router();
 router.use('/users', nguoiDungRouter);
@@ -23,5 +24,6 @@ router.use("/contributionDown", taiChinhChiRouter);
 router.use("/thongke", thongKeRouter);
 router.use("/tintuc", tinTucRouter);
 router.use("/tailieu", taiLieuRouter);
+router.use("/ollama", ollamaRouter);
 
 export default router;

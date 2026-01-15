@@ -4,7 +4,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { Header } from "@/components/ui/HeaderSub";
 import { MyFamilyTree } from "@/components/ui/tree";
 import { ViewMode } from "@/types/familytree";
-import { Users } from "lucide-react";
+import { Users, MessageCircle } from "lucide-react";
 import TinTucPage from "../news/page";
 import PhaKyPage from "../pen/page";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
@@ -76,6 +76,11 @@ function GenealogyContent() {
 
   // Không cần xử lý chọn dòng họ nữa
 
+  // Handle navigate to AI chat
+  const handleOpenAIChat = () => {
+    router.push('/genAI');
+  };
+
   return (
     <div className="flex flex-col h-screen w-full bg-stone-100 font-dancing overflow-hidden">
       {/* HEADER */}
@@ -132,6 +137,19 @@ function GenealogyContent() {
             </div>
           )}
         </div>
+
+        {/* Floating AI Chat Button */}
+        <button
+          onClick={handleOpenAIChat}
+          className="fixed bottom-6 right-6 z-50 bg-gradient-to-r from-[#b91c1c] to-[#991b1b] text-white p-4 rounded-full shadow-2xl hover:shadow-3xl hover:scale-110 transition-all duration-300 group"
+          title="Hỏi đáp AI về gia phả"
+        >
+          <MessageCircle size={28} className="group-hover:animate-pulse" />
+          <span className="absolute -top-1 -right-1 flex h-3 w-3">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-3 w-3 bg-yellow-500"></span>
+          </span>
+        </button>
       </main>
     </div>
   );

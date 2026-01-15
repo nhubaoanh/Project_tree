@@ -133,6 +133,8 @@ export class NguoiDungController {
   async insertUser(req: Request, res: Response): Promise<void> {
     try {
       const nguoiDung = req.body as nguoiDung;
+      console.log("InsertUser - Received data:", nguoiDung);
+      console.log("InsertUser - roleId:", nguoiDung.roleId, "type:", typeof nguoiDung.roleId);
       const results = await this.nguoiDungService.insertUser(nguoiDung);
       res.json({
         message: "Them nguoi dung thanh cong",
@@ -140,9 +142,13 @@ export class NguoiDungController {
         data: results,
       });
     } catch (error: any) {
+      console.error("InsertUser error:", error);
       res
         .status(500)
-        .json({ message: "Them nguoi dung that bai", success: false });
+        .json({ 
+          message: error.message || "Them nguoi dung that bai", 
+          success: false 
+        });
     }
   }
 
