@@ -367,7 +367,7 @@ curl http://localhost:8081/health
 # Production .env
 NODE_ENV=production
 DB_HOST=mysql
-DB_PORT=3306
+DB_PORT=yourport
 DB_USER=familytree
 DB_PASSWORD=your-secure-password
 DB_NAME=treefamily

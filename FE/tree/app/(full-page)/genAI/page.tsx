@@ -17,7 +17,7 @@ export default function GenealogyChatPage() {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       role: "model",
-      text: 'Chào bạn! Tôi là trợ lý AI tra cứu gia phả. Hãy hỏi tôi về quan hệ huyết thống, ví dụ:\n- "Ông A là con ai?"\n- "Con của bà B là ai?"\n- "Liệt kê tất cả thành viên"\n- "Ai thuộc đời thứ 2?"',
+      text: '🚀 Chào bạn! Tôi là trợ lý AI tra cứu gia phả (BFS Algorithm + Ollama).\n\nHãy hỏi tôi về quan hệ huyết thống:\n- "Nguyễn Văn A là con ai?"\n- "Con của Trần Thị B là ai?"\n- "Nguyễn Văn C có vợ/chồng là ai?"\n- "Anh chị em của Lê Văn D"\n\n💡 Hệ thống sử dụng thuật toán BFS để tìm quan hệ nhanh và chính xác!',
     },
   ]);
   const [input, setInput] = useState("");
@@ -56,7 +56,7 @@ export default function GenealogyChatPage() {
             setDongHoInfo(res.data);
             setMessages([{
               role: "model",
-              text: `Chào bạn! Tôi là trợ lý AI tra cứu gia phả dòng họ "${res.data.tenDongHo}". Hãy hỏi tôi về quan hệ huyết thống, ví dụ:\n- "Ông A là con ai?"\n- "Con của bà B là ai?"\n- "Liệt kê tất cả thành viên"\n- "Ai thuộc đời thứ 2?"`
+              text: `🚀 Chào bạn! Tôi là trợ lý AI tra cứu gia phả dòng họ "${res.data.tenDongHo}" (BFS Algorithm + Ollama).\n\nHãy hỏi tôi về quan hệ huyết thống:\n- "Nguyễn Văn A là con ai?"\n- "Con của Trần Thị B là ai?"\n- "Nguyễn Văn C có vợ/chồng là ai?"\n- "Anh chị em của Lê Văn D"\n\n💡 Hệ thống sử dụng thuật toán BFS để tìm quan hệ nhanh và chính xác!`
             }]);
           }
         }
@@ -134,7 +134,7 @@ export default function GenealogyChatPage() {
       ...prev,
       { 
         role: "model", 
-        text: `Đã chuyển sang ${engine === "ollama" ? "DeepSeek-Coder (Local)" : "Google Gemini (Cloud)"}` 
+        text: `✅ Đã chuyển sang ${engine === "ollama" ? "Ollama (BFS + Local AI)" : "Google Gemini (Cloud AI)"}\n\n${engine === "ollama" ? "💡 Sử dụng thuật toán BFS để tìm quan hệ, Ollama chỉ diễn giải kết quả!" : ""}` 
       },
     ]);
   };
@@ -245,7 +245,11 @@ export default function GenealogyChatPage() {
       {/* Quick Questions */}
       <div className="bg-[#fdfbf7] px-4 pb-2 border-x border-[#d4af37]/30">
         <div className="flex gap-2 flex-wrap">
-          {["Liệt kê thành viên", "Ai là tổ tiên?", "Thành viên đời 2"].map((q) => (
+          {[
+            "Nguyễn Văn A là con ai?", 
+            "Con của Trần Thị B", 
+            "Anh chị em của Lê Văn C"
+          ].map((q) => (
             <button
               key={q}
               onClick={() => setInput(q)}

@@ -1,5 +1,5 @@
 /**
- * Ollama Service - Text-to-SQL cho gia phả
+ * Ollama Service - Đơn giản: Chỉ diễn giải kết quả
  */
 
 import axios from "axios";
@@ -9,121 +9,48 @@ interface OllamaMessage {
   content: string;
 }
 
-interface OllamaRequest {
-  model: string;
-  messages: OllamaMessage[];
-  stream?: boolean;
-  temperature?: number;
-}
-
 export class OllamaService {
   private baseURL: string;
   private model: string;
+  private sqlModel: string; // Model chuyên cho SQL
 
   constructor() {
     this.baseURL = process.env.OLLAMA_BASE_URL || "http://localhost:11434";
-    this.model = process.env.OLLAMA_MODEL || "deepseek-coder";
+    this.model = process.env.OLLAMA_MODEL || "qwen2.5:7b"; // Default: Vietnamese
+    this.sqlModel = process.env.OLLAMA_SQL_MODEL || "pxlksr/defog_sqlcoder-7b-2:Q2_KS"; // SQL expert
   }
 
   /**
-   * TEXT-TO-SQL: Chuyển câu hỏi tiếng Việt thành SQL
+   * DIỄN GIẢI KẾT QUẢ: Chuyển dữ liệu quan hệ thành câu trả lời tự nhiên
    */
-  async textToSQL(userQuestion: string, dongHoId: string): Promise<string> {
-    const systemPrompt = `You are a SQL expert for family tree database.
+  async explainRelationship(
+    personName: string,
+    relatives: Array<{ hoTen: string; gioiTinh: number }>,
+    relationType: string
+  ): Promise<string> {
+    const systemPrompt = `Bạn là trợ lý gia phả. Diễn giải kết quả tra cứu thành câu văn tự nhiên.
+Trả lời ngắn gọn bằng tiếng Việt, không dùng emoji.`;
 
-DATABASE SCHEMA:
-Table: thanhvien
-Columns:
-- thanhVienId (INT, PRIMARY KEY)
-- dongHoId (VARCHAR, family tree ID)
-- hoTen (VARCHAR, full name)
-- gioiTinh (INT, 0=Female, 1=Male)
-- doiThuoc (INT, generation number)
-- chaId (INT, father's thanhVienId)
-- meId (INT, mother's thanhVienId)
-- voId (INT, wife's thanhVienId)
-- chongId (INT, husband's thanhVienId)
-- ngaySinh (DATE, birth date)
-- ngayMat (DATE, death date)
-- active_flag (INT, 1=active)
+    const relativesText = relatives
+      .map(r => `${r.hoTen} (${r.gioiTinh === 1 ? "Nam" : "Nữ"})`)
+      .join(", ");
 
-RELATIONSHIPS:
-- Father: chaId references thanhVienId
-- Mother: meId references thanhVienId
-- Uncle (chú/bác): father's brothers (same chaId, gioiTinh=1)
-- Aunt (cô): father's sisters (same chaId, gioiTinh=0)
-- Maternal uncle (cậu): mother's brothers (same meId, gioiTinh=1)
-- Maternal aunt (dì): mother's sisters (same meId, gioiTinh=0)
-- Siblings: same chaId or meId
-- Children: thanhVienId = someone's chaId or meId
-- Spouse: voId or chongId
-
-RULES:
-1. ALWAYS filter by dongHoId = '${dongHoId}'
-2. ALWAYS filter by active_flag = 1
-3. Return ONLY the SQL query, no explanation
-4. Use proper JOINs for relationships
-5. Use Vietnamese column aliases (AS)
-
-EXAMPLES:
-
-Q: "Ai là tổ tiên?" or "Đời 1"
-A: SELECT hoTen, gioiTinh FROM thanhvien WHERE dongHoId = '${dongHoId}' AND doiThuoc = 1 AND active_flag = 1;
-
-Q: "Liệt kê thành viên đời 2"
-A: SELECT hoTen, gioiTinh FROM thanhvien WHERE dongHoId = '${dongHoId}' AND doiThuoc = 2 AND active_flag = 1;
-
-Q: "Trần Văn A là con ai?" or "Cha mẹ của Trần Văn A"
-A: SELECT p.hoTen AS 'Cha', m.hoTen AS 'Mẹ' FROM thanhvien t LEFT JOIN thanhvien p ON t.chaId = p.thanhVienId LEFT JOIN thanhvien m ON t.meId = m.thanhVienId WHERE t.hoTen LIKE '%Trần Văn A%' AND t.dongHoId = '${dongHoId}' AND t.active_flag = 1;
-
-Q: "Con của Trần Văn A" or "Trần Văn A có mấy con"
-A: SELECT hoTen, gioiTinh FROM thanhvien WHERE (chaId = (SELECT thanhVienId FROM thanhvien WHERE hoTen LIKE '%Trần Văn A%' AND dongHoId = '${dongHoId}' LIMIT 1) OR meId = (SELECT thanhVienId FROM thanhvien WHERE hoTen LIKE '%Trần Văn A%' AND dongHoId = '${dongHoId}' LIMIT 1)) AND dongHoId = '${dongHoId}' AND active_flag = 1;
-
-Q: "Chú của Trần Văn A" or "Bác của Trần Văn A"
-A: SELECT u.hoTen FROM thanhvien t JOIN thanhvien f ON t.chaId = f.thanhVienId JOIN thanhvien u ON f.chaId = u.chaId WHERE t.hoTen LIKE '%Trần Văn A%' AND u.thanhVienId != f.thanhVienId AND u.gioiTinh = 1 AND t.dongHoId = '${dongHoId}' AND t.active_flag = 1 AND u.active_flag = 1;
-
-Q: "Anh chị em của Trần Văn A"
-A: SELECT s.hoTen, s.gioiTinh FROM thanhvien t JOIN thanhvien s ON (t.chaId = s.chaId OR t.meId = s.meId) WHERE t.hoTen LIKE '%Trần Văn A%' AND s.thanhVienId != t.thanhVienId AND t.dongHoId = '${dongHoId}' AND t.active_flag = 1 AND s.active_flag = 1;
-
-Now generate SQL for this question:`;
+    const userMessage = `${personName} - ${relationType}: ${relativesText}`;
 
     try {
-      const messages: OllamaMessage[] = [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: userQuestion },
-      ];
-
-      const response = await axios.post(
-        `${this.baseURL}/api/chat`,
-        {
-          model: this.model,
-          messages,
-          stream: false,
-          temperature: 0.1, // Low temperature for precise SQL
-        } as OllamaRequest,
-        { timeout: 30000 }
-      );
-
-      if (response.data && response.data.message) {
-        let sql = response.data.message.content.trim();
-
-        // Clean up SQL (remove markdown, extra text)
-        sql = sql.replace(/```sql\n?/g, "").replace(/```\n?/g, "");
-        sql = sql.split("\n")[0]; // Take first line only
-
-        return sql;
-      }
-
-      throw new Error("Invalid response from Ollama");
-    } catch (error: any) {
-      throw new Error("Không thể tạo SQL query");
+      const response = await this.chat(userMessage, systemPrompt);
+      return response;
+    } catch (error) {
+      // Fallback
+      const names = relatives.map(r => r.hoTen).join(", ");
+      return `${personName} có ${relatives.length} ${relationType}: ${names}.`;
     }
   }
 
   /**
-   * Chat thông thường (fallback)
+   * Chat với Ollama (general purpose)
    */
-  async chat(userMessage: string, systemPrompt?: string): Promise<string> {
+  async chat(userMessage: string, systemPrompt?: string, useSQL = false): Promise<string> {
     try {
       const messages: OllamaMessage[] = [];
 
@@ -133,15 +60,18 @@ Now generate SQL for this question:`;
 
       messages.push({ role: "user", content: userMessage });
 
+      // Chọn model phù hợp
+      const selectedModel = useSQL ? this.sqlModel : this.model;
+
       const response = await axios.post(
         `${this.baseURL}/api/chat`,
         {
-          model: this.model,
+          model: selectedModel,
           messages,
           stream: false,
-          temperature: 0.7,
-        } as OllamaRequest,
-        { timeout: 60000 }
+          temperature: useSQL ? 0.1 : 0.7, // SQL cần chính xác hơn
+        },
+        { timeout: 30000 }
       );
 
       if (response.data && response.data.message) {
@@ -151,17 +81,21 @@ Now generate SQL for this question:`;
       throw new Error("Invalid response from Ollama");
     } catch (error: any) {
       if (error.code === "ECONNREFUSED") {
-        throw new Error(
-          "Không thể kết nối với Ollama. Vui lòng chạy: ollama serve"
-        );
+        throw new Error("Không thể kết nối Ollama. Chạy: ollama serve");
       }
-
-      throw new Error(error.message || "Lỗi khi gọi Ollama API");
+      throw new Error(error.message || "Lỗi Ollama API");
     }
   }
 
   /**
-   * Kiểm tra Ollama có đang chạy không
+   * Text-to-SQL chuyên dụng
+   */
+  async textToSQL(prompt: string): Promise<string> {
+    return this.chat(prompt, undefined, true);
+  }
+
+  /**
+   * Health check
    */
   async healthCheck(): Promise<boolean> {
     try {
@@ -175,7 +109,7 @@ Now generate SQL for this question:`;
   }
 
   /**
-   * Lấy danh sách models có sẵn
+   * Lấy danh sách models
    */
   async listModels(): Promise<string[]> {
     try {

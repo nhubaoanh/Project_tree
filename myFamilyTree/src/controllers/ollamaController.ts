@@ -1,27 +1,28 @@
 /**
- * Ollama Controller - API endpoints cho DeepSeek-Coder
+ * Ollama Controller - BFS + Ollama Integration
  */
 
 import { Request, Response } from 'express';
 import { injectable } from 'tsyringe';
 import { OllamaService } from '../services/ollamaService';
-import { thanhVienRespository } from '../repositories/thanhVienRespository';
+import { RelationshipService } from '../services/relationshipService';
 
 @injectable()
 export class OllamaController {
   private ollamaService: OllamaService;
 
-  constructor(private thanhVienRepo: thanhVienRespository) {
+  constructor(private relationshipService: RelationshipService) {
     this.ollamaService = new OllamaService();
   }
 
   /**
    * POST /api/ollama/chat
-   * Chat với DeepSeek-Coder về gia phả (Text-to-SQL)
+   * Chat với Ollama - Sử dụng BFS để tìm quan hệ
    */
   async chat(req: Request, res: Response): Promise<void> {
     try {
       const { message, dongHoId } = req.body;
+      
       if (!message) {
         res.status(400).json({
           success: false,
@@ -38,82 +39,54 @@ export class OllamaController {
         return;
       }
 
-      // BƯỚC 1: Dùng DeepSeek-Coder để tạo SQL từ câu hỏi tiếng Việt
-      await this.ollamaService.textToSQL(message, dongHoId);
+      console.log(`[Ollama] Question: "${message}"`);
 
-      // BƯỚC 2: Thực thi SQL query
-      const members = await this.thanhVienRepo.getAllByDongHo(dongHoId);
-      
-      if (!members || members.length === 0) {
+      // BƯỚC 1: Dùng BFS để tìm quan hệ
+      const result = await this.relationshipService.analyzeQuestion(dongHoId, message);
+
+      if (!result.success) {
         res.json({
           success: true,
-          data: `Không tìm thấy thành viên nào trong dòng họ này.`,
+          data: result.message || "Không thể trả lời câu hỏi này.",
         });
         return;
       }
 
-      // BƯỚC 3: Format kết quả thành tiếng Việt
-      let vietnameseResponse = '';
+      const { person, relatives, relationshipType } = result.data!;
 
-      // Phân tích câu hỏi để format phù hợp
-      const lowerMsg = message.toLowerCase();
-      
-      if (lowerMsg.includes('tổ tiên') || lowerMsg.includes('đời 1')) {
-        const ancestors = members.filter((m: any) => m.doiThuoc === 1 || m.doiThu === 1);
-        if (ancestors.length > 0) {
-          vietnameseResponse = `Tổ tiên (Đời 1):\n${ancestors.map((m: any) => 
-            `- ${m.hoTen} (${m.gioiTinh === 1 ? 'Nam' : 'Nữ'})`
-          ).join('\n')}`;
-        } else {
-          vietnameseResponse = 'Không tìm thấy thông tin tổ tiên.';
-        }
-      } else if (lowerMsg.includes('đời')) {
-        const genMatch = lowerMsg.match(/đời\s*(\d+)/);
-        if (genMatch) {
-          const gen = parseInt(genMatch[1]);
-          const genMembers = members.filter((m: any) => 
-            (m.doiThuoc === gen || m.doiThu === gen)
-          );
-          if (genMembers.length > 0) {
-            vietnameseResponse = `Thành viên đời ${gen} (${genMembers.length} người):\n${genMembers.map((m: any) => 
-              `- ${m.hoTen} (${m.gioiTinh === 1 ? 'Nam' : 'Nữ'}${m.ngaySinh ? ', sinh ' + new Date(m.ngaySinh).getFullYear() : ''})`
-            ).join('\n')}`;
-          } else {
-            vietnameseResponse = `Không tìm thấy thành viên đời ${gen}.`;
-          }
-        }
-      } else if (lowerMsg.includes('liệt kê') || lowerMsg.includes('danh sách')) {
-        vietnameseResponse = `Tổng số thành viên: ${members.length} người\n\n`;
-        const byGeneration: any = {};
-        members.forEach((m: any) => {
-          const gen = m.doiThuoc || m.doiThu || 0;
-          if (!byGeneration[gen]) byGeneration[gen] = [];
-          byGeneration[gen].push(m);    
+      // BƯỚC 2: Nếu không có người thân
+      if (relatives.length === 0) {
+        res.json({
+          success: true,
+          data: `${person.hoTen} không có thông tin về ${relationshipType}.`,
         });
-        
-        Object.keys(byGeneration).sort((a, b) => parseInt(a) - parseInt(b)).forEach(gen => {
-          vietnameseResponse += `Đời ${gen} (${byGeneration[gen].length} người):\n`;
-          byGeneration[gen].forEach((m: any) => {
-            vietnameseResponse += `  - ${m.hoTen} (${m.gioiTinh === 1 ? 'Nam' : 'Nữ'})\n`;
-          });
-          vietnameseResponse += '\n';
-        });
-      } else {
-        // Câu hỏi phức tạp khác - trả về tổng quan
-        vietnameseResponse = `Tìm thấy ${members.length} thành viên trong dòng họ.\n\n`;
-        vietnameseResponse += `Một số thành viên:\n${members.slice(0, 10).map((m: any) => 
-          `- ${m.hoTen} (Đời ${m.doiThuoc || m.doiThu || '?'})`
-        ).join('\n')}`;
-        if (members.length > 10) {
-          vietnameseResponse += `\n... và ${members.length - 10} người khác.`;
-        }
+        return;
       }
-      res.json({
-        success: true,
-        data: vietnameseResponse,
-        message: 'Chat thành công',
-      });
+
+      // BƯỚC 3: Dùng Ollama để diễn giải
+      try {
+        const explanation = await this.ollamaService.explainRelationship(
+          person.hoTen,
+          relatives,
+          relationshipType
+        );
+
+        res.json({
+          success: true,
+          data: explanation,
+          message: 'Chat thành công (BFS + Ollama)',
+        });
+      } catch (error) {
+        // Fallback: Trả lời đơn giản
+        const names = relatives.map(r => r.hoTen).join(", ");
+        res.json({
+          success: true,
+          data: `${person.hoTen} có ${relatives.length} ${relationshipType}: ${names}`,
+          message: 'Chat thành công (BFS only)',
+        });
+      }
     } catch (error: any) {
+      console.error("[Ollama] Error:", error.message);
       res.status(500).json({
         success: false,
         message: error.message || 'Lỗi khi chat với AI',
