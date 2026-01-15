@@ -8,16 +8,31 @@ export class nguoiDungReponsitory {
 
   async logUpUser(nguoiDung: nguoiDung): Promise<any> {
     try {
-      const sql = "CALL SignUp (?,?,?, @err_code, @err_msg)";
+      const sql = "CALL SignUp (?,?,?,?,?,?, @err_code, @err_msg)";
 
       await this.db.query(sql, [
         nguoiDung.nguoiDungId,
         nguoiDung.tenDangNhap,
         nguoiDung.matKhau,
+        nguoiDung.tenDongHo,
+        nguoiDung.queQuanGoc,
+        nguoiDung.ngayThanhLap,
       ]);
+
+      // Lấy error code và message từ OUT parameters
+      const [result] = await this.db.query("SELECT @err_code as error_code, @err_msg as error_message", []);
+      const errorInfo = Array.isArray(result) ? result[0] : result;
+
+      console.log("📊 [logUpUser] Stored procedure result:", errorInfo);
+
+      if (errorInfo.error_code !== 0) {
+        throw new Error(errorInfo.error_message || "Đăng ký thất bại");
+      }
+
       return true;
     } catch (error: any) {
-      throw new Error(error);
+      console.error("❌ [logUpUser] Error:", error.message);
+      throw new Error(error.message || "Đăng ký thất bại");
     }
   }
 

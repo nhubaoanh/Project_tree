@@ -46,6 +46,7 @@ export class NguoiDungController {
   async createNguoiDung(req: Request, res: Response): Promise<void> {
     try {
       const nguoiDung = req.body as nguoiDung;
+      console.log("📝 [createNguoiDung] Received data:", JSON.stringify(nguoiDung, null, 2));
       const results = await this.nguoiDungService.createNguoiDung(nguoiDung);
       res.json({
         message: "Dang ky thanh cong.",
@@ -53,6 +54,7 @@ export class NguoiDungController {
         data: results,
       });
     } catch (error: any) {
+      console.error("❌ [createNguoiDung] Error:", error.message);
       res.status(500).json({
         message: error.message || "Đăng ký thất bại.",
         success: false,

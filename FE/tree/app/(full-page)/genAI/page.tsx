@@ -11,7 +11,7 @@ interface ChatMessage {
   text: string;
 }
 
-type AIEngine = "gemini" | "ollama";
+type AIEngine = "trợ lý AI" | "thư ký";
 
 export default function GenealogyChatPage() {
   const [messages, setMessages] = useState<ChatMessage[]>([
@@ -24,7 +24,7 @@ export default function GenealogyChatPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [dongHoInfo, setDongHoInfo] = useState<any>(null);
   const [selectedDongHo, setSelectedDongHo] = useState<string>("");
-  const [aiEngine, setAiEngine] = useState<AIEngine>("gemini");
+  const [aiEngine, setAiEngine] = useState<AIEngine>("trợ lý AI");
   const [ollamaStatus, setOllamaStatus] = useState<"checking" | "online" | "offline">("checking");
 
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -56,7 +56,7 @@ export default function GenealogyChatPage() {
             setDongHoInfo(res.data);
             setMessages([{
               role: "model",
-              text: `🚀 Chào bạn! Tôi là trợ lý AI tra cứu gia phả dòng họ "${res.data.tenDongHo}" (BFS Algorithm + Ollama).\n\nHãy hỏi tôi về quan hệ huyết thống:\n- "Nguyễn Văn A là con ai?"\n- "Con của Trần Thị B là ai?"\n- "Nguyễn Văn C có vợ/chồng là ai?"\n- "Anh chị em của Lê Văn D"\n\n💡 Hệ thống sử dụng thuật toán BFS để tìm quan hệ nhanh và chính xác!`
+              text: `🚀 Chào bạn! Tôi là trợ lý AI tra cứu gia phả dòng họ "${res.data.tenDongHo}".\n\nHãy hỏi tôi về quan hệ huyết thống:\n- "Nguyễn Văn A là con ai?"\n- "Con của Trần Thị B là ai?"\n- "Nguyễn Văn C có vợ/chồng là ai?"\n- "Anh chị em của Lê Văn D"\n\n💡 Hệ thống sử dụng thuật toán BFS để tìm quan hệ nhanh và chính xác!`
             }]);
           }
         }
@@ -93,7 +93,7 @@ export default function GenealogyChatPage() {
       let response;
       
       // Chọn AI engine
-      if (aiEngine === "ollama") {
+      if (aiEngine === "thư ký") {
         response = await chatWithOllama(userMsg, selectedDongHo);
       } else {
         response = await chatWithAI(userMsg, selectedDongHo);
@@ -119,12 +119,12 @@ export default function GenealogyChatPage() {
   };
 
   const handleEngineChange = (engine: AIEngine) => {
-    if (engine === "ollama" && ollamaStatus === "offline") {
+    if (engine === "thư ký" && ollamaStatus === "offline") {
       setMessages((prev) => [
         ...prev,
         { 
           role: "model", 
-          text: "⚠️ Ollama chưa chạy. Vui lòng chạy lệnh: ollama serve" 
+          text: "⚠️ AI chưa chạy. Vui lòng chạy lệnh: ollama serve" 
         },
       ]);
       return;
@@ -134,7 +134,7 @@ export default function GenealogyChatPage() {
       ...prev,
       { 
         role: "model", 
-        text: `✅ Đã chuyển sang ${engine === "ollama" ? "Ollama (BFS + Local AI)" : "Google Gemini (Cloud AI)"}\n\n${engine === "ollama" ? "💡 Sử dụng thuật toán BFS để tìm quan hệ, Ollama chỉ diễn giải kết quả!" : ""}` 
+        text: `✅ Đã chuyển sang ${engine === "thư ký" ? "Thư ký (BFS + Local AI)" : "Trợ lý AI (Cloud AI)"}\n\n${engine === "thư ký" ? "💡 Sử dụng thuật toán BFS để tìm quan hệ, Thư ký chỉ diễn giải kết quả!" : ""}` 
       },
     ]);
   };
@@ -154,29 +154,29 @@ export default function GenealogyChatPage() {
         {/* AI Engine Selector */}
         <div className="flex gap-2">
           <button
-            onClick={() => handleEngineChange("gemini")}
+            onClick={() => handleEngineChange("trợ lý AI")}
             className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
-              aiEngine === "gemini"
+              aiEngine === "trợ lý AI"
                 ? "bg-blue-600 text-white shadow-md"
                 : "bg-gray-100 text-gray-600 hover:bg-gray-200"
             }`}
-            title="Google Gemini - Cloud AI (Tiếng Việt tốt)"
+            title="Trợ lý AI - Cloud AI (Tiếng Việt tốt)"
           >
             <Cloud size={16} />
-            Gemini
+            Trợ lý AI
           </button>
           <button
-            onClick={() => handleEngineChange("ollama")}
+            onClick={() => handleEngineChange("thư ký")}
             className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
-              aiEngine === "ollama"
+              aiEngine === "thư ký"
                 ? "bg-purple-600 text-white shadow-md"
                 : "bg-gray-100 text-gray-600 hover:bg-gray-200"
             }`}
-            title="DeepSeek-Coder - Local AI (Miễn phí, bảo mật)"
+            title="Thư ký - Local AI (Miễn phí, bảo mật)"
             disabled={ollamaStatus === "offline"}
           >
             <Zap size={16} />
-            Ollama
+            Thư ký
             {ollamaStatus === "offline" && (
               <span className="w-2 h-2 bg-red-500 rounded-full"></span>
             )}
@@ -234,7 +234,7 @@ export default function GenealogyChatPage() {
             <div className="bg-white p-3 rounded-2xl rounded-tl-none border border-[#eaddcf] flex items-center gap-2">
               <Loader2 className="animate-spin text-[#d4af37]" size={16} />
               <span className="text-xs text-stone-500">
-                {aiEngine === "ollama" ? "DeepSeek đang suy nghĩ..." : "Đang tra cứu..."}
+                {aiEngine === "thư ký" ? "Thư ký đang suy nghĩ..." : "Đang tra cứu..."}
               </span>
             </div>
           </div>

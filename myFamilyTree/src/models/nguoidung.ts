@@ -13,6 +13,9 @@ export interface nguoiDung {
   active_flag: number;
   lu_user_id: string;
   gender?: number; // 0: Nữ, 1: Nam, 2: Khác
+  tenDongHo?: string; // Tên dòng họ (cho đăng ký)
+  queQuanGoc?: string; // Quê quán gốc (cho đăng ký)
+  ngayThanhLap?: string; // Ngày thành lập (cho đăng ký)
 }
 
 export interface UserProfile extends nguoiDung {

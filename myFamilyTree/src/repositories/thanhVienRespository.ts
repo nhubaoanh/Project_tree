@@ -71,14 +71,10 @@ export class thanhVienRespository {
         thanhVien.tieuSu,
         thanhVien.anhChanDung,
         thanhVien.doiThuoc,
-        // thanhVien.chaId,
-        // thanhVien.meId,
-        // thanhVien.voId,
-        // thanhVien.chongId,
-        null,
-        null,
-        null,
-        null,
+        thanhVien.chaId,
+        thanhVien.meId,
+        thanhVien.voId,
+        thanhVien.chongId,
         thanhVien.lu_user_id,
       ]);
       return true;
@@ -199,8 +195,16 @@ export class thanhVienRespository {
       console.log('[Repository] SearchThanhVienByDongHo result:', {
         isArray: Array.isArray(result),
         length: result?.length,
-        firstItem: result?.[0]
+        firstItem: result?.[0],
+        resultType: typeof result,
+        isNestedArray: Array.isArray(result?.[0])
       });
+      
+      // Nếu result là array of arrays, lấy array đầu tiên
+      if (Array.isArray(result) && Array.isArray(result[0])) {
+        console.log('[Repository] Detected nested array, using first array');
+        return result[0];
+      }
       
       return result;
     } catch (error: any) {

@@ -15,6 +15,9 @@ export class thanhVienController {
   async createThanhVien(req: Request, res: Response): Promise<void> {
     try {
       const thanhvien = req.body as thanhVien;
+      
+      console.log('📝 [createThanhVien] Received data:', JSON.stringify(thanhvien, null, 2));
+      
       if (!thanhvien.dongHoId) {
         res.status(400).json({ message: "Thiếu dongHoId", success: false });
         return;
@@ -26,6 +29,7 @@ export class thanhVienController {
         data: results,
       });
     } catch (error: any) {
+      console.error('❌ [createThanhVien] Error:', error.message);
       res.status(500).json({ message: "Thêm thành viên thất bại", success: false });
     }
   }

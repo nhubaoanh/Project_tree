@@ -34,9 +34,10 @@ import {
  */
 export const createThanhVienRules: ValidationChain[] = [
   stringLength("hoTen", "Họ tên", 2, 100),
-  // gioiTinh có thể là số (0, 1, 2) hoặc string
+  // gioiTinh bắt buộc
   body("gioiTinh")
-    .optional({ values: "falsy" })
+    .notEmpty()
+    .withMessage("Giới tính không được để trống")
     .custom((value) => {
       const validValues = [0, 1, 2, "0", "1", "2", "Nam", "Nữ", "Khác"];
       if (!validValues.includes(value)) {
@@ -44,11 +45,26 @@ export const createThanhVienRules: ValidationChain[] = [
       }
       return true;
     }),
+  // dongHoId là UUID string, không phải số
+  optionalStringLength("dongHoId", "Dòng họ ID", 50),
+  // Tất cả các trường khác đều optional
   optionalDate("ngaySinh", "Ngày sinh"),
   optionalDate("ngayMat", "Ngày mất"),
-  optionalId("dongHoId", "Dòng họ ID"),
+  optionalStringLength("noiSinh", "Nơi sinh", 255),
+  optionalStringLength("noiMat", "Nơi mất", 255),
+  optionalStringLength("ngheNghiep", "Nghề nghiệp", 255),
+  optionalStringLength("trinhDoHocVan", "Trình độ học vấn", 255),
+  optionalStringLength("diaChiHienTai", "Địa chỉ hiện tại", 255),
+  optionalStringLength("tieuSu", "Tiểu sử", 5000),
+  optionalStringLength("anhChanDung", "Ảnh chân dung", 255),
   optionalId("chaId", "Cha ID"),
   optionalId("meId", "Mẹ ID"),
+  optionalId("voId", "Vợ ID"),
+  optionalId("chongId", "Chồng ID"),
+  body("doiThuoc")
+    .optional({ values: "falsy" })
+    .isInt({ min: 1 })
+    .withMessage("Đời thứ phải là số nguyên dương"),
 ];
 
 // ============================================================================

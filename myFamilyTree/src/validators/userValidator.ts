@@ -41,18 +41,18 @@ export const loginRules: ValidationChain[] = [
  * Validate dữ liệu đăng ký
  *
  * Fields:
- * - taiKhoan: Bắt buộc, 3-50 ký tự
+ * - tenDangNhap: Bắt buộc, email hợp lệ
  * - matKhau: Bắt buộc, mật khẩu mạnh (8+ ký tự, chữ hoa, thường, số)
- * - email: Tùy chọn, format email
- * - hoTen: Tùy chọn, tối đa 100 ký tự
- * - soDienThoai: Tùy chọn, format SĐT Việt Nam
+ * - tenDongHo: Bắt buộc, 2-100 ký tự
+ * - queQuanGoc: Tùy chọn, tối đa 200 ký tự
+ * - ngayThanhLap: Tùy chọn, định dạng ngày
  */
 export const signupRules: ValidationChain[] = [
-  stringLength("taiKhoan", "Tài khoản", 3, 50),
+  emailRule("tenDangNhap"),
   strongPasswordRule("matKhau"),
-  optionalEmail("email"),
-  optionalStringLength("hoTen", "Họ tên", 100),
-  optionalPhone("soDienThoai"),
+  stringLength("tenDongHo", "Tên dòng họ", 2, 100),
+  optionalStringLength("queQuanGoc", "Quê quán gốc", 200),
+  // ngayThanhLap sẽ được validate ở frontend
 ];
 
 // ============================================================================

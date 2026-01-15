@@ -43,9 +43,9 @@ export function DetailModal({
             </div>
             <div className="flex-1">
                 <p className="text-[10px] text-yellow-900 uppercase font-bold tracking-widest">{label}</p>
-                <p className={`text-yellow-950 font-semibold text-sm mt-0.5 ${colorClass || ""}`}>
+                <div className={`text-yellow-950 font-semibold text-sm mt-0.5 ${colorClass || ""}`}>
                     {render ? render(value) : value || "Chưa cập nhật"}
-                </p>
+                </div>
             </div>
         </div>
     );

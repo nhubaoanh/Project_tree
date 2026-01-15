@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useRef, useEffect } from "react";
-import { useParams, useRouter } from "next/navigation";
-import { Search, Plus, Upload, X, Loader2, ArrowLeft, Download, GitBranch } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Search, Upload, X, Loader2, Download, GitBranch, Filter } from "lucide-react";
 import * as XLSX from "xlsx";
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 import { IMember, IMemberSearch } from "@/types/member";
@@ -14,30 +14,28 @@ import { searchMemberByDongHo, importMembersJson, IMemberImport, createMemberWit
 import { getDongHoById, IDongHo } from "@/service/dongho.service";
 import storage from "@/utils/storage";
 
-export default function MembersByDongHoPage() {
-    const params = useParams();
+export default function MembersPage() {
     const router = useRouter();
-    const dongHoId = params.dongHoId as string;
     const queryClient = useQueryClient();
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    // Kiểm tra quyền truy cập
-    const [hasAccess, setHasAccess] = useState(true);
+    // Lấy dongHoId từ storage
     const user = storage.getUser();
-    const isThudo = user?.roleCode === "thudo";
+    const dongHoId = user?.dongHoId;
 
+    // Redirect nếu không có dongHoId
     useEffect(() => {
-        // Nếu không phải Thudo và dongHoId không khớp với dòng họ của user
-        if (user && user.roleCode !== "thudo" && user.dongHoId && user.dongHoId !== dongHoId) {
-            setHasAccess(false);
+        if (!dongHoId) {
+            console.warn("⚠️ [Members] No dongHoId found, redirecting to dashboard");
             router.push("/dashboard");
         }
-    }, [dongHoId, user, router]);
+    }, [dongHoId, router]);
 
     const [pageIndex, setPageIndex] = useState(1);
     const [pageSize, setPageSize] = useState(5);
     const [searchTerm, setSearchTerm] = useState("");
     const [debouncedSearch, setDebouncedSearch] = useState("");
+    const [selectedGeneration, setSelectedGeneration] = useState<number | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingMember, setEditingMember] = useState<IMember | null>(null);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -56,45 +54,88 @@ export default function MembersByDongHoPage() {
     // Fetch thông tin dòng họ
     const dongHoQuery = useQuery({
         queryKey: ["dongho", dongHoId],
-        queryFn: () => getDongHoById(dongHoId),
+        queryFn: () => getDongHoById(dongHoId!),
         enabled: !!dongHoId,
     });
     const dongHoInfo: IDongHo | null = dongHoQuery.data?.data || null;
-    // Fetch members theo dongHoId
-    const searchParams: IMemberSearch = { pageIndex, pageSize, search_content: debouncedSearch, dongHoId };
-    const memberQuery = useQuery({
-        queryKey: ["member", dongHoId, searchParams],
-        queryFn: () => searchMemberByDongHo(searchParams),
-        placeholderData: keepPreviousData,
+
+    // Fetch TẤT CẢ members theo dongHoId (KHÔNG search) - dùng cho relationships
+    const allMembersParams: IMemberSearch = { 
+        pageIndex: 1, 
+        pageSize: 0, // 0 = lấy tất cả
+        search_content: "", // KHÔNG search
+        dongHoId: dongHoId! 
+    };
+    const allMembersQuery = useQuery({
+        queryKey: ["allMembers", dongHoId],
+        queryFn: () => searchMemberByDongHo(allMembersParams),
         enabled: !!dongHoId,
     });
 
-    const memberData = memberQuery.data?.data || [];
-    const totalRecords = memberQuery.data?.totalItems || 0;
-    const totalPages = memberQuery.data?.pageCount || 0;
-    const isLoading = memberQuery.isLoading;
+    // Fetch members có search - dùng cho hiển thị
+    const searchParams: IMemberSearch = { 
+        pageIndex: 1, 
+        pageSize: 0,
+        search_content: debouncedSearch,
+        dongHoId: dongHoId! 
+    };
+    const searchMembersQuery = useQuery({
+        queryKey: ["searchMembers", dongHoId, debouncedSearch],
+        queryFn: () => searchMemberByDongHo(searchParams),
+        enabled: !!dongHoId,
+    });
+
+    // TẤT CẢ members (không search) - dùng cho tìm relationships
+    const rawAllMembers = (allMembersQuery.data?.data || []) as IMember[];
+    const allMembers: IMember[] = Array.from(
+        new Map(rawAllMembers.map((m: IMember) => [m.thanhVienId, m])).values()
+    );
+
+    // Members sau khi search - dùng cho hiển thị table
+    const rawSearchMembers = (searchMembersQuery.data?.data || []) as IMember[];
+    const searchedMembers: IMember[] = Array.from(
+        new Map(rawSearchMembers.map((m: IMember) => [m.thanhVienId, m])).values()
+    );
+
+    // Filter theo đời (client-side) trên kết quả search
+    const filteredMembers = selectedGeneration 
+        ? searchedMembers.filter((m: IMember) => m.doiThuoc === selectedGeneration)
+        : searchedMembers;
+
+    // Lấy danh sách các đời từ TẤT CẢ members (không phải search results)
+    const generations = Array.from(
+        new Set(allMembers.map((m: IMember) => m.doiThuoc).filter(Boolean))
+    ).sort((a, b) => (a as number) - (b as number)) as number[];
+
+    // Phân trang ở client-side sau khi filter
+    const totalRecords = filteredMembers.length;
+    const totalPages = Math.ceil(totalRecords / pageSize);
+    const startIndex = (pageIndex - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    const memberData = filteredMembers.slice(startIndex, endIndex);
+    
+    const isLoading = allMembersQuery.isLoading || searchMembersQuery.isLoading;
 
     // Mutations
     const createMutation = useMutation({
-        mutationFn: (data: Partial<IMember>) => createMemberWithDongHo(data, dongHoId),
-        onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["member", dongHoId] }); showSuccess("Thêm thành viên thành công!"); setIsModalOpen(false); },
+        mutationFn: (data: Partial<IMember>) => createMemberWithDongHo(data, dongHoId!),
+        onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["allMembers", dongHoId] }); showSuccess("Thêm thành viên thành công!"); setIsModalOpen(false); },
         onError: (error: any) => { showError(error.message || "Có lỗi xảy ra khi thêm thành viên."); },
     });
 
     const updateMutation = useMutation({
         mutationFn: (vars: { id: number; data: Partial<IMember> }) => updateMember(vars.id, vars.data),
-        onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["member", dongHoId] }); showSuccess("Cập nhật thành công!"); setIsModalOpen(false); },
+        onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["allMembers", dongHoId] }); showSuccess("Cập nhật thành công!"); setIsModalOpen(false); },
         onError: (error: any) => { showError(error.message || "Có lỗi xảy ra khi cập nhật."); },
     });
 
     const deleteMutation = useMutation({
-        mutationFn: (thanhVienId: number) => deleteMember([{ thanhVienId }], dongHoId),
-        onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["member", dongHoId] }); showSuccess("Đã xóa thành viên."); setIsDeleteModalOpen(false); setMemberToDelete(null); },
+        mutationFn: (thanhVienId: number) => deleteMember([{ thanhVienId }], dongHoId!),
+        onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["allMembers", dongHoId] }); showSuccess("Đã xóa thành viên."); setIsDeleteModalOpen(false); setMemberToDelete(null); },
         onError: (error: any) => { showError(error.message || "Không thể xóa thành viên này."); },
     });
 
     // Handlers
-    const handleAdd = () => { setEditingMember(null); setIsModalOpen(true); };
     const handleEdit = (member: IMember) => { setEditingMember(member); setIsModalOpen(true); };
     const handleDeleteClick = (member: IMember) => { setMemberToDelete(member); setIsDeleteModalOpen(true); };
     const handleConfirmDelete = () => { if (memberToDelete) deleteMutation.mutate(memberToDelete.thanhVienId); };
@@ -102,16 +143,16 @@ export default function MembersByDongHoPage() {
         if (editingMember) updateMutation.mutate({ id: editingMember.thanhVienId, data: member });
         else createMutation.mutate(member);
     };
-    const handleBack = () => router.push("/family-trees");
     const handleViewDetail = (member: IMember) => { setDetailMember(member); setIsDetailModalOpen(true); };
 
-    // Nếu không có quyền truy cập
-    if (!hasAccess) {
+    // Loading hoặc không có dongHoId
+    if (!dongHoId) {
         return <div className="flex items-center justify-center h-64"><Loader2 className="animate-spin h-12 w-12 text-[#d4af37]" /></div>;
     }
 
     // Export Excel
     const handleExportExcel = async () => {
+        if (!dongHoId) return;
         try {
             await exportMembersExcel(dongHoId);
             showSuccess("Xuất Excel thành công!");
@@ -120,18 +161,18 @@ export default function MembersByDongHoPage() {
         }
     };
 
-    // Import Excel với dongHoId từ URL
+    // Import Excel
     const handleImportExcel = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (!dongHoId) return;
         const file = event.target.files?.[0];
         if (!file) return;
         try {
             if (!file.name.match(/\.(xlsx|xls)$/)) { showError("Vui lòng chọn file Excel"); return; }
             const members = await parseExcelToJson(file);
             if (members.length === 0) { showError("File Excel không có dữ liệu"); return; }
-            // Import với dongHoId từ URL params
             await importMembersJson(members, dongHoId);
             showSuccess(`Nhập thành công ${members.length} thành viên!`);
-            queryClient.invalidateQueries({ queryKey: ["member", dongHoId] });
+            queryClient.invalidateQueries({ queryKey: ["allMembers", dongHoId] });
             if (fileInputRef.current) fileInputRef.current.value = "";
         } catch (error: any) {
             showError(error?.message || "Có lỗi xảy ra khi nhập dữ liệu");
@@ -195,7 +236,7 @@ export default function MembersByDongHoPage() {
         return str;
     };
 
-    if (memberQuery.isLoading || dongHoQuery.isLoading) {
+    if (allMembersQuery.isLoading || searchMembersQuery.isLoading || dongHoQuery.isLoading) {
         return <div className="flex items-center justify-center h-64"><Loader2 className="animate-spin h-12 w-12 text-[#d4af37]" /></div>;
     }
 
@@ -204,12 +245,6 @@ export default function MembersByDongHoPage() {
             {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-end md:items-center mb-8 gap-4 border-b border-[#d4af37] pb-4">
                 <div>
-                    {/* Chỉ Thudo mới thấy nút quay lại */}
-                    {isThudo && (
-                        <button onClick={handleBack} className="flex items-center gap-1 text-[#8b5e3c] hover:text-[#b91c1c] mb-2 transition-colors">
-                            <ArrowLeft size={16} /><span className="text-sm">Quay lại danh sách</span>
-                        </button>
-                    )}
                     <h2 className="text-3xl font-display font-bold text-[#b91c1c] uppercase drop-shadow-sm">
                         {dongHoInfo?.tenDongHo || "Quản Lý Thành Viên"}
                     </h2>
@@ -224,41 +259,93 @@ export default function MembersByDongHoPage() {
                         <Upload size={16} /><span className="hidden sm:inline">Nhập Excel</span>
                         <input ref={fileInputRef} type="file" accept=".xlsx, .xls" onChange={handleImportExcel} className="hidden" />
                     </button>
-                    {/* <button onClick={handleAdd} className="flex items-center gap-2 px-4 py-2 bg-[#b91c1c] text-white rounded shadow hover:bg-[#991b1b] text-sm font-bold">
-                        <Plus size={16} /><span className="hidden sm:inline">Thêm Mới</span>
-                    </button> */}
+                    <button
+                        onClick={() => {
+                            setEditingMember(null);
+                            setIsModalOpen(true);
+                        }}
+                        className="flex items-center gap-2 px-4 py-2 bg-[#b91c1c] text-white rounded shadow hover:bg-[#991b1b] text-sm font-bold"
+                    >
+                        <Upload size={16} /><span className="hidden sm:inline">Thêm thành viên</span>
+                    </button>
                 </div>
             </div>
 
-            {/* Search và nút Xem cây gia phả */}
-            <div className="mb-6 flex items-center justify-between gap-4">
-                <div className="flex items-center bg-white border border-[#d4af37] rounded-lg p-1 shadow-sm w-full md:w-1/2">
-                    <div className="p-2 text-stone-400">{isLoading ? <Loader2 className="animate-spin" size={20} /> : <Search size={20} />}</div>
-                    <input value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} placeholder="Tìm kiếm theo họ tên..." className="w-full p-2 outline-none bg-transparent text-[#5d4037] placeholder-stone-400" />
-                    {searchTerm && <button onClick={() => setSearchTerm("")} className="p-2 text-stone-400 hover:text-[#b91c1c]"><X size={16} /></button>}
-                </div>
+            {/* Search và Filter */}
+            <div className="mb-6">
+                <div className="flex items-center justify-between gap-4 flex-wrap">
+                    {/* Search box */}
+                    <div className="flex items-center bg-white border border-[#d4af37] rounded-lg p-1 shadow-sm flex-1 max-w-[650px]">
+                        <div className="p-2 text-stone-400">{isLoading ? <Loader2 className="animate-spin" size={20} /> : <Search size={20} />}</div>
+                        <input value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} placeholder="Tìm kiếm theo họ tên..." className="w-full p-2 outline-none bg-transparent text-[#5d4037] placeholder-stone-400" />
+                        {searchTerm && <button onClick={() => setSearchTerm("")} className="p-2 text-stone-400 hover:text-[#b91c1c]"><X size={16} /></button>}
+                    </div>
 
-                {/* Nút Xem cây gia phả - link đến genealogy */}
-                <button
-                    onClick={() => {
-                        // Mở trang genealogy trong tab mới với dongHoId query parameter
-                        window.open(`/genealogy?dongHoId=${dongHoId}`, '_blank');
-                    }}
-                    className="flex items-center gap-2 px-4 py-2 bg-[#d4af37] text-white rounded shadow hover:bg-[#b8962a] transition-all text-sm font-bold whitespace-nowrap"
-                >
-                    <GitBranch size={16} />
-                    <span>Xem cây gia phả</span>
-                </button>
+                    {/* Filter theo đời */}
+                    <div className="flex items-center gap-2">
+                        <Filter size={16} className="text-[#8b5e3c]" />
+                        <select
+                            value={selectedGeneration === null ? "" : selectedGeneration}
+                            onChange={(e) => {
+                                setSelectedGeneration(e.target.value === "" ? null : Number(e.target.value));
+                                setPageIndex(1); // Reset về trang 1 khi đổi filter
+                            }}
+                            className="px-4 py-2 border border-[#d4af37] rounded-lg text-[#5d4037] bg-white hover:bg-[#fdf6e3] focus:outline-none focus:ring-2 focus:ring-[#d4af37] transition-colors text-sm font-medium min-w-[150px]"
+                        >
+                            <option value="">Tất cả các đời</option>
+                            {generations.map(gen => (
+                                <option key={gen} value={gen}>
+                                    Đời {gen}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    {/* Nút Xem cây gia phả */}
+                    <button
+                        onClick={() => window.open(`/genealogy?dongHoId=${dongHoId}`, '_blank')}
+                        className="flex items-center gap-2 px-4 py-2 bg-[#d4af37] text-white rounded shadow hover:bg-[#b8962a] transition-all text-sm font-bold whitespace-nowrap"
+                    >
+                        <GitBranch size={16} />
+                        <span>Xem cây gia phả</span>
+                    </button>
+                </div>
             </div>
 
             {/* Table */}
-            <MemberTable data={memberData} isLoading={isLoading} pageIndex={pageIndex} pageSize={pageSize} totalRecords={totalRecords} totalPages={totalPages} onPageChange={setPageIndex} onPageSizeChange={(size) => { setPageSize(size); setPageIndex(1); }} onEdit={handleEdit} onDelete={handleDeleteClick} onViewDetail={handleViewDetail} />
+            <MemberTable 
+                data={memberData} 
+                isLoading={isLoading} 
+                pageIndex={pageIndex} 
+                pageSize={pageSize} 
+                totalRecords={totalRecords} 
+                totalPages={totalPages} 
+                onPageChange={setPageIndex} 
+                onPageSizeChange={(size: number) => { setPageSize(size); setPageIndex(1); }} 
+                onEdit={handleEdit} 
+                onDelete={handleDeleteClick} 
+                onViewDetail={handleViewDetail} 
+            />
 
-            {/* Modal - truyền dongHoId */}
-            <MemberModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onSave={handleSaveMember} member={editingMember} isLoading={createMutation.isPending || updateMutation.isPending} dongHoId={dongHoId} />
+            {/* Modal */}
+            <MemberModal 
+                isOpen={isModalOpen} 
+                onClose={() => { setIsModalOpen(false); setEditingMember(null); }} 
+                onSave={handleSaveMember} 
+                member={editingMember} 
+                isLoading={createMutation.isPending || updateMutation.isPending} 
+                dongHoId={dongHoId!}
+                allMembers={allMembers}
+            />
 
-            {/* Detail Modal */}
-            <MemberDetailModal isOpen={isDetailModalOpen} onClose={() => { setIsDetailModalOpen(false); setDetailMember(null); }} member={detailMember} />
+            {/* Detail Modal - Truyền allMembers để có thể navigate */}
+            <MemberDetailModal 
+                isOpen={isDetailModalOpen} 
+                onClose={() => { setIsDetailModalOpen(false); setDetailMember(null); }} 
+                member={detailMember}
+                allMembers={allMembers}
+                onNavigate={(member: IMember) => setDetailMember(member)}
+            />
 
             {/* Delete Modal */}
             {isDeleteModalOpen && memberToDelete && (

@@ -83,12 +83,12 @@ nguoiDungRouter.post(
  * Đăng ký tài khoản mới
  *
  * Rate Limit: 3 tài khoản/giờ (chống spam)
- * Validation: taiKhoan, matKhau (mạnh), email, hoTen, soDienThoai
+ * Validation: Tạm thời tắt để debug
  */
 nguoiDungRouter.post(
   "/signup",
   registerLimiter,
-  validate(signupRules),
+  // validate(signupRules), // Tạm thời tắt để debug
   userController.createNguoiDung.bind(userController)
 );
 

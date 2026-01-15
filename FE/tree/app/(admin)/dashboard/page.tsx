@@ -123,7 +123,6 @@ export default function Dashboard() {
   // Thêm state cho bộ lọc tháng/năm
   const [selectedMonth, setSelectedMonth] = useState<number>(new Date().getMonth() + 1);
   const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
-  const [isMonthDropdownOpen, setIsMonthDropdownOpen] = useState(false);
   const [isYearDropdownOpen, setIsYearDropdownOpen] = useState(false);
 
   // Lấy thông tin user
@@ -244,77 +243,56 @@ export default function Dashboard() {
         {/* Tiêu đề */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-[#1e3a5f]">Tổng Quan Gia Phả</h1>
+            <h1 className="text-2xl font-bold text-[#1e3a5f]">
+              Tổng Quan Gia Phả
+            </h1>
             <p className="text-sm text-gray-500">
               Dòng họ: {selectedDongHo?.tenDongHo || ""}
             </p>
           </div>
         </div>
-
-        {/* Bộ lọc tháng/năm */}
-        <div className="flex items-center gap-4 p-4 bg-white rounded-xl shadow-sm border border-gray-200">
-          <span className="text-sm font-medium text-[#1e3a5f]">Lọc theo:</span>
-          
-          {/* Dropdown tháng */}
-          <div className="relative">
-            <button onClick={() => setIsMonthDropdownOpen(!isMonthDropdownOpen)}
-              className="flex items-center gap-2 px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 transition-all min-w-[120px]">
-              <Calendar size={16} className="text-[#d4af37]" />
-              <span className="flex-1 text-left text-sm font-medium text-[#1e3a5f]">
-                {months.find(m => m.value === selectedMonth)?.label}
-              </span>
-              <ChevronDown size={14} className={`text-gray-400 transition-transform ${isMonthDropdownOpen ? "rotate-180" : ""}`} />
-            </button>
-            {isMonthDropdownOpen && (
-              <div className="absolute top-full left-0 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-xl max-h-48 overflow-y-auto z-50">
-                {months.map((month) => (
-                  <button key={month.value} onClick={() => { setSelectedMonth(month.value); setIsMonthDropdownOpen(false); }}
-                    className={`w-full px-3 py-2 text-left hover:bg-gray-50 text-sm ${selectedMonth === month.value ? "bg-[#fdf6e3] text-[#d4af37] font-semibold" : "text-gray-700"}`}>
-                    {month.label}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Dropdown năm */}
-          <div className="relative">
-            <button onClick={() => setIsYearDropdownOpen(!isYearDropdownOpen)}
-              className="flex items-center gap-2 px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 transition-all min-w-[100px]">
-              <CalendarDays size={16} className="text-[#d4af37]" />
-              <span className="flex-1 text-left text-sm font-medium text-[#1e3a5f]">
-                {selectedYear}
-              </span>
-              <ChevronDown size={14} className={`text-gray-400 transition-transform ${isYearDropdownOpen ? "rotate-180" : ""}`} />
-            </button>
-            {isYearDropdownOpen && (
-              <div className="absolute top-full left-0 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-xl max-h-48 overflow-y-auto z-50">
-                {years.map((year) => (
-                  <button key={year} onClick={() => { setSelectedYear(year); setIsYearDropdownOpen(false); }}
-                    className={`w-full px-3 py-2 text-left hover:bg-gray-50 text-sm ${selectedYear === year ? "bg-[#fdf6e3] text-[#d4af37] font-semibold" : "text-gray-700"}`}>
-                    {year}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
       </div>
 
       {isLoading ? (
-        <div className="flex items-center justify-center h-96"><Loader2 className="animate-spin text-[#d4af37]" size={48} /></div>
+        <div className="flex items-center justify-center h-96">
+          <Loader2 className="animate-spin text-[#d4af37]" size={48} />
+        </div>
       ) : (
         <>
           {/* KPI Cards */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            <KPICard title="Tổng Thành Viên" value={stats?.tongThanhVien || 0} icon={Users} 
-              bgColor="bg-gradient-to-br from-[#1e3a5f] to-[#2c5282]" iconBg="bg-white/20" />
-            <KPICard title="Nam Giới" value={stats?.tongNam || 0} trend="up" trendValue={`${Math.round((stats?.tongNam / (stats?.tongThanhVien || 1)) * 100)}%`}
-              icon={UserPlus} bgColor="bg-gradient-to-br from-[#d4af37] to-[#a16207]" iconBg="bg-white/20" />
-            <KPICard title="Nữ Giới" value={stats?.tongNu || 0} icon={Heart}
-              bgColor="bg-gradient-to-br from-[#b91c1c] to-[#991b1b]" iconBg="bg-white/20" />
-            <KPICard title="Số Đời" value={stats?.doiCaoNhat || 0} icon={GitBranch}
-              bgColor="bg-gradient-to-br from-[#5d4037] to-[#3e2723]" iconBg="bg-white/20" />
+            <KPICard
+              title="Tổng Thành Viên"
+              value={stats?.tongThanhVien || 0}
+              icon={Users}
+              bgColor="bg-gradient-to-br from-[#1e3a5f] to-[#2c5282]"
+              iconBg="bg-white/20"
+            />
+            <KPICard
+              title="Nam Giới"
+              value={stats?.tongNam || 0}
+              trend="up"
+              trendValue={`${Math.round(
+                (stats?.tongNam / (stats?.tongThanhVien || 1)) * 100
+              )}%`}
+              icon={UserPlus}
+              bgColor="bg-gradient-to-br from-[#d4af37] to-[#a16207]"
+              iconBg="bg-white/20"
+            />
+            <KPICard
+              title="Nữ Giới"
+              value={stats?.tongNu || 0}
+              icon={Heart}
+              bgColor="bg-gradient-to-br from-[#b91c1c] to-[#991b1b]"
+              iconBg="bg-white/20"
+            />
+            <KPICard
+              title="Số Đời"
+              value={stats?.doiCaoNhat || 0}
+              icon={GitBranch}
+              bgColor="bg-gradient-to-br from-[#5d4037] to-[#3e2723]"
+              iconBg="bg-white/20"
+            />
           </div>
 
           {/* Main Content Grid */}
@@ -324,25 +302,65 @@ export default function Dashboard() {
               <div className="flex items-center justify-between mb-4">
                 <h3 className="font-bold text-[#1e3a5f]">Thống Kê Theo Đời</h3>
                 <div className="flex gap-4 text-xs">
-                  <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-[#1e3a5f]"></span> Nam</span>
-                  <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-[#d4af37]"></span> Nữ</span>
+                  <span className="flex items-center gap-1">
+                    <span className="w-3 h-3 rounded bg-[#1e3a5f]"></span> Nam
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <span className="w-3 h-3 rounded bg-[#d4af37]"></span> Nữ
+                  </span>
                 </div>
               </div>
               {generationData.length > 0 ? (
                 <div className="h-[280px]">
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={generationData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" vertical={false} />
-                      <XAxis dataKey="name" stroke="#9ca3af" fontSize={11} tickLine={false} axisLine={false} />
-                      <YAxis stroke="#9ca3af" fontSize={11} tickLine={false} axisLine={false} />
-                      <Tooltip contentStyle={{ borderRadius: 12, border: "none", boxShadow: "0 4px 20px rgba(0,0,0,0.1)" }} />
-                      <Bar dataKey="nam" fill="#1e3a5f" radius={[6, 6, 0, 0]} barSize={24} />
-                      <Bar dataKey="nu" fill="#d4af37" radius={[6, 6, 0, 0]} barSize={24} />
+                    <BarChart
+                      data={generationData}
+                      margin={{ top: 10, right: 10, left: -10, bottom: 0 }}
+                    >
+                      <CartesianGrid
+                        strokeDasharray="3 3"
+                        stroke="#f0f0f0"
+                        vertical={false}
+                      />
+                      <XAxis
+                        dataKey="name"
+                        stroke="#9ca3af"
+                        fontSize={11}
+                        tickLine={false}
+                        axisLine={false}
+                      />
+                      <YAxis
+                        stroke="#9ca3af"
+                        fontSize={11}
+                        tickLine={false}
+                        axisLine={false}
+                      />
+                      <Tooltip
+                        contentStyle={{
+                          borderRadius: 12,
+                          border: "none",
+                          boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
+                        }}
+                      />
+                      <Bar
+                        dataKey="nam"
+                        fill="#1e3a5f"
+                        radius={[6, 6, 0, 0]}
+                        barSize={24}
+                      />
+                      <Bar
+                        dataKey="nu"
+                        fill="#d4af37"
+                        radius={[6, 6, 0, 0]}
+                        barSize={24}
+                      />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
               ) : (
-                <div className="h-[280px] flex items-center justify-center text-gray-400">Chưa có dữ liệu</div>
+                <div className="h-[280px] flex items-center justify-center text-gray-400">
+                  Chưa có dữ liệu
+                </div>
               )}
             </div>
 
@@ -350,11 +368,21 @@ export default function Dashboard() {
             <div className="space-y-6">
               {/* Donut Chart */}
               <div className="bg-white rounded-2xl p-5 shadow-lg border border-gray-100">
-                <h3 className="font-bold text-[#1e3a5f] mb-4">Tỷ Lệ Giới Tính</h3>
+                <h3 className="font-bold text-[#1e3a5f] mb-4">
+                  Tỷ Lệ Giới Tính
+                </h3>
                 <div className="h-[160px] relative">
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
-                      <Pie data={genderData} cx="50%" cy="50%" innerRadius={45} outerRadius={70} paddingAngle={4} dataKey="value">
+                      <Pie
+                        data={genderData}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={45}
+                        outerRadius={70}
+                        paddingAngle={4}
+                        dataKey="value"
+                      >
                         <Cell fill="#1e3a5f" />
                         <Cell fill="#d4af37" />
                       </Pie>
@@ -363,36 +391,68 @@ export default function Dashboard() {
                   </ResponsiveContainer>
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="text-center">
-                      <p className="text-2xl font-bold text-[#1e3a5f]">{stats?.tongThanhVien || 0}</p>
-                      <p className="text-[10px] text-gray-400 uppercase">Tổng</p>
+                      <p className="text-2xl font-bold text-[#1e3a5f]">
+                        {stats?.tongThanhVien || 0}
+                      </p>
+                      <p className="text-[10px] text-gray-400 uppercase">
+                        Tổng
+                      </p>
                     </div>
                   </div>
                 </div>
                 <div className="flex justify-center gap-6 mt-2">
-                  <span className="flex items-center gap-2 text-xs"><span className="w-3 h-3 rounded-full bg-[#1e3a5f]"></span> Nam</span>
-                  <span className="flex items-center gap-2 text-xs"><span className="w-3 h-3 rounded-full bg-[#d4af37]"></span> Nữ</span>
+                  <span className="flex items-center gap-2 text-xs">
+                    <span className="w-3 h-3 rounded-full bg-[#1e3a5f]"></span>{" "}
+                    Nam
+                  </span>
+                  <span className="flex items-center gap-2 text-xs">
+                    <span className="w-3 h-3 rounded-full bg-[#d4af37]"></span>{" "}
+                    Nữ
+                  </span>
                 </div>
               </div>
 
               {/* Quick Stats */}
               <div className="bg-white rounded-2xl p-5 shadow-lg border border-gray-100">
-                <h3 className="font-bold text-[#1e3a5f] mb-3">Thống Kê Nhanh</h3>
+                <h3 className="font-bold text-[#1e3a5f] mb-3">
+                  Thống Kê Nhanh
+                </h3>
                 <div className="space-y-3">
                   <div className="flex items-center justify-between p-2 bg-green-50 rounded-lg">
-                    <span className="text-xs text-gray-600 flex items-center gap-2"><ArrowDownCircle size={14} className="text-green-600" /> Tổng thu</span>
-                    <span className="font-bold text-green-600 text-sm">{formatMoney(thuChi?.tongThu || 0)}</span>
+                    <span className="text-xs text-gray-600 flex items-center gap-2">
+                      <ArrowDownCircle size={14} className="text-green-600" />{" "}
+                      Tổng thu
+                    </span>
+                    <span className="font-bold text-green-600 text-sm">
+                      {formatMoney(thuChi?.tongThu || 0)}
+                    </span>
                   </div>
                   <div className="flex items-center justify-between p-2 bg-red-50 rounded-lg">
-                    <span className="text-xs text-gray-600 flex items-center gap-2"><ArrowUpCircle size={14} className="text-red-600" /> Tổng chi</span>
-                    <span className="font-bold text-red-600 text-sm">{formatMoney(thuChi?.tongChi || 0)}</span>
+                    <span className="text-xs text-gray-600 flex items-center gap-2">
+                      <ArrowUpCircle size={14} className="text-red-600" /> Tổng
+                      chi
+                    </span>
+                    <span className="font-bold text-red-600 text-sm">
+                      {formatMoney(thuChi?.tongChi || 0)}
+                    </span>
                   </div>
                   <div className="flex items-center justify-between p-2 bg-blue-50 rounded-lg">
-                    <span className="text-xs text-gray-600 flex items-center gap-2"><Wallet size={14} className="text-blue-600" /> Số dư</span>
-                    <span className="font-bold text-blue-600 text-sm">{formatMoney((thuChi?.tongThu || 0) - (thuChi?.tongChi || 0))}</span>
+                    <span className="text-xs text-gray-600 flex items-center gap-2">
+                      <Wallet size={14} className="text-blue-600" /> Số dư
+                    </span>
+                    <span className="font-bold text-blue-600 text-sm">
+                      {formatMoney(
+                        (thuChi?.tongThu || 0) - (thuChi?.tongChi || 0)
+                      )}
+                    </span>
                   </div>
                   <div className="flex items-center justify-between p-2 bg-amber-50 rounded-lg">
-                    <span className="text-xs text-gray-600 flex items-center gap-2"><Calendar size={14} className="text-amber-600" /> Sự kiện</span>
-                    <span className="font-bold text-amber-600 text-sm">{suKien?.tongSuKien || 0}</span>
+                    <span className="text-xs text-gray-600 flex items-center gap-2">
+                      <Calendar size={14} className="text-amber-600" /> Sự kiện
+                    </span>
+                    <span className="font-bold text-amber-600 text-sm">
+                      {suKien?.tongSuKien || 0}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -405,64 +465,196 @@ export default function Dashboard() {
             <div className="lg:col-span-2 bg-white rounded-2xl p-5 shadow-lg border border-gray-100">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="font-bold text-[#1e3a5f]">Thu Chi Theo Tháng</h3>
-                <span className="text-xs text-gray-400">Năm {selectedYear}</span>
+                <span className="text-xs text-gray-400">
+                  Năm {selectedYear}
+                </span>
+              </div>
+              {/* Bộ lọc tháng/năm */}
+              <div className="flex items-center gap-4 p-4 bg-white rounded-xl shadow-sm border border-gray-200">
+                <span className="text-sm font-medium text-[#1e3a5f]">
+                  Lọc theo:
+                </span>
+                {/* Dropdown năm */}
+                <div className="relative">
+                  <button
+                    onClick={() => setIsYearDropdownOpen(!isYearDropdownOpen)}
+                    className="flex items-center gap-2 px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 transition-all min-w-[100px]"
+                  >
+                    <CalendarDays size={16} className="text-[#d4af37]" />
+                    <span className="flex-1 text-left text-sm font-medium text-[#1e3a5f]">
+                      {selectedYear}
+                    </span>
+                    <ChevronDown
+                      size={14}
+                      className={`text-gray-400 transition-transform ${
+                        isYearDropdownOpen ? "rotate-180" : ""
+                      }`}
+                    />
+                  </button>
+                  {isYearDropdownOpen && (
+                    <div className="absolute top-full left-0 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-xl max-h-48 overflow-y-auto z-50">
+                      {years.map((year) => (
+                        <button
+                          key={year}
+                          onClick={() => {
+                            setSelectedYear(year);
+                            setIsYearDropdownOpen(false);
+                          }}
+                          className={`w-full px-3 py-2 text-left hover:bg-gray-50 text-sm ${
+                            selectedYear === year
+                              ? "bg-[#fdf6e3] text-[#d4af37] font-semibold"
+                              : "text-gray-700"
+                          }`}
+                        >
+                          {year}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
               {thuChiChartData.length > 0 ? (
                 <div className="h-[220px]">
                   <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={thuChiChartData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+                    <AreaChart
+                      data={thuChiChartData}
+                      margin={{ top: 10, right: 10, left: -10, bottom: 0 }}
+                    >
                       <defs>
-                        <linearGradient id="colorThu" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#1e3a5f" stopOpacity={0.3}/>
-                          <stop offset="95%" stopColor="#1e3a5f" stopOpacity={0}/>
+                        <linearGradient
+                          id="colorThu"
+                          x1="0"
+                          y1="0"
+                          x2="0"
+                          y2="1"
+                        >
+                          <stop
+                            offset="5%"
+                            stopColor="#1e3a5f"
+                            stopOpacity={0.3}
+                          />
+                          <stop
+                            offset="95%"
+                            stopColor="#1e3a5f"
+                            stopOpacity={0}
+                          />
                         </linearGradient>
-                        <linearGradient id="colorChi" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#d4af37" stopOpacity={0.3}/>
-                          <stop offset="95%" stopColor="#d4af37" stopOpacity={0}/>
+                        <linearGradient
+                          id="colorChi"
+                          x1="0"
+                          y1="0"
+                          x2="0"
+                          y2="1"
+                        >
+                          <stop
+                            offset="5%"
+                            stopColor="#d4af37"
+                            stopOpacity={0.3}
+                          />
+                          <stop
+                            offset="95%"
+                            stopColor="#d4af37"
+                            stopOpacity={0}
+                          />
                         </linearGradient>
                       </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" vertical={false} />
-                      <XAxis dataKey="name" stroke="#9ca3af" fontSize={11} tickLine={false} axisLine={false} />
-                      <YAxis stroke="#9ca3af" fontSize={11} tickLine={false} axisLine={false} tickFormatter={(v) => formatMoney(v)} />
-                      <Tooltip contentStyle={{ borderRadius: 12, border: "none", boxShadow: "0 4px 20px rgba(0,0,0,0.1)" }} 
-                        formatter={(value: number) => formatMoney(value)} />
-                      <Area type="monotone" dataKey="thu" stroke="#1e3a5f" strokeWidth={2} fillOpacity={1} fill="url(#colorThu)" />
-                      <Area type="monotone" dataKey="chi" stroke="#d4af37" strokeWidth={2} fillOpacity={1} fill="url(#colorChi)" />
+                      <CartesianGrid
+                        strokeDasharray="3 3"
+                        stroke="#f0f0f0"
+                        vertical={false}
+                      />
+                      <XAxis
+                        dataKey="name"
+                        stroke="#9ca3af"
+                        fontSize={11}
+                        tickLine={false}
+                        axisLine={false}
+                      />
+                      <YAxis
+                        stroke="#9ca3af"
+                        fontSize={11}
+                        tickLine={false}
+                        axisLine={false}
+                        tickFormatter={(v) => formatMoney(v)}
+                      />
+                      <Tooltip
+                        contentStyle={{
+                          borderRadius: 12,
+                          border: "none",
+                          boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
+                        }}
+                        formatter={(value: number) => formatMoney(value)}
+                      />
+                      <Area
+                        type="monotone"
+                        dataKey="thu"
+                        stroke="#1e3a5f"
+                        strokeWidth={2}
+                        fillOpacity={1}
+                        fill="url(#colorThu)"
+                      />
+                      <Area
+                        type="monotone"
+                        dataKey="chi"
+                        stroke="#d4af37"
+                        strokeWidth={2}
+                        fillOpacity={1}
+                        fill="url(#colorChi)"
+                      />
                     </AreaChart>
                   </ResponsiveContainer>
                 </div>
               ) : (
-                <div className="h-[220px] flex items-center justify-center text-gray-400">Chưa có dữ liệu</div>
+                <div className="h-[220px] flex items-center justify-center text-gray-400">
+                  Chưa có dữ liệu
+                </div>
               )}
               <div className="flex justify-center gap-6 mt-3">
-                <span className="flex items-center gap-2 text-xs"><span className="w-3 h-3 rounded-full bg-[#1e3a5f]"></span> Thu</span>
-                <span className="flex items-center gap-2 text-xs"><span className="w-3 h-3 rounded-full bg-[#d4af37]"></span> Chi</span>
+                <span className="flex items-center gap-2 text-xs">
+                  <span className="w-3 h-3 rounded-full bg-[#1e3a5f]"></span>{" "}
+                  Thu
+                </span>
+                <span className="flex items-center gap-2 text-xs">
+                  <span className="w-3 h-3 rounded-full bg-[#d4af37]"></span>{" "}
+                  Chi
+                </span>
               </div>
             </div>
 
             {/* Calendar + Events */}
             <div className="space-y-6">
               <MiniCalendar />
-              
+
               {/* Upcoming Events */}
               <div className="bg-white rounded-2xl p-4 shadow-lg border border-gray-100">
-                <h3 className="font-bold text-[#1e3a5f] mb-3 text-sm">Sự Kiện Sắp Tới</h3>
+                <h3 className="font-bold text-[#1e3a5f] mb-3 text-sm">
+                  Sự Kiện Sắp Tới
+                </h3>
                 {suKienSapToi.length > 0 ? (
                   <div className="space-y-2">
                     {suKienSapToi.slice(0, 3).map((event: any, idx: number) => (
-                      <div key={idx} className="flex items-center gap-3 p-2 bg-gray-50 rounded-lg">
+                      <div
+                        key={idx}
+                        className="flex items-center gap-3 p-2 bg-gray-50 rounded-lg"
+                      >
                         <div className="w-10 h-10 bg-[#d4af37] rounded-lg flex items-center justify-center text-white">
                           <CalendarDays size={16} />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-xs font-semibold text-[#1e3a5f] truncate">{event.tenSuKien}</p>
-                          <p className="text-[10px] text-gray-400">{formatDate(event.ngayDienRa)}</p>
+                          <p className="text-xs font-semibold text-[#1e3a5f] truncate">
+                            {event.tenSuKien}
+                          </p>
+                          <p className="text-[10px] text-gray-400">
+                            {formatDate(event.ngayDienRa)}
+                          </p>
                         </div>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <p className="text-xs text-gray-400 text-center py-4">Không có sự kiện</p>
+                  <p className="text-xs text-gray-400 text-center py-4">
+                    Không có sự kiện
+                  </p>
                 )}
               </div>
             </div>
@@ -470,24 +662,39 @@ export default function Dashboard() {
 
           {/* Members List */}
           <div className="mt-6 bg-white rounded-2xl p-5 shadow-lg border border-gray-100">
-            <h3 className="font-bold text-[#1e3a5f] mb-4">Thành Viên Mới Thêm</h3>
+            <h3 className="font-bold text-[#1e3a5f] mb-4">
+              Thành Viên Mới Thêm
+            </h3>
             {moiNhat.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
                 {moiNhat.map((member: any, idx: number) => (
-                  <div key={idx} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm
-                      ${member.gioiTinh === 1 ? "bg-[#1e3a5f]" : "bg-[#d4af37]"}`}>
+                  <div
+                    key={idx}
+                    className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors"
+                  >
+                    <div
+                      className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm
+                      ${
+                        member.gioiTinh === 1 ? "bg-[#1e3a5f]" : "bg-[#d4af37]"
+                      }`}
+                    >
                       {member.hoTen?.charAt(0) || "?"}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-[#1e3a5f] truncate">{member.hoTen}</p>
-                      <p className="text-[10px] text-gray-400">Đời {member.doiThuoc || "?"}</p>
+                      <p className="text-sm font-semibold text-[#1e3a5f] truncate">
+                        {member.hoTen}
+                      </p>
+                      <p className="text-[10px] text-gray-400">
+                        Đời {member.doiThuoc || "?"}
+                      </p>
                     </div>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-gray-400 text-center py-8">Chưa có thành viên nào</p>
+              <p className="text-gray-400 text-center py-8">
+                Chưa có thành viên nào
+              </p>
             )}
           </div>
         </>

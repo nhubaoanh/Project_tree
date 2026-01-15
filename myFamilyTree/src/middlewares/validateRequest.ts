@@ -37,6 +37,9 @@ export const handleValidationResult = (
       message: err.msg,
     }));
 
+    console.error('❌ [Validation Error]:', JSON.stringify(errorMessages, null, 2));
+    console.error('📦 [Request Body]:', JSON.stringify(req.body, null, 2));
+
     return res.status(400).json({
       success: false,
       message: "Dữ liệu không hợp lệ",

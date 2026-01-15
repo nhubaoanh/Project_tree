@@ -197,9 +197,11 @@ export class QueryPlanner {
     
     // Check cache
     if (this.sqlCache.has(cacheKey)) {
-      console.log("[Planner] SQL cache hit");
+      console.log("💾 [QueryPlanner] SQL cache hit");
       return this.sqlCache.get(cacheKey)!;
     }
+
+    console.log("🔍 [QueryPlanner] Generating SQL for intent:", JSON.stringify(intent));
 
     const prompt = `Bạn là SQL expert cho database gia phả. Generate SQL query.
 
@@ -241,15 +243,17 @@ SQL: SELECT COUNT(*) as total FROM thanhvien WHERE dongHoId = '${dongHoId}' AND 
 Generate SQL:`;
 
     try {
-      const response = await this.ollama.chat(prompt);
+      console.log("🤖 [QueryPlanner] Calling SQL Model (defog_sqlcoder)...");
+      const response = await this.ollama.textToSQL(prompt);
       const sql = this.extractSQL(response);
       
       // Cache result
       this.sqlCache.set(cacheKey, sql);
       
-      console.log("[Planner] Generated SQL:", sql);
+      console.log("✅ [QueryPlanner] Final SQL:", sql);
       return sql;
     } catch (error: any) {
+      console.error("❌ [QueryPlanner] SQL generation failed:", error.message);
       throw new Error(`Ollama SQL generation failed: ${error.message}`);
     }
   }

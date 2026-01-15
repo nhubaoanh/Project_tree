@@ -37,10 +37,15 @@ Trả lời ngắn gọn bằng tiếng Việt, không dùng emoji.`;
 
     const userMessage = `${personName} - ${relationType}: ${relativesText}`;
 
+    console.log("🇻🇳 [Ollama] Using Vietnamese Model:", this.model);
+    console.log("💬 [Ollama] Explaining relationship for:", personName);
+
     try {
       const response = await this.chat(userMessage, systemPrompt);
+      console.log("✅ [Ollama] Vietnamese explanation:", response);
       return response;
     } catch (error) {
+      console.error("❌ [Ollama] Explanation failed, using fallback");
       // Fallback
       const names = relatives.map(r => r.hoTen).join(", ");
       return `${personName} có ${relatives.length} ${relationType}: ${names}.`;
@@ -63,6 +68,10 @@ Trả lời ngắn gọn bằng tiếng Việt, không dùng emoji.`;
       // Chọn model phù hợp
       const selectedModel = useSQL ? this.sqlModel : this.model;
 
+      console.log("🤖 [Ollama] Model:", selectedModel);
+      console.log("📝 [Ollama] System Prompt:", systemPrompt?.substring(0, 100) + "...");
+      console.log("💬 [Ollama] User Message:", userMessage);
+
       const response = await axios.post(
         `${this.baseURL}/api/chat`,
         {
@@ -75,11 +84,14 @@ Trả lời ngắn gọn bằng tiếng Việt, không dùng emoji.`;
       );
 
       if (response.data && response.data.message) {
-        return response.data.message.content;
+        const aiResponse = response.data.message.content;
+        console.log("✅ [Ollama] Response:", aiResponse.substring(0, 200) + (aiResponse.length > 200 ? "..." : ""));
+        return aiResponse;
       }
 
       throw new Error("Invalid response from Ollama");
     } catch (error: any) {
+      console.error("❌ [Ollama] Error:", error.message);
       if (error.code === "ECONNREFUSED") {
         throw new Error("Không thể kết nối Ollama. Chạy: ollama serve");
       }
@@ -91,7 +103,11 @@ Trả lời ngắn gọn bằng tiếng Việt, không dùng emoji.`;
    * Text-to-SQL chuyên dụng
    */
   async textToSQL(prompt: string): Promise<string> {
-    return this.chat(prompt, undefined, true);
+    console.log("🔧 [Ollama] Using SQL Model:", this.sqlModel);
+    console.log("📋 [Ollama] SQL Prompt:", prompt.substring(0, 300) + "...");
+    const result = await this.chat(prompt, undefined, true);
+    console.log("🎯 [Ollama] Generated SQL:", result);
+    return result;
   }
 
   /**

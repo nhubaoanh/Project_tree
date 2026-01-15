@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -10,7 +10,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { useToast } from "@/service/useToas";
 import { useFormValidation } from "@/lib/useFormValidation";
 import { FormRules } from "@/lib/validator";
-import { sighInService } from "@/service/user.service";
+import { sighInService, checkUsernameExist } from "@/service/user.service";
 
 // ==================== CONFIG ====================
 
@@ -18,12 +18,18 @@ interface RegisterFormData {
   tenDangNhap: string;
   matKhau: string;
   nhapLaiMatKhau: string;
+  tenDongHo: string;
+  queQuanGoc: string;
+  ngayThanhLap: string;
 }
 
 const initialValues: RegisterFormData = {
   tenDangNhap: "",
   matKhau: "",
   nhapLaiMatKhau: "",
+  tenDongHo: "",
+  queQuanGoc: "",
+  ngayThanhLap: "",
 };
 
 const registerRules: FormRules = {
@@ -39,6 +45,18 @@ const registerRules: FormRules = {
     label: "Nhập lại mật khẩu",
     rules: ["required", { match: "matKhau" }],
   },
+  tenDongHo: {
+    label: "Tên dòng họ",
+    rules: ["required", { min: 2 }, { max: 100 }, "noNumber"],
+  },
+  queQuanGoc: {
+    label: "Quê quán gốc",
+    rules: [{ max: 200 }],
+  },
+  ngayThanhLap: {
+    label: "Ngày thành lập",
+    rules: ["date"],
+  },
 };
 
 // ==================== COMPONENT ====================
@@ -47,6 +65,9 @@ export default function RegisterPage() {
   const router = useRouter();
   const { showError, showSuccess } = useToast();
   const [loading, setLoading] = useState(false);
+  const [checkingEmail, setCheckingEmail] = useState(false);
+  const [emailExists, setEmailExists] = useState(false);
+  const checkEmailTimeout = useRef<NodeJS.Timeout | null>(null);
 
   // Sử dụng custom hook
   const form = useFormValidation<RegisterFormData>({
@@ -54,7 +75,62 @@ export default function RegisterPage() {
     rules: registerRules,
   });
 
+  // Check email tồn tại với debounce
+  const checkEmailExists = useCallback(async (email: string) => {
+    if (!email || email.length < 3) {
+      setEmailExists(false);
+      return;
+    }
+
+    // Validate email format trước
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setEmailExists(false);
+      return;
+    }
+
+    setCheckingEmail(true);
+    try {
+      const result = await checkUsernameExist(email);
+      if (result.exists) {
+        setEmailExists(true);
+        form.setError("tenDangNhap", "Email này đã được đăng ký");
+      } else {
+        setEmailExists(false);
+        // Xóa lỗi nếu email chưa tồn tại
+        if (form.errors.tenDangNhap === "Email này đã được đăng ký") {
+          form.setError("tenDangNhap", null);
+        }
+      }
+    } catch (error) {
+      console.error("Error checking email:", error);
+    } finally {
+      setCheckingEmail(false);
+    }
+  }, [form]);
+
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const email = e.target.value;
+    form.handleChange(e);
+    
+    // Clear timeout cũ
+    if (checkEmailTimeout.current) {
+      clearTimeout(checkEmailTimeout.current);
+    }
+    
+    // Set timeout mới (debounce 500ms)
+    checkEmailTimeout.current = setTimeout(() => {
+      checkEmailExists(email);
+    }, 500);
+  };
+
   const handleSubmit = async () => {
+    // Kiểm tra email đã tồn tại
+    if (emailExists) {
+      showError("Email này đã được đăng ký. Vui lòng sử dụng email khác!");
+      return;
+    }
+
     if (!form.validateAll()) {
       showError("Vui lòng kiểm tra lại thông tin!");
       return;
@@ -65,9 +141,14 @@ export default function RegisterPage() {
       const dataToSend = {
         tenDangNhap: form.values.tenDangNhap,
         matKhau: form.values.matKhau,
+        tenDongHo: form.values.tenDongHo,
+        queQuanGoc: form.values.queQuanGoc,
+        ngayThanhLap: form.values.ngayThanhLap,
       };
 
+      console.log("📤 [Frontend] Sending data:", dataToSend);
       const res = await sighInService(dataToSend);
+      console.log("📥 [Frontend] Response:", res);
 
       if (res.success) {
         showSuccess("Đăng ký thành công! Vui lòng đăng nhập.");
@@ -77,7 +158,14 @@ export default function RegisterPage() {
         showError(res.message || "Đăng ký thất bại!");
       }
     } catch (err: any) {
-      showError("Kết nối thất bại. Vui lòng kiểm tra kết nối mạng.");
+      // Xử lý lỗi từ backend
+      if (err.message.includes("đã tồn tại")) {
+        showError("Email này đã được đăng ký. Vui lòng sử dụng email khác!");
+        setEmailExists(true);
+        form.setError("tenDangNhap", "Email này đã được đăng ký");
+      } else {
+        showError(err.message || "Kết nối thất bại. Vui lòng kiểm tra kết nối mạng.");
+      }
     } finally {
       setLoading(false);
     }
@@ -117,15 +205,30 @@ export default function RegisterPage() {
             {/* Email */}
             <div className="grid gap-2">
               <label className="text-sm font-medium">Email</label>
-              <Input
-                type="text"
-                placeholder="Nhập email"
-                className={`h-12 text-base bg-white/90 ${form.hasError("tenDangNhap") ? "border-red-500" : ""}`}
-                {...form.getFieldProps("tenDangNhap")}
-                onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
-              />
+              <div className="relative">
+                <Input
+                  type="text"
+                  placeholder="Nhập email"
+                  className={`h-12 text-base bg-white/90 ${
+                    form.hasError("tenDangNhap") || emailExists ? "border-red-500" : ""
+                  } ${checkingEmail ? "pr-10" : ""}`}
+                  name="tenDangNhap"
+                  value={form.values.tenDangNhap}
+                  onChange={handleEmailChange}
+                  onBlur={form.handleBlur}
+                  onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
+                />
+                {checkingEmail && (
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                    <div className="animate-spin h-5 w-5 border-2 border-gray-300 border-t-blue-600 rounded-full"></div>
+                  </div>
+                )}
+              </div>
               {form.getError("tenDangNhap") && (
                 <p className="text-sm text-red-500">{form.getError("tenDangNhap")}</p>
+              )}
+              {emailExists && !form.getError("tenDangNhap") && (
+                <p className="text-sm text-red-500">Email này đã được đăng ký</p>
               )}
             </div>
 
@@ -158,16 +261,68 @@ export default function RegisterPage() {
                 <p className="text-sm text-red-500">{form.getError("nhapLaiMatKhau")}</p>
               )}
             </div>
+
+            {/* Tên dòng họ */}
+            <div className="grid gap-2">
+              <label className="text-sm font-medium">
+                Tên dòng họ <span className="text-red-500">*</span>
+              </label>
+              <Input
+                type="text"
+                placeholder="VD: Dòng họ Nguyễn"
+                className={`h-12 text-base bg-white/90 ${form.hasError("tenDongHo") ? "border-red-500" : ""}`}
+                name="tenDongHo"
+                value={form.values.tenDongHo}
+                onChange={(e) => {
+                  const value = e.target.value.replace(/\d/g, "");
+                  form.setValue("tenDongHo", value);
+                }}
+                onBlur={form.handleBlur}
+                onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
+              />
+              {form.getError("tenDongHo") && (
+                <p className="text-sm text-red-500">{form.getError("tenDongHo")}</p>
+              )}
+            </div>
+
+            {/* Quê quán gốc */}
+            <div className="grid gap-2">
+              <label className="text-sm font-medium">Quê quán gốc</label>
+              <Input
+                type="text"
+                placeholder="VD: Hải Dương"
+                className={`h-12 text-base bg-white/90 ${form.hasError("queQuanGoc") ? "border-red-500" : ""}`}
+                {...form.getFieldProps("queQuanGoc")}
+                onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
+              />
+              {form.getError("queQuanGoc") && (
+                <p className="text-sm text-red-500">{form.getError("queQuanGoc")}</p>
+              )}
+            </div>
+
+            {/* Ngày thành lập */}
+            <div className="grid gap-2">
+              <label className="text-sm font-medium">Ngày thành lập</label>
+              <Input
+                type="date"
+                className={`h-12 text-base bg-white/90 ${form.hasError("ngayThanhLap") ? "border-red-500" : ""}`}
+                {...form.getFieldProps("ngayThanhLap")}
+                onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
+              />
+              {form.getError("ngayThanhLap") && (
+                <p className="text-sm text-red-500">{form.getError("ngayThanhLap")}</p>
+              )}
+            </div>
           </CardContent>
 
           <CardFooter className="flex flex-col space-y-4">
             <Button
               onClick={handleSubmit}
-              disabled={loading}
+              disabled={loading || checkingEmail || emailExists}
               className="w-full h-12 text-base font-medium cursor-pointer hover:scale-105 active:scale-95 transition-transform duration-150 bg-red-600"
               variant="destructive"
             >
-              {loading ? "Đang xử lý..." : "Đăng ký"}
+              {loading ? "Đang xử lý..." : checkingEmail ? "Đang kiểm tra..." : "Đăng ký"}
             </Button>
             <p className="text-sm text-gray-600 text-center">
               Đã có tài khoản?{" "}

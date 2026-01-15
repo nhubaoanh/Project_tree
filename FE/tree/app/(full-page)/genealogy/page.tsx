@@ -65,13 +65,27 @@ function GenealogyContent() {
     enabled: !!selectedDongHoId,
   });
 
-  // Đảm bảo data luôn là array
+  // Đảm bảo data luôn là array và clean
   const rawData = membersQuery?.data?.data;
-  const data = Array.isArray(rawData) ? rawData : [];
+  const data = Array.isArray(rawData) ? rawData.filter(member => {
+    // Lọc ra những member có dữ liệu hợp lệ
+    if (!member || typeof member !== 'object') return false;
+    if (!member.thanhVienId || typeof member.thanhVienId !== 'number' || Number.isNaN(member.thanhVienId)) return false;
+    return true;
+  }) : [];
 
   const treeData = useMemo<ITreeNode[]>(() => {
     if (!data || data.length === 0) return [];
-    return buildTree(data);
+    
+    try {
+      const result = buildTree(data);
+      console.log('Tree data built successfully:', result.length, 'nodes');
+      return result;
+    } catch (error) {
+      console.error('Error building tree:', error);
+      console.error('Raw data:', data);
+      return [];
+    }
   }, [data]);
 
   // Không cần xử lý chọn dòng họ nữa

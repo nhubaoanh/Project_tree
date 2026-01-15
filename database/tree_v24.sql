@@ -5178,11 +5178,15 @@ CREATE DEFINER=`root`@`%` PROCEDURE `SignUp`(
     IN p_userId VARCHAR(40),
     IN p_tendangnhap VARCHAR(200),
     IN p_matkhau VARCHAR(200),
+    IN p_tenDongHo VARCHAR(255),
+    IN p_queQuanGoc VARCHAR(255),
+    IN p_ngayThanhLap DATE,
     OUT p_error_code INT,
     OUT p_error_message VARCHAR(500)
 )
 BEGIN
     DECLARE v_roleId VARCHAR(50);
+    DECLARE v_dongHoId VARCHAR(50);
 
     -- Handler lỗi SQL
     DECLARE EXIT HANDLER FOR SQLEXCEPTION 
@@ -5216,15 +5220,35 @@ BEGIN
             SET p_error_message = 'Không tìm thấy role mặc định "thanhvien".';
             ROLLBACK;
         ELSE
-            -- ⭐ BƯỚC 2: Thêm người dùng với roleId lấy được
+            -- ⭐ BƯỚC 2: Tạo dòng họ mới
+            SET v_dongHoId = UUID();
+            
+            INSERT INTO DongHo
+                (dongHoId, tenDongHo, queQuanGoc, ngayThanhLap, 
+                 nguoiQuanLy, active_flag, nguoiTaoId, ngayTao, lu_updated, lu_user_id)
+            VALUES
+                (v_dongHoId, p_tenDongHo, p_queQuanGoc, p_ngayThanhLap,
+                 p_tendangnhap, 1, p_userId, NOW(), NOW(), p_userId);
+
+            -- ⭐ BƯỚC 3: Thêm người dùng với roleId và dongHoId vừa tạo
             INSERT INTO NguoiDung
-                (nguoiDungId, tenDangNhap, matKhau, roleId,
+                (nguoiDungId, dongHoId, roleId, tenDangNhap, matKhau,
                  ngayTao, online_flag, active_flag, hoTen, email,
                  lu_updated, lu_user_id)
             VALUES
-                (p_userId, p_tendangnhap, p_matkhau, v_roleId,
+                (p_userId, v_dongHoId, v_roleId, p_tendangnhap, p_matkhau,
                  NOW(), 1, 1, p_tendangnhap, p_tendangnhap,
                  NOW(), p_userId);
+
+            -- ⭐ BƯỚC 4: Tạo user_profile với userId = nguoiDungId
+            INSERT INTO user_profile
+                (userId, first_name, middle_name, last_name, full_name,
+                 avatar, gender, date_of_birthday, email, phone,
+                 active_flag, created_by_user_id, create_date, lu_updated, lu_user_id)
+            VALUES
+                (p_userId, '', '', '', p_tendangnhap,
+                 NULL, 1, NULL, p_tendangnhap, NULL,
+                 1, p_userId, NOW(), NOW(), p_userId);
 
             COMMIT;
         END IF;

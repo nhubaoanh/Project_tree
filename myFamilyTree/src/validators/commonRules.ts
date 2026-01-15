@@ -273,13 +273,21 @@ export const requiredId = (field: string, label: string): ValidationChain =>
     .withMessage(`${label} phải là số nguyên dương`);
 
 /**
- * Optional ID trong body
+ * Optional ID trong body - chấp nhận null
  */
 export const optionalId = (field: string, label: string): ValidationChain =>
   body(field)
     .optional({ values: "falsy" })
-    .isInt({ min: 1 })
-    .withMessage(`${label} phải là số nguyên dương`);
+    .custom((value) => {
+      // Chấp nhận null hoặc số nguyên dương
+      if (value === null || value === undefined || value === '') {
+        return true;
+      }
+      if (!Number.isInteger(Number(value)) || Number(value) < 1) {
+        throw new Error(`${label} phải là số nguyên dương hoặc null`);
+      }
+      return true;
+    });
 
 // ============================================================================
 //                              ENUM RULES
@@ -334,8 +342,8 @@ export const paginationRules = [
     .withMessage("limit phải từ 1 đến 100"),
   body("pageSize")
     .optional()
-    .isInt({ min: 1, max: 100 })
-    .withMessage("pageSize phải từ 1 đến 100"),
+    .isInt({ min: 0, max: 100 })
+    .withMessage("pageSize phải từ 0 đến 100 (0 = lấy tất cả)"),
 ];
 
 // ============================================================================
