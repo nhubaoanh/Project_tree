@@ -1,6 +1,4 @@
 "use client";
-
-import React from "react";
 import { X, FileText, User, Calendar, Tag, BookOpen, MapPin, Download, ExternalLink } from "lucide-react";
 import { DetailModal, DetailSection } from "@/components/shared";
 import { ITaiLieu } from "@/service/tailieu.service";

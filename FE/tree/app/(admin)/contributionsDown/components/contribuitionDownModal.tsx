@@ -58,10 +58,6 @@ const PAYMENT_METHODS = [
   { value: "Chuyển khoản", label: "Chuyển khoản" },
   { value: "Khác", label: "Khác" },
 ];
-
-// ❌ REMOVED - Không cần danh mục nữa, dùng trường "Nội dung" thay thế
-// const DANH_MUC_LIST = [...];
-
 // ==================== INITIAL VALUES ====================
 const getInitialValues = (data?: IContributionDown | null, dongHoId?: string): Partial<IContributionDown> => ({
   dongHoId: data?.dongHoId || dongHoId || "",

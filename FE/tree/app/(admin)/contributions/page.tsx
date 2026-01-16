@@ -1,7 +1,6 @@
 "use client";
 import React, { useState, useRef, useEffect } from "react";
 import { DollarSign, Plus, Download, Upload, Trash2, Eye, Edit } from "lucide-react";
-import * as XLSX from "xlsx";
 import {
   useQuery,
   useMutation,
@@ -211,11 +210,7 @@ export default function QuanLyTaiChinhThuPage() {
     }
     
     try {
-      console.log('🔵 Bắt đầu export Excel...');
-      // Gọi API backend để export Excel (có format template)
       const blob = await exportExcel();
-      console.log('✅ Nhận được blob:', blob.size, 'bytes');
-      
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
@@ -226,15 +221,9 @@ export default function QuanLyTaiChinhThuPage() {
       window.URL.revokeObjectURL(url);
       showSuccess("Đã xuất dữ liệu thành công!");
     } catch (error: any) {
-      console.error('❌ Export Excel error:', error);
-      console.error('Error response:', error.response);
-      console.error('Error response data:', error.response?.data);
-      console.error('Error message:', error.message);
-      
       // Nếu response data là Blob, đọc nội dung
       if (error.response?.data instanceof Blob) {
         const text = await error.response.data.text();
-        console.error('Error response text:', text);
         try {
           const json = JSON.parse(text);
           console.error('Error response JSON:', json);
@@ -246,23 +235,6 @@ export default function QuanLyTaiChinhThuPage() {
       }
       
       showError("Không thể xuất dữ liệu. Vui lòng thử lại.");
-    }
-  };
-
-  const handleDownloadTemplate = async () => {
-    try {
-      const blob = await downloadTemplate();
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = 'Template_TaiChinhThu.xlsx';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-      showSuccess("Đã tải template thành công!");
-    } catch (error) {
-      showError("Không thể tải template. Vui lòng thử lại.");
     }
   };
 

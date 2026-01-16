@@ -23,6 +23,9 @@ export const MemberDetailModal: React.FC<MemberDetailModalProps> = ({
 }) => {
     if (!member) return null;
 
+  const DEFAULT_AVATAR = "/images/vangoc.jpg";
+
+
     const formatDate = (date: Date | string | null | undefined) => {
         if (!date) return "Chưa cập nhật";
         return new Date(date).toLocaleDateString("vi-VN", { 
@@ -219,6 +222,9 @@ export const MemberDetailModal: React.FC<MemberDetailModalProps> = ({
         },
     ];
 
+    const avatarPath = member.anhChanDung;
+      const avatarUrl = avatarPath ? getImageUrl(avatarPath) : DEFAULT_AVATAR;
+
     return (
         <DetailModal
             isOpen={isOpen}
@@ -226,7 +232,7 @@ export const MemberDetailModal: React.FC<MemberDetailModalProps> = ({
             title={member.hoTen}
             subtitle={`Mã thành viên: #${member.thanhVienId}`}
             gradient="red-yellow"
-            avatar={member.anhChanDung ? getImageUrl(member.anhChanDung) : undefined}
+            avatar={avatarUrl}
             avatarFallback={<User size={48} className="text-white/80" />}
             sections={sections}
             notes={member.tieuSu}

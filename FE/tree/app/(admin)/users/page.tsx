@@ -77,6 +77,7 @@ export default function QuanLyNguoiDungPage() {
   });
 
   const userData = usersQuery.data?.data || [];
+  console.log("User Data:", userData);
   const totalRecords = usersQuery.data?.totalItems || 0;
   const totalPages = usersQuery.data?.pageCount || 0;
   const isLoading = usersQuery.isLoading;

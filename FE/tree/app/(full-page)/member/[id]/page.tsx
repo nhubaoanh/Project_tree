@@ -6,46 +6,9 @@ import { useQuery } from "@tanstack/react-query";
 import { getMemberById, getMembersByDongHo } from "@/service/member.service";
 import storage from "@/utils/storage";
 import { ArrowLeft, User, Calendar, MapPin, Briefcase, GraduationCap, Users } from "lucide-react";
+import { getImageUrl } from "@/utils/imageUtils";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
 const DEFAULT_AVATAR = "/images/vangoc.jpg";
-
-// Helper function để xử lý URL ảnh
-const getImageUrl = (img: string | null | undefined): string => {
-  if (!img?.trim()) return DEFAULT_AVATAR;
-
-  try {
-    // Decode URL nếu bị encode
-    let decodedImg = decodeURIComponent(img);
-
-    if (decodedImg.startsWith("http")) {
-      // Nếu URL từ backend cũ (port 6001), chuyển sang gateway (port 8080)
-      if (decodedImg.includes(":6001")) {
-        decodedImg = decodedImg.replace(":6001", ":8080");
-      }
-      return decodedImg;
-    }
-
-    // Nếu là đường dẫn tương đối, build URL qua gateway
-    const path = decodedImg.startsWith("uploads/")
-      ? decodedImg
-      : `uploads/${decodedImg}`;
-    return `${API_BASE_URL}/${path}`;
-  } catch (error) {
-    let fallbackImg = img;
-    if (fallbackImg.startsWith("http")) {
-      // Chuyển từ backend cũ sang gateway nếu cần
-      if (fallbackImg.includes(":6001")) {
-        fallbackImg = fallbackImg.replace(":6001", ":8080");
-      }
-      return fallbackImg;
-    }
-    const path = fallbackImg.startsWith("uploads/")
-      ? fallbackImg
-      : `uploads/${fallbackImg}`;
-    return `${API_BASE_URL}/${path}`;
-  }
-};
 
 export default function MemberDetailPage() {
   const params = useParams();

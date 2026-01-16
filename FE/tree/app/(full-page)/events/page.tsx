@@ -16,19 +16,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import storage from "@/utils/storage";
+import { IEvent } from "@/types/event";
 
-// Interface cho event data
-interface EventData {
-  suKienId: string;
-  tenSuKien: string;
-  tenLoaiSuKien: string;
-  ngayDienRa: string;
-  gioDienRa: string;
-  diaDiem: string;
-  moTa: string;
-  uuTien: number;
-  full_name: string;
-}
 
 const getBadgeColor = (type: string) => {
   switch (type) {
@@ -70,7 +59,7 @@ export const SuKienPage: React.FC = () => {
 
   // Lấy danh sách loại sự kiện duy nhất
   const eventTypes = React.useMemo(() => {
-    const events = (eventQuery.data?.data || []) as EventData[];
+    const events = (eventQuery.data?.data || []) as IEvent[];
     const types = new Set(events.map((e) => e.tenLoaiSuKien));
     return Array.from(types);
   }, [eventQuery.data?.data]);
@@ -78,7 +67,7 @@ export const SuKienPage: React.FC = () => {
   // Sắp xếp và lọc sự kiện
   const sortedEvents = React.useMemo(
     () => {
-      const events = (eventQuery.data?.data || []) as EventData[];
+      const events = (eventQuery.data?.data || []) as IEvent[];
       return [...events]
         .filter((event) => selectedType === "ALL" || event.tenLoaiSuKien === selectedType)
         .sort(
@@ -112,7 +101,7 @@ export const SuKienPage: React.FC = () => {
 
   // Hàm đếm số lượng sự kiện theo loại
   const getEventCount = (type: string) => {
-    const events = (eventQuery.data?.data || []) as EventData[];
+    const events = (eventQuery.data?.data || []) as IEvent[];
     if (type === "ALL") return events.length;
     return events.filter((e) => e.tenLoaiSuKien === type).length;
   };

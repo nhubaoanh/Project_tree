@@ -16,6 +16,7 @@ export interface IEvent {
   loaiSuKien: number;
   hoTen: string;
   uuTien: number;
+  full_name: string;
 }
 
 export interface IsearchEvent {
