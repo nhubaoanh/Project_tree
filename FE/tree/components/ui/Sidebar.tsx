@@ -22,9 +22,8 @@ interface MenuItem {
 
 // Menu mặc định khi chưa đăng nhập
 const GUEST_MENU: MenuItem[] = [
-  { code: "HOME", name: "Trang chủ", href: "/", icon: "/icon/home.png", sortOrder: 1, actions: ["VIEW"] },
+  { code: "DASHBOARD", name: "Trang chủ", href: "/", icon: "/icon/home.png", sortOrder: 1, actions: ["VIEW"] },
 ];
-
 export default function Sidebar() {
   const { isSidebarOpen } = useSidebar();
   const pathname = usePathname();

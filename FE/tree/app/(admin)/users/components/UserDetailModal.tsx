@@ -4,7 +4,6 @@ import React from "react";
 import { User, Mail, Phone, Shield, Calendar, MapPin, Briefcase } from "lucide-react";
 import { DetailModal, DetailSection } from "@/components/shared";
 import { IUser } from "@/types/user";
-import { API_DOWNLOAD } from "@/constant/config";
 import { getImageUrl } from "@/utils/imageUtils";
 
 interface UserDetailModalProps {
