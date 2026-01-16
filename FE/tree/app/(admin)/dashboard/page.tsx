@@ -1,115 +1,35 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
-  Users,
-  Calendar,
-  TrendingUp,
-  TrendingDown,
-  UserPlus,
-  GitBranch,
-  Heart,
-  Loader2,
-  ChevronDown,
-  Wallet,
-  CalendarDays,
-  ArrowDownCircle,
-  ArrowUpCircle,
-  ChevronLeft,
-  ChevronRight,
+  Users, Calendar, UserPlus, GitBranch, Heart, Loader2,
+  ChevronDown, Wallet, CalendarDays, ArrowDownCircle, ArrowUpCircle,
 } from "lucide-react";
 import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-  AreaChart,
-  Area,
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area,
 } from "recharts";
 import { useQuery } from "@tanstack/react-query";
 import {
-  getDashboardStats,
-  getThanhVienMoiNhat,
-  getThongKeTheoDoi,
-  getThongKeThuChi,
-  getThongKeThuChiTheoThang,
-  getThongKeSuKien,
-  getSuKienSapToi,
-  IThongKeTheoDoi,
+  getDashboardStats, getThanhVienMoiNhat, getThongKeTheoDoi, getThongKeThuChi,
+  getThongKeThuChiTheoThang, getThongKeSuKien, getSuKienSapToi,
 } from "@/service/thongke.service";
-import { getDongHoById, IDongHo } from "@/service/dongho.service";
+import { getDongHoById } from "@/service/dongho.service";
 import storage from "@/utils/storage";
 
-const COLORS = ["#1e3a5f", "#d4af37", "#b91c1c", "#5d4037", "#2c5282", "#a16207"];
-
-// Mini Calendar Component
-const MiniCalendar = () => {
-  const [currentDate, setCurrentDate] = useState(new Date());
-  const today = new Date();
-
-  const daysInMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
-  const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).getDay();
-  
-  const monthNames = ["Tháng 1", "Tháng 2", "Tháng 3", "Tháng 4", "Tháng 5", "Tháng 6", 
-                      "Tháng 7", "Tháng 8", "Tháng 9", "Tháng 10", "Tháng 11", "Tháng 12"];
-
-  const prevMonth = () => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1));
-  const nextMonth = () => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1));
-
-  const days = [];
-  for (let i = 0; i < firstDayOfMonth; i++) {
-    days.push(<div key={`empty-${i}`} className="w-8 h-8"></div>);
-  }
-  for (let day = 1; day <= daysInMonth; day++) {
-    const isToday = day === today.getDate() && 
-                    currentDate.getMonth() === today.getMonth() && 
-                    currentDate.getFullYear() === today.getFullYear();
-    days.push(
-      <div key={day} className={`w-8 h-8 flex items-center justify-center text-xs rounded-full cursor-pointer transition-all
-        ${isToday ? "bg-[#d4af37] text-white font-bold" : "hover:bg-[#fdf6e3] text-[#5d4037]"}`}>
-        {day}
-      </div>
-    );
-  }
-
-  return (
-    <div className="bg-white rounded-2xl p-4 shadow-lg border border-gray-100">
-      <div className="flex items-center justify-between mb-4">
-        <button onClick={prevMonth} className="p-1 hover:bg-gray-100 rounded-full"><ChevronLeft size={16} /></button>
-        <span className="font-semibold text-[#5d4037] text-sm">{monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}</span>
-        <button onClick={nextMonth} className="p-1 hover:bg-gray-100 rounded-full"><ChevronRight size={16} /></button>
-      </div>
-      <div className="grid grid-cols-7 gap-1 mb-2">
-        {["CN", "T2", "T3", "T4", "T5", "T6", "T7"].map(d => (
-          <div key={d} className="w-8 h-6 flex items-center justify-center text-[10px] font-semibold text-[#8b5e3c]">{d}</div>
-        ))}
-      </div>
-      <div className="grid grid-cols-7 gap-1">{days}</div>
-    </div>
-  );
-};
-
-// KPI Card Component
-const KPICard = ({ title, value, trend, trendValue, icon: Icon, bgColor, iconBg }: any) => (
-  <div className={`${bgColor} rounded-2xl p-5 shadow-lg relative overflow-hidden`}>
+const KPICard = ({ title, value, ratio, percentage, icon: Icon, bgColor }: any) => (
+  <div className={`${bgColor} rounded-2xl p-5 shadow-lg`}>
     <div className="flex items-start justify-between">
       <div>
         <p className="text-white/80 text-xs font-medium mb-1">{title}</p>
         <p className="text-white text-2xl font-bold">{value}</p>
-        {trend && (
-          <div className={`flex items-center gap-1 mt-2 text-xs ${trend === "up" ? "text-green-300" : "text-red-300"}`}>
-            {trend === "up" ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
-            <span>{trendValue}</span>
+        {ratio && percentage && (
+          <div className="flex items-center gap-2 mt-2">
+            <span className="text-white/70 text-sm">{ratio}</span>
+            <span className="text-white/70 text-sm">•</span>
+            <span className="text-white/70 text-sm">{percentage}</span>
           </div>
         )}
       </div>
-      <div className={`${iconBg} p-3 rounded-xl`}>
+      <div className="bg-white/20 p-3 rounded-xl">
         <Icon size={22} className="text-white" />
       </div>
     </div>
@@ -117,98 +37,74 @@ const KPICard = ({ title, value, trend, trendValue, icon: Icon, bgColor, iconBg 
 );
 
 export default function Dashboard() {
-  const [selectedDongHoId, setSelectedDongHoId] = useState<string>("");
-  const [isReady, setIsReady] = useState(false);
-  
-  // Thêm state cho bộ lọc tháng/năm
-  const [selectedMonth, setSelectedMonth] = useState<number>(new Date().getMonth() + 1);
-  const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
+  const [selectedDongHoId, setSelectedDongHoId] = useState("");
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [isYearDropdownOpen, setIsYearDropdownOpen] = useState(false);
-
-  // Lấy thông tin user
   const [user, setUser] = useState<any>(null);
-
-  // Tạo danh sách tháng và năm
-  const months = [
-    { value: 1, label: "Tháng 1" }, { value: 2, label: "Tháng 2" }, { value: 3, label: "Tháng 3" },
-    { value: 4, label: "Tháng 4" }, { value: 5, label: "Tháng 5" }, { value: 6, label: "Tháng 6" },
-    { value: 7, label: "Tháng 7" }, { value: 8, label: "Tháng 8" }, { value: 9, label: "Tháng 9" },
-    { value: 10, label: "Tháng 10" }, { value: 11, label: "Tháng 11" }, { value: 12, label: "Tháng 12" }
-  ];
   
   const years = Array.from({ length: 10 }, (_, i) => new Date().getFullYear() - i);
 
   useEffect(() => {
     const userData = storage.getUser();
     setUser(userData);
-    setIsReady(true);
-    
-    // Tự động set dongHoId của user
-    if (userData && userData.dongHoId) {
-      setSelectedDongHoId(userData.dongHoId);
-    }
+    if (userData?.dongHoId) setSelectedDongHoId(userData.dongHoId);
   }, []);
 
-  // Fetch dòng họ của user
-  const myDongHoQuery = useQuery({
+  const { data: dongHoData } = useQuery({
     queryKey: ["my-dongho", user?.dongHoId],
     queryFn: () => getDongHoById(user?.dongHoId),
-    enabled: isReady && !!user?.dongHoId,
+    enabled: !!user?.dongHoId,
   });
 
-  const dongHoList: IDongHo[] = myDongHoQuery.data?.data ? [myDongHoQuery.data.data] : [];
-
-  // Không cần logic chọn dòng họ nữa
-
-  const statsQuery = useQuery({
+  const { data: statsData, isLoading } = useQuery({
     queryKey: ["dashboard-stats", selectedDongHoId],
     queryFn: () => getDashboardStats(selectedDongHoId || undefined),
   });
 
-  const theoDoiQuery = useQuery({
+  const { data: theoDoiData } = useQuery({
     queryKey: ["thongke-theodoi", selectedDongHoId],
     queryFn: () => getThongKeTheoDoi(selectedDongHoId),
     enabled: !!selectedDongHoId,
   });
 
-  const moiNhatQuery = useQuery({
+  const { data: moiNhatData } = useQuery({
     queryKey: ["thanhvien-moinhat", selectedDongHoId],
     queryFn: () => getThanhVienMoiNhat(selectedDongHoId || undefined, 5),
   });
 
-  const thuChiQuery = useQuery({
+  const { data: thuChiData } = useQuery({
     queryKey: ["thongke-thuchi", selectedDongHoId, selectedYear],
     queryFn: () => getThongKeThuChi(selectedDongHoId, selectedYear),
     enabled: !!selectedDongHoId,
   });
 
-  const thuChiTheoThangQuery = useQuery({
+  const { data: thuChiThangData } = useQuery({
     queryKey: ["thongke-thuchi-theothang", selectedDongHoId, selectedYear],
     queryFn: () => getThongKeThuChiTheoThang(selectedDongHoId, selectedYear),
     enabled: !!selectedDongHoId,
   });
 
-  const suKienQuery = useQuery({
+  const { data: suKienData } = useQuery({
     queryKey: ["thongke-sukien", selectedDongHoId, selectedYear],
     queryFn: () => getThongKeSuKien(selectedDongHoId, selectedYear),
     enabled: !!selectedDongHoId,
   });
 
-  const suKienSapToiQuery = useQuery({
+  const { data: suKienSapToiData } = useQuery({
     queryKey: ["sukien-saptoi", selectedDongHoId],
     queryFn: () => getSuKienSapToi(selectedDongHoId || undefined, 5),
   });
 
-  const stats = statsQuery.data?.data;
-  const theoDoi: IThongKeTheoDoi[] = theoDoiQuery.data?.data || [];
-  const moiNhat = moiNhatQuery.data?.data || [];
-  const thuChi = thuChiQuery.data?.data;
-  const thuChiTheoThang = thuChiTheoThangQuery.data?.data || [];
-  const suKien = suKienQuery.data?.data;
-  const suKienSapToi = suKienSapToiQuery.data?.data || [];
-  const selectedDongHo = dongHoList.find(d => d.dongHoId === selectedDongHoId);
+  const stats = statsData?.data;
+  const theoDoi = theoDoiData?.data || [];
+  const moiNhat = moiNhatData?.data || [];
+  const thuChi = thuChiData?.data;
+  const thuChiTheoThang = thuChiThangData?.data || [];
+  const suKien = suKienData?.data;
+  const suKienSapToi = suKienSapToiData?.data || [];
+  const selectedDongHo = dongHoData?.data;
 
-  const generationData = theoDoi.map((item) => ({
+  const generationData = theoDoi.map((item: any) => ({
     name: `Đời ${item.doi}`,
     nam: item.soNam,
     nu: item.soNu,
@@ -220,12 +116,6 @@ export default function Dashboard() {
     chi: item.tongChi || 0,
   }));
 
-  // Pie data for gender
-  const genderData = [
-    { name: "Nam", value: stats?.tongNam || 0 },
-    { name: "Nữ", value: stats?.tongNu || 0 },
-  ];
-
   const formatDate = (date: string) => date ? new Date(date).toLocaleDateString("vi-VN") : "";
   const formatMoney = (amount: number) => {
     if (!amount) return "0đ";
@@ -233,8 +123,6 @@ export default function Dashboard() {
     if (amount >= 1000) return `${(amount / 1000).toFixed(0)}k`;
     return `${amount}đ`;
   };
-
-  const isLoading = statsQuery.isLoading;
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
@@ -261,43 +149,29 @@ export default function Dashboard() {
         <>
           {/* KPI Cards */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            <KPICard
-              title="Tổng Thành Viên"
-              value={stats?.tongThanhVien || 0}
-              icon={Users}
-              bgColor="bg-gradient-to-br from-[#1e3a5f] to-[#2c5282]"
-              iconBg="bg-white/20"
-            />
-            <KPICard
-              title="Nam Giới"
+            <KPICard title="Tổng Thành Viên" value={stats?.tongThanhVien || 0} icon={Users} bgColor="bg-gradient-to-br from-[#1e3a5f] to-[#2c5282]" />
+            <KPICard 
+              title="Nam Giới" 
               value={stats?.tongNam || 0}
-              trend="up"
-              trendValue={`${Math.round(
-                (stats?.tongNam / (stats?.tongThanhVien || 1)) * 100
-              )}%`}
-              icon={UserPlus}
-              bgColor="bg-gradient-to-br from-[#d4af37] to-[#a16207]"
-              iconBg="bg-white/20"
+              ratio={`${stats?.tongNam || 0}/${stats?.tongThanhVien || 0}`}
+              percentage={`${Math.round((stats?.tongNam / (stats?.tongThanhVien || 1)) * 100)}%`}
+              icon={UserPlus} 
+              bgColor="bg-gradient-to-br from-[#d4af37] to-[#a16207]" 
             />
-            <KPICard
-              title="Nữ Giới"
+            <KPICard 
+              title="Nữ Giới" 
               value={stats?.tongNu || 0}
-              icon={Heart}
-              bgColor="bg-gradient-to-br from-[#b91c1c] to-[#991b1b]"
-              iconBg="bg-white/20"
+              ratio={`${stats?.tongNu || 0}/${stats?.tongThanhVien || 0}`}
+              percentage={`${Math.round((stats?.tongNu / (stats?.tongThanhVien || 1)) * 100)}%`}
+              icon={Heart} 
+              bgColor="bg-gradient-to-br from-[#b91c1c] to-[#991b1b]" 
             />
-            <KPICard
-              title="Số Đời"
-              value={stats?.doiCaoNhat || 0}
-              icon={GitBranch}
-              bgColor="bg-gradient-to-br from-[#5d4037] to-[#3e2723]"
-              iconBg="bg-white/20"
-            />
+            <KPICard title="Số Đời" value={stats?.doiCaoNhat || 0} icon={GitBranch} bgColor="bg-gradient-to-br from-[#5d4037] to-[#3e2723]" />
           </div>
 
           {/* Main Content Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-            {/* Bar Chart - Thống kê theo đời */}
+            {/* Bar Chart - Thống kê theo đời - 2 cột BÊN TRÁI */}
             <div className="lg:col-span-2 bg-white rounded-2xl p-5 shadow-lg border border-gray-100">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="font-bold text-[#1e3a5f]">Thống Kê Theo Đời</h3>
@@ -311,188 +185,81 @@ export default function Dashboard() {
                 </div>
               </div>
               {generationData.length > 0 ? (
-                <div className="h-[280px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart
-                      data={generationData}
-                      margin={{ top: 10, right: 10, left: -10, bottom: 0 }}
-                    >
-                      <CartesianGrid
-                        strokeDasharray="3 3"
-                        stroke="#f0f0f0"
-                        vertical={false}
-                      />
-                      <XAxis
-                        dataKey="name"
-                        stroke="#9ca3af"
-                        fontSize={11}
-                        tickLine={false}
-                        axisLine={false}
-                      />
-                      <YAxis
-                        stroke="#9ca3af"
-                        fontSize={11}
-                        tickLine={false}
-                        axisLine={false}
-                      />
-                      <Tooltip
-                        contentStyle={{
-                          borderRadius: 12,
-                          border: "none",
-                          boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
-                        }}
-                      />
-                      <Bar
-                        dataKey="nam"
-                        fill="#1e3a5f"
-                        radius={[6, 6, 0, 0]}
-                        barSize={24}
-                      />
-                      <Bar
-                        dataKey="nu"
-                        fill="#d4af37"
-                        radius={[6, 6, 0, 0]}
-                        barSize={24}
-                      />
+                <div className="h-[400px]">
+                  <ResponsiveContainer>
+                    <BarChart data={generationData} margin={{ top: 10, right: 10, left: -10, bottom: 5 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" vertical={false} />
+                      <XAxis dataKey="name" stroke="#9ca3af" fontSize={11} tickLine={false} axisLine={false} />
+                      <YAxis stroke="#9ca3af" fontSize={11} tickLine={false} axisLine={false} />
+                      <Tooltip contentStyle={{ borderRadius: 12, border: "none", boxShadow: "0 4px 20px rgba(0,0,0,0.1)" }} />
+                      <Bar dataKey="nam" fill="#1e3a5f" radius={[6, 6, 0, 0]} barSize={24} />
+                      <Bar dataKey="nu" fill="#d4af37" radius={[6, 6, 0, 0]} barSize={24} />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
               ) : (
-                <div className="h-[280px] flex items-center justify-center text-gray-400">
-                  Chưa có dữ liệu
-                </div>
+                <div className="h-[400px] flex items-center justify-center text-gray-400">Chưa có dữ liệu</div>
               )}
             </div>
 
-            {/* Right Column - Donut + Stats */}
-            <div className="space-y-6">
-              {/* Donut Chart */}
-              <div className="bg-white rounded-2xl p-5 shadow-lg border border-gray-100">
-                <h3 className="font-bold text-[#1e3a5f] mb-4">
-                  Tỷ Lệ Giới Tính
-                </h3>
-                <div className="h-[160px] relative">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie
-                        data={genderData}
-                        cx="50%"
-                        cy="50%"
-                        innerRadius={45}
-                        outerRadius={70}
-                        paddingAngle={4}
-                        dataKey="value"
-                      >
-                        <Cell fill="#1e3a5f" />
-                        <Cell fill="#d4af37" />
-                      </Pie>
-                      <Tooltip />
-                    </PieChart>
-                  </ResponsiveContainer>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="text-center">
-                      <p className="text-2xl font-bold text-[#1e3a5f]">
-                        {stats?.tongThanhVien || 0}
-                      </p>
-                      <p className="text-[10px] text-gray-400 uppercase">
-                        Tổng
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex justify-center gap-6 mt-2">
-                  <span className="flex items-center gap-2 text-xs">
-                    <span className="w-3 h-3 rounded-full bg-[#1e3a5f]"></span>{" "}
-                    Nam
+            {/* Quick Stats - 1 cột BÊN PHẢI */}
+            <div className="bg-white rounded-2xl p-5 shadow-lg border border-gray-100">
+              <h2 className="font-bold text-[#1e3a5f] mb-3">Thống Kê Nhanh</h2>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between p-2 bg-green-50 rounded-lg">
+                  <span className="text-xxs text-gray-600 flex items-center gap-2">
+                    <ArrowDownCircle size={14} className="text-green-600" /> Tổng thu
                   </span>
-                  <span className="flex items-center gap-2 text-xs">
-                    <span className="w-3 h-3 rounded-full bg-[#d4af37]"></span>{" "}
-                    Nữ
-                  </span>
+                  <span className="font-bold text-green-600 text-sm">{formatMoney(thuChi?.tongThu || 0)}</span>
                 </div>
-              </div>
-
-              {/* Quick Stats */}
-              <div className="bg-white rounded-2xl p-5 shadow-lg border border-gray-100">
-                <h3 className="font-bold text-[#1e3a5f] mb-3">
-                  Thống Kê Nhanh
-                </h3>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between p-2 bg-green-50 rounded-lg">
-                    <span className="text-xs text-gray-600 flex items-center gap-2">
-                      <ArrowDownCircle size={14} className="text-green-600" />{" "}
-                      Tổng thu
-                    </span>
-                    <span className="font-bold text-green-600 text-sm">
-                      {formatMoney(thuChi?.tongThu || 0)}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between p-2 bg-red-50 rounded-lg">
-                    <span className="text-xs text-gray-600 flex items-center gap-2">
-                      <ArrowUpCircle size={14} className="text-red-600" /> Tổng
-                      chi
-                    </span>
-                    <span className="font-bold text-red-600 text-sm">
-                      {formatMoney(thuChi?.tongChi || 0)}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between p-2 bg-blue-50 rounded-lg">
-                    <span className="text-xs text-gray-600 flex items-center gap-2">
-                      <Wallet size={14} className="text-blue-600" /> Số dư
-                    </span>
-                    <span className="font-bold text-blue-600 text-sm">
-                      {formatMoney(
-                        (thuChi?.tongThu || 0) - (thuChi?.tongChi || 0)
-                      )}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between p-2 bg-amber-50 rounded-lg">
-                    <span className="text-xs text-gray-600 flex items-center gap-2">
-                      <Calendar size={14} className="text-amber-600" /> Sự kiện
-                    </span>
-                    <span className="font-bold text-amber-600 text-sm">
-                      {suKien?.tongSuKien || 0}
-                    </span>
-                  </div>
+                <div className="flex items-center justify-between p-2 bg-red-50 rounded-lg">
+                  <span className="text-xxs text-gray-600 flex items-center gap-2">
+                    <ArrowUpCircle size={14} className="text-red-600" /> Tổng chi
+                  </span>
+                  <span className="font-bold text-red-600 text-sm">{formatMoney(thuChi?.tongChi || 0)}</span>
+                </div>
+                <div className="flex items-center justify-between p-2 bg-blue-50 rounded-lg">
+                  <span className="text-xxs text-gray-600 flex items-center gap-2">
+                    <Wallet size={14} className="text-blue-600" /> Số dư
+                  </span>
+                  <span className="font-bold text-blue-600 text-sm">{formatMoney((thuChi?.tongThu || 0) - (thuChi?.tongChi || 0))}</span>
+                </div>
+                <div className="flex items-center justify-between p-2 bg-amber-50 rounded-lg">
+                  <span className="text-xxs text-gray-600 flex items-center gap-2">
+                    <Calendar size={14} className="text-amber-600" /> Sự kiện
+                  </span>
+                  <span className="font-bold text-amber-600 text-sm">{suKien?.tongSuKien || 0}</span>
                 </div>
               </div>
             </div>
           </div>
 
           {/* Bottom Section */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Area Chart - Thu Chi */}
-            <div className="lg:col-span-2 bg-white rounded-2xl p-5 shadow-lg border border-gray-100">
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+            {/* Area Chart - Thu Chi - 3 phần */}
+            <div className="lg:col-span-3 bg-white rounded-2xl p-5 shadow-lg border border-gray-100">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="font-bold text-[#1e3a5f]">Thu Chi Theo Tháng</h3>
-                <span className="text-xs text-gray-400">
-                  Năm {selectedYear}
-                </span>
-              </div>
-              {/* Bộ lọc tháng/năm */}
-              <div className="flex items-center gap-2 p-2 bg-white rounded-xl shadow-sm border border-gray-200 mb-10">
-                <span className="text-sm font-medium text-[#1e3a5f]">
-                  Lọc theo:
-                </span>
-                {/* Dropdown năm */}
+                
+                {/* Bộ lọc năm */}
                 <div className="relative">
                   <button
                     onClick={() => setIsYearDropdownOpen(!isYearDropdownOpen)}
-                    className="flex items-center gap-2 px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 transition-all max-w-[100px]"
+                    className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 transition-all"
                   >
-                    <CalendarDays size={16} className="text-[#d4af37]" />
-                    <span className="flex-1 text-left text-sm font-medium text-[#1e3a5f]">
+                    <CalendarDays size={14} className="text-[#d4af37]" />
+                    <span className="text-sm font-medium text-[#1e3a5f]">
                       {selectedYear}
                     </span>
                     <ChevronDown
-                      size={14}
+                      size={12}
                       className={`text-gray-400 transition-transform ${
                         isYearDropdownOpen ? "rotate-180" : ""
                       }`}
                     />
                   </button>
                   {isYearDropdownOpen && (
-                    <div className="absolute top-full left-0 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-xl max-h-48 overflow-y-auto z-50">
+                    <div className="absolute top-full right-0 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-xl max-h-48 overflow-y-auto z-50">
                       {years.map((year) => (
                         <button
                           key={year}
@@ -514,11 +281,11 @@ export default function Dashboard() {
                 </div>
               </div>
               {thuChiChartData.length > 0 ? (
-                <div className="h-[220px]">
+                <div className="h-[300px]">
                   <ResponsiveContainer width="100%" height="100%">
                     <AreaChart
                       data={thuChiChartData}
-                      margin={{ top: 10, right: 10, left: -10, bottom: 0 }}
+                      margin={{ top: 10, right: 10, left: -10, bottom: 5 }}
                     >
                       <defs>
                         <linearGradient
@@ -605,7 +372,7 @@ export default function Dashboard() {
                   </ResponsiveContainer>
                 </div>
               ) : (
-                <div className="h-[220px] flex items-center justify-center text-gray-400">
+                <div className="h-[300px] flex items-center justify-center text-gray-400">
                   Chưa có dữ liệu
                 </div>
               )}
@@ -621,42 +388,37 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* Calendar + Events */}
-            <div className="space-y-6">
-              <MiniCalendar />
-
-              {/* Upcoming Events */}
-              <div className="bg-white rounded-2xl p-4 shadow-lg border border-gray-100">
-                <h3 className="font-bold text-[#1e3a5f] mb-3 text-sm">
-                  Sự Kiện Sắp Tới
-                </h3>
-                {suKienSapToi.length > 0 ? (
-                  <div className="space-y-2">
-                    {suKienSapToi.slice(0, 3).map((event: any, idx: number) => (
-                      <div
-                        key={idx}
-                        className="flex items-center gap-3 p-2 bg-gray-50 rounded-lg"
-                      >
-                        <div className="w-10 h-10 bg-[#d4af37] rounded-lg flex items-center justify-center text-white">
-                          <CalendarDays size={16} />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-xs font-semibold text-[#1e3a5f] truncate">
-                            {event.tenSuKien}
-                          </p>
-                          <p className="text-[10px] text-gray-400">
-                            {formatDate(event.ngayDienRa)}
-                          </p>
-                        </div>
+            {/* Upcoming Events - 2 phần */}
+            <div className="lg:col-span-2 bg-white rounded-2xl p-4 shadow-lg border border-gray-100">
+              <h2 className="font-bold text-[#1e3a5f] mb-3 text-sm">
+                Sự Kiện Sắp Tới
+              </h2>
+              {suKienSapToi.length > 0 ? (
+                <div className="space-y-2">
+                  {suKienSapToi.slice(0, 5).map((event: any, idx: number) => (
+                    <div
+                      key={idx}
+                      className="flex items-center gap-3 p-2 bg-gray-50 rounded-lg"
+                    >
+                      <div className="w-10 h-10 bg-[#d4af37] rounded-lg flex items-center justify-center text-white">
+                        <CalendarDays size={16} />
                       </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-xs text-gray-400 text-center py-4">
-                    Không có sự kiện
-                  </p>
-                )}
-              </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xl font-semibold text-[#1e3a5f] truncate">
+                          {event.tenSuKien}
+                        </p>
+                        <p className="text-[15px] text-gray-400">
+                          {formatDate(event.ngayDienRa)}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-xs text-gray-400 text-center py-4">
+                  Không có sự kiện
+                </p>
+              )}
             </div>
           </div>
 
@@ -681,7 +443,7 @@ export default function Dashboard() {
                       {member.hoTen?.charAt(0) || "?"}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-[#1e3a5f] truncate">
+                      <p className="text-xl font-semibold text-[#1e3a5f] truncate">
                         {member.hoTen}
                       </p>
                       <p className="text-[10px] text-gray-400">

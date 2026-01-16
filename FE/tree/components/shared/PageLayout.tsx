@@ -25,7 +25,6 @@ export interface PageLayoutProps {
 export function PageLayout({
   title,
   subtitle,
-  icon: Icon,
   actions = [],
   children,
   className = "",
@@ -64,11 +63,6 @@ export function PageLayout({
       {/* Header & Toolbar */}
       <div className="flex flex-col md:flex-row justify-between items-end md:items-center mb-8 gap-4 border-b border-[#d4af37] pb-4">
         <div className="flex items-center gap-3">
-          {Icon && (
-            <div className="w-12 h-12 bg-gradient-to-br from-[#b91c1c] to-[#d4af37] rounded-full flex items-center justify-center text-white shadow-lg">
-              <Icon size={24} />
-            </div>
-          )}
           <div>
             <h2 className="text-3xl font-display font-bold text-[#b91c1c] uppercase drop-shadow-sm">
               {title}

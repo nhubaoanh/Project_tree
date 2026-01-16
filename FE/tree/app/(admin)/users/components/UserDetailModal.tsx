@@ -5,6 +5,7 @@ import { User, Mail, Phone, Shield, Calendar, MapPin, Briefcase } from "lucide-r
 import { DetailModal, DetailSection } from "@/components/shared";
 import { IUser } from "@/types/user";
 import { API_DOWNLOAD } from "@/constant/config";
+import { getImageUrl } from "@/utils/imageUtils";
 
 interface UserDetailModalProps {
   isOpen: boolean;
@@ -43,6 +44,8 @@ export function UserDetailModal({ isOpen, onClose, user }: UserDetailModalProps)
     }
   ];
 
+  const DEFAULT_AVATAR = "/images/vangoc.jpg";
+
   return (
     <DetailModal
       isOpen={isOpen}
@@ -51,7 +54,7 @@ export function UserDetailModal({ isOpen, onClose, user }: UserDetailModalProps)
       subtitle={user.email}
       badge={user.roleCode}
       gradient="red-yellow"
-      avatar={user.anhDaiDien ? `${API_DOWNLOAD}/${user.anhDaiDien}` : undefined}
+      avatar={user.anhChanDung ? getImageUrl(user.anhChanDung) : undefined}
       avatarFallback={<User size={48} className="text-white/80" />}
       sections={sections}
     />

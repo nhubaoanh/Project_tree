@@ -52,7 +52,7 @@ export default function RouteGuard({ children }: RouteGuardProps) {
         return;
       }
 
-      // Dashboard luôn được phép nếu đã đăng nhập
+      // Dashboard và lineage luôn được phép nếu đã đăng nhập
       if (pathname === "/dashboard") {
         setAuthorized(true);
         setChecking(false);

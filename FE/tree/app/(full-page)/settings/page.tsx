@@ -7,11 +7,12 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { User, Mail, Phone, Camera, UserCircle, Calendar, Loader2, Lock } from 'lucide-react';
+import { User, Mail, Phone, Camera, UserCircle, Calendar, Loader2, Lock, ArrowLeft } from 'lucide-react';
 import { useMutation } from '@tanstack/react-query';
 import { UpdateMyProfile } from '@/service/user.service';
 import { uploadFile } from '@/service/upload.service';
 import { useToast } from '@/service/useToas';
+import { useRouter } from 'next/navigation';
 import storage from '@/utils/storage';
 import { getAvatarUrl } from '@/utils/imageUtils';
 import { IUserProfile } from '@/types/user';
@@ -19,6 +20,7 @@ import { IUserProfile } from '@/types/user';
 export default function SettingsPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { showSuccess, showError } = useToast();
+  const router = useRouter();
 
   // Form state
   const [formData, setFormData] = useState<Partial<IUserProfile>>({
@@ -58,13 +60,6 @@ export default function SettingsPage() {
         avatar: user.avatar || '',
         lu_user_id: user.nguoiDungId,
       }));
-      // Set preview URL nếu có avatar - không cần set preview URL nữa vì AuthenticatedImage sẽ handle
-      // if (user.avatar) {
-      //   const avatarUrl = getAvatarUrl(user.avatar);
-      //   console.log('BASE_URL from env:', process.env.NEXT_PUBLIC_API_BASE_URL);
-      //   console.log('Setting preview URL:', avatarUrl); // Debug log
-      //   setPreviewUrl(avatarUrl);
-      // }
     }
   }, []);
 
@@ -223,10 +218,15 @@ export default function SettingsPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 py-10 px-4">
       <div className="container mx-auto max-w-3xl">
-        <h1 className="text-3xl font-bold mb-8 text-center bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-          Cài đặt tài khoản
-        </h1>
-
+        {/* Back Button */}
+        <Button
+          variant="ghost"
+          onClick={() => router.back()}
+          className="mb-4 hover:bg-primary/10 hover:text-primary transition-colors"
+        >
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Quay lại
+        </Button>
         <Card className="shadow-xl border-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm">
           <CardHeader className="border-b pb-6 ">
             <CardTitle className="text-xl flex items-center gap-2 ">
@@ -428,13 +428,18 @@ export default function SettingsPage() {
 
               {/* Action Buttons */}
               <div className="flex justify-end gap-4 pt-6 border-t">
-                <Button type="button" variant="outline" className="px-6 h-11">
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={() => router.back()}
+                  className="px-6 h-11 hover:bg-slate-100 hover:border-slate-400 dark:hover:bg-slate-800 transition-all"
+                >
                   Hủy
                 </Button>
                 <Button
                   type="submit"
                   disabled={updateMutation.isPending || uploading}
-                  className="px-8 h-11 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-md"
+                  className="px-8 h-11 bg-gradient-to-r from-[#A20105] to-[#8B0104] hover:from-[#8B0104] hover:to-[#6B0103] hover:shadow-lg hover:scale-105 transition-all duration-200 shadow-md text-white"
                 >
                   {updateMutation.isPending ? (
                     <>

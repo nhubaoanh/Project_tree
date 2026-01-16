@@ -126,7 +126,7 @@ export default function Sidebar() {
                 className="object-contain brightness-0 invert"
               />
               {isSidebarOpen && (
-                <span className="whitespace-nowrap text-sm">{item.name}</span>
+                <span className="whitespace-nowrap text-xxs">{item.name}</span>
               )}
             </div>
             {isSidebarOpen && (
@@ -168,7 +168,7 @@ export default function Sidebar() {
           />
         )}
         {isSidebarOpen && (
-          <span className="whitespace-nowrap text-sm">{item.name}</span>
+          <span className="whitespace-nowrap text-xxs">{item.name}</span>
         )}
       </Link>
     );
