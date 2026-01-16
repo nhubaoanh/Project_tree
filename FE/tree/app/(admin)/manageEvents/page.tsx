@@ -88,6 +88,7 @@ export default function QuanLySuKienPage() {
       queryClient.invalidateQueries({ queryKey: ["event"] });
       showSuccess("Thêm sự kiện thành công!");
       setIsModalOpen(false);
+      setEditingEvent(null); // Reset editing state
     },
     onError: (error: any) => {
       showError(error.message || "Có lỗi xảy ra khi thêm sự kiện.");
@@ -100,6 +101,7 @@ export default function QuanLySuKienPage() {
       queryClient.invalidateQueries({ queryKey: ["event"] });
       showSuccess("Cập nhật sự kiện thành công!");
       setIsModalOpen(false);
+      setEditingEvent(null); // Reset editing state
     },
     onError: (error: any) => {
       showError(error.message || "Có lỗi xảy ra khi cập nhật.");

@@ -1,64 +1,45 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
-import FamilyTree from "@balkangraph/familytree.js";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import ReactFlow, {
+  Node,
+  Edge,
+  Background,
+  Controls,
+  MiniMap,
+  useNodesState,
+  useEdgesState,
+  NodeTypes,
+  MarkerType,
+  ConnectionMode,
+  ReactFlowProvider,
+  useReactFlow,
+} from "reactflow";
+import "reactflow/dist/style.css";
+import { QueryClient } from "@tanstack/react-query";
+
 import { ITreeNode } from "@/types/tree";
+import { FamilyNode, FamilyNodeData } from "./tree/FamilyNode";
+import { CompactNode } from "./tree/CompactNode";
+import { PhotoNode } from "./tree/PhotoNode";
 import { FamilyMemberModal } from "./FamilyMemberModal";
-import { ControlPanel } from "./tree/ControlPanel";
-import { ToolbarPanel } from "./tree/ToolbarPanel";
+import { MemberCRUDModal } from "./tree/MemberCRUDModal";
+import { TreeControls } from "./tree/TreeControls";
+import { ContextMenu, CanvasContextMenu } from "./tree/ContextMenu";
+import { AdvancedSearch } from "./tree/AdvancedSearch";
+import { getLayoutedElements } from "./tree/layoutUtils";
+import { exportToPng, exportToSvg } from "./tree/exportUtils";
+import { useUndoRedo } from "@/hooks/useUndoRedo";
+import { createMember, updateMember, deleteMember } from "@/service/member.service";
+import { useToast } from "@/service/useToas";
+import storage from "@/utils/storage";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
-const DEFAULT_AVATAR = "/images/vangoc.jpg";
-
-type AppFamilyNode = FamilyTree.node & {
-  pids?: (string | number)[];
-  memberId?: number;
-  field_0?: string;
-  field_1?: string;
-  field_2?: string;
-  img_0?: string;
-  tags?: string[];
-  fid?: number | null;
-  mid?: number | null;
-  doiThuoc?: number;
-};
-
-// Helpers
-const getImageUrl = (img: string | null | undefined): string => {
-  if (!img?.trim()) return DEFAULT_AVATAR;
-  
-  try {
-    // Decode URL nếu bị encode
-    let decodedImg = decodeURIComponent(img);
-    
-    // Nếu là URL đầy đủ, kiểm tra xem có phải từ backend cũ không
-    if (decodedImg.startsWith("http")) {
-      // Nếu URL từ backend cũ (port 6001), chuyển sang gateway (port 8080)
-      if (decodedImg.includes(":6001")) {
-        decodedImg = decodedImg.replace(":6001", ":8080");
-      }
-      return decodedImg;
-    }
-    
-    // Nếu là đường dẫn tương đối, build URL qua gateway
-    const path = decodedImg.startsWith("uploads/") ? decodedImg : `uploads/${decodedImg}`;
-    return `${API_BASE_URL}/${path}`;
-  } catch (error) {
-    console.warn('Error decoding image URL:', img, error);
-    
-    // Fallback: xử lý URL gốc nếu decode lỗi
-    let fallbackImg = img;
-    if (fallbackImg.startsWith("http")) {
-      // Chuyển từ backend cũ sang gateway nếu cần
-      if (fallbackImg.includes(":6001")) {
-        fallbackImg = fallbackImg.replace(":6001", ":8080");
-      }
-      return fallbackImg;
-    }
-    const path = fallbackImg.startsWith("uploads/") ? fallbackImg : `uploads/${fallbackImg}`;
-    return `${API_BASE_URL}/${path}`;
-  }
-};
+interface Props {
+  data: ITreeNode[];
+  dongHoId?: string;
+  queryClient?: QueryClient; // Thêm queryClient để invalidate queries
+  onDataChange?: () => void; // Giữ lại để backward compatible
+}
 
 const toNum = (v: unknown): number | undefined => {
   if (v == null) return undefined;
@@ -66,61 +47,57 @@ const toNum = (v: unknown): number | undefined => {
   return Number.isFinite(n) ? n : undefined;
 };
 
-// Custom Templates - Fix hình ảnh không bị méo
-const initTemplates = () => {
-  const create = (name: string, bg: string, border: string, opacity = 1) => {
-    // Copy từ template john
-    FamilyTree.templates[name] = Object.assign({}, FamilyTree.templates.john);
-    FamilyTree.templates[name].size = [180, 120];
-    FamilyTree.templates[name].node = `
-      <rect x="0" y="0" width="180" height="120" fill="${bg}" stroke="${border}" stroke-width="2" rx="10" ry="10" opacity="${opacity}"/>
-      <rect x="0" y="0" width="180" height="35" fill="${border}" rx="10" ry="10"/>
-      <rect x="0" y="25" width="180" height="10" fill="${border}"/>
-    `;
-    FamilyTree.templates[name].field_0 = '<text x="90" y="24" text-anchor="middle" fill="#fff" font-weight="bold" font-size="12">{val}</text>';
-    FamilyTree.templates[name].field_1 = '<text x="90" y="95" text-anchor="middle" fill="#555" font-size="10">{val}</text>';
-    FamilyTree.templates[name].field_2 = '<text x="90" y="108" text-anchor="middle" fill="#777" font-size="9">{val}</text>';
-    // Ảnh tròn với clipPath - fix ảnh vuông không vừa node
-    FamilyTree.templates[name].defs = `
-      <clipPath id="${name}_clip">
-        <circle cx="90" cy="62" r="20"/>
-      </clipPath>
-    `;
-    FamilyTree.templates[name].img_0 = `
-      <circle cx="90" cy="62" r="22" fill="#fff" stroke="${border}" stroke-width="2"/>
-      <image x="70" y="42" width="40" height="40" href="{val}" xlink:href="{val}" preserveAspectRatio="xMidYMid slice" clip-path="url(#${name}_clip)"/>
-    `;
-  };
-  create("male_tpl", "#e3f2fd", "#1976d2");
-  create("female_tpl", "#fce4ec", "#d81b60");
-  create("dead_tpl", "#eeeeee", "#757575", 0.85);
-};
-
-interface Props {
-  data: ITreeNode[];
-}
-
-export const MyFamilyTree = ({ data }: Props) => {
-  const divRef = useRef<HTMLDivElement>(null);
-  const familyRef = useRef<FamilyTree | null>(null);
-
+const MyFamilyTreeInner = ({ data, dongHoId, queryClient, onDataChange }: Props) => {
+  const [nodes, setNodes, onNodesChange] = useNodesState([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  const { fitView } = useReactFlow();
+  const { showSuccess, showError } = useToast();
+  
   const [modalOpen, setModalOpen] = useState(false);
-  const [selectedNode, setSelectedNode] = useState<AppFamilyNode | null>(null);
-  const [allNodes, setAllNodes] = useState<any[]>([]);
-
-  // Config
+  const [selectedNodeData, setSelectedNodeData] = useState<any>(null);
+  
   const [maxGen, setMaxGen] = useState(3);
   const [gens, setGens] = useState<number[]>([]);
-  const [orientation, setOrientation] = useState(FamilyTree.orientation.top);
-  const [template, setTemplate] = useState("custom");
+  const [direction, setDirection] = useState<"TB" | "BT" | "LR" | "RL">("TB");
   const [search, setSearch] = useState("");
-  const [results, setResults] = useState<number[]>([]);
+  const [darkMode, setDarkMode] = useState(false);
+  const [layoutAlgorithm, setLayoutAlgorithm] = useState<"dagre" | "compact" | "spacious" | "balanced">("dagre");
+  const [nodeTemplate, setNodeTemplate] = useState<"default" | "compact" | "photo">("default");
+
+  // CRUD Modal state
+  const [crudModalOpen, setCrudModalOpen] = useState(false);
+  const [crudMode, setCrudMode] = useState<"add" | "edit">("add");
+  const [selectedMember, setSelectedMember] = useState<ITreeNode | null>(null);
 
   // Panel visibility
-  const [showLeft, setShowLeft] = useState(false);
-  const [showRight, setShowRight] = useState(false);
+  const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
 
-  // Calc generations
+  // Context menu state
+  const [contextMenu, setContextMenu] = useState<{
+    id: string;
+    top: number;
+    left: number;
+  } | null>(null);
+  const [canvasContextMenu, setCanvasContextMenu] = useState<{
+    top: number;
+    left: number;
+  } | null>(null);
+
+  // Highlighted nodes for search/relationship
+  const [highlightedNodes, setHighlightedNodes] = useState<string[]>([]);
+
+  // Undo/Redo
+  const { undo, redo, canUndo, canRedo, takeSnapshot } = useUndoRedo();
+
+  // Dynamic node types based on template
+  const nodeTypes: NodeTypes = useMemo(() => {
+    const nodeType = nodeTemplate === "compact" ? CompactNode : nodeTemplate === "photo" ? PhotoNode : FamilyNode;
+    return {
+      familyNode: nodeType,
+    };
+  }, [nodeTemplate]);
+
+  // Tính toán generations
   useEffect(() => {
     if (!data.length) return;
     const g = [...new Set(data.map((n) => n.doiThuoc || 1))].sort((a, b) => a - b);
@@ -128,199 +105,667 @@ export const MyFamilyTree = ({ data }: Props) => {
     setMaxGen(Math.min(3, Math.max(...g)));
   }, [data]);
 
-  // Search
-  const doSearch = useCallback(
-    (q: string) => {
-      setSearch(q);
-      if (!q.trim()) {
-        setResults([]);
-        return;
-      }
-      const r = allNodes
-        .filter(
-          (n) =>
-            n.field_0?.toLowerCase().includes(q.toLowerCase()) ||
-            n.field_2?.toLowerCase().includes(q.toLowerCase())
-        )
-        .map((n) => n.id);
-      setResults(r);
-      if (r.length && familyRef.current) familyRef.current.center(r[0]);
-    },
-    [allNodes]
-  );
-
-  // Init tree
-  useEffect(() => {
-    if (!divRef.current || !data.length) return;
-    initTemplates();
-
+  // Chuyển đổi data thành nodes và edges
+  const buildGraph = useCallback(() => {
     const filtered = data.filter((n) => (n.doiThuoc || 1) <= maxGen);
-    const getTags = (n: ITreeNode) => {
-      if (template !== "custom") return [n.gioiTinh === 1 ? "male" : "female"];
-      if (n.ngayMat) return ["dead"];
-      return [n.gioiTinh === 1 ? "male" : "female"];
-    };
-
-    const nodes = filtered.map((n) => {
-      // Xử lý ảnh - nếu không có hoặc rỗng thì dùng ảnh mặc định
-      let imgUrl = n.anhChanDung?.trim() ? getImageUrl(n.anhChanDung) : DEFAULT_AVATAR;
-      
-      return {
-        id: toNum(n.id)!,
-        pids: (n.pids ?? []).map(toNum).filter((x): x is number => typeof x === "number"),
-        fid: toNum(n.fid),
-        mid: toNum(n.mid),
+    
+    // Tạo nodes
+    const newNodes: Node<FamilyNodeData>[] = filtered.map((n) => ({
+      id: String(n.id),
+      type: "familyNode",
+      position: { x: 0, y: 0 }, // Sẽ được tính lại bởi layout
+      data: {
         memberId: n.thanhVienId,
-        doiThuoc: n.doiThuoc || 1,
-        field_0: n.hoTen || "Chưa rõ",
-        field_1: n.ngayMat ? `Mất: ${new Date(n.ngayMat).toLocaleDateString("vi-VN")}` : "Còn sống",
-        field_2: n.ngheNghiep || "Chưa rõ",
-        img_0: imgUrl,
-        tags: getTags(n),
-      };
+        hoTen: n.hoTen || "Chưa rõ",
+        gioiTinh: n.gioiTinh || 1,
+        ngayMat: n.ngayMat ? String(n.ngayMat) : undefined,
+        ngheNghiep: n.ngheNghiep || undefined,
+        anhChanDung: n.anhChanDung || undefined,
+        doiThuoc: n.doiThuoc || undefined,
+      },
+      draggable: true,
+      style: highlightedNodes.length > 0 
+        ? { opacity: highlightedNodes.includes(String(n.id)) ? 1 : 0.3 }
+        : {},
+    }));
+
+    // Tạo edges (quan hệ cha-mẹ -> con)
+    const newEdges: Edge[] = [];
+    filtered.forEach((n) => {
+      const childId = String(n.id);
+      
+      // Edge từ cha
+      if (n.fid) {
+        const fatherId = String(n.fid);
+        if (filtered.some((x) => String(x.id) === fatherId)) {
+          newEdges.push({
+            id: `f-${fatherId}-${childId}`,
+            source: fatherId,
+            target: childId,
+            type: "smoothstep",
+            animated: false,
+            style: { 
+              stroke: darkMode ? "#6b7280" : "#9ca3af", 
+              strokeWidth: 1.5
+            },
+            markerEnd: { 
+              type: MarkerType.ArrowClosed, 
+              color: darkMode ? "#6b7280" : "#9ca3af"
+            },
+          });
+        }
+      }
+      
+      // Edge từ mẹ
+      if (n.mid) {
+        const motherId = String(n.mid);
+        if (filtered.some((x) => String(x.id) === motherId)) {
+          newEdges.push({
+            id: `m-${motherId}-${childId}`,
+            source: motherId,
+            target: childId,
+            type: "smoothstep",
+            animated: false,
+            style: { 
+              stroke: darkMode ? "#6b7280" : "#9ca3af", 
+              strokeWidth: 1.5
+            },
+            markerEnd: { 
+              type: MarkerType.ArrowClosed, 
+              color: darkMode ? "#6b7280" : "#9ca3af"
+            },
+          });
+        }
+      }
     });
-    setAllNodes(nodes);
 
-    if (familyRef.current) divRef.current.innerHTML = "";
+    // Tạo edges cho vợ chồng (pids)
+    filtered.forEach((n) => {
+      if (n.pids && n.pids.length > 0) {
+        n.pids.forEach((pid) => {
+          const partnerId = String(pid);
+          const nodeId = String(n.id);
+          if (filtered.some((x) => String(x.id) === partnerId)) {
+            // Tránh duplicate edge (chỉ tạo 1 chiều)
+            if (nodeId < partnerId) {
+              newEdges.push({
+                id: `spouse-${nodeId}-${partnerId}`,
+                source: nodeId,
+                target: partnerId,
+                type: "straight",
+                animated: false,
+                style: { 
+                  stroke: darkMode ? "#f59e0b" : "#fbbf24", 
+                  strokeWidth: 2,
+                  strokeDasharray: "5,5"
+                },
+              });
+            }
+          }
+        });
+      }
+    });
 
-    const openModal = (nodeId: string | number) => {
-      const id = typeof nodeId === "string" ? Number(nodeId) : nodeId;
-      if (!Number.isFinite(id)) return;
-      const node = tree.get(id) as unknown as AppFamilyNode;
-      if (node) {
-        setSelectedNode(node);
-        setModalOpen(true);
+    return { nodes: newNodes, edges: newEdges };
+  }, [data, maxGen, highlightedNodes]);
+
+  // Apply layout khi data thay đổi
+  useEffect(() => {
+    const { nodes: newNodes, edges: newEdges } = buildGraph();
+    const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(
+      newNodes,
+      newEdges,
+      { direction, algorithm: layoutAlgorithm }
+    );
+    setNodes(layoutedNodes);
+    setEdges(layoutedEdges);
+  }, [buildGraph, direction, layoutAlgorithm, setNodes, setEdges]);
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ctrl+Z: Undo
+      if (e.ctrlKey && e.key === 'z' && !e.shiftKey) {
+        e.preventDefault();
+        handleUndo();
+      }
+      // Ctrl+Y or Ctrl+Shift+Z: Redo
+      if ((e.ctrlKey && e.key === 'y') || (e.ctrlKey && e.shiftKey && e.key === 'z')) {
+        e.preventDefault();
+        handleRedo();
+      }
+      // Ctrl+0: Fit view
+      if (e.ctrlKey && e.key === '0') {
+        e.preventDefault();
+        fitView({ padding: 0.2, duration: 800 });
+      }
+      // Ctrl+F: Focus search
+      if (e.ctrlKey && e.key === 'f') {
+        e.preventDefault();
+        const searchInput = document.querySelector('input[type="text"]') as HTMLInputElement;
+        searchInput?.focus();
       }
     };
 
-    const tree = new FamilyTree(divRef.current!, {
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [nodes, edges, fitView]);
+
+  // Undo handler
+  const handleUndo = useCallback(() => {
+    const previous = undo(nodes, edges);
+    if (previous) {
+      setNodes(previous.nodes);
+      setEdges(previous.edges);
+    }
+  }, [undo, nodes, edges, setNodes, setEdges]);
+
+  // Redo handler
+  const handleRedo = useCallback(() => {
+    const next = redo();
+    if (next) {
+      setNodes(next.nodes);
+      setEdges(next.edges);
+    }
+  }, [redo, setNodes, setEdges]);
+
+  // Relayout manually
+  const handleRelayout = useCallback(() => {
+    takeSnapshot(nodes, edges);
+    const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(
       nodes,
-      template: template === "custom" ? "john" : template,
-      scaleInitial: FamilyTree.match.boundary,
-      scaleMin: 0.2,
-      scaleMax: 5,
-      enableSearch: true,
-      miniMap: true,
-      mouseScrool: FamilyTree.action.zoom,
-      orientation,
-      // Bật kéo thả node
-      movable: FamilyTree.movable.node,
-      nodeMouseClick: FamilyTree.action.none, // Cho phép kéo thả mà không trigger click
-      levelSeparation: 100,
-      siblingSeparation: 50,
-      subtreeSeparation: 70,
-      lazyLoading: true,
-      // undoRedoStorageName: "ft_history",
-      anim: { func: FamilyTree.anim.outPow, duration: 200 },
-      zoom: { speed: 100, smooth: 10 },
-      nodeBinding: { field_0: "field_0", field_1: "field_1", field_2: "field_2", img_0: "img_0" },
-      nodeMenu: {
-        details: { text: "Chi tiết", onClick: openModal },
-        edit: { text: "Sửa" },
-        center: {
-          text: "🎯 Căn giữa",
-          onClick: (id: string | number) => tree.center(typeof id === "string" ? Number(id) : id),
-        },
-      },
-      // menu: { pdf: { text: "📄 PDF" }, png: { text: "🖼️ PNG" }, svg: { text: "📐 SVG" } },
-      tags:
-        template === "custom"
-          ? { male: { template: "male_tpl" }, female: { template: "female_tpl" }, dead: { template: "dead_tpl" } }
-          : { male: { template: template }, female: { template: template } },
-      // toolbar: { layout: true, zoom: true, fit: true, expandAll: true, fullScreen: true },
-    });
+      edges,
+      { direction, algorithm: layoutAlgorithm }
+    );
+    setNodes(layoutedNodes);
+    setEdges(layoutedEdges);
+  }, [nodes, edges, direction, layoutAlgorithm, setNodes, setEdges, takeSnapshot]);
 
-    tree.onNodeDoubleClick(function (args) {
-      const d = (args as any).node || args.data;
-      if (d) openModal(d.id);
-    });
+  // Export handlers
+  const handleExportPng = useCallback(async () => {
+    try {
+      await exportToPng(nodes);
+    } catch (error) {
+      console.error('Export PNG failed:', error);
+      alert('Không thể export PNG. Vui lòng thử lại.');
+    }
+  }, [nodes]);
 
-    familyRef.current = tree;
-    return () => {
-      if (divRef.current) divRef.current.innerHTML = "";
-    };
-  }, [data, maxGen, orientation, template]);
+  const handleExportSvg = useCallback(async () => {
+    try {
+      await exportToSvg(nodes);
+    } catch (error) {
+      console.error('Export SVG failed:', error);
+      alert('Không thể export SVG. Vui lòng thử lại.');
+    }
+  }, [nodes]);
+
+  // Search
+  const handleSearch = useCallback((query: string) => {
+    setSearch(query);
+    // Không tìm real-time nữa, chỉ update state
+  }, []);
+
+  // Thực hiện tìm kiếm khi nhấn Enter hoặc button
+  const performSearch = useCallback(() => {
+    if (!search.trim()) {
+      setHighlightedNodes([]);
+      return;
+    }
+
+    // Find matching nodes
+    const matches = nodes.filter((n) =>
+      n.data.hoTen?.toLowerCase().includes(search.toLowerCase()) ||
+      n.data.ngheNghiep?.toLowerCase().includes(search.toLowerCase())
+    );
+    
+    const matchIds = matches.map((n) => n.id);
+    setHighlightedNodes(matchIds);
+
+    // Jump to first result
+    if (matches.length > 0 && fitView) {
+      setTimeout(() => {
+        fitView({ 
+          nodes: [matches[0]], 
+          duration: 800, 
+          padding: 0.5,
+          maxZoom: 1.5
+        });
+      }, 100);
+    }
+  }, [search, nodes, fitView]);
+
+  // Advanced search handler
+  const handleAdvancedSearch = useCallback((resultIds: string[]) => {
+    setHighlightedNodes(resultIds);
+    
+    // Jump to first result
+    if (resultIds.length > 0 && fitView) {
+      const firstNode = nodes.find((n) => n.id === resultIds[0]);
+      if (firstNode) {
+        setTimeout(() => {
+          fitView({ 
+            nodes: [firstNode], 
+            duration: 800, 
+            padding: 0.5,
+            maxZoom: 1.5
+          });
+        }, 100);
+      }
+    }
+  }, [nodes, fitView]);
+
+  // Double click to open modal
+  const onNodeDoubleClick = useCallback((_: any, node: Node<FamilyNodeData>) => {
+    setSelectedNodeData(node.data);
+    setModalOpen(true);
+  }, []);
+
+  // CRUD handlers
+  const handleAddMember = useCallback(() => {
+    setCrudMode("add");
+    setSelectedMember(null);
+    setCrudModalOpen(true);
+  }, []);
+
+  const handleEditMember = useCallback((nodeId: string) => {
+    const node = nodes.find((n) => n.id === nodeId);
+    if (!node) return;
+    
+    // Find the original member data
+    const member = data.find((m) => m.thanhVienId === node.data.memberId);
+    if (!member) return;
+    
+    setCrudMode("edit");
+    setSelectedMember(member);
+    setCrudModalOpen(true);
+  }, [nodes, data]);
+
+  const handleDeleteMember = useCallback(async (nodeId: string) => {
+    const node = nodes.find((n) => n.id === nodeId);
+    if (!node) return;
+    
+    const confirmed = window.confirm(`Bạn có chắc muốn xóa thành viên "${node.data.hoTen}"?`);
+    if (!confirmed) return;
+    
+    try {
+      if (!node.data.memberId) {
+        throw new Error("Không tìm thấy ID thành viên");
+      }
+      
+      // Lấy user ID và dongHoId từ storage
+      const user = storage.getUser();
+      const userId = user?.nguoiDungId || "";
+      const userDongHoId = user?.dongHoId;
+      const finalDongHoId = dongHoId || userDongHoId;
+      
+      const result = await deleteMember(
+        [{ thanhVienId: node.data.memberId }],
+        userId
+      );
+      
+      if (result.success) {
+        showSuccess("Xóa thành viên thành công!");
+        
+        // Invalidate queries nếu có queryClient
+        if (queryClient && finalDongHoId) {
+          queryClient.invalidateQueries({ queryKey: ["member-tree", finalDongHoId] });
+        }
+        // Fallback: gọi callback nếu có
+        if (onDataChange) {
+          onDataChange();
+        }
+      } else {
+        throw new Error(result.message || "Không thể xóa thành viên");
+      }
+    } catch (error: any) {
+      console.error("Error deleting member:", error);
+      showError(error.message || "Có lỗi xảy ra khi xóa thành viên");
+    }
+  }, [nodes, showSuccess, showError, dongHoId, queryClient, onDataChange]);
+
+  const handleSaveMember = useCallback(async (formData: Partial<ITreeNode>) => {
+    try {
+      // Lấy dongHoId từ user hiện tại thay vì props
+      const user = storage.getUser();
+      const userDongHoId = user?.dongHoId;
+      
+      // Fallback: lấy từ props hoặc từ data
+      let finalDongHoId = userDongHoId || dongHoId;
+      
+      if (!finalDongHoId && data.length > 0) {
+        // Thử lấy từ data có sẵn
+        finalDongHoId = data[0]?.dongHoId;
+      }
+      
+      if (!finalDongHoId) {
+        throw new Error("Không tìm thấy thông tin dòng họ");
+      }
+
+      // Lấy userId từ storage
+      const userId = user?.nguoiDungId || "";
+
+      // Format date cho API
+      const formatDateForAPI = (date: Date | string | undefined): string | undefined => {
+        if (!date) return undefined;
+        if (typeof date === 'string') return date;
+        return date.toISOString().split('T')[0];
+      };
+
+      if (crudMode === "add") {
+        // Tạo mới thành viên - format giống MemberModal
+        const payload = {
+          hoTen: formData.hoTen,
+          gioiTinh: formData.gioiTinh,
+          ngheNghiep: formData.ngheNghiep,
+          doiThuoc: formData.doiThuoc,
+          chaId: formData.chaId || null,
+          meId: formData.meId || null,
+          dongHoId: finalDongHoId,
+          lu_user_id: userId,
+          nguoiTaoId: userId,
+          // Thêm các trường mới
+          ngaySinh: formatDateForAPI(formData.ngaySinh),
+          ngayMat: formatDateForAPI(formData.ngayMat),
+          noiSinh: formData.noiSinh,
+          noiMat: formData.noiMat,
+          trinhDoHocVan: formData.trinhDoHocVan,
+          diaChiHienTai: formData.diaChiHienTai,
+          tieuSu: formData.tieuSu,
+          // Chuyển pids thành voId hoặc chongId
+          voId: formData.gioiTinh === 1 && formData.pids && formData.pids.length > 0 ? formData.pids[0] : null,
+          chongId: formData.gioiTinh === 0 && formData.pids && formData.pids.length > 0 ? formData.pids[0] : null,
+        };
+        
+        // Xóa các field undefined/empty string
+        Object.keys(payload).forEach(key => {
+          const value = payload[key as keyof typeof payload];
+          if (value === undefined || value === '') {
+            delete payload[key as keyof typeof payload];
+          }
+        });
+        
+        console.log('📤 [Tree CRUD] Creating member:', payload);
+        
+        const result = await createMember(payload);
+        
+        if (result.success) {
+          showSuccess("Thêm thành viên thành công!");
+          setCrudModalOpen(false);
+          setSelectedMember(null);
+          
+          // Invalidate queries nếu có queryClient
+          if (queryClient && finalDongHoId) {
+            queryClient.invalidateQueries({ queryKey: ["member-tree", finalDongHoId] });
+          }
+          // Fallback: gọi callback nếu có
+          if (onDataChange) {
+            onDataChange();
+          }
+        } else {
+          throw new Error(result.message || "Không thể thêm thành viên");
+        }
+      } else {
+        // Cập nhật thành viên
+        if (!selectedMember?.thanhVienId) {
+          throw new Error("Không tìm thấy ID thành viên");
+        }
+        
+        const payload = {
+          hoTen: formData.hoTen,
+          gioiTinh: formData.gioiTinh,
+          ngheNghiep: formData.ngheNghiep,
+          doiThuoc: formData.doiThuoc,
+          chaId: formData.chaId || null,
+          meId: formData.meId || null,
+          dongHoId: finalDongHoId,
+          lu_user_id: userId,
+          // Thêm các trường mới
+          ngaySinh: formatDateForAPI(formData.ngaySinh),
+          ngayMat: formatDateForAPI(formData.ngayMat),
+          noiSinh: formData.noiSinh,
+          noiMat: formData.noiMat,
+          trinhDoHocVan: formData.trinhDoHocVan,
+          diaChiHienTai: formData.diaChiHienTai,
+          tieuSu: formData.tieuSu,
+          // Chuyển pids thành voId hoặc chongId
+          voId: formData.gioiTinh === 1 && formData.pids && formData.pids.length > 0 ? formData.pids[0] : null,
+          chongId: formData.gioiTinh === 0 && formData.pids && formData.pids.length > 0 ? formData.pids[0] : null,
+        };
+        
+        // Xóa các field undefined/empty string
+        Object.keys(payload).forEach(key => {
+          const value = payload[key as keyof typeof payload];
+          if (value === undefined || value === '') {
+            delete payload[key as keyof typeof payload];
+          }
+        });
+        
+        console.log('📤 [Tree CRUD] Updating member:', payload);
+        
+        const result = await updateMember(selectedMember.thanhVienId, payload);
+        
+        if (result.success) {
+          showSuccess("Cập nhật thành viên thành công!");
+          setCrudModalOpen(false);
+          setSelectedMember(null);
+          
+          // Invalidate queries nếu có queryClient
+          if (queryClient && finalDongHoId) {
+            queryClient.invalidateQueries({ queryKey: ["member-tree", finalDongHoId] });
+          }
+          // Fallback: gọi callback nếu có
+          if (onDataChange) {
+            onDataChange();
+          }
+        } else {
+          throw new Error(result.message || "Không thể cập nhật thành viên");
+        }
+      }
+    } catch (error: any) {
+      console.error("Error saving member:", error);
+      showError(error.message || "Có lỗi xảy ra khi lưu thành viên");
+      throw error;
+    }
+  }, [crudMode, selectedMember, showSuccess, showError, dongHoId, data, queryClient, onDataChange]);
+
+  // Context menu handlers
+  const onNodeContextMenu = useCallback((event: React.MouseEvent, node: Node) => {
+    event.preventDefault();
+    setContextMenu({
+      id: node.id,
+      top: event.clientY,
+      left: event.clientX,
+    });
+    setCanvasContextMenu(null);
+  }, []);
+
+  const onPaneContextMenu = useCallback((event: React.MouseEvent) => {
+    event.preventDefault();
+    setCanvasContextMenu({
+      top: event.clientY,
+      left: event.clientX,
+    });
+    setContextMenu(null);
+  }, []);
+
+  const closeContextMenu = useCallback(() => {
+    setContextMenu(null);
+    setCanvasContextMenu(null);
+  }, []);
+
+  // Node changes with snapshot
+  const handleNodesChange = useCallback((changes: any) => {
+    // Take snapshot before drag
+    if (changes.some((c: any) => c.type === 'position' && c.dragging)) {
+      takeSnapshot(nodes, edges);
+    }
+    onNodesChange(changes);
+  }, [onNodesChange, nodes, edges, takeSnapshot]);
+
+  // Helper functions for modal
+  const getNameById = useCallback((id: string | number | null | undefined) => {
+    if (id == null) return "Không có";
+    const numId = typeof id === "string" ? Number(id) : id;
+    // Tìm trong data gốc theo fid/mid
+    const person = data.find((n) => n.id === numId);
+    return person?.hoTen || "Không có";
+  }, [data]);
+
+  const getChildren = useCallback((memberId: number | undefined) => {
+    if (!memberId) return [];
+    // Tìm trong data gốc theo thanhVienId
+    const parent = data.find((n) => n.thanhVienId === memberId);
+    if (!parent) return [];
+    
+    return data
+      .filter((n) => n.fid === parent.id || n.mid === parent.id)
+      .map((n) => n.hoTen || "Chưa rõ");
+  }, [data]);
 
   return (
-    <div className="relative w-full h-screen">
-      {/* LEFT - Control Panel */}
-      <ControlPanel
-        show={showLeft}
-        onToggle={() => setShowLeft(!showLeft)}
-        maxGen={maxGen}
-        setMaxGen={setMaxGen}
-        gens={gens}
-        orientation={orientation}
-        setOrientation={setOrientation}
-        template={template}
-        setTemplate={setTemplate}
-        search={search}
-        onSearch={doSearch}
-        resultCount={results.length}
-        totalNodes={allNodes.length}
+    <div className={`w-full h-screen ${darkMode ? 'dark bg-gray-900' : 'bg-gradient-to-b from-amber-50 to-stone-100'}`}>
+      <ReactFlow
+        nodes={nodes}
+        edges={edges}
+        onNodesChange={handleNodesChange}
+        onEdgesChange={onEdgesChange}
+        onNodeDoubleClick={onNodeDoubleClick}
+        onNodeContextMenu={onNodeContextMenu}
+        onPaneContextMenu={onPaneContextMenu}
+        nodeTypes={nodeTypes}
+        connectionMode={ConnectionMode.Loose}
+        fitView
+        fitViewOptions={{ padding: 0.2 }}
+        minZoom={0.1}
+        maxZoom={4}
+        defaultEdgeOptions={{
+          type: "smoothstep",
+          animated: false,
+        }}
+      >
+        <Background color={darkMode ? "#374151" : "#d4a574"} gap={16} />
+        <MiniMap
+          nodeColor={(node) => {
+            const data = node.data as FamilyNodeData;
+            if (data.ngayMat) return "#9ca3af";
+            return data.gioiTinh === 1 ? "#3b82f6" : "#ec4899";
+          }}
+          maskColor={darkMode ? "rgba(0, 0, 0, 0.3)" : "rgba(0, 0, 0, 0.1)"}
+        />
+        
+        <TreeControls
+          maxGen={maxGen}
+          setMaxGen={setMaxGen}
+          gens={gens}
+          direction={direction}
+          setDirection={setDirection}
+          search={search}
+          onSearch={handleSearch}
+          onPerformSearch={performSearch}
+          onRelayout={handleRelayout}
+          onExportPng={handleExportPng}
+          onExportSvg={handleExportSvg}
+          onUndo={handleUndo}
+          onRedo={handleRedo}
+          canUndo={canUndo}
+          canRedo={canRedo}
+          darkMode={darkMode}
+          onToggleDarkMode={() => setDarkMode(!darkMode)}
+          layoutAlgorithm={layoutAlgorithm}
+          setLayoutAlgorithm={setLayoutAlgorithm}
+          nodeTemplate={nodeTemplate}
+          setNodeTemplate={setNodeTemplate}
+          onAddMember={handleAddMember}
+          onRefresh={onDataChange}
+        />
+      </ReactFlow>
+      {/* Advanced Search */}
+      <AdvancedSearch
+        nodes={nodes}
+        onSearch={handleAdvancedSearch}
+        show={showAdvancedSearch}
+        onToggle={() => setShowAdvancedSearch(!showAdvancedSearch)}
       />
-
-      {/* RIGHT - Toolbar Panel */}
-      <ToolbarPanel show={showRight} onToggle={() => setShowRight(!showRight)} familyRef={familyRef} />
-
-      {/* LEGEND */}
-      {template === "custom" && (
-        <div className="absolute bottom-16 right-4 z-10 bg-white/95 rounded-lg shadow border border-amber-400 px-3 py-2 text-xs">
-          <div className="flex gap-4">
-            <span className="flex items-center gap-1">
-              <span className="w-3 h-3 rounded-full bg-blue-100 border-2 border-blue-600"></span>Nam
-            </span>
-            <span className="flex items-center gap-1">
-              <span className="w-3 h-3 rounded-full bg-pink-100 border-2 border-pink-600"></span>Nữ
-            </span>
-            <span className="flex items-center gap-1">
-              <span className="w-3 h-3 rounded-full bg-gray-200 border-2 border-gray-500"></span>Đã mất
-            </span>
-          </div>
-        </div>
+      {/* Context Menus */}
+      {contextMenu && (
+        <ContextMenu
+          id={contextMenu.id}
+          top={contextMenu.top}
+          left={contextMenu.left}
+          onClose={closeContextMenu}
+          onViewDetail={() => {
+            const node = nodes.find((n) => n.id === contextMenu.id);
+            if (node) {
+              setSelectedNodeData(node.data);
+              setModalOpen(true);
+            }
+          }}
+          onEdit={() => {
+            handleEditMember(contextMenu.id);
+          }}
+          onDelete={() => {
+            handleDeleteMember(contextMenu.id);
+          }}
+          onCenter={() => {
+            const node = nodes.find((n) => n.id === contextMenu.id);
+            if (node) {
+              fitView({ nodes: [node], duration: 800, padding: 0.5 });
+            }
+          }}
+        />
       )}
 
-      {/* SEARCH RESULTS */}
-      {results.length > 0 && (
-        <div className={`absolute z-10 bg-white rounded-lg shadow border border-amber-400 p-2 max-h-36 overflow-y-auto transition-all duration-300 ${
-          showRight ? 'bottom-16 left-4 right-20' : 'bottom-16 left-4'
-        }`}>
-          <p className="text-xs font-bold text-amber-800 mb-1">🎯 Kết quả ({results.length}):</p>
-          {results.slice(0, 6).map((id) => {
-            const n = allNodes.find((x) => x.id === id);
-            return (
-              <button
-                key={id}
-                onClick={() => familyRef.current?.center(id)}
-                className="block w-full text-left px-2 py-1 text-xs bg-amber-50 hover:bg-amber-100 rounded mb-0.5"
-              >
-                {n?.field_0}
-              </button>
-            );
-          })}
-          {results.length > 6 && <p className="text-xs text-gray-400 mt-1">...và {results.length - 6} khác</p>}
-        </div>
+      {canvasContextMenu && (
+        <CanvasContextMenu
+          top={canvasContextMenu.top}
+          left={canvasContextMenu.left}
+          onClose={closeContextMenu}
+          onFitView={() => fitView({ padding: 0.2, duration: 800 })}
+          onExportPng={handleExportPng}
+          onExportSvg={handleExportSvg}
+        />
       )}
 
-      {/* TREE */}
-      <div ref={divRef} className="w-full h-full bg-gradient-to-b from-amber-50 to-stone-100" />
-
-      {/* MODAL */}
-      {selectedNode && (
+      {/* Detail Modal */}
+      {selectedNodeData && (
         <FamilyMemberModal
           open={modalOpen}
           onOpenChange={setModalOpen}
-          node={selectedNode}
-          getNameById={(id) => {
-            if (id == null) return "Không có";
-            const nid = typeof id === "string" ? Number(id) : id;
-            return allNodes.find((n) => n.id === nid)?.field_0 || "Không có";
+          node={{
+            id: selectedNodeData.memberId,
+            memberId: selectedNodeData.memberId,
+            field_0: selectedNodeData.hoTen,
+            field_1: selectedNodeData.ngayMat
+              ? `Mất: ${new Date(selectedNodeData.ngayMat).toLocaleDateString("vi-VN")}`
+              : "Còn sống",
+            field_2: selectedNodeData.ngheNghiep || "Chưa rõ",
+            img_0: selectedNodeData.anhChanDung,
+            // Thêm thông tin cha mẹ, vợ chồng từ data gốc
+            fid: data.find((n) => n.thanhVienId === selectedNodeData.memberId)?.fid,
+            mid: data.find((n) => n.thanhVienId === selectedNodeData.memberId)?.mid,
+            pids: data.find((n) => n.thanhVienId === selectedNodeData.memberId)?.pids || [],
           }}
-          getChildren={(pid) =>
-            allNodes.filter((n) => n.fid === pid || n.mid === pid).map((n) => n.field_0 || "Chưa rõ")
-          }
+          getNameById={getNameById}
+          getChildren={getChildren}
         />
       )}
+
+      {/* CRUD Modal */}
+      <MemberCRUDModal
+        open={crudModalOpen}
+        onOpenChange={setCrudModalOpen}
+        mode={crudMode}
+        member={selectedMember}
+        allMembers={data}
+        dongHoId={dongHoId}
+      />
     </div>
   );
 };
+
+export const MyFamilyTree = (props: Props) => (
+  <ReactFlowProvider>
+    <MyFamilyTreeInner {...props} />
+  </ReactFlowProvider>
+);

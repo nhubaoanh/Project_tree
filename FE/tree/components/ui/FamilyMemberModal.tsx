@@ -80,17 +80,31 @@ export function FamilyMemberModal({
           </div>
 
           {/* Profile section */}
-          <div className="px-6 py-4 flex items-start gap-6 border-b border-gray-200">
-            <div className="w-24 h-24 rounded-full bg-gray-100 overflow-hidden border-2 border-white shadow-md">
+          <div className="px-6 py-4 flex items-start gap-6 border-b border-gray-200 bg-white/90">
+            <div className="w-24 h-24 rounded-full bg-white overflow-hidden border-4 border-red-100 shadow-lg flex-shrink-0">
               {node.img_0 ? (
                 <img
                   src={node.img_0}
                   alt={node.field_0}
                   className="w-full h-full object-cover"
+                  onError={(e) => {
+                    // Nếu ảnh lỗi, hiển thị icon User
+                    e.currentTarget.style.display = 'none';
+                    const parent = e.currentTarget.parentElement;
+                    if (parent) {
+                      parent.innerHTML = `
+                        <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-red-100 to-red-200">
+                          <svg class="w-12 h-12 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                          </svg>
+                        </div>
+                      `;
+                    }
+                  }}
                 />
               ) : (
-                <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-400">
-                  <User size={32} />
+                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-red-100 to-red-200">
+                  <User size={48} className="text-red-600" />
                 </div>
               )}
             </div>
@@ -104,7 +118,7 @@ export function FamilyMemberModal({
 
           {/* Tabs */}
           <Tabs.Root defaultValue="detail" className="w-full">
-            <Tabs.List className="grid grid-cols-4 border-b border-gray-200 px-6">
+            <Tabs.List className="grid grid-cols-4 px-6 bg-white/90 border-b border-gray-200">
               {[
                 { value: "detail", icon: User, label: "Chi tiết" },
                 { value: "parents", icon: Users, label: "Cha mẹ" },
@@ -126,7 +140,7 @@ export function FamilyMemberModal({
               ))}
             </Tabs.List>
 
-            <div className="p-6 max-h-[400px] overflow-y-auto">
+            <div className="p-6 max-h-[400px] overflow-y-auto bg-white/90">
               {/* Detail Tab */}
               <Tabs.Content value="detail" className="space-y-2">
                 <InfoItem label="Họ tên" value={node.field_0} />

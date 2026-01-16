@@ -1,6 +1,6 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
-import { Menu, Settings, LogOut, User } from "lucide-react";
+import { Menu, Settings, LogOut, User, Users } from "lucide-react";
 import { useSidebar } from "@/context/SidebarContext";
 import { useRouter } from "next/navigation";
 import storage from "@/utils/storage";
@@ -97,19 +97,36 @@ export default function Header() {
           </button>
           {open && (
             <div className="absolute right-0 mt-3 w-56 bg-white rounded-xl shadow-2xl py-3 z-50 border border-gray-100">
+              {/* User Info */}
               <div className="px-4 py-3 border-b border-gray-100 hover:bg-gray-50 rounded-t-lg transition-colors">
                 <p className="font-semibold text-gray-900">{userData?.full_name || 'Người dùng'}</p>
                 <p className="text-sm text-gray-600">{userData?.email || ''}</p>
               </div>
-              <Link
-                href="/settings"
-                className="w-full flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition-colors rounded-lg"
-                onClick={() => setOpen(false)}
-              >
-                <Settings size={18} className="flex-shrink-0" />
-                <span>Cài đặt</span>
-              </Link>
 
+              {/* Menu Items */}
+              <div className="py-1">
+                {/* Quản lý thông tin - Dữ liệu cá nhân */}
+                <Link
+                  href="/settings"
+                  className="w-full flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition-colors"
+                  onClick={() => setOpen(false)}
+                >
+                  <User size={18} className="flex-shrink-0" />
+                  <span>Quản lý thông tin</span>
+                </Link>
+
+                {/* Cài đặt - Cập nhật dòng họ */}
+                <Link
+                  href="/lineage"
+                  className="w-full flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition-colors"
+                  onClick={() => setOpen(false)}
+                >
+                  <Users size={18} className="flex-shrink-0" />
+                  <span>Cài đặt dòng họ</span>
+                </Link>
+              </div>
+
+              {/* Logout */}
               <div className="border-t border-gray-100 mt-1 pt-1">
                 <button
                   onClick={handleLogout}

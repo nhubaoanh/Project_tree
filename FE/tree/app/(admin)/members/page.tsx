@@ -119,19 +119,37 @@ export default function MembersPage() {
     // Mutations
     const createMutation = useMutation({
         mutationFn: (data: Partial<IMember>) => createMemberWithDongHo(data, dongHoId!),
-        onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["allMembers", dongHoId] }); showSuccess("Thêm thành viên thành công!"); setIsModalOpen(false); },
+        onSuccess: () => { 
+            queryClient.invalidateQueries({ queryKey: ["allMembers", dongHoId] });
+            queryClient.invalidateQueries({ queryKey: ["searchMembers", dongHoId] });
+            showSuccess("Thêm thành viên thành công!"); 
+            setIsModalOpen(false);
+            setEditingMember(null); // Reset editing state
+        },
         onError: (error: any) => { showError(error.message || "Có lỗi xảy ra khi thêm thành viên."); },
     });
 
     const updateMutation = useMutation({
         mutationFn: (vars: { id: number; data: Partial<IMember> }) => updateMember(vars.id, vars.data),
-        onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["allMembers", dongHoId] }); showSuccess("Cập nhật thành công!"); setIsModalOpen(false); },
+        onSuccess: () => { 
+            queryClient.invalidateQueries({ queryKey: ["allMembers", dongHoId] });
+            queryClient.invalidateQueries({ queryKey: ["searchMembers", dongHoId] });
+            showSuccess("Cập nhật thành công!"); 
+            setIsModalOpen(false);
+            setEditingMember(null); // Reset editing state
+        },
         onError: (error: any) => { showError(error.message || "Có lỗi xảy ra khi cập nhật."); },
     });
 
     const deleteMutation = useMutation({
         mutationFn: (thanhVienId: number) => deleteMember([{ thanhVienId }], dongHoId!),
-        onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["allMembers", dongHoId] }); showSuccess("Đã xóa thành viên."); setIsDeleteModalOpen(false); setMemberToDelete(null); },
+        onSuccess: () => { 
+            queryClient.invalidateQueries({ queryKey: ["allMembers", dongHoId] });
+            queryClient.invalidateQueries({ queryKey: ["searchMembers", dongHoId] });
+            showSuccess("Đã xóa thành viên."); 
+            setIsDeleteModalOpen(false); 
+            setMemberToDelete(null); 
+        },
         onError: (error: any) => { showError(error.message || "Không thể xóa thành viên này."); },
     });
 

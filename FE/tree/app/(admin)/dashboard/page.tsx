@@ -470,7 +470,7 @@ export default function Dashboard() {
                 </span>
               </div>
               {/* Bộ lọc tháng/năm */}
-              <div className="flex items-center gap-4 p-4 bg-white rounded-xl shadow-sm border border-gray-200">
+              <div className="flex items-center gap-2 p-2 bg-white rounded-xl shadow-sm border border-gray-200 mb-10">
                 <span className="text-sm font-medium text-[#1e3a5f]">
                   Lọc theo:
                 </span>
@@ -478,7 +478,7 @@ export default function Dashboard() {
                 <div className="relative">
                   <button
                     onClick={() => setIsYearDropdownOpen(!isYearDropdownOpen)}
-                    className="flex items-center gap-2 px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 transition-all min-w-[100px]"
+                    className="flex items-center gap-2 px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 transition-all max-w-[100px]"
                   >
                     <CalendarDays size={16} className="text-[#d4af37]" />
                     <span className="flex-1 text-left text-sm font-medium text-[#1e3a5f]">

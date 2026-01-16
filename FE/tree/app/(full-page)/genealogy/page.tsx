@@ -7,7 +7,7 @@ import { ViewMode } from "@/types/familytree";
 import { Users, MessageCircle } from "lucide-react";
 import TinTucPage from "../news/page";
 import PhaKyPage from "../pen/page";
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getMembersByDongHo } from "@/service/member.service";
 import { ITreeNode } from "@/types/tree";
 import { buildTree } from "@/utils/treeUtils";
@@ -28,6 +28,7 @@ function GenealogyLoading() {
 function GenealogyContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [activeView, setActiveView] = useState<ViewMode>(ViewMode.PHA_KY);
   
   // Lấy dongHoId từ URL
@@ -126,7 +127,11 @@ function GenealogyContent() {
                   <div className="text-[#8b5e3c]">Đang tải cây gia phả...</div>
                 </div>
               ) : treeData.length > 0 ? (
-                <MyFamilyTree data={treeData} />
+                <MyFamilyTree 
+                  data={treeData} 
+                  dongHoId={selectedDongHoId}
+                  queryClient={queryClient}
+                />
               ) : (
                 <div className="flex flex-col items-center justify-center h-full text-[#8b5e3c]">
                   <Users size={64} className="mb-4 opacity-50" />
