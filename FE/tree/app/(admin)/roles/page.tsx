@@ -306,7 +306,16 @@ export default function RolesPage() {
                 <div className="flex items-center gap-2">
                   <div className="relative">
                     <Input placeholder="Tên thao tác, mã thao tác..." value={searchThaoTac} onChange={(e) => setSearchThaoTac(e.target.value)} className="w-64 pr-8" />
-                    <Search className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    {searchThaoTac ? (
+                      <button
+                        onClick={() => setSearchThaoTac("")}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 hover:text-red-700 transition-colors"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    ) : (
+                      <Search className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    )}
                   </div>
                   <Button onClick={handleSavePermissions} disabled={saving} variant="outline">
                     {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : "Lưu"}

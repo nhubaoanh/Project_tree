@@ -43,22 +43,6 @@ export class thanhVienService {
     return await this.thanhvienRespository.getAllByDongHo(dongHoId);
   }
 
-  async searchThanhVien(
-    pageIndex: number,
-    pageSize: number,
-    search_content: string,
-    dongHoId: string,
-    thanhVienId: number
-  ): Promise<any> {
-    return await this.thanhvienRespository.searchThanhVien(
-      pageIndex,
-      pageSize,
-      search_content,
-      dongHoId,
-      thanhVienId
-    );
-  }
-
   // Search thành viên theo dòng họ cụ thể
   async searchThanhVienByDongHo(
     pageIndex: number,

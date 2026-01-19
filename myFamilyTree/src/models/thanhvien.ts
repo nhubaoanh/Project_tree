@@ -10,6 +10,7 @@ export interface thanhVien {
   ngheNghiep: string;
   trinhDoHocVan: string;
   diaChiHienTai: string;
+  soDienThoai: string;
   tieuSu: string;
   anhChanDung: string;
   doiThuoc: number;

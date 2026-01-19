@@ -139,16 +139,6 @@ thanhVienRouter.post(
   controller.createThanhVien.bind(controller)
 );
 
-/**
- * POST /search
- * Tìm kiếm thành viên
- */
-thanhVienRouter.post(
-  "/search",
-  authenticate,
-  validate(searchThanhVienRules),
-  controller.searchThanhVien.bind(controller)
-);
 
 /**
  * POST /search-by-dongho

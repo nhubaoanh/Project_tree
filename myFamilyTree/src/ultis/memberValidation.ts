@@ -13,6 +13,7 @@ export interface MemberImportData {
   noiMat: string;
   ngheNghiep: string;
   trinhDoHocVan: string;
+  soDienThoai: string;
   diaChiHienTai: string;
   tieuSu: string;
   doiThuoc: number;
@@ -164,7 +165,20 @@ function validateSingleMember(
     }
   }
 
-  // 6. Đời thứ - Phải là số dương
+  // 6. Số điện thoại - Validate format nếu có
+  if (member.soDienThoai && member.soDienThoai.trim() !== "") {
+    const phoneValidation = validatePhoneNumber(member.soDienThoai);
+    if (!phoneValidation.isValid) {
+      warnings.push({
+        row,
+        field: "Số điện thoại",
+        message: phoneValidation.message,
+        value: member.soDienThoai
+      });
+    }
+  }
+
+  // 7. Đời thứ - Phải là số dương
   if (member.doiThuoc !== null && member.doiThuoc !== undefined) {
     if (member.doiThuoc <= 0) {
       errors.push({
@@ -176,7 +190,7 @@ function validateSingleMember(
     }
   }
 
-  // 7. ID Cha - Phải tồn tại trong danh sách
+  // 8. ID Cha - Phải tồn tại trong danh sách
   if (member.chaId !== null) {
     if (!sttSet.has(member.chaId)) {
       errors.push({
@@ -208,7 +222,7 @@ function validateSingleMember(
     }
   }
 
-  // 8. ID Mẹ - Phải tồn tại và là Nữ
+  // 9. ID Mẹ - Phải tồn tại và là Nữ
   if (member.meId !== null) {
     if (!sttSet.has(member.meId)) {
       errors.push({
@@ -230,7 +244,7 @@ function validateSingleMember(
     }
   }
 
-  // 9. ID Vợ - Chỉ Nam mới có vợ
+  // 10. ID Vợ - Chỉ Nam mới có vợ
   // Nếu Nữ nhập ID Vợ -> tự động chuyển sang ID Chồng (cảnh báo thay vì lỗi)
   if (member.voId !== null) {
     if (member.gioiTinh !== 1) {
@@ -273,7 +287,7 @@ function validateSingleMember(
     }
   }
 
-  // 10. ID Chồng - Chỉ Nữ mới có chồng
+  // 11. ID Chồng - Chỉ Nữ mới có chồng
   // Nếu Nam nhập ID Chồng -> tự động chuyển sang ID Vợ
   if (member.chongId !== null) {
     if (member.gioiTinh !== 0) {
@@ -316,7 +330,7 @@ function validateSingleMember(
     }
   }
 
-  // 11. Không được tự tham chiếu
+  // 12. Không được tự tham chiếu
   if (member.chaId === member.stt) {
     errors.push({ row, field: "ID Cha", message: "Không thể là cha của chính mình" });
   }
@@ -374,6 +388,29 @@ function validateGlobalRules(
   }
 
   return { errors, warnings };
+}
+
+/**
+ * Validate số điện thoại Việt Nam
+ */
+function validatePhoneNumber(phone: string): { isValid: boolean; message: string } {
+  if (!phone || phone.trim() === "") {
+    return { isValid: true, message: "" };
+  }
+
+  const phoneStr = phone.trim();
+  
+  // Số điện thoại Việt Nam: 10-11 chữ số, bắt đầu bằng 0
+  const phoneRegex = /^0[3-9]\d{8,9}$/;
+  
+  if (!phoneRegex.test(phoneStr)) {
+    return { 
+      isValid: false, 
+      message: `Số điện thoại không đúng định dạng. VD: 0912345678, 0387654321` 
+    };
+  }
+
+  return { isValid: true, message: "" };
 }
 
 /**

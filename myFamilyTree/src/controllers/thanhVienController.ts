@@ -2,10 +2,7 @@ import { thanhVien } from "../models/thanhvien";
 import { thanhVienService } from "../services/thanhVienService";
 import { injectable } from "tsyringe";
 import { Request, Response } from "express";
-import multer from "multer";
-// import * as XLSX from 'xlsx'
-import ExcelJS, { BorderStyle, Alignment } from "exceljs";
-import { Readable } from "stream";
+import ExcelJS from "exceljs";
 
 @injectable()
 export class thanhVienController {
@@ -14,10 +11,7 @@ export class thanhVienController {
   // Tạo thành viên mới - dongHoId bắt buộc
   async createThanhVien(req: Request, res: Response): Promise<void> {
     try {
-      const thanhvien = req.body as thanhVien;
-      
-      console.log('📝 [createThanhVien] Received data:', JSON.stringify(thanhvien, null, 2));
-      
+      const thanhvien = req.body as thanhVien;      
       if (!thanhvien.dongHoId) {
         res.status(400).json({ message: "Thiếu dongHoId", success: false });
         return;
@@ -146,46 +140,6 @@ export class thanhVienController {
     }
   }
 
-  async searchThanhVien(req: Request, res: Response): Promise<void> {
-    try {
-      const object = req.body as {
-        pageIndex: number;
-        pageSize: number;
-        search_content: string;
-        dongHoId: string;
-        thanhVienId: number;
-      };
-
-      const data: any = await this.thanhvienService.searchThanhVien(
-        object.pageIndex,
-        object.pageSize,
-        object.search_content,
-        object.dongHoId,
-        object.thanhVienId
-      );
-      if (data) {
-        res.json({
-          totalItems: Math.ceil(
-            data && data.length > 0 ? data[0].RecordCount : 0
-          ),
-          page: object.pageIndex,
-          pageSize: object.pageSize,
-          data: data,
-          pageCount: Math.ceil(
-            (data && data.length > 0 ? data[0].RecordCount : 0) /
-              (object.pageSize ? object.pageSize : 1)
-          ),
-        });
-      } else {
-        res.json({ message: "Không tồn tại kết quả tìm kiếm.", success: true });
-      }
-    } catch (error: any) {
-      res
-        .status(500)
-        .json({ message: "Tim kiếm thanh vien that bai", success: false });
-    }
-  }
-
   // Search thành viên theo dòng họ cụ thể
   async searchThanhVienByDongHo(req: Request, res: Response): Promise<void> {
     try {
@@ -286,10 +240,10 @@ export class thanhVienController {
       const workbook = new ExcelJS.Workbook();
       const sheet = workbook.addWorksheet("Danh sách thành viên");
 
-      // ========== PHẦN DATA (Cột A-P) ==========
+      // ========== PHẦN DATA (Cột A-Q) ==========
       const headers = [
         "STT", "Họ và tên", "Giới tính", "Ngày sinh", "Ngày mất",
-        "Nơi sinh", "Nơi mất", "Nghề nghiệp", "Trình độ học vấn",
+        "Nơi sinh", "Nơi mất", "Nghề nghiệp", "Trình độ học vấn", "Số điện thoại",
         "Địa chỉ", "Tiểu sử", "Đời thứ", "ID Cha", "ID Mẹ", "ID Vợ", "ID Chồng",
       ];
 
@@ -297,11 +251,16 @@ export class thanhVienController {
       const headerRow = sheet.addRow(headers);
       headerRow.height = 28;
       headerRow.eachCell((cell, colNumber) => {
-        if (colNumber <= 16) {
+        if (colNumber <= 17) {
           cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "4472C4" } };
           cell.font = { bold: true, color: { argb: "FFFFFF" }, size: 11 };
           cell.alignment = { horizontal: "center", vertical: "middle", wrapText: true };
           cell.border = { top: { style: "thin" }, bottom: { style: "thin" }, left: { style: "thin" }, right: { style: "thin" } };
+          
+          // Format cột số điện thoại như text
+          if (colNumber === 10) { // Cột số điện thoại
+            cell.numFmt = "@"; // Text format
+          }
         }
       });
 
@@ -320,6 +279,7 @@ export class thanhVienController {
         const row = sheet.addRow([
           idx + 1, m.hoTen || "", m.gioiTinh ?? "", formatDate(m.ngaySinh), formatDate(m.ngayMat),
           m.noiSinh || "", m.noiMat || "", m.ngheNghiep || "", m.trinhDoHocVan || "",
+          m.soDienThoai || "", // Thêm số điện thoại
           m.diaChiHienTai || "", m.tieuSu || "", m.doiThuoc || "",
           m.chaId ? idToStt.get(m.chaId) || "" : "",
           m.meId ? idToStt.get(m.meId) || "" : "",
@@ -328,21 +288,28 @@ export class thanhVienController {
         ]);
         row.height = 22;
         row.eachCell((cell, colNumber) => {
-          if (colNumber <= 16) {
+          if (colNumber <= 17) {
             cell.alignment = { horizontal: "center", vertical: "middle" };
             cell.border = { top: { style: "thin" }, bottom: { style: "thin" }, left: { style: "thin" }, right: { style: "thin" } };
+            
+            // Format số điện thoại như text để giữ số 0 đầu
+            if (colNumber === 10 && cell.value) { // Cột số điện thoại
+              cell.numFmt = "@"; // Text format
+              cell.value = String(cell.value); // Đảm bảo là string
+            }
           }
         });
       });
 
-      // ========== PHẦN HƯỚNG DẪN (Cột R trở đi - bên phải) ==========
-      const guideCol = 18; // Cột R
+      // ========== PHẦN HƯỚNG DẪN (Cột S trở đi - bên phải) ==========
+      const guideCol = 19; // Cột S
       const guideLines = [
         { text: "📖 HƯỚNG DẪN", bold: true, size: 14, color: "4472C4" },
         { text: "" },
         { text: "▸ Giới tính: 1=Nam, 0=Nữ", bold: true },
         { text: "▸ Ngày: DD/MM/YYYY hoặc chỉ năm (1950)", bold: true },
         { text: "▸ Đời thứ: 1, 2, 3... (đời 1 là tổ tiên)", bold: true },
+        { text: "▸ Số điện thoại: 09xxxxxxxx hoặc 03xxxxxxxx", bold: true },
         { text: "" },
         { text: "▸ ID Cha/Mẹ/Vợ/Chồng:", bold: true },
         { text: "  Nhập STT của người tương ứng" },
@@ -354,7 +321,7 @@ export class thanhVienController {
         { text: "" },
         { text: "⚠️ LƯU Ý KHI IMPORT:", bold: true, color: "C00000" },
         { text: "  File này có thể import lại hệ thống" },
-        { text: "  Giữ nguyên format 16 cột đầu (A-P)" },
+        { text: "  Giữ nguyên format 17 cột đầu (A-Q)" },
       ];
 
       guideLines.forEach((line, idx) => {
@@ -378,15 +345,16 @@ export class thanhVienController {
       sheet.getColumn(7).width = 15;
       sheet.getColumn(8).width = 14;
       sheet.getColumn(9).width = 16;
-      sheet.getColumn(10).width = 20;
-      sheet.getColumn(11).width = 25;
-      sheet.getColumn(12).width = 10;
-      sheet.getColumn(13).width = 8;
+      sheet.getColumn(10).width = 16; // Số điện thoại
+      sheet.getColumn(11).width = 20;
+      sheet.getColumn(12).width = 25;
+      sheet.getColumn(13).width = 10;
       sheet.getColumn(14).width = 8;
       sheet.getColumn(15).width = 8;
-      sheet.getColumn(16).width = 10;
-      sheet.getColumn(17).width = 3;  // Cột trống ngăn cách
-      sheet.getColumn(18).width = 40; // Cột hướng dẫn
+      sheet.getColumn(16).width = 8;
+      sheet.getColumn(17).width = 10;
+      sheet.getColumn(18).width = 3;  // Cột trống ngăn cách
+      sheet.getColumn(19).width = 40; // Cột hướng dẫn
 
       res.setHeader("Content-Disposition", `attachment; filename="DanhSach_ThanhVien.xlsx"`);
       res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
@@ -407,7 +375,7 @@ export class thanhVienController {
       // ========== PHẦN DATA (Cột A-P) ==========
       const headers = [
         "STT", "Họ và tên", "Giới tính", "Ngày sinh", "Ngày mất",
-        "Nơi sinh", "Nơi mất", "Nghề nghiệp", "Trình độ học vấn",
+        "Nơi sinh", "Nơi mất", "Nghề nghiệp", "Trình độ học vấn", "Số điện thoại",
         "Địa chỉ", "Tiểu sử", "Đời thứ", "ID Cha", "ID Mẹ", "ID Vợ", "ID Chồng",
       ];
 
@@ -416,43 +384,59 @@ export class thanhVienController {
       const headerRow = sheet.getRow(1);
       headerRow.height = 28;
       headerRow.eachCell((cell, colNumber) => {
-        if (colNumber <= 16) {
+        if (colNumber <= 17) {
           cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "4472C4" } };
           cell.font = { bold: true, color: { argb: "FFFFFF" }, size: 11 };
           cell.alignment = { horizontal: "center", vertical: "middle", wrapText: true };
           cell.border = { top: { style: "thin" }, bottom: { style: "thin" }, left: { style: "thin" }, right: { style: "thin" } };
+          
+          // Format cột số điện thoại như text
+          if (colNumber === 10) { // Cột số điện thoại
+            cell.numFmt = "@"; // Text format
+          }
         }
       });
 
       // Row 2: Gợi ý nhập liệu
       const hints = [
         "Số TT", "Bắt buộc", "1=Nam, 0=Nữ", "Năm/DD/MM/YYYY", "Năm/DD/MM/YYYY",
-        "Tùy chọn", "Tùy chọn", "Tùy chọn", "Tùy chọn", "Tùy chọn", "Tùy chọn",
+        "Tùy chọn", "Tùy chọn", "Tùy chọn", "Tùy chọn", "09/03xxxxxxxx", "Tùy chọn", "Tùy chọn",
         "Số (1,2,3...)", "STT cha", "STT mẹ", "STT vợ", "STT chồng"
       ];
       const hintRow = sheet.addRow(hints);
       hintRow.height = 30;
       hintRow.eachCell((cell, colNumber) => {
-        if (colNumber <= 16) {
+        if (colNumber <= 17) {
           cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFF2CC" } };
           cell.font = { italic: true, size: 9, color: { argb: "806000" } };
           cell.alignment = { horizontal: "center", vertical: "middle", wrapText: true };
           cell.border = { top: { style: "thin" }, bottom: { style: "thin" }, left: { style: "thin" }, right: { style: "thin" } };
+          
+          // Format cột số điện thoại như text
+          if (colNumber === 10) { // Cột số điện thoại
+            cell.numFmt = "@"; // Text format
+          }
         }
       });
 
       // Row 3-4: Dữ liệu mẫu
       const samples = [
-        [1, "Nguyễn Văn A", 1, "1950", "2020", "Hà Nội", "Hà Nội", "Nông dân", "Cấp 3", "Hà Nội", "Tổ tiên", 1, "", "", 2, ""],
-        [2, "Trần Thị B", 0, "1955", "", "Hải Dương", "", "Nội trợ", "Cấp 2", "Hà Nội", "", 1, "", "", "", 1],
+        [1, "Nguyễn Văn A", 1, "1950", "2020", "Hà Nội", "Hà Nội", "Nông dân", "Cấp 3", "0912345678", "Hà Nội", "Tổ tiên", 1, "", "", 2, ""],
+        [2, "Trần Thị B", 0, "1955", "", "Hải Dương", "", "Nội trợ", "Cấp 2", "0987654321", "Hà Nội", "", 1, "", "", "", 1],
       ];
       samples.forEach(sample => {
         const row = sheet.addRow(sample);
         row.height = 22;
         row.eachCell((cell, colNumber) => {
-          if (colNumber <= 16) {
+          if (colNumber <= 17) {
             cell.alignment = { horizontal: "center", vertical: "middle" };
             cell.border = { top: { style: "thin" }, bottom: { style: "thin" }, left: { style: "thin" }, right: { style: "thin" } };
+            
+            // Format số điện thoại như text để giữ số 0 đầu
+            if (colNumber === 10 && cell.value) { // Cột số điện thoại
+              cell.numFmt = "@"; // Text format
+              cell.value = String(cell.value); // Đảm bảo là string
+            }
           }
         });
       });
@@ -460,7 +444,12 @@ export class thanhVienController {
       // ========== PHẦN HƯỚNG DẪN (Cột R - bên phải) ==========
       const guideCol = 18;
       const guideLines = [
-        { text: "📖 HƯỚNG DẪN NHẬP LIỆU", bold: true, size: 14, color: "4472C4" },
+        {
+          text: "📖 HƯỚNG DẪN NHẬP LIỆU",
+          bold: true,
+          size: 14,
+          color: "4472C4",
+        },
         { text: "" },
         { text: "1. CỘT STT (Bắt buộc)", bold: true },
         { text: "   Số thứ tự duy nhất, dùng để tham chiếu quan hệ" },
@@ -478,12 +467,16 @@ export class thanhVienController {
         { text: "   Nhập STT của người tương ứng" },
         { text: "   VD: Cha STT=1 → Con nhập ID Cha = 1" },
         { text: "" },
-        { text: "6. QUAN HỆ VỢ CHỒNG", bold: true },
+        { text: "6. SỐ ĐIỆN THOẠI", bold: true },
+        { text: "   Nhập số điện thoại đầy đủ" },
+        { text: "   VD: 0912345678, 0387654321" },
+        { text: "" },
+        { text: "7. QUAN HỆ VỢ CHỒNG", bold: true },
         { text: "   Nam → nhập ID Vợ, bỏ trống ID Chồng" },
         { text: "   Nữ → nhập ID Chồng, bỏ trống ID Vợ" },
         { text: "" },
         { text: "⚠️ LƯU Ý:", bold: true, color: "C00000" },
-        { text: "   Chỉ import 16 cột đầu (A-P)" },
+        { text: "   Chỉ import 17 cột đầu (A-Q)" },
         { text: "   Xóa dòng mẫu trước khi nhập dữ liệu thật" },
       ];
 
@@ -508,15 +501,16 @@ export class thanhVienController {
       sheet.getColumn(7).width = 15;
       sheet.getColumn(8).width = 14;
       sheet.getColumn(9).width = 16;
-      sheet.getColumn(10).width = 18;
-      sheet.getColumn(11).width = 20;
-      sheet.getColumn(12).width = 10;
-      sheet.getColumn(13).width = 8;
+      sheet.getColumn(10).width = 16;
+      sheet.getColumn(11).width = 18;
+      sheet.getColumn(12).width = 20;
+      sheet.getColumn(13).width = 10;
       sheet.getColumn(14).width = 8;
       sheet.getColumn(15).width = 8;
-      sheet.getColumn(16).width = 10;
-      sheet.getColumn(17).width = 3;  // Cột trống ngăn cách
-      sheet.getColumn(18).width = 45; // Cột hướng dẫn
+      sheet.getColumn(16).width = 8;
+      sheet.getColumn(17).width = 10;
+      sheet.getColumn(18).width = 3;  // Cột trống ngăn cách
+      sheet.getColumn(19).width = 45; // Cột hướng dẫn
 
       // Data validation cho cột Giới tính (từ dòng 3)
       for (let i = 3; i <= 1000; i++) {

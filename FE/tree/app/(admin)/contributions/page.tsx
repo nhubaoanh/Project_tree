@@ -12,6 +12,7 @@ import { IContributionUp, IsearchContributionUp } from "@/types/contribuitionUp"
 import { createContributionUp, deleteContributionUp, searchContributionUp, updateContributionUp, downloadTemplate, downloadTemplateWithSample, exportExcel, importFromExcel } from "@/service/contribuitionUp.service";
 import { ContributionUpModal } from "./components/contribuitionUpModal";
 import { useToast } from "@/service/useToas";
+import { useErrorModal } from "@/hooks";
 import storage from "@/utils/storage";
 import {
   PageLayout, 
@@ -21,7 +22,7 @@ import {
   PageLoading, 
   ErrorState,
   NoFamilyTreeState,
-  ValidationErrorModal,
+  ErrorModal,
   ColumnConfig,
   ActionConfig,
   DetailSection,
@@ -67,6 +68,7 @@ export default function QuanLyTaiChinhThuPage() {
   const [validationSummary, setValidationSummary] = useState({ validCount: 0, totalCount: 0 });
 
   const { showSuccess, showError } = useToast();
+  const errorModal = useErrorModal();
 
   React.useEffect(() => {
     const timer = setTimeout(() => {
@@ -102,8 +104,21 @@ export default function QuanLyTaiChinhThuPage() {
       showSuccess("Thêm dữ liệu đóng góp thành công!");
       setIsModalOpen(false);
     },
-    onError: () => {
-      showError("Có lỗi xảy ra khi thêm.");
+    onError: (error: any) => {
+      console.error("Create contribution error:", error);
+      
+      if (error.response?.data?.errors) {
+        errorModal.showError(
+          "Lỗi khi tạo khoản thu",
+          error.response.data.errors,
+          error.response.data.warnings || []
+        );
+      } else {
+        errorModal.showError("Lỗi khi tạo khoản thu", [{
+          field: "Hệ thống",
+          message: error.message || "Có lỗi xảy ra khi thêm khoản thu."
+        }]);
+      }
     },
   });
 
@@ -114,8 +129,21 @@ export default function QuanLyTaiChinhThuPage() {
       showSuccess("Cập nhật dữ liệu thành công!");
       setIsModalOpen(false);
     },
-    onError: () => {
-      showError("Có lỗi xảy ra khi cập nhật.");
+    onError: (error: any) => {
+      console.error("Update contribution error:", error);
+      
+      if (error.response?.data?.errors) {
+        errorModal.showError(
+          "Lỗi khi cập nhật khoản thu",
+          error.response.data.errors,
+          error.response.data.warnings || []
+        );
+      } else {
+        errorModal.showError("Lỗi khi cập nhật khoản thu", [{
+          field: "Hệ thống",
+          message: error.message || "Có lỗi xảy ra khi cập nhật khoản thu."
+        }]);
+      }
     },
   });
 
@@ -128,8 +156,21 @@ export default function QuanLyTaiChinhThuPage() {
       setItemsToDelete([]);
       setSelectedIds([]);
     },
-    onError: () => {
-      showError("Không thể xóa.");
+    onError: (error: any) => {
+      console.error("Delete contribution error:", error);
+      
+      if (error.response?.data?.errors) {
+        errorModal.showError(
+          "Lỗi khi xóa khoản thu",
+          error.response.data.errors,
+          error.response.data.warnings || []
+        );
+      } else {
+        errorModal.showError("Lỗi khi xóa khoản thu", [{
+          field: "Hệ thống",
+          message: error.message || "Không thể xóa khoản thu này."
+        }]);
+      }
     },
   });
 
@@ -288,15 +329,20 @@ export default function QuanLyTaiChinhThuPage() {
       } else {
         // Hiển thị modal validation errors
         if (result.errors && result.errors.length > 0) {
-          setValidationErrors(result.errors);
-          setValidationWarnings(result.warnings || []);
-          setValidationSummary({
-            validCount: result.validCount || 0,
-            totalCount: result.totalCount || 0
-          });
-          setIsValidationErrorModalOpen(true);
+          errorModal.showError(
+            "Lỗi khi nhập dữ liệu Excel",
+            result.errors,
+            result.warnings || [],
+            {
+              validCount: result.validCount || 0,
+              totalCount: result.totalCount || 0
+            }
+          );
         } else {
-          showError(result.message || "Import thất bại");
+          errorModal.showError("Lỗi khi nhập dữ liệu Excel", [{
+            field: "Import thất bại",
+            message: result.message || "Import thất bại"
+          }]);
         }
       }
     } catch (error: any) {
@@ -304,26 +350,28 @@ export default function QuanLyTaiChinhThuPage() {
       
       // Kiểm tra nếu error response có validation errors
       if (error.response?.data?.errors) {
-        setValidationErrors(error.response.data.errors);
-        setValidationWarnings(error.response.data.warnings || []);
-        setValidationSummary({
-          validCount: error.response.data.validCount || 0,
-          totalCount: error.response.data.totalCount || 0
-        });
-        setIsValidationErrorModalOpen(true);
+        errorModal.showError(
+          "Lỗi khi nhập dữ liệu Excel",
+          error.response.data.errors,
+          error.response.data.warnings || [],
+          {
+            validCount: error.response.data.validCount || 0,
+            totalCount: error.response.data.totalCount || 0
+          }
+        );
       } else if (error.response?.status === 500) {
         // Lỗi 500 - hiển thị modal với thông báo lỗi server
-        setValidationErrors([{
+        errorModal.showError("Lỗi hệ thống khi nhập Excel", [{
           row: 0,
           field: "Server Error",
           message: error.response?.data?.message || "Lỗi server khi xử lý file Excel. Vui lòng kiểm tra định dạng file và thử lại.",
           value: "HTTP 500"
         }]);
-        setValidationWarnings([]);
-        setValidationSummary({ validCount: 0, totalCount: 1 });
-        setIsValidationErrorModalOpen(true);
       } else {
-        showError(error.response?.data?.message || "Có lỗi xảy ra khi import file Excel");
+        errorModal.showError("Lỗi khi nhập dữ liệu Excel", [{
+          field: "Lỗi hệ thống",
+          message: error.response?.data?.message || "Có lỗi xảy ra khi import file Excel"
+        }]);
       }
     } finally {
       if (fileInputRef.current) fileInputRef.current.value = "";
@@ -607,15 +655,15 @@ export default function QuanLyTaiChinhThuPage() {
         }
       />
 
-      {/* Validation Error Modal */}
-      <ValidationErrorModal
-        isOpen={isValidationErrorModalOpen}
-        onClose={() => setIsValidationErrorModalOpen(false)}
-        title="Lỗi Import File Excel"
-        errors={validationErrors}
-        warnings={validationWarnings}
-        validCount={validationSummary.validCount}
-        totalCount={validationSummary.totalCount}
+      {/* Error Modal */}
+      <ErrorModal
+        isOpen={errorModal.isOpen}
+        onClose={errorModal.hideError}
+        title={errorModal.title}
+        errors={errorModal.errors}
+        warnings={errorModal.warnings}
+        validCount={errorModal.validCount}
+        totalCount={errorModal.totalCount}
       />
     </PageLayout>
   );

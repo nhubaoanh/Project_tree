@@ -254,22 +254,56 @@ export default function QuanLyTaiLieuPage() {
         </div>
       </div>
 
-      {/* Filter */}
-      <div className="mb-6 flex items-center gap-2">
-        <Filter size={16} className="text-[#8b5e3c]" />
-        <select
-          value={filterLoai}
-          onChange={(e) => { setFilterLoai(e.target.value); setPageIndex(1); }}
-          className="px-3 py-2 border border-[#d4af37] rounded bg-white text-[#5d4037]"
-        >
-          <option value="">Tất cả loại</option>
-          {LOAI_TAI_LIEU.map((loai) => (
-            <option key={loai} value={loai}>{loai}</option>
-          ))}
-        </select>
+      {/* DataTable Component với filter inline */}
+      <div className="mb-6">
+        {/* Search và Filter cùng hàng */}
+        <div className="flex flex-col md:flex-row gap-4 mb-6">
+          {/* Search */}
+          <div className="flex-1 flex items-center bg-white border border-yellow-600 rounded-lg p-1 shadow-sm transition-all focus-within:ring-2 focus-within:ring-yellow-600 focus-within:ring-opacity-50">
+            <div className="p-2 text-stone-400">
+              {isLoading ? (
+                <div className="animate-spin w-5 h-5 border-2 border-stone-400 border-t-transparent rounded-full"></div>
+              ) : (
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              )}
+            </div>
+            <input
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Tìm kiếm theo tên tài liệu..."
+              className="w-full p-2 outline-none bg-transparent text-yellow-900 placeholder-stone-400"
+            />
+            {searchTerm && (
+              <button 
+                onClick={() => setSearchTerm("")} 
+                className="p-2 text-stone-400 hover:text-red-700 transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            )}
+          </div>
+
+          {/* Filter */}
+          <div className="flex items-center gap-2 min-w-[200px]">
+            <Filter size={16} className="text-[#8b5e3c]" />
+            <select
+              value={filterLoai}
+              onChange={(e) => { setFilterLoai(e.target.value); setPageIndex(1); }}
+              className="flex-1 px-3 py-2 border border-[#d4af37] rounded-lg bg-white text-[#5d4037] focus:ring-2 focus:ring-yellow-600 focus:border-yellow-600"
+            >
+              <option value="">Tất cả loại</option>
+              {LOAI_TAI_LIEU.map((loai) => (
+                <option key={loai} value={loai}>{loai}</option>
+              ))}
+            </select>
+          </div>
+        </div>
       </div>
 
-      {/* DataTable Component */}
       <DataTable
         data={dataList}
         columns={columns}
@@ -291,9 +325,6 @@ export default function QuanLyTaiLieuPage() {
           { icon: Edit, label: "Sửa", onClick: handleEdit, color: "blue" },
           { icon: Trash2, label: "Xóa", onClick: handleDeleteClick, color: "red" },
         ]}
-        searchValue={searchTerm}
-        onSearchChange={setSearchTerm}
-        searchPlaceholder="Tìm kiếm theo tên tài liệu..."
       />
 
       {/* Modals */}

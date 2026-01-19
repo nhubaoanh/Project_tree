@@ -1,6 +1,6 @@
 import { API_CORE } from "@/constant/config";
 import { apiClient } from "@/lib/api";
-import { IMemberSearch } from "@/types/member";
+import { IMemberSearch, IMember, IMemberImport } from "@/types/member";
 import { parseApiError } from "@/lib/apiError";
 
 const prefix = `${API_CORE}/member`;
@@ -65,7 +65,7 @@ export const updateMember = async (id: number, data: any): Promise<any> => {
     }
 }
 
-export const deleteMember = async (listJson: { thanhVienId: number }[], luUserId: string): Promise<any> => {
+export const deleteMember = async (listJson: { thanhVienId: number; dongHoId: string }[], luUserId: string): Promise<any> => {
     try {
         const res = await apiClient.post(`${prefix}/delete`, {
             list_json: listJson,
@@ -190,22 +190,3 @@ export const importMembersJson = async (
     }
 }
 
-// Interface cho import
-export interface IMemberImport {
-    stt: number | null;
-    hoTen: string;
-    gioiTinh: number;
-    ngaySinh: string | null;
-    ngayMat: string | null;
-    noiSinh: string;
-    noiMat: string;
-    ngheNghiep: string;
-    trinhDoHocVan: string;
-    diaChiHienTai: string;
-    tieuSu: string;
-    doiThuoc: number;
-    chaId: number | null;
-    meId: number | null;
-    voId: number | null;
-    chongId: number | null;
-}

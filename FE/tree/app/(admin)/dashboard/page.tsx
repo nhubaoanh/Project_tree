@@ -149,24 +149,38 @@ export default function Dashboard() {
         <>
           {/* KPI Cards */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            <KPICard title="Tổng Thành Viên" value={stats?.tongThanhVien || 0} icon={Users} bgColor="bg-gradient-to-br from-[#1e3a5f] to-[#2c5282]" />
-            <KPICard 
-              title="Nam Giới" 
+            <KPICard
+              title="Tổng Thành Viên"
+              value={stats?.tongThanhVien || 0}
+              icon={Users}
+              bgColor="bg-gradient-to-br from-[#1e3a5f] to-[#2c5282]"
+            />
+            <KPICard
+              title="Nam Giới"
               value={stats?.tongNam || 0}
               ratio={`${stats?.tongNam || 0}/${stats?.tongThanhVien || 0}`}
-              percentage={`${Math.round((stats?.tongNam / (stats?.tongThanhVien || 1)) * 100)}%`}
-              icon={UserPlus} 
-              bgColor="bg-gradient-to-br from-[#d4af37] to-[#a16207]" 
+              percentage={`${Math.round(
+                (stats?.tongNam / (stats?.tongThanhVien || 1)) * 100
+              )}%`}
+              icon={UserPlus}
+              bgColor="bg-gradient-to-br from-[#d4af37] to-[#a16207]"
             />
-            <KPICard 
-              title="Nữ Giới" 
+            <KPICard
+              title="Nữ Giới"
               value={stats?.tongNu || 0}
               ratio={`${stats?.tongNu || 0}/${stats?.tongThanhVien || 0}`}
-              percentage={`${Math.round((stats?.tongNu / (stats?.tongThanhVien || 1)) * 100)}%`}
-              icon={Heart} 
-              bgColor="bg-gradient-to-br from-[#b91c1c] to-[#991b1b]" 
+              percentage={`${Math.round(
+                (stats?.tongNu / (stats?.tongThanhVien || 1)) * 100
+              )}%`}
+              icon={Heart}
+              bgColor="bg-gradient-to-br from-[#b91c1c] to-[#991b1b]"
             />
-            <KPICard title="Số Đời" value={stats?.doiCaoNhat || 0} icon={GitBranch} bgColor="bg-gradient-to-br from-[#5d4037] to-[#3e2723]" />
+            <KPICard
+              title="Số Đời"
+              value={stats?.doiCaoNhat || 0}
+              icon={GitBranch}
+              bgColor="bg-gradient-to-br from-[#5d4037] to-[#3e2723]"
+            />
           </div>
 
           {/* Main Content Grid */}
@@ -187,50 +201,88 @@ export default function Dashboard() {
               {generationData.length > 0 ? (
                 <div className="h-[400px]">
                   <ResponsiveContainer>
-                    <BarChart data={generationData} margin={{ top: 10, right: 10, left: -10, bottom: 5 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" vertical={false} />
-                      <XAxis dataKey="name" stroke="#9ca3af" fontSize={11} tickLine={false} axisLine={false} />
-                      <YAxis stroke="#9ca3af" fontSize={11} tickLine={false} axisLine={false} />
-                      <Tooltip contentStyle={{ borderRadius: 12, border: "none", boxShadow: "0 4px 20px rgba(0,0,0,0.1)" }} />
-                      <Bar dataKey="nam" fill="#1e3a5f" radius={[6, 6, 0, 0]} barSize={24} />
-                      <Bar dataKey="nu" fill="#d4af37" radius={[6, 6, 0, 0]} barSize={24} />
+                    <BarChart
+                      data={generationData}
+                      margin={{ top: 10, right: 10, left: -10, bottom: 5 }}
+                    >
+                      <CartesianGrid
+                        strokeDasharray="3 3"
+                        stroke="#f0f0f0"
+                        vertical={false}
+                      />
+                      <XAxis
+                        dataKey="name"
+                        stroke="#9ca3af"
+                        fontSize={11}
+                        tickLine={false}
+                        axisLine={false}
+                      />
+                      <YAxis
+                        stroke="#9ca3af"
+                        fontSize={11}
+                        tickLine={false}
+                        axisLine={false}
+                      />
+                      <Tooltip
+                        contentStyle={{
+                          borderRadius: 12,
+                          border: "none",
+                          boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
+                        }}
+                      />
+                      <Bar
+                        dataKey="nam"
+                        fill="#1e3a5f"
+                        radius={[6, 6, 0, 0]}
+                        barSize={24}
+                      />
+                      <Bar
+                        dataKey="nu"
+                        fill="#d4af37"
+                        radius={[6, 6, 0, 0]}
+                        barSize={24}
+                      />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
               ) : (
-                <div className="h-[400px] flex items-center justify-center text-gray-400">Chưa có dữ liệu</div>
+                <div className="h-[400px] flex items-center justify-center text-gray-400">
+                  Chưa có dữ liệu
+                </div>
               )}
             </div>
 
             {/* Quick Stats - 1 cột BÊN PHẢI */}
             <div className="bg-white rounded-2xl p-5 shadow-lg border border-gray-100">
-              <h2 className="font-bold text-[#1e3a5f] mb-3">Thống Kê Nhanh</h2>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between p-2 bg-green-50 rounded-lg">
-                  <span className="text-xxs text-gray-600 flex items-center gap-2">
-                    <ArrowDownCircle size={14} className="text-green-600" /> Tổng thu
-                  </span>
-                  <span className="font-bold text-green-600 text-sm">{formatMoney(thuChi?.tongThu || 0)}</span>
+              <h2 className="font-bold text-[#1e3a5f] mb-3 text-sm">
+                Sự Kiện Sắp Tới
+              </h2>
+              {suKienSapToi.length > 0 ? (
+                <div className="space-y-2">
+                  {suKienSapToi.slice(0, 5).map((event: any, idx: number) => (
+                    <div
+                      key={idx}
+                      className="flex items-center gap-3 p-2 bg-gray-50 rounded-lg"
+                    >
+                      <div className="w-10 h-10 bg-[#d4af37] rounded-lg flex items-center justify-center text-white">
+                        <CalendarDays size={16} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xl font-semibold text-[#1e3a5f] truncate">
+                          {event.tenSuKien}
+                        </p>
+                        <p className="text-[15px] text-gray-400">
+                          {formatDate(event.ngayDienRa)}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-                <div className="flex items-center justify-between p-2 bg-red-50 rounded-lg">
-                  <span className="text-xxs text-gray-600 flex items-center gap-2">
-                    <ArrowUpCircle size={14} className="text-red-600" /> Tổng chi
-                  </span>
-                  <span className="font-bold text-red-600 text-sm">{formatMoney(thuChi?.tongChi || 0)}</span>
-                </div>
-                <div className="flex items-center justify-between p-2 bg-blue-50 rounded-lg">
-                  <span className="text-xxs text-gray-600 flex items-center gap-2">
-                    <Wallet size={14} className="text-blue-600" /> Số dư
-                  </span>
-                  <span className="font-bold text-blue-600 text-sm">{formatMoney((thuChi?.tongThu || 0) - (thuChi?.tongChi || 0))}</span>
-                </div>
-                <div className="flex items-center justify-between p-2 bg-amber-50 rounded-lg">
-                  <span className="text-xxs text-gray-600 flex items-center gap-2">
-                    <Calendar size={14} className="text-amber-600" /> Sự kiện
-                  </span>
-                  <span className="font-bold text-amber-600 text-sm">{suKien?.tongSuKien || 0}</span>
-                </div>
-              </div>
+              ) : (
+                <p className="text-xs text-gray-400 text-center py-4">
+                  Không có sự kiện
+                </p>
+              )}
             </div>
           </div>
 
@@ -240,7 +292,7 @@ export default function Dashboard() {
             <div className="lg:col-span-3 bg-white rounded-2xl p-5 shadow-lg border border-gray-100">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="font-bold text-[#1e3a5f]">Thu Chi Theo Tháng</h3>
-                
+
                 {/* Bộ lọc năm */}
                 <div className="relative">
                   <button
@@ -390,35 +442,45 @@ export default function Dashboard() {
 
             {/* Upcoming Events - 2 phần */}
             <div className="lg:col-span-2 bg-white rounded-2xl p-4 shadow-lg border border-gray-100">
-              <h2 className="font-bold text-[#1e3a5f] mb-3 text-sm">
-                Sự Kiện Sắp Tới
-              </h2>
-              {suKienSapToi.length > 0 ? (
-                <div className="space-y-2">
-                  {suKienSapToi.slice(0, 5).map((event: any, idx: number) => (
-                    <div
-                      key={idx}
-                      className="flex items-center gap-3 p-2 bg-gray-50 rounded-lg"
-                    >
-                      <div className="w-10 h-10 bg-[#d4af37] rounded-lg flex items-center justify-center text-white">
-                        <CalendarDays size={16} />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xl font-semibold text-[#1e3a5f] truncate">
-                          {event.tenSuKien}
-                        </p>
-                        <p className="text-[15px] text-gray-400">
-                          {formatDate(event.ngayDienRa)}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
+              <h2 className="font-bold text-[#1e3a5f] mb-3">Thống Kê Nhanh</h2>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between p-2 bg-green-50 rounded-lg">
+                  <span className="text-xxs text-gray-600 flex items-center gap-2">
+                    <ArrowDownCircle size={14} className="text-green-600" />{" "}
+                    Tổng thu
+                  </span>
+                  <span className="font-bold text-green-600 text-sm">
+                    {formatMoney(thuChi?.tongThu || 0)}
+                  </span>
                 </div>
-              ) : (
-                <p className="text-xs text-gray-400 text-center py-4">
-                  Không có sự kiện
-                </p>
-              )}
+                <div className="flex items-center justify-between p-2 bg-red-50 rounded-lg">
+                  <span className="text-xxs text-gray-600 flex items-center gap-2">
+                    <ArrowUpCircle size={14} className="text-red-600" /> Tổng
+                    chi
+                  </span>
+                  <span className="font-bold text-red-600 text-sm">
+                    {formatMoney(thuChi?.tongChi || 0)}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between p-2 bg-blue-50 rounded-lg">
+                  <span className="text-xxs text-gray-600 flex items-center gap-2">
+                    <Wallet size={14} className="text-blue-600" /> Số dư
+                  </span>
+                  <span className="font-bold text-blue-600 text-sm">
+                    {formatMoney(
+                      (thuChi?.tongThu || 0) - (thuChi?.tongChi || 0)
+                    )}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between p-2 bg-amber-50 rounded-lg">
+                  <span className="text-xxs text-gray-600 flex items-center gap-2">
+                    <Calendar size={14} className="text-amber-600" /> Sự kiện
+                  </span>
+                  <span className="font-bold text-amber-600 text-sm">
+                    {suKien?.tongSuKien || 0}
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
 

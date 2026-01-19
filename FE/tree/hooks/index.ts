@@ -1,6 +1,8 @@
 export { useCrudOperations } from "./useCrudOperations";
 export { useSearch } from "./useSearch";
 export { usePagination } from "./usePagination";
+export { useErrorModal } from "./useErrorModal";
+export { useUndoRedo } from "./useUndoRedo";
 
 export type {
   CrudOperations,

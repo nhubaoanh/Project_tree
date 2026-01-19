@@ -1,0 +1,110 @@
+/* Cursor Pointer Fixes for Interactive Elements */
+
+/* Buttons that are missing cursor-pointer */
+button:not([disabled]) {
+  cursor: pointer;
+}
+
+/* Interactive divs and spans with onClick */
+[onclick]:not([disabled]),
+div[onclick]:not([disabled]),
+span[onclick]:not([disabled]) {
+  cursor: pointer;
+}
+
+/* Specific component fixes */
+
+/* Search clear buttons */
+.search-clear-button,
+button[aria-label="Clear search"] {
+  cursor: pointer;
+}
+
+/* Modal close buttons */
+.modal-close-button,
+button[aria-label="Close"],
+button[aria-label="Đóng"] {
+  cursor: pointer;
+}
+
+/* Navigation buttons */
+.nav-button,
+.sidebar-button,
+.menu-button {
+  cursor: pointer;
+}
+
+/* Upload areas */
+.upload-area,
+.file-upload-trigger {
+  cursor: pointer;
+}
+
+/* Interactive cards and items */
+.clickable-card,
+.interactive-item,
+.selectable-item {
+  cursor: pointer;
+}
+
+/* Tree component interactive elements */
+.tree-node,
+.tree-control,
+.context-menu-item {
+  cursor: pointer;
+}
+
+/* Form elements that should have pointer cursor */
+select:not([disabled]),
+input[type="checkbox"]:not([disabled]),
+input[type="radio"]:not([disabled]),
+input[type="file"]:not([disabled]) {
+  cursor: pointer;
+}
+
+/* Hover states that should have pointer cursor */
+.hover\:bg-gray-100:hover,
+.hover\:bg-red-50:hover,
+.hover\:opacity-80:hover,
+.hover\:scale-110:hover,
+.hover\:shadow-xl:hover {
+  cursor: pointer;
+}
+
+/* Specific fixes for components found in search */
+.transition-colors:hover,
+.transition-transform:hover,
+.transition-all:hover {
+  cursor: pointer;
+}
+
+/* Toast notifications that are clickable */
+.toast-clickable {
+  cursor: pointer;
+}
+
+/* Table rows that are hoverable/clickable
+tr:hover,
+.table-row:hover {
+  cursor: pointer;
+} */
+
+/* Icon buttons */
+.icon-button,
+button > svg,
+button > .lucide {
+  cursor: pointer;
+}
+
+/* Disabled state override */
+[disabled],
+.disabled,
+.opacity-50 {
+  cursor: not-allowed !important;
+}
+
+/* Loading state override */
+.loading,
+.animate-spin {
+  cursor: wait !important;
+}

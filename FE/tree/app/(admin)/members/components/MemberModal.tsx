@@ -59,6 +59,7 @@ export const MemberModal: React.FC<MemberModalProps> = ({
         noiMat: member?.noiMat || "",
         ngheNghiep: member?.ngheNghiep || "",
         trinhDoHocVan: member?.trinhDoHocVan || "",
+        soDienThoai: member?.soDienThoai || "",
         diaChiHienTai: member?.diaChiHienTai || "",
         tieuSu: member?.tieuSu || "",
         anhChanDung: member?.anhChanDung || "",
@@ -337,6 +338,11 @@ export const MemberModal: React.FC<MemberModalProps> = ({
             <div className="space-y-2">
               <label className="block text-sm font-bold text-[#8b5e3c] uppercase">Trình độ học vấn</label>
               <input type="text" value={formData.trinhDoHocVan || ""} onChange={(e) => setFormData({ ...formData, trinhDoHocVan: e.target.value })} className="w-full p-3 bg-white border border-[#d4af37]/50 rounded shadow-inner focus:outline-none focus:border-[#b91c1c]" />
+            </div>
+
+            <div className="space-y-2">
+              <label className="block text-sm font-bold text-[#8b5e3c] uppercase">Số điện thoại</label>
+              <input type="tel" value={formData.soDienThoai || ""} onChange={(e) => setFormData({ ...formData, soDienThoai: e.target.value })} placeholder="VD: 0912345678" className="w-full p-3 bg-white border border-[#d4af37]/50 rounded shadow-inner focus:outline-none focus:border-[#b91c1c]" />
             </div>
 
             <div className="space-y-2">

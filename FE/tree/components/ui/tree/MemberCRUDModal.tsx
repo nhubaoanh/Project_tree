@@ -12,7 +12,7 @@ import { User, Users, Heart, Check, ChevronsUpDown, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ITreeNode } from "@/types/tree";
 import { useQueryClient } from "@tanstack/react-query";
-import { createMember, updateMember } from "@/service/member.service";
+import { createMemberWithDongHo, updateMember } from "@/service/member.service";
 import { useToast } from "@/service/useToas";
 import storage from "@/utils/storage";
 
@@ -33,6 +33,13 @@ export function MemberCRUDModal({
   allMembers,
   dongHoId,
 }: MemberCRUDModalProps) {
+  console.log("🔄 [MemberCRUDModal] Render with props:", {
+    open,
+    mode,
+    member: member?.hoTen,
+    dongHoId,
+    allMembersCount: allMembers.length
+  });
   const queryClient = useQueryClient();
   const { showSuccess, showError } = useToast();
   
@@ -163,22 +170,22 @@ export function MemberCRUDModal({
       const payload = {
         hoTen: formData.hoTen,
         gioiTinh: formData.gioiTinh,
-        ngheNghiep: formData.ngheNghiep,
+        ngheNghiep: formData.ngheNghiep || "",
         doiThuoc: formData.doiThuoc,
         chaId: formData.fid || null,
         meId: formData.mid || null,
-        dongHoId: finalDongHoId,
         lu_user_id: userId,
         nguoiTaoId: userId,
         ngaySinh: formatDateForAPI(formData.ngaySinh),
         ngayMat: formatDateForAPI(formData.ngayMat),
-        noiSinh: formData.noiSinh,
-        noiMat: formData.noiMat,
-        trinhDoHocVan: formData.trinhDoHocVan,
-        diaChiHienTai: formData.diaChiHienTai,
-        tieuSu: formData.tieuSu,
+        noiSinh: formData.noiSinh || "",
+        noiMat: formData.noiMat || "",
+        trinhDoHocVan: formData.trinhDoHocVan || "",
+        diaChiHienTai: formData.diaChiHienTai || "",
+        tieuSu: formData.tieuSu || "",
+        // Xử lý vợ/chồng
         voId: formData.gioiTinh === 1 && formData.pids && formData.pids.length > 0 ? formData.pids[0] : null,
-        chongId: formData.gioiTinh === 0 && formData.pids && formData.pids.length > 0 ? formData.pids[0] : null,
+        chongId: formData.gioiTinh === 2 && formData.pids && formData.pids.length > 0 ? formData.pids[0] : null,
       };
 
       // Xóa các field undefined/empty string
@@ -188,17 +195,20 @@ export function MemberCRUDModal({
           delete payload[key as keyof typeof payload];
         }
       });
-
-      console.log('📤 [MemberCRUDModal] Sending data:', payload);
-
       let result;
       if (mode === "add") {
-        result = await createMember(payload);
+        // Sử dụng createMemberWithDongHo thay vì createMember
+        result = await createMemberWithDongHo(payload, finalDongHoId);
       } else {
         if (!member?.thanhVienId) {
           throw new Error("Không tìm thấy ID thành viên");
         }
-        result = await updateMember(member.thanhVienId, payload);
+        // Thêm dongHoId vào payload cho update
+        const updatePayload = {
+          ...payload,
+          dongHoId: finalDongHoId
+        };
+        result = await updateMember(member.thanhVienId, updatePayload);
       }
 
       if (result.success) {

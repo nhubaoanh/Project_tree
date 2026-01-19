@@ -30,7 +30,7 @@ import { AdvancedSearch } from "./tree/AdvancedSearch";
 import { getLayoutedElements } from "./tree/layoutUtils";
 import { exportToPng, exportToSvg } from "./tree/exportUtils";
 import { useUndoRedo } from "@/hooks/useUndoRedo";
-import { createMember, updateMember, deleteMember } from "@/service/member.service";
+import { createMemberWithDongHo, updateMember, deleteMember } from "@/service/member.service";
 import { useToast } from "@/service/useToas";
 import storage from "@/utils/storage";
 
@@ -363,9 +363,11 @@ const MyFamilyTreeInner = ({ data, dongHoId, queryClient, onDataChange }: Props)
 
   // CRUD handlers
   const handleAddMember = useCallback(() => {
+    console.log("➕ [Tree] handleAddMember called");
     setCrudMode("add");
     setSelectedMember(null);
     setCrudModalOpen(true);
+    console.log("✅ [Tree] CRUD modal should open now");
   }, []);
 
   const handleEditMember = useCallback((nodeId: string) => {
@@ -382,11 +384,21 @@ const MyFamilyTreeInner = ({ data, dongHoId, queryClient, onDataChange }: Props)
   }, [nodes, data]);
 
   const handleDeleteMember = useCallback(async (nodeId: string) => {
+    console.log("🗑️ [Tree] handleDeleteMember called with nodeId:", nodeId);
+    
     const node = nodes.find((n) => n.id === nodeId);
-    if (!node) return;
+    if (!node) {
+      console.error("❌ [Tree] Node not found:", nodeId);
+      return;
+    }
+    
+    console.log("🔍 [Tree] Found node:", node.data);
     
     const confirmed = window.confirm(`Bạn có chắc muốn xóa thành viên "${node.data.hoTen}"?`);
-    if (!confirmed) return;
+    if (!confirmed) {
+      console.log("❌ [Tree] User cancelled delete");
+      return;
+    }
     
     try {
       if (!node.data.memberId) {
@@ -399,10 +411,25 @@ const MyFamilyTreeInner = ({ data, dongHoId, queryClient, onDataChange }: Props)
       const userDongHoId = user?.dongHoId;
       const finalDongHoId = dongHoId || userDongHoId;
       
+      console.log("📋 [Tree] Delete params:", {
+        memberId: node.data.memberId,
+        dongHoId: finalDongHoId,
+        userId
+      });
+      
+      // Kiểm tra dongHoId bắt buộc
+      if (!finalDongHoId) {
+        throw new Error("Không tìm thấy thông tin dòng họ");
+      }
+      
+      console.log("🚀 [Tree] Calling deleteMember API...");
+      
       const result = await deleteMember(
-        [{ thanhVienId: node.data.memberId }],
+        [{ thanhVienId: node.data.memberId, dongHoId: finalDongHoId }],
         userId
       );
+      
+      console.log("📥 [Tree] Delete result:", result);
       
       if (result.success) {
         showSuccess("Xóa thành viên thành công!");
@@ -419,7 +446,7 @@ const MyFamilyTreeInner = ({ data, dongHoId, queryClient, onDataChange }: Props)
         throw new Error(result.message || "Không thể xóa thành viên");
       }
     } catch (error: any) {
-      console.error("Error deleting member:", error);
+      console.error("❌ [Tree] Error deleting member:", error);
       showError(error.message || "Có lỗi xảy ra khi xóa thành viên");
     }
   }, [nodes, showSuccess, showError, dongHoId, queryClient, onDataChange]);
@@ -457,24 +484,23 @@ const MyFamilyTreeInner = ({ data, dongHoId, queryClient, onDataChange }: Props)
         const payload = {
           hoTen: formData.hoTen,
           gioiTinh: formData.gioiTinh,
-          ngheNghiep: formData.ngheNghiep,
+          ngheNghiep: formData.ngheNghiep || "",
           doiThuoc: formData.doiThuoc,
           chaId: formData.chaId || null,
           meId: formData.meId || null,
-          dongHoId: finalDongHoId,
           lu_user_id: userId,
           nguoiTaoId: userId,
           // Thêm các trường mới
           ngaySinh: formatDateForAPI(formData.ngaySinh),
           ngayMat: formatDateForAPI(formData.ngayMat),
-          noiSinh: formData.noiSinh,
-          noiMat: formData.noiMat,
-          trinhDoHocVan: formData.trinhDoHocVan,
-          diaChiHienTai: formData.diaChiHienTai,
-          tieuSu: formData.tieuSu,
+          noiSinh: formData.noiSinh || "",
+          noiMat: formData.noiMat || "",
+          trinhDoHocVan: formData.trinhDoHocVan || "",
+          diaChiHienTai: formData.diaChiHienTai || "",
+          tieuSu: formData.tieuSu || "",
           // Chuyển pids thành voId hoặc chongId
           voId: formData.gioiTinh === 1 && formData.pids && formData.pids.length > 0 ? formData.pids[0] : null,
-          chongId: formData.gioiTinh === 0 && formData.pids && formData.pids.length > 0 ? formData.pids[0] : null,
+          chongId: formData.gioiTinh === 2 && formData.pids && formData.pids.length > 0 ? formData.pids[0] : null,
         };
         
         // Xóa các field undefined/empty string
@@ -487,7 +513,7 @@ const MyFamilyTreeInner = ({ data, dongHoId, queryClient, onDataChange }: Props)
         
         console.log('📤 [Tree CRUD] Creating member:', payload);
         
-        const result = await createMember(payload);
+        const result = await createMemberWithDongHo(payload, finalDongHoId);
         
         if (result.success) {
           showSuccess("Thêm thành viên thành công!");
@@ -514,23 +540,23 @@ const MyFamilyTreeInner = ({ data, dongHoId, queryClient, onDataChange }: Props)
         const payload = {
           hoTen: formData.hoTen,
           gioiTinh: formData.gioiTinh,
-          ngheNghiep: formData.ngheNghiep,
+          ngheNghiep: formData.ngheNghiep || "",
           doiThuoc: formData.doiThuoc,
           chaId: formData.chaId || null,
           meId: formData.meId || null,
-          dongHoId: finalDongHoId,
+          dongHoId: finalDongHoId, // Thêm dongHoId cho update
           lu_user_id: userId,
           // Thêm các trường mới
           ngaySinh: formatDateForAPI(formData.ngaySinh),
           ngayMat: formatDateForAPI(formData.ngayMat),
-          noiSinh: formData.noiSinh,
-          noiMat: formData.noiMat,
-          trinhDoHocVan: formData.trinhDoHocVan,
-          diaChiHienTai: formData.diaChiHienTai,
-          tieuSu: formData.tieuSu,
+          noiSinh: formData.noiSinh || "",
+          noiMat: formData.noiMat || "",
+          trinhDoHocVan: formData.trinhDoHocVan || "",
+          diaChiHienTai: formData.diaChiHienTai || "",
+          tieuSu: formData.tieuSu || "",
           // Chuyển pids thành voId hoặc chongId
           voId: formData.gioiTinh === 1 && formData.pids && formData.pids.length > 0 ? formData.pids[0] : null,
-          chongId: formData.gioiTinh === 0 && formData.pids && formData.pids.length > 0 ? formData.pids[0] : null,
+          chongId: formData.gioiTinh === 2 && formData.pids && formData.pids.length > 0 ? formData.pids[0] : null,
         };
         
         // Xóa các field undefined/empty string
@@ -706,6 +732,7 @@ const MyFamilyTreeInner = ({ data, dongHoId, queryClient, onDataChange }: Props)
           }}
           onDelete={() => {
             handleDeleteMember(contextMenu.id);
+            setContextMenu(null); // Đóng context menu sau khi xóa
           }}
           onCenter={() => {
             const node = nodes.find((n) => n.id === contextMenu.id);

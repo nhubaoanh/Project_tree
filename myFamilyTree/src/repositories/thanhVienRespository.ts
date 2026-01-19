@@ -21,7 +21,7 @@ export class thanhVienRespository {
   // Tạo thành viên mới - sử dụng Composite Key (tự động tăng ID theo dòng họ)
   async createThanhVien(thanhvien: thanhVien): Promise<any> {
     try {
-      const sql = `CALL InsertMemberComposite(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?, @newId, @err_code, @err_msg)`;
+      const sql = `CALL InsertMemberComposite(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?, @newId, @err_code, @err_msg)`;
       await this.db.query(sql, [
         thanhvien.dongHoId,
         thanhvien.hoTen,
@@ -32,6 +32,7 @@ export class thanhVienRespository {
         thanhvien.noiMat,
         thanhvien.ngheNghiep,
         thanhvien.trinhDoHocVan,
+        thanhvien.soDienThoai,
         thanhvien.diaChiHienTai,
         thanhvien.tieuSu,
         thanhvien.anhChanDung,
@@ -55,7 +56,7 @@ export class thanhVienRespository {
   // Update thành viên - cần cả dongHoId và thanhVienId (Composite Key)
   async updateMultipleThanhVien(thanhVien: thanhVien): Promise<any> {
     try {
-      const sql = `CALL UpdateThanhVien(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?, @err_code, @err_msg)`;
+      const sql = `CALL UpdateThanhVien(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?, @err_code, @err_msg)`;
       await this.db.query(sql, [
         thanhVien.dongHoId,
         thanhVien.thanhVienId,
@@ -67,6 +68,7 @@ export class thanhVienRespository {
         thanhVien.noiMat,
         thanhVien.ngheNghiep,
         thanhVien.trinhDoHocVan,
+        thanhVien.soDienThoai, // Thêm số điện thoại
         thanhVien.diaChiHienTai,
         thanhVien.tieuSu,
         thanhVien.anhChanDung,
@@ -153,29 +155,6 @@ export class thanhVienRespository {
     }
   }
 
-  async searchThanhVien(
-    pageIndex: number,
-    pageSize: number,
-    search_content: string,
-    dongHoId: string,
-    thanhVienId: number
-  ): Promise<any[]> {
-    try {
-      const sql = "CALL SearchThanhVien(?,?,?,?,?, @err_code, @err_msg)";
-      const [result] = await this.db.query(sql, [
-        pageIndex,
-        pageSize,
-        search_content || null,
-        dongHoId || null,
-        thanhVienId || null,
-      ]);
-
-      return result;
-    } catch (error: any) {
-      throw new Error(error);
-    }
-  }
-
   // Search thành viên theo dòng họ cụ thể (dùng procedure mới)
   async searchThanhVienByDongHo(
     pageIndex: number,
@@ -191,15 +170,6 @@ export class thanhVienRespository {
         search_content || null,
         dongHoId,
       ]);
-      
-      console.log('[Repository] SearchThanhVienByDongHo result:', {
-        isArray: Array.isArray(result),
-        length: result?.length,
-        firstItem: result?.[0],
-        resultType: typeof result,
-        isNestedArray: Array.isArray(result?.[0])
-      });
-      
       // Nếu result là array of arrays, lấy array đầu tiên
       if (Array.isArray(result) && Array.isArray(result[0])) {
         console.log('[Repository] Detected nested array, using first array');
@@ -210,59 +180,6 @@ export class thanhVienRespository {
     } catch (error: any) {
       console.error('[Repository] SearchThanhVienByDongHo error:', error.message);
       throw new Error(error);
-    }
-  }
-
-  // Query trực tiếp để debug (không qua stored procedure)
-  async findByDongHoIdDirect(dongHoId: string): Promise<any[]> {
-    try {
-      const sql = `
-        SELECT thanhVienId, hoTen, gioiTinh, ngaySinh, ngayMat, doiThuoc as doiThu, 
-               chaId as idCha, meId as idMe, ngheNghiep
-        FROM thanhvien 
-        WHERE LOWER(TRIM(dongHoId)) = LOWER(TRIM(?)) AND active_flag = 1
-        LIMIT 1000
-      `;
-      
-      console.log('[Repository] Executing direct query with dongHoId:', dongHoId);
-      
-      const [rows] = await this.db.query(sql, [dongHoId]);
-      
-      // Đảm bảo trả về array
-      const result = Array.isArray(rows) ? rows : [];
-      
-      console.log('[Repository] Direct query result:', {
-        isArray: Array.isArray(result),
-        length: result?.length,
-        sample: result?.[0],
-        dongHoIdUsed: dongHoId
-      });
-      
-      // Nếu không có kết quả, thử query không filter để xem có data không
-      if (result.length === 0) {
-        const [allRows] = await this.db.query(
-          'SELECT COUNT(*) as total FROM thanhvien WHERE active_flag = 1'
-        , []);
-        console.log('[Repository] Total active members in DB:', allRows);
-        
-        // Kiểm tra xem có dongHoId nào trong DB không
-        const [dongHoSample] = await this.db.query(
-          'SELECT DISTINCT dongHoId FROM thanhvien WHERE active_flag = 1 LIMIT 5'
-        , []);
-        console.log('[Repository] Sample dongHoIds in DB:', dongHoSample);
-        
-        // Kiểm tra xem dongHoId này có tồn tại không (thử cả lowercase)
-        const [checkDongHo] = await this.db.query(
-          'SELECT COUNT(*) as count FROM thanhvien WHERE LOWER(dongHoId) = LOWER(?) AND active_flag = 1',
-          [dongHoId]
-        );
-        console.log('[Repository] Count for this dongHoId (case-insensitive):', checkDongHo);
-      }
-      
-      return result as any[];
-    } catch (error: any) {
-      console.error('[Repository] Direct query error:', error.message);
-      return [];
     }
   }
 

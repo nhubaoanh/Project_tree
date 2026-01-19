@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { User, Calendar, MapPin, Briefcase, GraduationCap, Home, Heart, Users, Baby } from "lucide-react";
+import { User, Calendar, MapPin, Briefcase, GraduationCap, Home, Heart, Users, Baby, Phone } from "lucide-react";
 import { DetailModal, DetailSection } from "@/components/shared";
 import { IMember } from "@/types/member";
 import { getImageUrl } from "@/utils/imageUtils";
@@ -180,6 +180,7 @@ export const MemberDetailModal: React.FC<MemberDetailModalProps> = ({
             fields: [
                 { icon: Briefcase, label: "Nghề nghiệp", value: member.ngheNghiep },
                 { icon: GraduationCap, label: "Trình độ học vấn", value: member.trinhDoHocVan },
+                { icon: Phone, label: "Số điện thoại", value: member.soDienThoai },
                 { icon: Home, label: "Địa chỉ hiện tại", value: member.diaChiHienTai },
             ]
         },

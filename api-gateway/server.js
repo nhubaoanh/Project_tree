@@ -92,7 +92,6 @@ const coreProxy = createProxyMiddleware({
       console.log(`[PROXY CORE] -> ${URL_CORE}${req.originalUrl}`);
     },
     error: (err, req, res) => {
-      console.error('[PROXY ERROR]', err.message);
       if (!res.headersSent) {
         res.status(502).json({ message: 'Lỗi kết nối server', success: false });
       }
@@ -108,7 +107,6 @@ const fireworkProxy = createProxyMiddleware({
       console.log(`[PROXY FIREWORK] -> ${URL_FIREWORK}${req.originalUrl}`);
     },
     error: (err, req, res) => {
-      console.error('[PROXY ERROR]', err.message);
       if (!res.headersSent) {
         res.status(502).json({ message: 'Lỗi kết nối server', success: false });
       }
@@ -130,7 +128,6 @@ app.all('/api-firework/*', verifyToken, (req, res, next) => {
 // STATIC FILES - Proxy uploads to core backend
 // ============================================================================
 app.all('/uploads/*', (req, res, next) => {
-  console.log(`[PROXY UPLOADS] -> ${URL_CORE}${req.originalUrl}`);
   coreProxy(req, res, next);
 });
 

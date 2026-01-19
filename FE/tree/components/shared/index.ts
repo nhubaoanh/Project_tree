@@ -6,6 +6,7 @@ export { PageLayout } from "./PageLayout";
 export { ImportExportModal } from "./ImportExportModal";
 export { ImportGuideModal } from "./ImportGuideModal";
 export { ValidationErrorModal } from "./ValidationErrorModal";
+export { ErrorModal } from "./ErrorModal";
 export { 
   LoadingSpinner, 
   PageLoading, 
