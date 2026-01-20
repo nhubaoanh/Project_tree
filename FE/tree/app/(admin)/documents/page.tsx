@@ -1,368 +1,344 @@
 "use client";
-import { useState, useEffect } from "react";
-import { Plus, Trash2, Filter, Edit } from "lucide-react";
-import {
-  useQuery,
-  useMutation,
-  useQueryClient,
-  keepPreviousData,
-} from "@tanstack/react-query";
-import { useToast } from "@/service/useToas";
-import {
-  searchTaiLieu,
-  createTaiLieu,
-  updateTaiLieu,
-  deleteTaiLieu,
-  ITaiLieu,
-  ISearchTaiLieu,
-  LOAI_TAI_LIEU,
-} from "@/service/tailieu.service";
+import React from "react";
+import { FileText, Plus, Trash2, Edit, User, Calendar, Download, Eye, Tag } from "lucide-react";
+import { ITaiLieu, ISearchTaiLieu, searchTaiLieu, createTaiLieu, updateTaiLieu, deleteTaiLieu } from "@/service/tailieu.service";
 import { TaiLieuModal } from "./components/TaiLieuModal";
-import { DocumentDetailModal } from "./components/DocumentDetailModal";
-import { DataTable, ColumnConfig } from "@/components/shared";
+import { useCrudPage } from "@/hooks";
 import storage from "@/utils/storage";
+import { getFileUrl } from "@/utils/imageUtils";
+import {
+  PageLayout, 
+  DataTable, 
+  DeleteModal, 
+  DetailModal,
+  PageLoading, 
+  ErrorState,
+  NoFamilyTreeState,
+  ColumnConfig,
+  ActionConfig,
+  DetailSection,
+  DetailField
+} from "@/components/shared";
 
 export default function QuanLyTaiLieuPage() {
-  const queryClient = useQueryClient();
+  // Get user info
+  const user = storage.getUser();
+  const dongHoId = user?.dongHoId;
 
-  const [pageIndex, setPageIndex] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [filterLoai, setFilterLoai] = useState("");
-  const [dongHoId, setDongHoId] = useState<string>("");
-
-  // Selection state
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
-
-  // Modal states
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingItem, setEditingItem] = useState<ITaiLieu | null>(null);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [itemsToDelete, setItemsToDelete] = useState<ITaiLieu[]>([]);
-
-  // Detail modal state
-  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
-  const [selectedDocument, setSelectedDocument] = useState<ITaiLieu | null>(null);
-
-  const { showSuccess, showError } = useToast();
-
-  useEffect(() => {
-    const user = storage.getUser();
-    if (user?.dongHoId) {
-      setDongHoId(user.dongHoId);
-    }
-  }, []);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearch(searchTerm);
-      setPageIndex(1);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, [searchTerm]);
-
-  const searchParams: ISearchTaiLieu = {
-    pageIndex,
-    pageSize,
-    search_content: debouncedSearch,
-    dongHoId: dongHoId,
-    loaiTaiLieu: filterLoai,
-  };
-
-  const dataQuery = useQuery({
-    queryKey: ["tailieu", searchParams],
-    queryFn: () => searchTaiLieu(searchParams),
-    placeholderData: keepPreviousData,
-    enabled: !!dongHoId,
-  });
-
-  const dataList = dataQuery.data?.data || [];
-  const totalRecords = dataQuery.data?.totalItems || 0;
-  const totalPages = dataQuery.data?.pageCount || 0;
-  const isLoading = dataQuery.isLoading;
-
-  const createMutation = useMutation({
-    mutationFn: createTaiLieu,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["tailieu"] });
-      showSuccess("Thêm tài liệu thành công!");
-      setIsModalOpen(false);
+  // Use generic CRUD hook
+  const crud = useCrudPage<ITaiLieu>({
+    queryKey: ["taiLieu", dongHoId || ""],
+    operations: {
+      search: (params) => {
+        const searchParams: ISearchTaiLieu = {
+          pageIndex: params.pageIndex,
+          pageSize: params.pageSize,
+          search_content: params.search_content,
+          dongHoId: dongHoId || "",
+        };
+        return searchTaiLieu(searchParams);
+      },
+      create: (data) => createTaiLieu({ ...data, dongHoId: dongHoId || "" } as ITaiLieu),
+      update: (data) => {
+        const id = (data as any).taiLieuId;
+        return updateTaiLieu(id, { ...data, dongHoId: dongHoId || "" } as ITaiLieu);
+      },
+      delete: (params) => {
+        const listJson = params.items.map((item: ITaiLieu) => ({ 
+          taiLieuId: item.taiLieuId! 
+        }));
+        return deleteTaiLieu(listJson, params.userId || user?.nguoiDungId || "");
+      },
     },
-    onError: (error: any) => showError(error.message || "Có lỗi xảy ra."),
-  });
-
-  const updateMutation = useMutation({
-    mutationFn: (data: ITaiLieu) => updateTaiLieu(data.taiLieuId!, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["tailieu"] });
-      showSuccess("Cập nhật thành công!");
-      setIsModalOpen(false);
+    searchParams: { dongHoId: dongHoId || "" },
+    tableConfig: {
+      initialPageSize: 10,
+      enableSelection: true,
+      enableSearch: true
     },
-    onError: (error: any) => showError(error.message || "Có lỗi xảy ra."),
+    messages: {
+      createSuccess: "Thêm tài liệu thành công!",
+      updateSuccess: "Cập nhật tài liệu thành công!",
+      deleteSuccess: "Đã xóa tài liệu thành công.",
+      createError: "Có lỗi xảy ra khi thêm tài liệu.",
+      updateError: "Có lỗi xảy ra khi cập nhật tài liệu.",
+      deleteError: "Không thể xóa tài liệu này."
+    }
   });
 
-  const deleteMutation = useMutation({
-    mutationFn: ({ listJson, luUserId }: { listJson: { taiLieuId: string }[]; luUserId: string }) =>
-      deleteTaiLieu(listJson, luUserId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["tailieu"] });
-      showSuccess(itemsToDelete.length > 1 ? `Đã xóa ${itemsToDelete.length} tài liệu.` : "Đã xóa tài liệu.");
-      setIsDeleteModalOpen(false);
-      setItemsToDelete([]);
-      setSelectedIds([]);
-    },
-    onError: (error: any) => showError(error.message || "Không thể xóa."),
-  });
-
-  // Handlers
-  const handleSelectAll = (checked: boolean) => {
-    if (checked) {
-      setSelectedIds(dataList.map((item: ITaiLieu) => item.taiLieuId!));
-    } else {
-      setSelectedIds([]);
-    }
-  };
-
-  const handleSelectOne = (id: string | number, checked: boolean) => {
-    if (checked) {
-      setSelectedIds((prev) => [...prev, String(id)]);
-    } else {
-      setSelectedIds((prev) => prev.filter((i) => i !== String(id)));
-    }
-  };
-
-  const handleAdd = () => {
-    setEditingItem(null);
-    setIsModalOpen(true);
-  };
-
-  const handleEdit = (item: ITaiLieu) => {
-    setEditingItem(item);
-    setIsModalOpen(true);
-  };
-
-  const handleViewDetail = (item: ITaiLieu) => {
-    setSelectedDocument(item);
-    setIsDetailModalOpen(true);
-  };
-
+  // Custom handlers
   const handleDeleteClick = (item: ITaiLieu) => {
-    if (selectedIds.length > 1 && selectedIds.includes(item.taiLieuId!)) {
-      const selected = dataList.filter((i: ITaiLieu) => selectedIds.includes(i.taiLieuId!));
-      setItemsToDelete(selected);
+    if (crud.selectedIds.length > 1 && crud.selectedIds.includes(item.taiLieuId!)) {
+      const selected = crud.data.filter((e: ITaiLieu) => crud.selectedIds.includes(e.taiLieuId!));
+      crud.handleDelete(selected);
     } else {
-      setItemsToDelete([item]);
+      crud.handleDelete([item]);
     }
-    setIsDeleteModalOpen(true);
   };
 
   const handleDeleteSelected = () => {
-    const selected = dataList.filter((i: ITaiLieu) => selectedIds.includes(i.taiLieuId!));
-    setItemsToDelete(selected);
-    setIsDeleteModalOpen(true);
+    const selected = crud.data.filter((e: ITaiLieu) => crud.selectedIds.includes(e.taiLieuId!));
+    crud.handleDelete(selected);
   };
 
-  const handleConfirmDelete = () => {
-    const user = storage.getUser();
-    if (itemsToDelete.length > 0 && user?.nguoiDungId) {
-      const listJson = itemsToDelete.map((i) => ({ taiLieuId: i.taiLieuId! }));
-      deleteMutation.mutate({ listJson, luUserId: user.nguoiDungId });
+  // Page actions
+  const pageActions = React.useMemo(() => [
+    // Bulk actions
+    ...(crud.hasSelection ? [
+      {
+        id: "bulk-delete",
+        icon: Trash2,
+        label: `Xóa đã chọn (${crud.selectedIds.length})`,
+        onClick: handleDeleteSelected,
+        variant: "danger" as const,
+      }
+    ] : []),
+    {
+      id: "add-new",
+      icon: Plus,
+      label: "Thêm tài liệu",
+      onClick: crud.handleAdd,
+      variant: "primary" as const,
+    },
+  ], [crud.hasSelection, crud.selectedIds.length, handleDeleteSelected, crud.handleAdd]);
+
+  // Loading state
+  if (crud.isLoading) {
+    return <PageLoading message="Đang tải danh sách tài liệu..." />;
+  }
+
+  // Error state
+  if (crud.error) {
+    return (
+      <ErrorState
+        title="Lỗi tải dữ liệu"
+        message="Không thể tải danh sách tài liệu. Vui lòng thử lại sau."
+        onRetry={() => window.location.reload()}
+      />
+    );
+  }
+
+  // No family tree state
+  if (!dongHoId) {
+    return <NoFamilyTreeState />;
+  }
+
+  // Format date helper
+  const formatDate = (date: Date | string | null | undefined) => {
+    if (!date) return "-";
+    try {
+      return new Date(date).toLocaleDateString("vi-VN", {
+        day: "2-digit",
+        month: "2-digit", 
+        year: "numeric",
+      });
+    } catch {
+      return "-";
     }
   };
 
-  const handleSave = (data: Partial<ITaiLieu>) => {
-    const payload = { ...data, dongHoId };
-    if (editingItem) {
-      updateMutation.mutate({ ...payload, taiLieuId: editingItem.taiLieuId } as ITaiLieu);
-    } else {
-      createMutation.mutate(payload as ITaiLieu);
-    }
+  // Format file size helper
+  const formatFileSize = (bytes: number | null | undefined) => {
+    if (!bytes) return "-";
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    if (bytes === 0) return '0 Bytes';
+    const i = Math.floor(Math.log(bytes) / Math.log(1024));
+    return Math.round(bytes / Math.pow(1024, i) * 100) / 100 + ' ' + sizes[i];
   };
 
-  const isSaving = createMutation.isPending || updateMutation.isPending;
-  const isDeleting = deleteMutation.isPending;
-
-  // Column configuration for DataTable
+  // Column configuration
   const columns: ColumnConfig<ITaiLieu>[] = [
     {
       key: "tenTaiLieu",
       label: "Tên tài liệu",
       clickable: true,
-      align: "left",
     },
     {
       key: "loaiTaiLieu",
-      label: "Loại",
-      align: "left",
-      render: (value) => (
-        <span className="px-2 py-1 bg-[#f5e6d3] text-[#8b5e3c] text-xs rounded">{value || "-"}</span>
-      ),
+      label: "Loại tài liệu",
+      render: (value) => value || "-",
+    },
+    {
+      key: "moTa",
+      label: "Mô tả",
+      render: (value) => {
+        if (!value) return "-";
+        // Truncate long descriptions
+        return value.length > 50 ? value.substring(0, 50) + "..." : value;
+      },
+    },
+    {
+      key: "ngayTaiLen",
+      label: "Ngày tải lên",
+      render: (value) => formatDate(value),
     },
     {
       key: "tacGia",
       label: "Tác giả",
-      align: "left",
+      render: (value) => value || "-",
     },
     {
-      key: "namSangTac",
-      label: "Năm",
-      align: "center",
-    },
-    {
-      key: "nguonGoc",
-      label: "Nguồn gốc",
-      align: "left",
+      key: "trangThai",
+      label: "Trạng thái",
+      render: () => (
+        <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+          Hoạt động
+        </span>
+      ),
     },
   ];
 
-  if (!dongHoId) {
-    return (
-      <div className="p-8 text-center">
-        <p className="text-lg text-amber-700">Bạn chưa được gán vào dòng họ nào.</p>
-      </div>
-    );
-  }
+  // Action configuration
+  const customActions: ActionConfig<ITaiLieu>[] = [
+    {
+      icon: Edit,
+      label: "Sửa",
+      onClick: crud.handleEdit,
+      color: "blue",
+    },
+    {
+      icon: Trash2,
+      label: "Xóa",
+      onClick: handleDeleteClick,
+      color: "red",
+    },
+  ];
+
+  // Detail modal sections
+  const getDetailSections = (taiLieu: ITaiLieu): DetailSection[] => [
+    {
+      title: "Thông tin cơ bản",
+      fields: [
+        {
+          icon: FileText,
+          label: "Tên tài liệu",
+          value: taiLieu.tenTaiLieu,
+        } as DetailField,
+        {
+          icon: Tag,
+          label: "Loại tài liệu",
+          value: taiLieu.loaiTaiLieu || "Không có",
+        } as DetailField,
+        {
+          icon: Calendar,
+          label: "Ngày tải lên",
+          value: taiLieu.ngayTaiLen,
+          render: (value) => formatDate(value),
+        } as DetailField,
+      ],
+    },
+    {
+      title: "Tải xuống",
+      fields: [
+        {
+          icon: Download,
+          label: "File đính kèm",
+          value: taiLieu.duongDan,
+          render: (value) => {
+            if (!value) return "Không có file";
+            return (
+              <button
+                onClick={() => window.open(getFileUrl(value), '_blank')}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
+              >
+                <Download size={16} />
+                Tải xuống tài liệu
+              </button>
+            );
+          },
+        } as DetailField,
+      ],
+    },
+    {
+      title: "Thông tin chi tiết",
+      fields: [
+        {
+          icon: User,
+          label: "Tác giả",
+          value: taiLieu.tacGia || "Không có",
+        } as DetailField,
+        {
+          icon: Calendar,
+          label: "Năm sáng tác",
+          value: taiLieu.namSangTac || "Không có",
+        } as DetailField,
+        {
+          icon: Tag,
+          label: "Nguồn gốc",
+          value: taiLieu.nguonGoc || "Không có",
+        } as DetailField,
+      ],
+    },
+  ];
 
   return (
-    <div className="max-w-6xl mx-auto font-dancing text-[#4a4a4a] pb-20 animate-fadeIn">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-end md:items-center mb-8 gap-4 border-b border-[#d4af37] pb-4">
-        <div>
-          <h2 className="text-3xl font-display font-bold text-[#b91c1c] uppercase drop-shadow-sm">
-            Quản Lý Tài Liệu
-          </h2>
-          <p className="text-[#8b5e3c] italic text-sm">Tài liệu của dòng họ</p>
-        </div>
-        <div className="flex gap-2">
-          {selectedIds.length > 0 && (
-            <button
-              onClick={handleDeleteSelected}
-              className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded shadow hover:bg-red-700 text-sm font-bold"
-            >
-              <Trash2 size={16} />
-              <span>Xóa ({selectedIds.length})</span>
-            </button>
-          )}
-          <button
-            onClick={handleAdd}
-            className="flex items-center gap-2 px-4 py-2 bg-[#b91c1c] text-white rounded shadow hover:bg-[#991b1b] text-sm font-bold"
-          >
-            <Plus size={16} />
-            <span>Thêm Mới</span>
-          </button>
-        </div>
-      </div>
-
-      {/* DataTable Component với filter inline */}
-      <div className="mb-6">
-        {/* Search và Filter cùng hàng */}
-        <div className="flex flex-col md:flex-row gap-4 mb-6">
-          {/* Search */}
-          <div className="flex-1 flex items-center bg-white border border-yellow-600 rounded-lg p-1 shadow-sm transition-all focus-within:ring-2 focus-within:ring-yellow-600 focus-within:ring-opacity-50">
-            <div className="p-2 text-stone-400">
-              {isLoading ? (
-                <div className="animate-spin w-5 h-5 border-2 border-stone-400 border-t-transparent rounded-full"></div>
-              ) : (
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              )}
-            </div>
-            <input
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Tìm kiếm theo tên tài liệu..."
-              className="w-full p-2 outline-none bg-transparent text-yellow-900 placeholder-stone-400"
-            />
-            {searchTerm && (
-              <button 
-                onClick={() => setSearchTerm("")} 
-                className="p-2 text-stone-400 hover:text-red-700 transition-colors"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            )}
-          </div>
-
-          {/* Filter */}
-          <div className="flex items-center gap-2 min-w-[200px]">
-            <Filter size={16} className="text-[#8b5e3c]" />
-            <select
-              value={filterLoai}
-              onChange={(e) => { setFilterLoai(e.target.value); setPageIndex(1); }}
-              className="flex-1 px-3 py-2 border border-[#d4af37] rounded-lg bg-white text-[#5d4037] focus:ring-2 focus:ring-yellow-600 focus:border-yellow-600"
-            >
-              <option value="">Tất cả loại</option>
-              {LOAI_TAI_LIEU.map((loai) => (
-                <option key={loai} value={loai}>{loai}</option>
-              ))}
-            </select>
-          </div>
-        </div>
-      </div>
-
+    <PageLayout
+      title="QUẢN LÝ TÀI LIỆU"
+      subtitle="Danh sách tài liệu và file đính kèm"
+      icon={FileText}
+      actions={pageActions}
+    >
+      {/* Data Table */}
       <DataTable
-        data={dataList}
+        data={crud.data}
         columns={columns}
         keyField="taiLieuId"
-        pageIndex={pageIndex}
-        pageSize={pageSize}
-        totalRecords={totalRecords}
-        totalPages={totalPages}
-        onPageChange={setPageIndex}
-        onPageSizeChange={setPageSize}
-        isLoading={isLoading}
-        emptyMessage="Chưa có tài liệu nào"
+        pageIndex={crud.pageIndex}
+        pageSize={crud.pageSize}
+        totalRecords={crud.totalRecords}
+        totalPages={crud.totalPages}
+        onPageChange={crud.handlePageChange}
+        onPageSizeChange={crud.handlePageSizeChange}
+        isLoading={crud.isLoading}
         enableSelection={true}
-        selectedIds={selectedIds}
-        onSelectAll={handleSelectAll}
-        onSelectOne={handleSelectOne}
-        onViewDetail={handleViewDetail}
-        customActions={[
-          { icon: Edit, label: "Sửa", onClick: handleEdit, color: "blue" },
-          { icon: Trash2, label: "Xóa", onClick: handleDeleteClick, color: "red" },
-        ]}
+        selectedIds={crud.selectedIds as string[]}
+        onSelectAll={crud.handleSelectAll}
+        onSelectOne={crud.handleSelectOne}
+        customActions={customActions}
+        onViewDetail={crud.handleViewDetail}
+        searchValue={crud.searchTerm}
+        onSearchChange={crud.handleSearch}
+        searchPlaceholder="Tìm kiếm theo tên tài liệu, loại tài liệu..."
+        emptyMessage="Chưa có tài liệu nào được tạo"
       />
 
       {/* Modals */}
-      <TaiLieuModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSubmit={handleSave}
-        initialData={editingItem}
-        isLoading={isSaving}
-      />
-
-      <DocumentDetailModal
-        isOpen={isDetailModalOpen}
-        onClose={() => setIsDetailModalOpen(false)}
-        document={selectedDocument}
-      />
-
-      {/* Delete Modal */}
-      {isDeleteModalOpen && itemsToDelete.length > 0 && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full shadow-xl border border-[#d4af37]">
-            <h3 className="text-lg font-bold text-[#5d4037] mb-4">Xác nhận xóa</h3>
-            <p className="text-gray-600 mb-6">
-              {itemsToDelete.length === 1 ? (
-                <>Bạn có chắc chắn muốn xóa tài liệu <strong className="text-[#b91c1c]">{itemsToDelete[0].tenTaiLieu}</strong>?</>
-              ) : (
-                <>Bạn có chắc chắn muốn xóa <strong className="text-[#b91c1c]">{itemsToDelete.length} tài liệu</strong> đã chọn?</>
-              )}
-            </p>
-            <div className="flex justify-end gap-3">
-              <button onClick={() => { setIsDeleteModalOpen(false); setItemsToDelete([]); }} className="px-4 py-2 border rounded hover:bg-gray-50">Hủy</button>
-              <button onClick={handleConfirmDelete} disabled={isDeleting} className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50">
-                {isDeleting ? "Đang xóa..." : "Xóa"}
-              </button>
-            </div>
-          </div>
-        </div>
+      {crud.isFormOpen && (
+        <TaiLieuModal
+          isOpen={crud.isFormOpen}
+          onClose={crud.handleCloseForm}
+          onSubmit={crud.handleSave}
+          initialData={crud.editingItem}
+          isLoading={crud.isSaving}
+        />
       )}
-    </div>
+
+      {crud.isDetailOpen && crud.selectedItemForDetail && (
+        <DetailModal
+          isOpen={crud.isDetailOpen}
+          onClose={crud.handleCloseDetail}
+          title={crud.selectedItemForDetail.tenTaiLieu}
+          subtitle={`Tài liệu tải lên ngày ${formatDate(crud.selectedItemForDetail.ngayTaiLen)}`}
+          gradient="red-yellow"
+          sections={getDetailSections(crud.selectedItemForDetail)}
+          notes={crud.selectedItemForDetail.moTa || crud.selectedItemForDetail.ghiChu}
+        />
+      )}
+
+      {crud.isDeleteOpen && (
+        <DeleteModal
+          isOpen={crud.isDeleteOpen}
+          onClose={crud.handleCloseDelete}
+          onConfirm={crud.handleConfirmDelete}
+          isLoading={crud.isDeleting}
+          title={crud.itemsToDelete.length === 1 ? "Xác nhận xóa tài liệu" : `Xác nhận xóa ${crud.itemsToDelete.length} tài liệu`}
+          message={crud.itemsToDelete.length === 1 ? 
+            "Bạn có chắc chắn muốn xóa tài liệu này? Hành động này không thể hoàn tác." :
+            `Bạn có chắc chắn muốn xóa ${crud.itemsToDelete.length} tài liệu đã chọn? Hành động này không thể hoàn tác.`
+          }
+          items={crud.itemsToDelete}
+        />
+      )}
+    </PageLayout>
   );
 }

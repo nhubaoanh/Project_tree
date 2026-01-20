@@ -80,7 +80,7 @@ export const UserModal: React.FC<UserModalProps> = ({
     queryFn: getAllRoles,
   });
 
-  // Lọc chỉ lấy Thủ Đồ và Thành Viên, không hiển thị Admin (sa)
+  // Lọc chỉ lấy Thủ Đồ và Thành Viên
   const allRoles = rolesData?.data || [];
   const roleList = allRoles.filter((role: any) => 
     role.roleCode === 'thudo' || role.roleCode === 'thanhvien'

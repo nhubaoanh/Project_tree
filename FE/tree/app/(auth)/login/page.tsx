@@ -64,7 +64,13 @@ export default function LoginPage() {
     try {
       const result = await loginService(form.values);
       if (result?.token) {
+        // Save access token`
         storage.setToken(result.token);
+        
+        // Save refresh token
+        if (result.refreshToken) {
+          storage.setRefreshToken(result.refreshToken);
+        }
 
         const userData = await autherization(result.token);
         if (userData) {
@@ -94,7 +100,7 @@ export default function LoginPage() {
           // Redirect dựa trên roleCode
           // Thủ Đô (TD) → Dashboard
           // Thành viên (TV) → Giữ nguyên URL hoặc về trang genealogy
-          if (userData.roleCode === "thudo" || userData.roleCode === "sa") {
+          if (userData.roleCode === "thudo") {
             router.push("/dashboard");
           } else {
             // Thành viên: redirect về trang genealogy

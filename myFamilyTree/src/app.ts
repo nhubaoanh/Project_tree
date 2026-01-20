@@ -69,6 +69,10 @@ app.use("/uploads", (req, res, next) => {
     '.webp': 'image/webp',
     '.svg': 'image/svg+xml',
     '.txt': 'text/plain',
+    '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    '.doc': 'application/msword',
+    '.xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    '.xls': 'application/vnd.ms-excel',
   };
   
   if (inlineTypes[ext]) {
@@ -81,17 +85,18 @@ app.use("/uploads", (req, res, next) => {
   setHeaders: (res, filePath) => {
     const ext = path.extname(filePath).toLowerCase();
     
-    // Các loại file hiển thị inline
-    const inlineExts = ['.pdf', '.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg', '.txt'];
-    
-    if (inlineExts.includes(ext)) {
-      res.setHeader('Content-Disposition', 'inline');
-    } else {
-      // Các file khác (doc, xls, etc.) vẫn download
-      res.setHeader('Content-Disposition', 'attachment');
-    }
+    // Tất cả file đều set inline để browser tự quyết định xem hay download
+    res.setHeader('Content-Disposition', 'inline');
   }
-}));
+}), (req, res, next) => {
+  // Xử lý lỗi 404 cho uploads
+  res.status(404).json({
+    success: false,
+    message: "Không tìm thấy file",
+    error_code: "FILE_NOT_FOUND",
+    path: req.path
+  });
+});
 
 // ============================================================================
 // 1. CORS - Cho phép cross-origin requests

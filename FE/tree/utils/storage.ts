@@ -48,6 +48,20 @@ const storage = {
     window.localStorage.removeItem(`${storagePrefix}token`);
   },
 
+  getRefreshToken: () => {
+    return JSON.parse(
+      window.localStorage.getItem(`${storagePrefix}refreshToken`) as string
+    );
+  },
+
+  setRefreshToken: (refreshToken: string) => {
+    window.localStorage.setItem(`${storagePrefix}refreshToken`, JSON.stringify(refreshToken));
+  },
+
+  clearRefreshToken: () => {
+    window.localStorage.removeItem(`${storagePrefix}refreshToken`);
+  },
+
   setUser: (userData: UserData) => {
     if (typeof window !== "undefined") {
       localStorage.setItem(`${storagePrefix}user`, JSON.stringify(userData));
@@ -71,6 +85,7 @@ const storage = {
   clearAll: () => {
     if (typeof window !== "undefined") {
       localStorage.removeItem(`${storagePrefix}token`);
+      localStorage.removeItem(`${storagePrefix}refreshToken`);
       localStorage.removeItem(`${storagePrefix}user`);
     }
   },

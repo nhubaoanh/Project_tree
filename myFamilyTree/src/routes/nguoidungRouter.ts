@@ -79,6 +79,19 @@ nguoiDungRouter.post(
 );
 
 /**
+ * POST /refresh-token
+ * Làm mới access token bằng refresh token
+ * 
+ * Rate Limit: 10 lần/15 phút
+ * Body: { refreshToken: string }
+ */
+nguoiDungRouter.post(
+  "/refresh-token",
+  loginLimiter, // Sử dụng cùng rate limiter với login
+  userController.refreshToken.bind(userController)
+);
+
+/**
  * POST /signup
  * Đăng ký tài khoản mới
  *

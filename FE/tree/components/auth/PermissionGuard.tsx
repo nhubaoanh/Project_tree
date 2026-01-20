@@ -31,8 +31,8 @@ export default function PermissionGuard({
 }: PermissionGuardProps) {
   const user = storage.getUser();
   
-  // Admin có tất cả quyền
-  if (user?.roleCode === "sa") {
+  // Thủ độ có tất cả quyền
+  if (user?.roleCode === "thudo") {
     return <>{children}</>;
   }
 
@@ -52,12 +52,11 @@ export default function PermissionGuard({
  */
 export function usePermission() {
   const user = storage.getUser();
-  const isAdmin = user?.roleCode === "sa";
   const isThuDo = user?.roleCode === "thudo";
   const isThanhVien = user?.roleCode === "thanhvien";
 
   const hasPermission = (chucNangCode: string, thaoTacCode: string): boolean => {
-    if (isAdmin) return true;
+    if (isThuDo) return true;
     return storage.checkPermission(chucNangCode, thaoTacCode);
   };
 
@@ -67,7 +66,6 @@ export function usePermission() {
   const canDelete = (chucNangCode: string) => hasPermission(chucNangCode, "DELETE");
 
   return {
-    isAdmin,
     isThuDo,
     isThanhVien,
     hasPermission,

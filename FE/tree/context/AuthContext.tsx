@@ -31,7 +31,6 @@ interface AuthContextType {
   menus: MenuItem[];
   roleCode: string;
   dongHoId: string | null;
-  isAdmin: boolean;
   isThuDo: boolean;
   isThanhVien: boolean;
   canSelectAllDongHo: boolean;
@@ -97,7 +96,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             menus: newMenus,
             roleCode: newRoleCode,
             dongHoId: newDongHoId || undefined,
-            canSelectAllDongHo: newRoleCode === "sa",
+            canSelectAllDongHo: newRoleCode === "thudo",
             permissions: buildPermissionsMap(newMenus),
           });
         }
@@ -124,8 +123,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Kiểm tra quyền
   const hasPermission = useCallback((chucNangCode: string, thaoTacCode: string): boolean => {
-    // Admin có tất cả quyền
-    if (roleCode === "sa") return true;
+    // Thủ độ có tất cả quyền
+    if (roleCode === "thudo") return true;
 
     // Tìm trong menus
     const findInMenus = (items: MenuItem[]): boolean => {
@@ -145,8 +144,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Kiểm tra có thể truy cập route
   const canAccessRoute = useCallback((pathname: string): boolean => {
-    // Admin truy cập tất cả
-    if (roleCode === "sa") return true;
+    // Thủ độ truy cập tất cả
+    if (roleCode === "thudo") return true;
 
     // Tìm menu có đường dẫn match
     const findRoute = (items: MenuItem[]): boolean => {
@@ -178,10 +177,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     menus,
     roleCode,
     dongHoId,
-    isAdmin: roleCode === "sa",
     isThuDo: roleCode === "thudo",
     isThanhVien: roleCode === "thanhvien",
-    canSelectAllDongHo: roleCode === "sa",
+    canSelectAllDongHo: roleCode === "thudo",
     isLoading,
     loadUserMenu,
     hasPermission,

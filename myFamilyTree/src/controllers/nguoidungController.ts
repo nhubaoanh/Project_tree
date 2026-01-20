@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { injectable } from "tsyringe";
 import { nguoiDungService } from "../services/nguoidungService";
 import { nguoiDung, UserProfile } from "../models/nguoidung";
-import { generateToken } from "../config/jwt";
+import { generateToken, generateRefreshToken, verifyRefreshToken } from "../config/jwt";
 @injectable()
 export class NguoiDungController {
   constructor(private nguoiDungService: nguoiDungService) {}
@@ -29,8 +29,20 @@ export class NguoiDungController {
           online_flag: user.online_flag,
           // Không đưa functions và actions vào token để giảm kích thước
         };
+        
+        // Generate access token (1 hour)
         const token = generateToken(obj);
+        
+        // Generate refresh token (7 days)
+        const refreshToken = generateRefreshToken({ 
+          nguoiDungId: user.nguoiDungId,
+          roleCode: user.roleCode,
+          dongHoId: user.dongHoId
+        });
+        
         user.token = token;
+        user.refreshToken = refreshToken;
+        
         res.json(user);
       } else {
         res.json({
@@ -40,6 +52,78 @@ export class NguoiDungController {
       }
     } catch (error: any) {
       res.status(500).json({ message: "Đăng nhập thất bại.", success: false });
+    }
+  }
+
+  /**
+   * Refresh access token using refresh token
+   */
+  async refreshToken(req: Request, res: Response): Promise<void> {
+    try {
+      const { refreshToken } = req.body;
+      
+      if (!refreshToken) {
+        res.status(401).json({ 
+          message: "Refresh token is required", 
+          success: false 
+        });
+        return;
+      }
+
+      // Verify refresh token
+      const decoded = verifyRefreshToken(refreshToken);
+      
+      if (!decoded) {
+        res.status(401).json({ 
+          message: "Invalid or expired refresh token", 
+          success: false 
+        });
+        return;
+      }
+
+      // Get fresh user data from database
+      const user = await this.nguoiDungService.getUserById(decoded.nguoiDungId);
+      
+      if (!user) {
+        res.status(401).json({ 
+          message: "User not found", 
+          success: false 
+        });
+        return;
+      }
+
+      // Generate new access token
+      let obj: any = {
+        nguoiDungId: user.nguoiDungId,
+        first_name: user.first_name,
+        middle_name: user.middle_name,
+        last_name: user.last_name,
+        full_name: user.full_name,
+        gender: user.gender,
+        date_of_birthday: user.date_of_birthday,
+        avatar: user.avatar,
+        email: user.email,
+        phone: user.phone,
+        dongHoId: user.dongHoId,
+        roleId: user.roleId,
+        roleCode: user.roleCode,
+        online_flag: user.online_flag,
+      };
+      
+      const newToken = generateToken(obj);
+      
+      res.json({
+        success: true,
+        token: newToken,
+        message: "Token refreshed successfully"
+      });
+      
+    } catch (error: any) {
+      console.error("Refresh token error:", error);
+      res.status(500).json({ 
+        message: "Failed to refresh token", 
+        success: false 
+      });
     }
   }
 

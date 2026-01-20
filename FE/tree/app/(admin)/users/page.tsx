@@ -1,239 +1,143 @@
 "use client";
-import React, { useState, useEffect } from "react";
-import { Users, Plus, Trash2, Edit } from "lucide-react";
-import {
-  useQuery,
-  useMutation,
-  useQueryClient,
-  keepPreviousData,
-} from "@tanstack/react-query";
-
-import { IUser, IUserSearch } from "@/types/user";
-import {
-  getUsers,
-  createUser,
-  updateUser,
-  deleteUser,
-} from "@/service/user.service";
+import React from "react";
+import { Users, Plus, Trash2, Edit, User, Mail, Phone, Shield, Calendar, Eye } from "lucide-react";
+import { IUser, IsearchUser } from "@/types/user";
+import { getUsers as searchUser, createUser, updateUser, deleteUser } from "@/service/user.service";
 import { UserModal } from "./components/userModal";
-import { UserDetailModal } from "./components/UserDetailModal";
-import { useToast } from "@/service/useToas";
+import { useCrudPage } from "@/hooks";
 import storage from "@/utils/storage";
-import { 
+import {
   PageLayout, 
   DataTable, 
   DeleteModal, 
+  DetailModal,
   PageLoading, 
   ErrorState,
   NoFamilyTreeState,
   ColumnConfig,
-  ActionConfig 
+  ActionConfig,
+  DetailSection,
+  DetailField
 } from "@/components/shared";
 
 export default function QuanLyNguoiDungPage() {
-  const queryClient = useQueryClient();
-
-  const [pageIndex, setPageIndex] = useState(1);
-  const [pageSize, setPageSize] = useState(5);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
-
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
-
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingUser, setEditingUser] = useState<IUser | null>(null);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [usersToDelete, setUsersToDelete] = useState<IUser[]>([]);
-
-  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
-  const [selectedUserForDetail, setSelectedUserForDetail] = useState<IUser | null>(null);
-
-  const { showSuccess, showError } = useToast();
-
-  // Lấy dongHoId từ user hiện tại để filter người dùng
+  // Get user info
   const user = storage.getUser();
-  const userDongHoId = user?.dongHoId;
+  const dongHoId = user?.dongHoId;
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearch(searchTerm);
-      setPageIndex(1);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, [searchTerm]);
-
-  const searchParams: IUserSearch = {
-    pageIndex,
-    pageSize,
-    search_content: debouncedSearch,
-    dongHoId: userDongHoId, // Chỉ lấy người dùng của dòng họ hiện tại
-  };
-
-  const usersQuery = useQuery({
-    queryKey: ["users", searchParams],
-    queryFn: () => getUsers(searchParams),
-    placeholderData: keepPreviousData,
-    enabled: !!userDongHoId, // Chỉ fetch khi có dongHoId
+  // Use generic CRUD hook
+  const crud = useCrudPage<IUser>({
+    queryKey: ["users", dongHoId || ""],
+    operations: {
+      search: (params) => {
+        const searchParams: IsearchUser = {
+          pageIndex: params.pageIndex,
+          pageSize: params.pageSize,
+          search_content: params.search_content,
+          dongHoId: dongHoId || "",
+        };
+        return searchUser(searchParams);
+      },
+      create: (data) => createUser(data as IUser),
+      update: (data) => updateUser(data as IUser),
+      delete: (params) => {
+        const userIds = params.items.map((item: IUser) => item.nguoiDungId);
+        return deleteUser(userIds, params.userId || user?.nguoiDungId);
+      },
+    },
+    searchParams: { dongHoId: dongHoId || "" },
+    tableConfig: {
+      initialPageSize: 10,
+      enableSelection: true,
+      enableSearch: true
+    },
+    messages: {
+      createSuccess: "Thêm người dùng thành công!",
+      updateSuccess: "Cập nhật người dùng thành công!",
+      deleteSuccess: "Đã xóa người dùng thành công.",
+      createError: "Có lỗi xảy ra khi thêm người dùng.",
+      updateError: "Có lỗi xảy ra khi cập nhật người dùng.",
+      deleteError: "Không thể xóa người dùng này."
+    }
   });
 
-  const userData = usersQuery.data?.data || [];
-  console.log("User Data:", userData);
-  const totalRecords = usersQuery.data?.totalItems || 0;
-  const totalPages = usersQuery.data?.pageCount || 0;
-  const isLoading = usersQuery.isLoading;
-
-  const createMutation = useMutation({
-    mutationFn: createUser,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["users"] });
-      showSuccess("Thêm người dùng thành công!");
-      setIsModalOpen(false);
-    },
-    onError: (error: any) => {
-      showError(error.message || "Có lỗi xảy ra khi thêm người dùng.");
-    },
-  });
-
-  const updateMutation = useMutation({
-    mutationFn: (user: Partial<IUser>) => updateUser(user),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["users"] });
-      showSuccess("Cập nhật thông tin thành công!");
-      setIsModalOpen(false);
-    },
-    onError: (error: any) => {
-      showError(error.message || "Có lỗi xảy ra khi cập nhật.");
-    },
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: (userIds: string[]) => deleteUser(userIds),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["users"] });
-      showSuccess("Đã xóa người dùng.");
-      setIsDeleteModalOpen(false);
-      setUsersToDelete([]);
-      setSelectedIds([]);
-    },
-    onError: (error: any) => {
-      showError(error.message || "Không thể xóa người dùng này.");
-    },
-  });
-
-  const handleSelectAll = (checked: boolean) => {
-    if (checked) {
-      setSelectedIds(userData.map((u: IUser) => u.nguoiDungId));
+  // Custom handlers
+  const handleDeleteClick = (item: IUser) => {
+    if (crud.selectedIds.length > 1 && crud.selectedIds.includes(item.nguoiDungId)) {
+      const selected = crud.data.filter((e: IUser) => crud.selectedIds.includes(e.nguoiDungId));
+      crud.handleDelete(selected);
     } else {
-      setSelectedIds([]);
+      crud.handleDelete([item]);
     }
-  };
-
-  const handleSelectOne = (id: string | number, checked: boolean) => {
-    const stringId = String(id);
-    if (checked) {
-      setSelectedIds((prev) => [...prev, stringId]);
-    } else {
-      setSelectedIds((prev) => prev.filter((i) => i !== stringId));
-    }
-  };
-
-  const handleAdd = () => {
-    setEditingUser(null);
-    setIsModalOpen(true);
-  };
-
-  const handleEdit = (user: IUser) => {
-    // Cho phép mở modal để xem thông tin
-    setEditingUser(user);
-    setIsModalOpen(true);
-  };
-
-  const handleDeleteClick = (user: IUser) => {
-    const currentUser = storage.getUser();
-    
-    // Không cho phép xóa chính mình
-    if (user.nguoiDungId === currentUser?.nguoiDungId) {
-      showError("Không thể xóa tài khoản của chính mình!");
-      return;
-    }
-    
-    if (selectedIds.length > 1 && selectedIds.includes(user.nguoiDungId)) {
-      const selected = userData.filter((u: IUser) => selectedIds.includes(u.nguoiDungId));
-      setUsersToDelete(selected);
-    } else {
-      setUsersToDelete([user]);
-    }
-    setIsDeleteModalOpen(true);
   };
 
   const handleDeleteSelected = () => {
-    const selected = userData.filter((u: IUser) => selectedIds.includes(u.nguoiDungId));
-    setUsersToDelete(selected);
-    setIsDeleteModalOpen(true);
+    const selected = crud.data.filter((e: IUser) => crud.selectedIds.includes(e.nguoiDungId));
+    crud.handleDelete(selected);
   };
 
-  const handleConfirmDelete = () => {
-    const userIds = usersToDelete.map(u => u.nguoiDungId);
-    deleteMutation.mutate(userIds);
-  };
+  // Page actions
+  const pageActions = React.useMemo(() => [
+    // Bulk actions
+    ...(crud.hasSelection ? [
+      {
+        id: "bulk-delete",
+        icon: Trash2,
+        label: `Xóa đã chọn (${crud.selectedIds.length})`,
+        onClick: handleDeleteSelected,
+        variant: "danger" as const,
+      }
+    ] : []),
+    {
+      id: "add-new",
+      icon: Plus,
+      label: "Thêm người dùng",
+      onClick: crud.handleAdd,
+      variant: "primary" as const,
+    },
+  ], [crud.hasSelection, crud.selectedIds.length, handleDeleteSelected, crud.handleAdd]);
 
-  const handleSaveUser = (user: Partial<IUser>) => {
-    const currentUser = storage.getUser();
-    const userDataToSave = {
-      ...user,
-      nguoiDungId: editingUser?.nguoiDungId,
-      nguoiTaoId: editingUser ? editingUser.nguoiTaoId : currentUser?.nguoiDungId,
-      lu_user_id: currentUser?.nguoiDungId || undefined,
-    };
-
-    if (editingUser) {
-      updateMutation.mutate(userDataToSave as Partial<IUser>);
-    } else {
-      createMutation.mutate(userDataToSave);
-    }
-  };
-
-  const handleViewDetail = (user: IUser) => {
-    setSelectedUserForDetail(user);
-    setIsDetailModalOpen(true);
-  };
-
-  const handlePageSizeChange = (newSize: number) => {
-    setPageSize(newSize);
-    setPageIndex(1);
-  };
-
-  const isSaving = createMutation.isPending || updateMutation.isPending;
-  const isDeleting = deleteMutation.isPending;
-
-  if (usersQuery.isLoading) {
+  // Loading state
+  if (crud.isLoading) {
     return <PageLoading message="Đang tải danh sách người dùng..." />;
   }
 
-  if (usersQuery.isError) {
+  // Error state
+  if (crud.error) {
     return (
       <ErrorState
         title="Lỗi tải dữ liệu"
         message="Không thể tải danh sách người dùng. Vui lòng thử lại sau."
-        onRetry={() => usersQuery.refetch()}
+        onRetry={() => window.location.reload()}
       />
     );
   }
 
-  // --- NO FAMILY TREE STATE ---
-  if (!userDongHoId) {
+  // No family tree state
+  if (!dongHoId) {
     return <NoFamilyTreeState />;
   }
 
+  // Format date helper
+  const formatDate = (date: Date | string | null | undefined) => {
+    if (!date) return "-";
+    try {
+      return new Date(date).toLocaleDateString("vi-VN", {
+        day: "2-digit",
+        month: "2-digit", 
+        year: "numeric",
+      });
+    } catch {
+      return "-";
+    }
+  };
+
+  // Column configuration
   const columns: ColumnConfig<IUser>[] = [
     {
-      key: "full_name",
+      key: "hoTen",
       label: "Họ và tên",
       clickable: true,
-    },
-    {
-      key: "tenDangNhap",
-      label: "Tên đăng nhập",
     },
     {
       key: "email",
@@ -241,80 +145,52 @@ export default function QuanLyNguoiDungPage() {
       render: (value) => value || "-",
     },
     {
-      key: "phone",
+      key: "soDienThoai",
       label: "Số điện thoại",
-      render: (value) => value || "-",
-    },
-    {
-      key: "tenDongHo",
-      label: "Dòng họ",
       render: (value) => value || "-",
     },
     {
       key: "roleCode",
       label: "Vai trò",
       render: (value) => {
-        const roles: Record<string, string> = {
-          sa: "Super Admin",
-          td: "Thủ Đồ",
-          tv: "Thành Viên",
+        const roles: Record<string, { label: string; color: string }> = {
+          "thanhvien": { label: "Thành viên", color: "bg-blue-100 text-blue-800" },
+          "thudo": { label: "Thủ độ", color: "bg-purple-100 text-purple-800" },
         };
-        return roles[value?.toLowerCase()] || value || "-";
+        const role = roles[value] || { label: value || "-", color: "bg-gray-100 text-gray-800" };
+        return (
+          <span className={`px-2 py-1 rounded-full text-xs font-medium ${role.color}`}>
+            {role.label}
+          </span>
+        );
       },
     },
     {
+      key: "ngayTao",
+      label: "Ngày tạo",
+      render: (value) => formatDate(value),
+    },
+    {
       key: "active_flag",
-      label: "Tình trạng",
+      label: "Trạng thái",
       render: (value) => (
-        <span className={`px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1 w-fit ${
+        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
           value === 1 
             ? "bg-green-100 text-green-800" 
             : "bg-red-100 text-red-800"
         }`}>
-          {value === 1 ? (
-            <>
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                <polyline points="22 4 12 14.01 9 11.01"></polyline>
-              </svg>
-              Hoạt động
-            </>
-          ) : (
-            <>
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="10"></circle>
-                <line x1="15" y1="9" x2="9" y2="15"></line>
-                <line x1="9" y1="9" x2="15" y2="15"></line>
-              </svg>
-              Ngưng hoạt động
-            </>
-          )}
-        </span>
-      ),
-    },
-    {
-      key: "online_flag",
-      label: "Trạng thái",
-      render: (value) => (
-        <span className={`px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1 w-fit ${
-          value === 1 
-            ? "bg-blue-100 text-blue-800" 
-            : "bg-gray-100 text-gray-800"
-        }`}>
-          <span className={`w-2 h-2 rounded-full ${
-            value === 1 ? "bg-blue-600 animate-pulse" : "bg-gray-400"
-          }`}></span>
-          {value === 1 ? "Online" : "Offline"}
+          {value === 1 ? "Hoạt động" : "Không hoạt động"}
         </span>
       ),
     },
   ];
 
+  // Action configuration
   const customActions: ActionConfig<IUser>[] = [
     {
       icon: Edit,
       label: "Sửa",
-      onClick: handleEdit,
+      onClick: crud.handleEdit,
       color: "blue",
     },
     {
@@ -325,82 +201,128 @@ export default function QuanLyNguoiDungPage() {
     },
   ];
 
-  const pageActions = [
-    ...(selectedIds.length > 0 ? [{
-      icon: Trash2,
-      label: "Xóa",
-      onClick: handleDeleteSelected,
-      variant: "danger" as const,
-      count: selectedIds.length,
-    }] : []),
+  // Detail modal sections
+  const getDetailSections = (nguoiDung: IUser): DetailSection[] => [
     {
-      icon: Plus,
-      label: "Thêm Mới",
-      onClick: handleAdd,
-      variant: "primary" as const,
+      title: "Thông tin cơ bản",
+      fields: [
+        {
+          icon: User,
+          label: "Họ và tên",
+          value: nguoiDung.hoTen,
+        } as DetailField,
+        {
+          icon: Mail,
+          label: "Email",
+          value: nguoiDung.email || "Không có",
+        } as DetailField,
+        {
+          icon: Phone,
+          label: "Số điện thoại",
+          value: nguoiDung.soDienThoai || "Không có",
+        } as DetailField,
+        {
+          icon: Calendar,
+          label: "Ngày tạo",
+          value: nguoiDung.ngayTao,
+          render: (value) => formatDate(value),
+        } as DetailField,
+      ],
+    },
+    {
+      title: "Phân quyền",
+      fields: [
+        {
+          icon: Shield,
+          label: "Vai trò",
+          value: nguoiDung.roleCode,
+          render: (value) => {
+            const roles: Record<string, string> = {
+              "thanhvien": "Thành viên",
+              "thudo": "Thủ độ",
+            };
+            return roles[value] || value || "Không có";
+          },
+          colorClass: nguoiDung.roleCode === "thudo" ? "text-purple-600" : "text-blue-600",
+        } as DetailField,
+        {
+          icon: Eye,
+          label: "Trạng thái",
+          value: nguoiDung.active_flag,
+          render: (value) => value === 1 ? "Hoạt động" : "Không hoạt động",
+          colorClass: nguoiDung.active_flag === 1 ? "text-green-600" : "text-red-600",
+        } as DetailField,
+      ],
     },
   ];
 
   return (
     <PageLayout
-      title="Quản Lý Người Dùng"
-      subtitle="Danh sách người dùng và tài khoản truy cập hệ thống"
+      title="QUẢN LÝ NGƯỜI DÙNG"
+      subtitle="Danh sách người dùng và phân quyền"
       icon={Users}
       actions={pageActions}
     >
+      {/* Data Table */}
       <DataTable
-        data={userData}
+        data={crud.data}
         columns={columns}
         keyField="nguoiDungId"
-        pageIndex={pageIndex}
-        pageSize={pageSize}
-        totalRecords={totalRecords}
-        totalPages={totalPages}
-        onPageChange={setPageIndex}
-        onPageSizeChange={handlePageSizeChange}
-        isLoading={isLoading}
+        pageIndex={crud.pageIndex}
+        pageSize={crud.pageSize}
+        totalRecords={crud.totalRecords}
+        totalPages={crud.totalPages}
+        onPageChange={crud.handlePageChange}
+        onPageSizeChange={crud.handlePageSizeChange}
+        isLoading={crud.isLoading}
         enableSelection={true}
-        selectedIds={selectedIds}
-        onSelectAll={handleSelectAll}
-        onSelectOne={handleSelectOne}
+        selectedIds={crud.selectedIds as string[]}
+        onSelectAll={crud.handleSelectAll}
+        onSelectOne={crud.handleSelectOne}
         customActions={customActions}
-        searchValue={searchTerm}
-        onSearchChange={setSearchTerm}
-        searchPlaceholder="Tìm kiếm theo họ tên, tài khoản..."
-        emptyMessage="Chưa có người dùng nào"
-        onViewDetail={handleViewDetail}
+        onViewDetail={crud.handleViewDetail}
+        searchValue={crud.searchTerm}
+        onSearchChange={crud.handleSearch}
+        searchPlaceholder="Tìm kiếm theo tên, email, số điện thoại..."
+        emptyMessage="Chưa có người dùng nào được tạo"
       />
 
-      <UserModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSubmit={handleSaveUser}
-        initialData={editingUser}
-        isLoading={isSaving}
-      />
+      {/* Modals */}
+      {crud.isFormOpen && (
+        <UserModal
+          isOpen={crud.isFormOpen}
+          onClose={crud.handleCloseForm}
+          onSubmit={crud.handleSave}
+          initialData={crud.editingItem}
+          isLoading={crud.isSaving}
+        />
+      )}
 
-      <UserDetailModal
-        isOpen={isDetailModalOpen}
-        onClose={() => setIsDetailModalOpen(false)}
-        user={selectedUserForDetail}
-      />
+      {crud.isDetailOpen && crud.selectedItemForDetail && (
+        <DetailModal
+          isOpen={crud.isDetailOpen}
+          onClose={crud.handleCloseDetail}
+          title={crud.selectedItemForDetail.hoTen}
+          subtitle={`Người dùng tạo ngày ${formatDate(crud.selectedItemForDetail.ngayTao)}`}
+          gradient="red-yellow"
+          sections={getDetailSections(crud.selectedItemForDetail)}
+        />
+      )}
 
-      <DeleteModal
-        isOpen={isDeleteModalOpen}
-        items={usersToDelete}
-        onClose={() => {
-          setIsDeleteModalOpen(false);
-          setUsersToDelete([]);
-        }}
-        onConfirm={handleConfirmDelete}
-        itemDisplayField="full_name"
-        title={usersToDelete.length === 1 ? "Xác nhận xóa người dùng" : `Xác nhận xóa ${usersToDelete.length} người dùng`}
-        message={usersToDelete.length === 1 ? 
-          "Bạn có chắc chắn muốn xóa người dùng này? Hành động này không thể hoàn tác." :
-          `Bạn có chắc chắn muốn xóa ${usersToDelete.length} người dùng đã chọn? Hành động này không thể hoàn tác.`
-        }
-        isLoading={isDeleting}
-      />
+      {crud.isDeleteOpen && (
+        <DeleteModal
+          isOpen={crud.isDeleteOpen}
+          onClose={crud.handleCloseDelete}
+          onConfirm={crud.handleConfirmDelete}
+          isLoading={crud.isDeleting}
+          title={crud.itemsToDelete.length === 1 ? "Xác nhận xóa người dùng" : `Xác nhận xóa ${crud.itemsToDelete.length} người dùng`}
+          message={crud.itemsToDelete.length === 1 ? 
+            "Bạn có chắc chắn muốn xóa người dùng này? Hành động này không thể hoàn tác." :
+            `Bạn có chắc chắn muốn xóa ${crud.itemsToDelete.length} người dùng đã chọn? Hành động này không thể hoàn tác.`
+          }
+          items={crud.itemsToDelete}
+        />
+      )}
     </PageLayout>
   );
 }

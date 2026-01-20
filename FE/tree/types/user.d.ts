@@ -5,8 +5,10 @@ export interface IUser extends IBaseData {
   dongHoId: string;
   tenDangNhap: string;
   matKhau: string;
+  hoTen: string;
   full_name: string;
   email: string;
+  soDienThoai: string;
   phone: string;
   roleId: string;
   roleCode: string;
@@ -14,6 +16,7 @@ export interface IUser extends IBaseData {
   ngayTao: Date | null;
   avatar:string;
   nguoiTaoId: string;
+  trangThai: number;
   gender?: number; // 0: Nữ, 1: Nam
   online_flag?: number; // 0: Offline, 1: Online
 }
@@ -24,6 +27,8 @@ export interface IUserSearch{
   search_content?: string;
   dongHoId? :string;
 }
+
+export interface IsearchUser extends IUserSearch {}
 
 export interface IUserResetPassword{
   tenDangNhap: string;

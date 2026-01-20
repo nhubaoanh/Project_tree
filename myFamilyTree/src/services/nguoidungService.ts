@@ -288,4 +288,8 @@ export class nguoiDungService {
   async getMenuByRoleId(roleId: string): Promise<any[]> {
     return this.nguoidungResponsitory.getMenuByRoleId(roleId);
   }
+
+  async getUserById(nguoiDungId: string): Promise<any> {
+    return this.nguoidungResponsitory.getUserById(nguoiDungId);
+  }
 }

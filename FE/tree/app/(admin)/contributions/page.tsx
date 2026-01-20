@@ -1,18 +1,10 @@
 "use client";
-import React, { useState, useRef, useEffect } from "react";
-import { DollarSign, Plus, Download, Upload, Trash2, Eye, Edit } from "lucide-react";
-import {
-  useQuery,
-  useMutation,
-  useQueryClient,
-  keepPreviousData,
-} from "@tanstack/react-query";
-import { toast } from "react-hot-toast";
+import React, { useRef } from "react";
+import { DollarSign, Plus, Download, Upload, Trash2, Edit, User, Calendar, CreditCard, FileText, Phone, MessageSquare, AlertCircle, CheckCircle } from "lucide-react";
 import { IContributionUp, IsearchContributionUp } from "@/types/contribuitionUp";
-import { createContributionUp, deleteContributionUp, searchContributionUp, updateContributionUp, downloadTemplate, downloadTemplateWithSample, exportExcel, importFromExcel } from "@/service/contribuitionUp.service";
+import { createContributionUp, deleteContributionUp, searchContributionUp, updateContributionUp, downloadTemplateWithSample, exportExcel, importFromExcel } from "@/service/contribuitionUp.service";
 import { ContributionUpModal } from "./components/contribuitionUpModal";
-import { useToast } from "@/service/useToas";
-import { useErrorModal } from "@/hooks";
+import { useCrudPage } from "@/hooks";
 import storage from "@/utils/storage";
 import {
   PageLayout, 
@@ -22,263 +14,78 @@ import {
   PageLoading, 
   ErrorState,
   NoFamilyTreeState,
-  ErrorModal,
   ColumnConfig,
   ActionConfig,
   DetailSection,
   DetailField
 } from "@/components/shared";
-import { User, Calendar, CreditCard, FileText, Phone, MessageSquare } from "lucide-react";
+import { ErrorModal } from "@/components/shared/ErrorModal";
 
 export default function QuanLyTaiChinhThuPage() {
-  const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const [user, setUser] = useState<any>(null);
-  const [dongHoId, setDongHoId] = useState<string>("");
-  const [isReady, setIsReady] = useState(false);
+  // Get user info
+  const user = storage.getUser();
+  const dongHoId = user?.dongHoId;
 
-  useEffect(() => {
-    const userData = storage.getUser();
-    setUser(userData);
-    if (userData?.dongHoId) {
-      setDongHoId(userData.dongHoId);
+  // Use generic CRUD hook
+  const crud = useCrudPage<IContributionUp>({
+    queryKey: ["contribuitionUp", dongHoId || ""],
+    operations: {
+      search: (params) => {
+        const searchParams: IsearchContributionUp = {
+          pageIndex: params.pageIndex,
+          pageSize: params.pageSize,
+          search_content: params.search_content,
+          dongHoId: dongHoId || "",
+        };
+        return searchContributionUp(searchParams);
+      },
+      create: (data) => createContributionUp(data as IContributionUp),
+      update: (data) => updateContributionUp(data as IContributionUp),
+      delete: (params) => {
+        const listJson = params.items.map((item: IContributionUp) => ({ 
+          thuId: item.thuId,
+          dongHoId: item.dongHoId 
+        }));
+        return deleteContributionUp(listJson, params.userId || user?.nguoiDungId || "");
+      },
+      export: () => exportExcel(),
+      import: (file) => importFromExcel(file)
+    },
+    searchParams: { dongHoId: dongHoId || "" },
+    tableConfig: {
+      initialPageSize: 5,
+      enableSelection: true,
+      enableSearch: true
+    },
+    enableImportExport: true,
+    messages: {
+      createSuccess: "Thêm dữ liệu đóng góp thành công!",
+      updateSuccess: "Cập nhật dữ liệu thành công!",
+      deleteSuccess: "Đã xóa thành công.",
+      createError: "Có lỗi xảy ra khi thêm khoản thu.",
+      updateError: "Có lỗi xảy ra khi cập nhật khoản thu.",
+      deleteError: "Không thể xóa khoản thu này."
     }
-    setIsReady(true);
-  }, []);
-
-  const [pageIndex, setPageIndex] = useState(1);
-  const [pageSize, setPageSize] = useState(5);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
-
-  // Selection state
-  const [selectedIds, setSelectedIds] = useState<number[]>([]);
-
-  // Modal states
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingUser, setEditingUser] = useState<IContributionUp | null>(null);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [itemsToDelete, setItemsToDelete] = useState<IContributionUp[]>([]);
-  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
-  const [selectedContributionForDetail, setSelectedContributionForDetail] = useState<IContributionUp | null>(null);
-  const [isValidationErrorModalOpen, setIsValidationErrorModalOpen] = useState(false);
-  const [validationErrors, setValidationErrors] = useState<any[]>([]);
-  const [validationWarnings, setValidationWarnings] = useState<any[]>([]);
-  const [validationSummary, setValidationSummary] = useState({ validCount: 0, totalCount: 0 });
-
-  const { showSuccess, showError } = useToast();
-  const errorModal = useErrorModal();
-
-  React.useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearch(searchTerm);
-      setPageIndex(1);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, [searchTerm]);
-
-  const searchParams: IsearchContributionUp = {
-    pageIndex,
-    pageSize,
-    search_content: debouncedSearch,
-    dongHoId: dongHoId || undefined,
-  };
-
-  const usersQuery = useQuery({
-    queryKey: ["contribuitionUp", searchParams],
-    queryFn: () => searchContributionUp(searchParams),
-    placeholderData: keepPreviousData,
-    enabled: isReady && !!dongHoId,
   });
 
-  const userData = usersQuery.data?.data || [];
-  const totalRecords = usersQuery.data?.totalItems || 0;
-  const totalPages = usersQuery.data?.pageCount || 0;
-  const isLoading = usersQuery.isLoading;
-
-  const createMutation = useMutation({
-    mutationFn: createContributionUp,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["contribuitionUp"] });
-      showSuccess("Thêm dữ liệu đóng góp thành công!");
-      setIsModalOpen(false);
-    },
-    onError: (error: any) => {
-      console.error("Create contribution error:", error);
-      
-      if (error.response?.data?.errors) {
-        errorModal.showError(
-          "Lỗi khi tạo khoản thu",
-          error.response.data.errors,
-          error.response.data.warnings || []
-        );
-      } else {
-        errorModal.showError("Lỗi khi tạo khoản thu", [{
-          field: "Hệ thống",
-          message: error.message || "Có lỗi xảy ra khi thêm khoản thu."
-        }]);
-      }
-    },
-  });
-
-  const updateMutation = useMutation({
-    mutationFn: updateContributionUp,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["contribuitionUp"] });
-      showSuccess("Cập nhật dữ liệu thành công!");
-      setIsModalOpen(false);
-    },
-    onError: (error: any) => {
-      console.error("Update contribution error:", error);
-      
-      if (error.response?.data?.errors) {
-        errorModal.showError(
-          "Lỗi khi cập nhật khoản thu",
-          error.response.data.errors,
-          error.response.data.warnings || []
-        );
-      } else {
-        errorModal.showError("Lỗi khi cập nhật khoản thu", [{
-          field: "Hệ thống",
-          message: error.message || "Có lỗi xảy ra khi cập nhật khoản thu."
-        }]);
-      }
-    },
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: (listJson: { thuId: number }[]) => deleteContributionUp(listJson, user?.nguoiDungId || ""),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["contribuitionUp"] });
-      showSuccess("Đã xóa thành công.");
-      setIsDeleteModalOpen(false);
-      setItemsToDelete([]);
-      setSelectedIds([]);
-    },
-    onError: (error: any) => {
-      console.error("Delete contribution error:", error);
-      
-      if (error.response?.data?.errors) {
-        errorModal.showError(
-          "Lỗi khi xóa khoản thu",
-          error.response.data.errors,
-          error.response.data.warnings || []
-        );
-      } else {
-        errorModal.showError("Lỗi khi xóa khoản thu", [{
-          field: "Hệ thống",
-          message: error.message || "Không thể xóa khoản thu này."
-        }]);
-      }
-    },
-  });
-
-  // Handlers
-  const handleSelectAll = (checked: boolean) => {
-    if (checked) {
-      setSelectedIds(userData.map((e: IContributionUp) => e.thuId));
-    } else {
-      setSelectedIds([]);
-    }
-  };
-
-  const handleSelectOne = (id: string | number, checked: boolean) => {
-    const numId = Number(id);
-    if (checked) {
-      setSelectedIds((prev) => [...prev, numId]);
-    } else {
-      setSelectedIds((prev) => prev.filter((i) => i !== numId));
-    }
-  };
-
-  const handleAdd = () => {
-    setEditingUser(null);
-    setIsModalOpen(true);
-  };
-
-  const handleEdit = (item: IContributionUp) => {
-    setEditingUser(item);
-    setIsModalOpen(true);
-  };
-
+  // Custom handlers để giữ logic đặc biệt
   const handleDeleteClick = (item: IContributionUp) => {
-    if (selectedIds.length > 1 && selectedIds.includes(item.thuId)) {
-      const selected = userData.filter((e: IContributionUp) => selectedIds.includes(e.thuId));
-      setItemsToDelete(selected);
+    if (crud.selectedIds.length > 1 && crud.selectedIds.includes(item.thuId)) {
+      const selected = crud.data.filter((e: IContributionUp) => crud.selectedIds.includes(e.thuId));
+      crud.handleDelete(selected);
     } else {
-      setItemsToDelete([item]);
+      crud.handleDelete([item]);
     }
-    setIsDeleteModalOpen(true);
   };
 
   const handleDeleteSelected = () => {
-    const selected = userData.filter((e: IContributionUp) => selectedIds.includes(e.thuId));
-    setItemsToDelete(selected);
-    setIsDeleteModalOpen(true);
+    const selected = crud.data.filter((e: IContributionUp) => crud.selectedIds.includes(e.thuId));
+    crud.handleDelete(selected);
   };
 
-  const handleConfirmDelete = () => {
-    const listJson = itemsToDelete.map((item) => ({ 
-      thuId: item.thuId,
-      dongHoId: item.dongHoId 
-    }));
-    deleteMutation.mutate(listJson);
-  };
-
-  const handleSaveUser = (data: Partial<IContributionUp>) => {
-    if (editingUser) {
-      updateMutation.mutate(data as IContributionUp);
-    } else {
-      createMutation.mutate(data as IContributionUp);
-    }
-  };
-
-  const handleViewDetail = (item: IContributionUp) => {
-    setSelectedContributionForDetail(item);
-    setIsDetailModalOpen(true);
-  };
-
-  const handlePageSizeChange = (newSize: number) => {
-    setPageSize(newSize);
-    setPageIndex(1);
-  };
-
-  const handleExportExcel = async () => {
-    if (userData.length === 0) {
-      toast("Không có dữ liệu để xuất");
-      return;
-    }
-    
-    try {
-      const blob = await exportExcel();
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `TaiChinhThu_${new Date().toLocaleDateString('vi-VN').replace(/\//g, '-')}.xlsx`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-      showSuccess("Đã xuất dữ liệu thành công!");
-    } catch (error: any) {
-      // Nếu response data là Blob, đọc nội dung
-      if (error.response?.data instanceof Blob) {
-        const text = await error.response.data.text();
-        try {
-          const json = JSON.parse(text);
-          console.error('Error response JSON:', json);
-          showError(json.message || "Không thể xuất dữ liệu. Vui lòng thử lại.");
-          return;
-        } catch (e) {
-          console.error('Cannot parse error as JSON');
-        }
-      }
-      
-      showError("Không thể xuất dữ liệu. Vui lòng thử lại.");
-    }
-  };
-
+  // Download template handler
   const handleDownloadTemplateWithSample = async () => {
     try {
       const blob = await downloadTemplateWithSample();
@@ -290,13 +97,13 @@ export default function QuanLyTaiChinhThuPage() {
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
-      showSuccess("Đã tải file mẫu thành công!");
     } catch (error) {
-      showError("Không thể tải file mẫu. Vui lòng thử lại.");
+      console.error("Download template error:", error);
     }
   };
 
-  const handleImportExcel = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  // File input handler - sử dụng crud.handleImport
+  const handleFileInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -307,96 +114,85 @@ export default function QuanLyTaiChinhThuPage() {
     ];
     
     if (!allowedTypes.includes(file.type)) {
-      showError("Chỉ chấp nhận file Excel (.xlsx, .xls)");
       if (fileInputRef.current) fileInputRef.current.value = "";
       return;
     }
 
     // Validate file size (10MB)
     if (file.size > 10 * 1024 * 1024) {
-      showError("File quá lớn. Kích thước tối đa 10MB");
       if (fileInputRef.current) fileInputRef.current.value = "";
       return;
     }
 
-    try {
-      toast("Đang xử lý file Excel...", { icon: "⏳" });
-      const result = await importFromExcel(file);
-      
-      if (result.success) {
-        queryClient.invalidateQueries({ queryKey: ["contribuitionUp"] });
-        showSuccess(result.message || "Import thành công!");
-      } else {
-        // Hiển thị modal validation errors
-        if (result.errors && result.errors.length > 0) {
-          errorModal.showError(
-            "Lỗi khi nhập dữ liệu Excel",
-            result.errors,
-            result.warnings || [],
-            {
-              validCount: result.validCount || 0,
-              totalCount: result.totalCount || 0
-            }
-          );
-        } else {
-          errorModal.showError("Lỗi khi nhập dữ liệu Excel", [{
-            field: "Import thất bại",
-            message: result.message || "Import thất bại"
-          }]);
-        }
-      }
-    } catch (error: any) {
-      console.error("Import error:", error);
-      
-      // Kiểm tra nếu error response có validation errors
-      if (error.response?.data?.errors) {
-        errorModal.showError(
-          "Lỗi khi nhập dữ liệu Excel",
-          error.response.data.errors,
-          error.response.data.warnings || [],
-          {
-            validCount: error.response.data.validCount || 0,
-            totalCount: error.response.data.totalCount || 0
-          }
-        );
-      } else if (error.response?.status === 500) {
-        // Lỗi 500 - hiển thị modal với thông báo lỗi server
-        errorModal.showError("Lỗi hệ thống khi nhập Excel", [{
-          row: 0,
-          field: "Server Error",
-          message: error.response?.data?.message || "Lỗi server khi xử lý file Excel. Vui lòng kiểm tra định dạng file và thử lại.",
-          value: "HTTP 500"
-        }]);
-      } else {
-        errorModal.showError("Lỗi khi nhập dữ liệu Excel", [{
-          field: "Lỗi hệ thống",
-          message: error.response?.data?.message || "Có lỗi xảy ra khi import file Excel"
-        }]);
-      }
-    } finally {
-      if (fileInputRef.current) fileInputRef.current.value = "";
+    // Sử dụng crud.handleImport - sẽ tự động hiển thị DetailModal khi có lỗi
+    if (crud.handleImport) {
+      await crud.handleImport(file);
     }
+    
+    // Reset file input
+    if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
-  const isSaving = createMutation.isPending || updateMutation.isPending;
-  const isDeleting = deleteMutation.isPending;
+  // Memoize actions để tránh re-render không cần thiết
+  const pageActions = React.useMemo(() => [
+    // Bulk actions - hiển thị khi có selection
+    ...(crud.hasSelection ? [
+      {
+        id: "bulk-delete",
+        icon: Trash2,
+        label: `Xóa đã chọn (${crud.selectedIds.length})`,
+        onClick: handleDeleteSelected,
+        variant: "danger" as const,
+      }
+    ] : []),
+    {
+      id: "download-template",
+      icon: Download,
+      label: "Tải file mẫu",
+      onClick: handleDownloadTemplateWithSample,
+      variant: "secondary" as const,
+    },
+    {
+      id: "export-excel",
+      icon: Download,
+      label: "Xuất Excel",
+      onClick: crud.handleExport || (() => console.log("Export không khả dụng")),
+      variant: "success" as const,
+    },
+    {
+      id: "import-excel",
+      icon: Upload,
+      label: "Nhập Excel",
+      onClick: () => fileInputRef.current?.click(),
+      variant: "primary" as const,
+    },
+    {
+      id: "add-new",
+      icon: Plus,
+      label: "Thêm mới",
+      onClick: crud.handleAdd,
+      variant: "primary" as const,
+    },
+  ], [crud.hasSelection, crud.selectedIds.length, handleDeleteSelected, crud.handleAdd, crud.handleExport, handleDownloadTemplateWithSample]);
 
-  // Loading states
-  if (usersQuery.isLoading) {
+  // Loading state
+  if (crud.isLoading) {
     return <PageLoading message="Đang tải danh sách tài chính thu..." />;
   }
 
-  if (usersQuery.isError) {
+  // Error state
+  if (crud.error) {
     return (
       <ErrorState
         title="Lỗi tải dữ liệu"
         message="Không thể tải danh sách tài chính thu. Vui lòng thử lại sau."
-        onRetry={() => usersQuery.refetch()}
+        onRetry={() => window.location.reload()}
       />
     );
   }
 
-  if (isReady && !dongHoId) {
+  // No family tree state
+  if (!dongHoId) {
     return <NoFamilyTreeState />;
   }
 
@@ -405,7 +201,7 @@ export default function QuanLyTaiChinhThuPage() {
     {
       key: "hoTenNguoiDong",
       label: "Người đóng góp",
-      clickable: false, // Bỏ clickable vì đã có nút Eye
+      clickable: true,
     },
     {
       key: "soTien",
@@ -443,15 +239,9 @@ export default function QuanLyTaiChinhThuPage() {
   // Action configuration
   const customActions: ActionConfig<IContributionUp>[] = [
     {
-      icon: Eye,
-      label: "Xem chi tiết",
-      onClick: handleViewDetail,
-      color: "green",
-    },
-    {
       icon: Edit,
       label: "Sửa",
-      onClick: handleEdit,
+      onClick: crud.handleEdit,
       color: "blue",
     },
     {
@@ -459,41 +249,6 @@ export default function QuanLyTaiChinhThuPage() {
       label: "Xóa",
       onClick: handleDeleteClick,
       color: "red",
-    },
-  ];
-
-  // Page actions
-  const pageActions = [
-    ...(selectedIds.length > 0 ? [{
-      icon: Trash2,
-      label: "Xóa",
-      onClick: handleDeleteSelected,
-      variant: "danger" as const,
-      count: selectedIds.length,
-    }] : []),
-    {
-      icon: Download,
-      label: "Tải file mẫu",
-      onClick: handleDownloadTemplateWithSample,
-      variant: "secondary" as const,
-    },
-    {
-      icon: Download,
-      label: "Xuất Excel",
-      onClick: handleExportExcel,
-      variant: "success" as const,
-    },
-    {
-      icon: Upload,
-      label: "Nhập Excel",
-      onClick: () => fileInputRef.current?.click(),
-      variant: "primary" as const,
-    },
-    {
-      icon: Plus,
-      label: "Thêm Mới",
-      onClick: handleAdd,
-      variant: "primary" as const,
     },
   ];
 
@@ -562,109 +317,100 @@ export default function QuanLyTaiChinhThuPage() {
 
   return (
     <PageLayout
-      title="Quản Lý Tài Chính Thu"
+      title="QUẢN LÝ TÀI CHÍNH THU"
       subtitle="Danh sách các khoản thu tài chính"
       icon={DollarSign}
       actions={pageActions}
     >
-      {/* Hidden file input */}
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept=".xlsx, .xls"
-        onChange={handleImportExcel}
-        className="hidden"
-      />
-
-      {/* Table */}
-      <DataTable
-        data={userData}
-        columns={columns}
-        keyField="thuId"
-        pageIndex={pageIndex}
-        pageSize={pageSize}
-        totalRecords={totalRecords}
-        totalPages={totalPages}
-        onPageChange={setPageIndex}
-        onPageSizeChange={handlePageSizeChange}
-        isLoading={isLoading}
-        enableSelection={true}
-        selectedIds={selectedIds}
-        onSelectAll={handleSelectAll}
-        onSelectOne={handleSelectOne}
-        onViewDetail={undefined} // Bỏ onViewDetail vì đã có nút Eye
-        customActions={customActions}
-        searchValue={searchTerm}
-        onSearchChange={setSearchTerm}
-        searchPlaceholder="Tìm kiếm theo tên người đóng góp..."
-        emptyMessage="Chưa có khoản thu nào được tạo"
-      />
-
-      {/* Form Modal */}
-      <ContributionUpModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSubmit={handleSaveUser}
-        initialData={editingUser}
-        isLoading={isSaving}
-      />
-
-      {/* Detail Modal */}
-      {selectedContributionForDetail && (
-        <DetailModal
-          isOpen={isDetailModalOpen}
-          onClose={() => setIsDetailModalOpen(false)}
-          title={selectedContributionForDetail.hoTenNguoiDong}
-          subtitle={`Khoản thu ngày ${
-            selectedContributionForDetail.ngayDong
-              ? new Date(
-                  selectedContributionForDetail.ngayDong
-                ).toLocaleDateString("vi-VN")
-              : "N/A"
-          }`}
-          badge={new Intl.NumberFormat("vi-VN", {
-            style: "currency",
-            currency: "VND",
-          }).format(selectedContributionForDetail.soTien || 0)}
-          gradient="red-yellow"
-          sections={getDetailSections(selectedContributionForDetail)}
-          notes={selectedContributionForDetail.ghiChu}
+        {/* Hidden file input */}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".xlsx, .xls"
+          onChange={handleFileInputChange}
+          className="hidden"
         />
-      )}
 
-      {/* Delete Modal */}
-      <DeleteModal
-        isOpen={isDeleteModalOpen}
-        items={itemsToDelete}
-        onClose={() => {
-          setIsDeleteModalOpen(false);
-          setItemsToDelete([]);
-        }}
-        onConfirm={handleConfirmDelete}
-        isLoading={isDeleting}
-        itemDisplayField="hoTenNguoiDong"
-        title={
-          itemsToDelete.length === 1
-            ? "Xác nhận xóa khoản thu"
-            : `Xác nhận xóa ${itemsToDelete.length} khoản thu`
-        }
-        message={
-          itemsToDelete.length === 1
-            ? "Bạn có chắc chắn muốn xóa khoản thu này? Hành động này không thể hoàn tác."
-            : `Bạn có chắc chắn muốn xóa ${itemsToDelete.length} khoản thu đã chọn? Hành động này không thể hoàn tác.`
-        }
-      />
+        {/* Data Table */}
+        <DataTable
+          data={crud.data}
+          columns={columns}
+          keyField="thuId"
+          pageIndex={crud.pageIndex}
+          pageSize={crud.pageSize}
+          totalRecords={crud.totalRecords}
+          totalPages={crud.totalPages}
+          onPageChange={crud.handlePageChange}
+          onPageSizeChange={crud.handlePageSizeChange}
+          isLoading={crud.isLoading}
+          enableSelection={true}
+          selectedIds={crud.selectedIds as number[]}
+          onSelectAll={crud.handleSelectAll}
+          onSelectOne={crud.handleSelectOne}
+          customActions={customActions}
+          onViewDetail={crud.handleViewDetail}
+          searchValue={crud.searchTerm}
+          onSearchChange={crud.handleSearch}
+          searchPlaceholder="Tìm kiếm theo tên người đóng góp..."
+          emptyMessage="Chưa có khoản thu nào được tạo"
+        />
 
-      {/* Error Modal */}
-      <ErrorModal
-        isOpen={errorModal.isOpen}
-        onClose={errorModal.hideError}
-        title={errorModal.title}
-        errors={errorModal.errors}
-        warnings={errorModal.warnings}
-        validCount={errorModal.validCount}
-        totalCount={errorModal.totalCount}
-      />
-    </PageLayout>
-  );
-}
+        {/* Modals */}
+        {crud.isFormOpen && (
+          <ContributionUpModal
+            isOpen={crud.isFormOpen}
+            onClose={crud.handleCloseForm}
+            onSubmit={crud.handleSave}
+            initialData={crud.editingItem}
+            isLoading={crud.isSaving}
+          />
+        )}
+
+        {crud.isDetailOpen && crud.selectedItemForDetail && (
+          <DetailModal
+            isOpen={crud.isDetailOpen}
+            onClose={crud.handleCloseDetail}
+            title={crud.selectedItemForDetail.hoTenNguoiDong}
+            subtitle={`Khoản thu ngày ${
+              crud.selectedItemForDetail.ngayDong
+                ? new Date(crud.selectedItemForDetail.ngayDong).toLocaleDateString("vi-VN")
+                : "N/A"
+            }`}
+            badge={new Intl.NumberFormat("vi-VN", {
+              style: "currency",
+              currency: "VND",
+            }).format(crud.selectedItemForDetail.soTien || 0)}
+            gradient="red-yellow"
+            sections={getDetailSections(crud.selectedItemForDetail)}
+            notes={crud.selectedItemForDetail.ghiChu}
+          />
+        )}
+
+        {/* Error Modal - hiển thị lỗi import */}
+        <ErrorModal
+          isOpen={crud.isErrorModalOpen}
+          onClose={crud.handleCloseErrorModal}
+          title={crud.errorModalTitle}
+          errors={crud.errorModalErrors}
+          warnings={crud.errorModalWarnings}
+          validCount={crud.errorModalValidCount}
+          totalCount={crud.errorModalTotalCount}
+        />
+
+        {crud.isDeleteOpen && (
+          <DeleteModal
+            isOpen={crud.isDeleteOpen}
+            onClose={crud.handleCloseDelete}
+            onConfirm={crud.handleConfirmDelete}
+            isLoading={crud.isDeleting}
+            title={crud.itemsToDelete.length === 1 ? "Xác nhận xóa khoản thu" : `Xác nhận xóa ${crud.itemsToDelete.length} khoản thu`}
+            message={crud.itemsToDelete.length === 1 ? 
+              "Bạn có chắc chắn muốn xóa khoản thu này? Hành động này không thể hoàn tác." :
+              `Bạn có chắc chắn muốn xóa ${crud.itemsToDelete.length} khoản thu đã chọn? Hành động này không thể hoàn tác.`
+            }
+            items={crud.itemsToDelete}
+          />
+        )}
+      </PageLayout>
+    );
+  }

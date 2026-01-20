@@ -12,7 +12,17 @@ uploadRouter.post('/', uploadService.multerUpload, (req: Request, res: Response)
     }
 
     const filePath = req.file.path.replace(/\\/g, '/'); // Chuẩn hóa path cho Windows
-    res.json({ success: true, path: filePath, message: '' });
+    
+    // Build full URL using BASE_URL from environment (gateway URL, not backend URL)
+    const baseUrl = process.env.BASE_URL || 'http://localhost:8080';
+    const fullUrl = `${baseUrl}/${filePath}`;
+    
+    res.json({ 
+        success: true, 
+        path: fullUrl,  // URL đầy đủ qua gateway để lưu vào database
+        relativePath: filePath,  // Path tương đối (backup)
+        message: '' 
+    });
 })
 
 export default uploadRouter;

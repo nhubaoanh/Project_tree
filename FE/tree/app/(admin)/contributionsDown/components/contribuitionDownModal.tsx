@@ -71,7 +71,7 @@ const getInitialValues = (data?: IContributionDown | null, dongHoId?: string): P
 });
 
 // ==================== MAIN COMPONENT ====================
-export const ContributionUpModal: React.FC<ContributionUpModalProps> = ({
+export const ContributionDownModal: React.FC<ContributionUpModalProps> = ({
   isOpen,
   onClose,
   onSubmit,

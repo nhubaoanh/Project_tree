@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { X, Loader2, Upload, Trash2, Info } from "lucide-react";
 import { ITaiLieu, LOAI_TAI_LIEU } from "@/service/tailieu.service";
 import { uploadFile } from "@/service/upload.service";
-import { getImageUrl } from "@/utils/imageUtils";
+import { getImageUrl, getFileUrl } from "@/utils/imageUtils";
 import { useToast } from "@/service/useToas";
 import {
   prepareFileForUpload,
@@ -51,6 +51,8 @@ export function TaiLieuModal({
   useEffect(() => {
     if (initialData) {
       setFormData({
+        taiLieuId: initialData.taiLieuId,
+        dongHoId: initialData.dongHoId,
         tenTaiLieu: initialData.tenTaiLieu || "",
         moTa: initialData.moTa || "",
         loaiTaiLieu: initialData.loaiTaiLieu || "",
@@ -297,7 +299,7 @@ export function TaiLieuModal({
                         {uploadedFileName || "File đã tải lên"}
                       </p>
                       <a
-                        href={getImageUrl(formData.duongDan)}
+                        href={getFileUrl(formData.duongDan)}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-xs text-blue-600 hover:underline"

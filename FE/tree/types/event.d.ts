@@ -17,7 +17,11 @@ export interface IEvent {
   hoTen: string;
   uuTien: number;
   full_name: string;
+  ngayBatDau?: Date;
+  ngayKetThuc?: Date;
 }
+
+export interface ISuKien extends IEvent {}
 
 export interface IsearchEvent {
   pageIndex?: number;
@@ -25,3 +29,5 @@ export interface IsearchEvent {
   search_content?: string;
   dongHoId?: string;
 }
+
+export interface IsearchSuKien extends IsearchEvent {}

@@ -13,6 +13,8 @@ export const config = {
   },
   jwt: {
     secret: env('JWT_SECRET', 'thong tin cua gia dinh toi nhe 21'),
-    expiresIn: env('JWT_EXPIRES_IN', '24h') 
+    expiresIn: env('JWT_EXPIRES_IN', '1h'), // Access token: 1 giờ
+    refreshSecret: env('JWT_REFRESH_SECRET', 'refresh token secret gia dinh toi 2024'),
+    refreshExpiresIn: env('JWT_REFRESH_EXPIRES_IN', '7d'), // Refresh token: 7 ngày
   },
 };

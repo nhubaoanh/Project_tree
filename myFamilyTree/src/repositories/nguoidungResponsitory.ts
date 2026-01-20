@@ -241,4 +241,21 @@ export class nguoiDungReponsitory {
       return [];
     }
   }
+
+  /**
+   * Lấy thông tin user theo ID (dùng cho refresh token)
+   */
+  async getUserById(nguoiDungId: string): Promise<any> {
+    try {
+      const sql = "CALL GetUserById(?)";
+      const [results] = await this.db.query(sql, [nguoiDungId]);
+      if (Array.isArray(results) && results.length > 0) {
+        return results[0];
+      }
+      return null;
+    } catch (error: any) {
+      console.error("getUserById error:", error.message);
+      return null;
+    }
+  }
 }

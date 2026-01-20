@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { searchTaiLieu, ITaiLieu } from "@/service/tailieu.service";
 import storage from "@/utils/storage";
-import { getImageUrl } from "@/utils/imageUtils";
+import { getImageUrl, getFileUrl } from "@/utils/imageUtils";
 import {
   FileText,
   BookOpen,
@@ -67,7 +67,7 @@ export default function PhaKyPage() {
       return '📎';
     };
 
-    const fileUrl = item.duongDan ? getImageUrl(item.duongDan) : "";
+    const fileUrl = item.duongDan ? getFileUrl(item.duongDan) : "";
     const isImage = isImageFile(item.duongDan || "");
 
     return (

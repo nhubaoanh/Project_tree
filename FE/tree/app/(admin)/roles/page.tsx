@@ -392,7 +392,7 @@ export default function RolesPage() {
               </div>
             </div>
             <div className="flex items-center justify-between p-4 border-t bg-gray-50">
-              <Button variant="destructive" size="sm" onClick={handleDeleteRole} disabled={savingRole || selectedRole.roleCode === "sa"}>
+              <Button variant="destructive" size="sm" onClick={handleDeleteRole} disabled={savingRole || selectedRole.roleCode === "thudo"}>
                 <Trash2 className="w-4 h-4 mr-1" /> Xóa
               </Button>
               <div className="flex gap-2">

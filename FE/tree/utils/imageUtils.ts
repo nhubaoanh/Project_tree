@@ -3,7 +3,10 @@ import { BASE_URL, API_DOWNLOAD } from "@/constant/config";
 const DEFAULT_AVATAR = "/images/vangoc.jpg";
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
 
-// Helper function để xử lý URL ảnh (copy từ member page)
+/**
+ * Helper function để xử lý URL ảnh/file
+ * Hỗ trợ cả URL đầy đủ và path tương đối
+ */
 export const getImageUrl = (img: string | null | undefined): string => {
   if (!img?.trim()) return DEFAULT_AVATAR;
 
@@ -11,11 +14,8 @@ export const getImageUrl = (img: string | null | undefined): string => {
     // Decode URL nếu bị encode
     let decodedImg = decodeURIComponent(img);
 
-    if (decodedImg.startsWith("http")) {
-      // Nếu URL từ backend cũ (port 6001), chuyển sang gateway (port 8080)
-      if (decodedImg.includes(":6001")) {
-        decodedImg = decodedImg.replace(":6001", ":8080");
-      }
+    // Nếu đã là URL đầy đủ (http/https), return luôn
+    if (decodedImg.startsWith("http://") || decodedImg.startsWith("https://")) {
       return decodedImg;
     }
 
@@ -25,12 +25,9 @@ export const getImageUrl = (img: string | null | undefined): string => {
       : `uploads/${decodedImg}`;
     return `${API_BASE_URL}/${path}`;
   } catch (error) {
+    // Fallback: xử lý như path tương đối
     let fallbackImg = img;
-    if (fallbackImg.startsWith("http")) {
-      // Chuyển từ backend cũ sang gateway nếu cần
-      if (fallbackImg.includes(":6001")) {
-        fallbackImg = fallbackImg.replace(":6001", ":8080");
-      }
+    if (fallbackImg.startsWith("http://") || fallbackImg.startsWith("https://")) {
       return fallbackImg;
     }
     const path = fallbackImg.startsWith("uploads/")
@@ -42,4 +39,38 @@ export const getImageUrl = (img: string | null | undefined): string => {
 
 export const getAvatarUrl = (avatar: string | null | undefined): string => {
   return getImageUrl(avatar);
+};
+
+/**
+ * Helper function để xử lý URL file download (tài liệu, file đính kèm)
+ * Hỗ trợ cả URL đầy đủ và path tương đối
+ */
+export const getFileUrl = (filePath: string | null | undefined): string => {
+  if (!filePath?.trim()) return "";
+
+  try {
+    // Decode URL nếu bị encode
+    let decodedPath = decodeURIComponent(filePath);
+
+    // Nếu đã là URL đầy đủ (http/https), return luôn
+    if (decodedPath.startsWith("http://") || decodedPath.startsWith("https://")) {
+      return decodedPath;
+    }
+
+    // Nếu là đường dẫn tương đối, build URL qua gateway
+    const path = decodedPath.startsWith("uploads/")
+      ? decodedPath
+      : `uploads/${decodedPath}`;
+    return `${API_BASE_URL}/${path}`;
+  } catch (error) {
+    // Fallback: xử lý như path tương đối
+    let fallbackPath = filePath;
+    if (fallbackPath.startsWith("http://") || fallbackPath.startsWith("https://")) {
+      return fallbackPath;
+    }
+    const path = fallbackPath.startsWith("uploads/")
+      ? fallbackPath
+      : `uploads/${fallbackPath}`;
+    return `${API_BASE_URL}/${path}`;
+  }
 };
