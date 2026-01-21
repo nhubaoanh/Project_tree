@@ -1,5 +1,6 @@
 import { thanhVien } from "../models/thanhvien";
 import { thanhVienRespository } from "../repositories/thanhVienRespository";
+import { RelationshipSyncService } from "./relationshipSyncService";
 import { injectable } from "tsyringe";
 import { 
   validateMemberImport, 
@@ -9,7 +10,10 @@ import {
 
 @injectable()
 export class thanhVienService {
-  constructor(private thanhvienRespository: thanhVienRespository) {}
+  constructor(
+    private thanhvienRespository: thanhVienRespository,
+    private relationshipSyncService: RelationshipSyncService
+  ) {}
 
   async createThanhVien(thanhvien: thanhVien): Promise<any> {
     return await this.thanhvienRespository.createThanhVien(thanhvien);
@@ -85,11 +89,38 @@ export class thanhVienService {
       nguoiTaoId
     );
 
-    return {
-      ...result,
-      warnings: validation.warnings.length > 0 
-        ? validation.warnings.map(w => `Dòng ${w.row}: ${w.message}`)
-        : []
-    };
+    // 3. Tự động đồng bộ quan hệ sau khi import thành công
+    try {
+      console.log(`🔄 Auto-syncing relationships for dongHoId: ${dongHoId}`);
+      const syncResult = await this.relationshipSyncService.syncAllRelationships(dongHoId);
+      console.log(`✅ Auto-sync completed: ${syncResult.total_relationships_created} relationships created`);
+      
+      return {
+        ...result,
+        relationshipSync: {
+          success: true,
+          totalRelationships: syncResult.total_relationships_created,
+          syncedAt: syncResult.synced_at
+        },
+        warnings: validation.warnings.length > 0 
+          ? validation.warnings.map(w => `Dòng ${w.row}: ${w.message}`)
+          : []
+      };
+    } catch (syncError: any) {
+      // Nếu sync quan hệ thất bại, vẫn trả về kết quả import thành công
+      // nhưng thông báo lỗi sync
+      console.error("❌ Auto-sync failed:", syncError.message);
+      return {
+        ...result,
+        relationshipSync: {
+          success: false,
+          error: syncError.message,
+          message: "Import thành công nhưng đồng bộ quan hệ thất bại. Vui lòng đồng bộ thủ công."
+        },
+        warnings: validation.warnings.length > 0 
+          ? validation.warnings.map(w => `Dòng ${w.row}: ${w.message}`)
+          : []
+      };
+    }
   }
 }

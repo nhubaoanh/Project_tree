@@ -11,6 +11,8 @@ import thongKeRouter from "./thongKeRouter";
 import tinTucRouter from "./tinTucRouter";
 import taiLieuRouter from "./taiLieuRouter";
 import ollamaRouter from "./ollamaRouter";
+import relationshipRouter from "./relationshipRouter";
+import aiQueryRouter from "./aiQueryRouter";
 
 const router = Router();
 router.use('/users', nguoiDungRouter);
@@ -25,5 +27,7 @@ router.use("/thongke", thongKeRouter);
 router.use("/tintuc", tinTucRouter);
 router.use("/tailieu", taiLieuRouter);
 router.use("/ollama", ollamaRouter);
+router.use("/relationships", relationshipRouter);
+router.use("/ai", aiQueryRouter);
 
 export default router;
