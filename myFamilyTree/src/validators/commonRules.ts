@@ -259,8 +259,13 @@ export const idParam = (field: string = "id"): ValidationChain =>
   param(field)
     .notEmpty()
     .withMessage("ID không được để trống")
-    .isInt({ min: 1 })
-    .withMessage("ID phải là số nguyên dương");
+    .custom((value) => {
+      const numValue = Number(value);
+      if (isNaN(numValue) || !Number.isInteger(numValue) || numValue < 1) {
+        throw new Error("ID phải là số nguyên dương");
+      }
+      return true;
+    });
 
 /**
  * Required ID trong body

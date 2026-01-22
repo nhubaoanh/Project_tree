@@ -451,149 +451,149 @@ const MyFamilyTreeInner = ({ data, dongHoId, queryClient, onDataChange }: Props)
     }
   }, [nodes, showSuccess, showError, dongHoId, queryClient, onDataChange]);
 
-  const handleSaveMember = useCallback(async (formData: Partial<ITreeNode>) => {
-    try {
-      // Lấy dongHoId từ user hiện tại thay vì props
-      const user = storage.getUser();
-      const userDongHoId = user?.dongHoId;
+  // const handleSaveMember = useCallback(async (formData: Partial<ITreeNode>) => {
+  //   try {
+  //     // Lấy dongHoId từ user hiện tại thay vì props
+  //     const user = storage.getUser();
+  //     const userDongHoId = user?.dongHoId;
       
-      // Fallback: lấy từ props hoặc từ data
-      let finalDongHoId = userDongHoId || dongHoId;
+  //     // Fallback: lấy từ props hoặc từ data
+  //     let finalDongHoId = userDongHoId || dongHoId;
       
-      if (!finalDongHoId && data.length > 0) {
-        // Thử lấy từ data có sẵn
-        finalDongHoId = data[0]?.dongHoId;
-      }
+  //     if (!finalDongHoId && data.length > 0) {
+  //       // Thử lấy từ data có sẵn
+  //       finalDongHoId = data[0]?.dongHoId;
+  //     }
       
-      if (!finalDongHoId) {
-        throw new Error("Không tìm thấy thông tin dòng họ");
-      }
+  //     if (!finalDongHoId) {
+  //       throw new Error("Không tìm thấy thông tin dòng họ");
+  //     }
 
-      // Lấy userId từ storage
-      const userId = user?.nguoiDungId || "";
+  //     // Lấy userId từ storage
+  //     const userId = user?.nguoiDungId || "";
 
-      // Format date cho API
-      const formatDateForAPI = (date: Date | string | undefined): string | undefined => {
-        if (!date) return undefined;
-        if (typeof date === 'string') return date;
-        return date.toISOString().split('T')[0];
-      };
+  //     // Format date cho API
+  //     const formatDateForAPI = (date: Date | string | undefined): string | undefined => {
+  //       if (!date) return undefined;
+  //       if (typeof date === 'string') return date;
+  //       return date.toISOString().split('T')[0];
+  //     };
 
-      if (crudMode === "add") {
-        // Tạo mới thành viên - format giống MemberModal
-        const payload = {
-          hoTen: formData.hoTen,
-          gioiTinh: formData.gioiTinh,
-          ngheNghiep: formData.ngheNghiep || "",
-          doiThuoc: formData.doiThuoc,
-          chaId: formData.chaId || null,
-          meId: formData.meId || null,
-          lu_user_id: userId,
-          nguoiTaoId: userId,
-          // Thêm các trường mới
-          ngaySinh: formatDateForAPI(formData.ngaySinh),
-          ngayMat: formatDateForAPI(formData.ngayMat),
-          noiSinh: formData.noiSinh || "",
-          noiMat: formData.noiMat || "",
-          trinhDoHocVan: formData.trinhDoHocVan || "",
-          diaChiHienTai: formData.diaChiHienTai || "",
-          tieuSu: formData.tieuSu || "",
-          // Chuyển pids thành voId hoặc chongId
-          voId: formData.gioiTinh === 1 && formData.pids && formData.pids.length > 0 ? formData.pids[0] : null,
-          chongId: formData.gioiTinh === 2 && formData.pids && formData.pids.length > 0 ? formData.pids[0] : null,
-        };
+  //     if (crudMode === "add") {
+  //       // Tạo mới thành viên - format giống MemberModal
+  //       const payload = {
+  //         hoTen: formData.hoTen,
+  //         gioiTinh: formData.gioiTinh,
+  //         ngheNghiep: formData.ngheNghiep || "",
+  //         doiThuoc: formData.doiThuoc,
+  //         chaId: formData.chaId || null,
+  //         meId: formData.meId || null,
+  //         lu_user_id: userId,
+  //         nguoiTaoId: userId,
+  //         // Thêm các trường mới
+  //         ngaySinh: formatDateForAPI(formData.ngaySinh),
+  //         ngayMat: formatDateForAPI(formData.ngayMat),
+  //         noiSinh: formData.noiSinh || "",
+  //         noiMat: formData.noiMat || "",
+  //         trinhDoHocVan: formData.trinhDoHocVan || "",
+  //         diaChiHienTai: formData.diaChiHienTai || "",
+  //         tieuSu: formData.tieuSu || "",
+  //         // Chuyển pids thành voId hoặc chongId
+  //         voId: formData.gioiTinh === 1 && formData.pids && formData.pids.length > 0 ? formData.pids[0] : null,
+  //         chongId: formData.gioiTinh === 2 && formData.pids && formData.pids.length > 0 ? formData.pids[0] : null,
+  //       };
         
-        // Xóa các field undefined/empty string
-        Object.keys(payload).forEach(key => {
-          const value = payload[key as keyof typeof payload];
-          if (value === undefined || value === '') {
-            delete payload[key as keyof typeof payload];
-          }
-        });
+  //       // Xóa các field undefined/empty string
+  //       Object.keys(payload).forEach(key => {
+  //         const value = payload[key as keyof typeof payload];
+  //         if (value === undefined || value === '') {
+  //           delete payload[key as keyof typeof payload];
+  //         }
+  //       });
         
-        console.log('📤 [Tree CRUD] Creating member:', payload);
+  //       console.log('📤 [Tree CRUD] Creating member:', payload);
         
-        const result = await createMemberWithDongHo(payload, finalDongHoId);
+  //       const result = await createMemberWithDongHo(payload, finalDongHoId);
         
-        if (result.success) {
-          showSuccess("Thêm thành viên thành công!");
-          setCrudModalOpen(false);
-          setSelectedMember(null);
+  //       if (result.success) {
+  //         showSuccess("Thêm thành viên thành công!");
+  //         setCrudModalOpen(false);
+  //         setSelectedMember(null);
           
-          // Invalidate queries nếu có queryClient
-          if (queryClient && finalDongHoId) {
-            queryClient.invalidateQueries({ queryKey: ["member-tree", finalDongHoId] });
-          }
-          // Fallback: gọi callback nếu có
-          if (onDataChange) {
-            onDataChange();
-          }
-        } else {
-          throw new Error(result.message || "Không thể thêm thành viên");
-        }
-      } else {
-        // Cập nhật thành viên
-        if (!selectedMember?.thanhVienId) {
-          throw new Error("Không tìm thấy ID thành viên");
-        }
+  //         // Invalidate queries nếu có queryClient
+  //         if (queryClient && finalDongHoId) {
+  //           queryClient.invalidateQueries({ queryKey: ["member-tree", finalDongHoId] });
+  //         }
+  //         // Fallback: gọi callback nếu có
+  //         if (onDataChange) {
+  //           onDataChange();
+  //         }
+  //       } else {
+  //         throw new Error(result.message || "Không thể thêm thành viên");
+  //       }
+  //     } else {
+  //       // Cập nhật thành viên
+  //       if (!selectedMember?.thanhVienId) {
+  //         throw new Error("Không tìm thấy ID thành viên");
+  //       }
         
-        const payload = {
-          hoTen: formData.hoTen,
-          gioiTinh: formData.gioiTinh,
-          ngheNghiep: formData.ngheNghiep || "",
-          doiThuoc: formData.doiThuoc,
-          chaId: formData.chaId || null,
-          meId: formData.meId || null,
-          dongHoId: finalDongHoId, // Thêm dongHoId cho update
-          lu_user_id: userId,
-          // Thêm các trường mới
-          ngaySinh: formatDateForAPI(formData.ngaySinh),
-          ngayMat: formatDateForAPI(formData.ngayMat),
-          noiSinh: formData.noiSinh || "",
-          noiMat: formData.noiMat || "",
-          trinhDoHocVan: formData.trinhDoHocVan || "",
-          diaChiHienTai: formData.diaChiHienTai || "",
-          tieuSu: formData.tieuSu || "",
-          // Chuyển pids thành voId hoặc chongId
-          voId: formData.gioiTinh === 1 && formData.pids && formData.pids.length > 0 ? formData.pids[0] : null,
-          chongId: formData.gioiTinh === 2 && formData.pids && formData.pids.length > 0 ? formData.pids[0] : null,
-        };
+  //       const payload = {
+  //         hoTen: formData.hoTen,
+  //         gioiTinh: formData.gioiTinh,
+  //         ngheNghiep: formData.ngheNghiep || "",
+  //         doiThuoc: formData.doiThuoc,
+  //         chaId: formData.chaId || null,
+  //         meId: formData.meId || null,
+  //         dongHoId: finalDongHoId, // Thêm dongHoId cho update
+  //         lu_user_id: userId,
+  //         // Thêm các trường mới
+  //         ngaySinh: formatDateForAPI(formData.ngaySinh),
+  //         ngayMat: formatDateForAPI(formData.ngayMat),
+  //         noiSinh: formData.noiSinh || "",
+  //         noiMat: formData.noiMat || "",
+  //         trinhDoHocVan: formData.trinhDoHocVan || "",
+  //         diaChiHienTai: formData.diaChiHienTai || "",
+  //         tieuSu: formData.tieuSu || "",
+  //         // Chuyển pids thành voId hoặc chongId
+  //         voId: formData.gioiTinh === 1 && formData.pids && formData.pids.length > 0 ? formData.pids[0] : null,
+  //         chongId: formData.gioiTinh === 2 && formData.pids && formData.pids.length > 0 ? formData.pids[0] : null,
+  //       };
         
-        // Xóa các field undefined/empty string
-        Object.keys(payload).forEach(key => {
-          const value = payload[key as keyof typeof payload];
-          if (value === undefined || value === '') {
-            delete payload[key as keyof typeof payload];
-          }
-        });
+  //       // Xóa các field undefined/empty string
+  //       Object.keys(payload).forEach(key => {
+  //         const value = payload[key as keyof typeof payload];
+  //         if (value === undefined || value === '') {
+  //           delete payload[key as keyof typeof payload];
+  //         }
+  //       });
         
-        console.log('📤 [Tree CRUD] Updating member:', payload);
+  //       console.log('📤 [Tree CRUD] Updating member:', payload);
         
-        const result = await updateMember(selectedMember.thanhVienId, payload);
+  //       const result = await updateMember(selectedMember.thanhVienId, payload);
         
-        if (result.success) {
-          showSuccess("Cập nhật thành viên thành công!");
-          setCrudModalOpen(false);
-          setSelectedMember(null);
+  //       if (result.success) {
+  //         showSuccess("Cập nhật thành viên thành công!");
+  //         setCrudModalOpen(false);
+  //         setSelectedMember(null);
           
-          // Invalidate queries nếu có queryClient
-          if (queryClient && finalDongHoId) {
-            queryClient.invalidateQueries({ queryKey: ["member-tree", finalDongHoId] });
-          }
-          // Fallback: gọi callback nếu có
-          if (onDataChange) {
-            onDataChange();
-          }
-        } else {
-          throw new Error(result.message || "Không thể cập nhật thành viên");
-        }
-      }
-    } catch (error: any) {
-      console.error("Error saving member:", error);
-      showError(error.message || "Có lỗi xảy ra khi lưu thành viên");
-      throw error;
-    }
-  }, [crudMode, selectedMember, showSuccess, showError, dongHoId, data, queryClient, onDataChange]);
+  //         // Invalidate queries nếu có queryClient
+  //         if (queryClient && finalDongHoId) {
+  //           queryClient.invalidateQueries({ queryKey: ["member-tree", finalDongHoId] });
+  //         }
+  //         // Fallback: gọi callback nếu có
+  //         if (onDataChange) {
+  //           onDataChange();
+  //         }
+  //       } else {
+  //         throw new Error(result.message || "Không thể cập nhật thành viên");
+  //       }
+  //     }
+  //   } catch (error: any) {
+  //     console.error("Error saving member:", error);
+  //     showError(error.message || "Có lỗi xảy ra khi lưu thành viên");
+  //     throw error;
+  //   }
+  // }, [crudMode, selectedMember, showSuccess, showError, dongHoId, data, queryClient, onDataChange]);
 
   // Context menu handlers
   const onNodeContextMenu = useCallback((event: React.MouseEvent, node: Node) => {

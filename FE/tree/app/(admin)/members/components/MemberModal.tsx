@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { X, Loader2, Upload, Image as ImageIcon, Trash2, Plus } from "lucide-react";
-import { uploadFile, uploadFiles } from "@/service/upload.service";
+import { X, Loader2, Upload, Image as ImageIcon, Trash2 } from "lucide-react";
+import { uploadFile } from "@/service/upload.service";
 import { IMember } from "@/types/member";
 import { getImageUrl } from "@/utils/imageUtils";
 import { FormRules, validateForm, validateField } from "@/lib/validator";
@@ -35,21 +35,19 @@ export const MemberModal: React.FC<MemberModalProps> = ({
   allMembers,
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const multiFileInputRef = useRef<HTMLInputElement>(null);
 
   const [formData, setFormData] = useState<Partial<IMember>>({});
   const [errors, setErrors] = useState<Record<string, string | null>>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [uploading, setUploading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [uploadingMulti, setUploadingMulti] = useState(false);
-  const [extraImages, setExtraImages] = useState<string[]>([]);
   const [spouses, setSpouses] = useState<number[]>([]);
 
   // Reset form khi modal mở
   useEffect(() => {
     if (isOpen) {
       setFormData({
+        thanhVienId: member?.thanhVienId, // Thêm thanhVienId để update
         hoTen: member?.hoTen || "",
         dongHoId: dongHoId,
         gioiTinh: member?.gioiTinh ?? 1,
@@ -70,7 +68,6 @@ export const MemberModal: React.FC<MemberModalProps> = ({
         chongId: member?.chongId,
       });
       setPreviewUrl(member?.anhChanDung ? getImageUrl(member.anhChanDung) : null);
-      setExtraImages([]);
       
       // Load danh sách vợ/chồng hiện có
       if (member) {
@@ -138,39 +135,13 @@ export const MemberModal: React.FC<MemberModalProps> = ({
   };
 
   const handleMultiUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files || files.length === 0) return;
-    for (let i = 0; i < files.length; i++) {
-      if (!files[i].type.startsWith("image/")) { alert(`File "${files[i].name}" không phải ảnh!`); return; }
-      if (files[i].size > 5 * 1024 * 1024) { alert(`File "${files[i].name}" vượt quá 5MB!`); return; }
-    }
-    setUploadingMulti(true);
-    try {
-      const formDataUpload = new FormData();
-      Array.from(files).forEach((file) => formDataUpload.append("files", file));
-      const result = await uploadFiles(formDataUpload);
-      if (result.success && result.paths) {
-        setExtraImages((prev) => [...prev, ...result.paths]);
-      } else {
-        throw new Error(result.message || "Upload thất bại");
-      }
-    } catch (error: any) {
-      console.error("Multi upload failed:", error);
-      alert(error.message || "Upload ảnh thất bại!");
-    } finally {
-      setUploadingMulti(false);
-      if (multiFileInputRef.current) multiFileInputRef.current.value = "";
-    }
+    // Removed - không dùng upload nhiều ảnh nữa
   };
 
   const handleRemoveMainImage = () => {
     setPreviewUrl(null);
     setFormData((prev) => ({ ...prev, anhChanDung: "" }));
     if (fileInputRef.current) fileInputRef.current.value = "";
-  };
-
-  const handleRemoveExtraImage = (index: number) => {
-    setExtraImages((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleSubmit = () => {
@@ -234,7 +205,7 @@ export const MemberModal: React.FC<MemberModalProps> = ({
           <h2 className="text-xl font-bold uppercase tracking-wider">
             {member ? "Chỉnh sửa thành viên" : "Thêm thành viên mới"}
           </h2>
-          <button onClick={onClose} disabled={isLoading || uploading || uploadingMulti} className="hover:text-white transition-colors">
+          <button onClick={onClose} disabled={isLoading || uploading} className="hover:text-white transition-colors">
             <X size={24} />
           </button>
         </div>
@@ -267,30 +238,6 @@ export const MemberModal: React.FC<MemberModalProps> = ({
                 </button>
                 {previewUrl && <button type="button" onClick={handleRemoveMainImage} className="flex items-center gap-2 px-4 py-2 border border-red-500 text-red-500 rounded hover:bg-red-50"><Trash2 size={16} />Xóa ảnh</button>}
               </div>
-            </div>
-          </div>
-
-          {/* Upload Nhiều Ảnh Phụ */}
-          <div className="space-y-2">
-            <label className="block text-sm font-bold text-[#8b5e3c] uppercase">Ảnh bổ sung</label>
-            <div className="flex flex-wrap gap-3">
-              {extraImages.map((path, index) => (
-                <div key={index} className="relative w-24 h-24 group">
-                  <img 
-                    src={getImageUrl(path)} 
-                    alt={`Extra ${index + 1}`} 
-                    className="w-full h-full object-cover rounded-lg border border-[#d4af37]"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = '/images/vangoc.jpg';
-                    }}
-                  />
-                  <button type="button" onClick={() => handleRemoveExtraImage(index)} className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"><X size={14} /></button>
-                </div>
-              ))}
-              <div onClick={() => !uploadingMulti && multiFileInputRef.current?.click()} className={`w-24 h-24 border-2 border-dashed border-[#d4af37] rounded-lg flex flex-col items-center justify-center cursor-pointer hover:bg-[#fdf6e3] ${uploadingMulti ? "opacity-50 cursor-not-allowed" : ""}`}>
-                {uploadingMulti ? <Loader2 className="w-6 h-6 animate-spin text-[#d4af37]" /> : <><Plus size={24} className="text-[#d4af37]" /><span className="text-xs text-[#d4af37] mt-1">Thêm ảnh</span></>}
-              </div>
-              <input ref={multiFileInputRef} type="file" accept="image/*" multiple onChange={handleMultiUpload} className="hidden" />
             </div>
           </div>
 
@@ -433,7 +380,7 @@ export const MemberModal: React.FC<MemberModalProps> = ({
           <button 
             type="button"
             onClick={onClose} 
-            disabled={isLoading || uploading || uploadingMulti}
+            disabled={isLoading || uploading}
             className="px-6 py-2 text-[#5d4037] font-bold hover:text-[#b91c1c] disabled:opacity-50"
           >
             Đóng
@@ -441,7 +388,7 @@ export const MemberModal: React.FC<MemberModalProps> = ({
           <button 
             type="button"
             onClick={handleSubmit} 
-            disabled={isLoading || uploading || uploadingMulti} 
+            disabled={isLoading || uploading} 
             className="px-8 py-2 bg-[#b91c1c] text-white font-bold rounded shadow hover:bg-[#991b1b] disabled:opacity-50 flex items-center gap-2"
           >
             {isLoading ? (

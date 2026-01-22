@@ -21,6 +21,7 @@ declare global {
         roleId: string;
         roleCode: string;
         full_name: string;
+        permissions?: Record<string, string[]>; // Thêm permissions từ DB
       };
     }
   }
@@ -57,6 +58,7 @@ export const authenticate = (req: Request, res: Response, next: NextFunction) =>
     roleId: decoded.roleId,
     roleCode: decoded.roleCode,
     full_name: decoded.full_name,
+    permissions: decoded.permissions, // Thêm permissions từ token
   };
 
   next();
@@ -64,7 +66,7 @@ export const authenticate = (req: Request, res: Response, next: NextFunction) =>
 
 /**
  * Middleware kiểm tra quyền truy cập chức năng
- * @param chucNangCode - Mã chức năng (VD: THANHVIEN, SUKIEN...)
+ * @param chucNangCode - Mã chức năng (VD: THANHVIEN, SUKIEN, TAILIEU...)
  * @param thaoTacCode - Mã thao tác (VD: VIEW, CREATE, UPDATE, DELETE)
  */
 export const authorize = (chucNangCode: string, thaoTacCode: string = "VIEW") => {
@@ -79,30 +81,24 @@ export const authorize = (chucNangCode: string, thaoTacCode: string = "VIEW") =>
       });
     }
 
-    // Admin (sa) có tất cả quyền
-    if (user.roleCode === "sa") {
+    // Admin (sa) hoặc Thủ đồ có tất cả quyền
+    if (user.roleCode === "sa" || user.roleCode === "thudo") {
       return next();
     }
 
-    // TODO: Kiểm tra quyền từ database (role_chucnang)
-    // Tạm thời cho phép Thủ đồ truy cập các chức năng cơ bản
-    if (user.roleCode === "thudo") {
-      const allowedFunctions = [
-        "DASHBOARD", "THANHVIEN", "SUKIEN", "TAICHINH", 
-        "TAILIEU", "TINTUC", "CHICHI"
-      ];
-      if (allowedFunctions.includes(chucNangCode)) {
+    // Kiểm tra quyền từ database (permissions)
+    if (user.permissions && user.permissions[chucNangCode]) {
+      const allowedActions = user.permissions[chucNangCode];
+      
+      // Kiểm tra xem user có quyền thực hiện thao tác này không
+      if (allowedActions.includes(thaoTacCode)) {
         return next();
       }
     }
 
-    // Thành viên chỉ được xem
-    if (user.roleCode === "thanhvien") {
-      const viewOnlyFunctions = ["DASHBOARD", "THANHVIEN", "SUKIEN", "TINTUC"];
-      if (viewOnlyFunctions.includes(chucNangCode) && thaoTacCode === "VIEW") {
-        return next();
-      }
-    }
+    // Log để debug
+    console.log(`❌ [Authorize] User ${user.full_name} không có quyền ${thaoTacCode} trên ${chucNangCode}`);
+    console.log(`   Permissions:`, user.permissions);
 
     return res.status(403).json({
       success: false,
