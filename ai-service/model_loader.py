@@ -84,5 +84,5 @@ class ModelLoader:
         if self._tokenizer is None:
             self.load_model()
         return self._tokenizer
-
+    
 model_loader = ModelLoader()
