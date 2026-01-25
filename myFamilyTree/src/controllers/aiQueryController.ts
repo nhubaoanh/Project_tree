@@ -31,20 +31,26 @@ export class AIQueryController {
       // Call AI service
       const result = await this.aiQueryService.askQuestion(question, dongHoId);
 
-      // Return response
-      res.status(200).json({
-        success: result.success,
-        message: result.success ? 'Truy vấn thành công' : 'Truy vấn thất bại',
-        data: {
+      // Return response - Format giống AI Service
+      if (result.success) {
+        res.status(200).json({
+          success: true,
           question,
           sql: result.sql,
           confidence: result.confidence,
           results: result.data,
-          columns: result.columns,
-          row_count: result.row_count,
-          error: result.error
-        }
-      });
+          total_rows: result.row_count,
+          message: `Tìm thấy ${result.row_count || 0} kết quả`
+        });
+      } else {
+        res.status(200).json({
+          success: false,
+          question,
+          sql: result.sql,
+          error: result.error,
+          message: result.error || 'Truy vấn thất bại'
+        });
+      }
 
     } catch (error: any) {
       console.error(`❌ [Controller] Error:`, error.message);
@@ -110,6 +116,68 @@ export class AIQueryController {
         success: false,
         healthy: false,
         message: 'Không thể kiểm tra AI Service'
+      });
+    }
+  }
+
+  /**
+   * GET /api-core/ai/logs/questions
+   * Lấy danh sách câu hỏi đã thu thập
+   */
+  async getCollectedQuestions(req: Request, res: Response): Promise<void> {
+    try {
+      // Đọc file logs/questions.txt từ AI Service
+      // Tạm thời return empty vì chưa implement
+      res.status(200).json({
+        success: true,
+        questions: [],
+        total: 0,
+        message: 'Chức năng đang phát triển'
+      });
+    } catch (error: any) {
+      res.status(500).json({
+        success: false,
+        message: error.message
+      });
+    }
+  }
+
+  /**
+   * GET /api-core/ai/logs/results
+   * Lấy danh sách kết quả queries
+   */
+  async getQueryResults(req: Request, res: Response): Promise<void> {
+    try {
+      res.status(200).json({
+        success: true,
+        results: [],
+        total: 0,
+        message: 'Chức năng đang phát triển'
+      });
+    } catch (error: any) {
+      res.status(500).json({
+        success: false,
+        message: error.message
+      });
+    }
+  }
+
+  /**
+   * POST /api-core/ai/dataset/export
+   * Export dataset để fine-tune
+   */
+  async exportDataset(req: Request, res: Response): Promise<void> {
+    try {
+      res.status(200).json({
+        success: true,
+        dataset_path: 'ai-service/dataset/training_data.json',
+        total_samples: 0,
+        message: 'Chức năng đang phát triển'
+      });
+    } catch (error: any) {
+      res.status(500).json({
+        success: false,
+        message: error.message
       });
     }
   }

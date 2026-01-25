@@ -7,6 +7,19 @@ interface AIQueryRequest {
   execute: boolean;
 }
 
+// Response từ AI Service
+interface AIServiceResponse {
+  success: boolean;
+  question: string;
+  sql: string;
+  confidence: string; // AI Service trả về string "95.5%"
+  results?: any[];
+  total_rows?: number;
+  error?: string;
+  message?: string;
+}
+
+// Response trả về cho Controller
 interface AIQueryResponse {
   success: boolean;
   sql: string;
@@ -43,8 +56,8 @@ export class AIQueryService {
       };
 
       const startTime = Date.now();
-      const response = await axios.post<AIQueryResponse>(
-        `${this.aiServiceUrl}/query`,
+      const response = await axios.post<AIServiceResponse>(
+        `${this.aiServiceUrl}/ask`,
         request,
         {
           timeout: 30000, // 30 seconds
@@ -60,20 +73,27 @@ export class AIQueryService {
       console.log(`\n✅ [AI Query] Response received in ${duration}ms`);
       console.log(`📝 [AI Query] Generated SQL:`);
       console.log(`   ${result.sql}`);
-      console.log(`📊 [AI Query] Confidence: ${(result.confidence * 100).toFixed(1)}%`);
+      console.log(`📊 [AI Query] Confidence: ${result.confidence}`);
       
-      if (result.success && result.data) {
-        console.log(`📦 [AI Query] Results: ${result.row_count} rows`);
-        console.log(`📋 [AI Query] Columns: ${result.columns?.join(', ')}`);
+      if (result.success && result.results) {
+        console.log(`📦 [AI Query] Results: ${result.total_rows} rows`);
         console.log(`💾 [AI Query] Data:`);
-        console.log(JSON.stringify(result.data, null, 2));
+        console.log(JSON.stringify(result.results, null, 2));
       } else if (result.error) {
         console.log(`❌ [AI Query] Error: ${result.error}`);
       }
       
       console.log(`${'='.repeat(60)}\n`);
 
-      return result;
+      // Map response to match interface
+      return {
+        success: result.success,
+        sql: result.sql,
+        confidence: parseFloat(result.confidence) || 0,
+        data: result.results, // Map 'results' to 'data'
+        row_count: result.total_rows,
+        error: result.error
+      };
 
     } catch (error: any) {
       console.error(`\n❌ [AI Query] Error calling AI service:`);

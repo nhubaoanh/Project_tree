@@ -4,8 +4,11 @@ from fastapi.responses import RedirectResponse
 from pydantic import BaseModel
 from typing import Optional, List
 from contextlib import asynccontextmanager
+from datetime import datetime
 import logging
 import uvicorn
+import os
+import json
 
 from config import API_HOST, API_PORT
 from model_loader import model_loader
@@ -14,6 +17,42 @@ from query_executor import query_executor
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
+
+# ============================================
+# LOGGING FUNCTIONS - Thu thập câu hỏi
+# ============================================
+
+def ensure_logs_dir():
+    """Tạo thư mục logs nếu chưa có"""
+    os.makedirs('logs', exist_ok=True)
+
+def log_question(question: str, dongHoId: str):
+    """Log câu hỏi vào file"""
+    try:
+        ensure_logs_dir()
+        timestamp = datetime.now().isoformat()
+        with open('logs/questions.txt', 'a', encoding='utf-8') as f:
+            f.write(f"{timestamp}|{dongHoId}|{question}\n")
+    except Exception as e:
+        logger.error(f"Error logging question: {e}")
+
+def log_query_result(question: str, sql: str, success: bool, row_count: int, error: str = ""):
+    """Log kết quả query vào file JSON"""
+    try:
+        ensure_logs_dir()
+        log_entry = {
+            "timestamp": datetime.now().isoformat(),
+            "question": question,
+            "sql": sql,
+            "success": success,
+            "row_count": row_count,
+            "error": error
+        }
+        
+        with open('logs/query_results.jsonl', 'a', encoding='utf-8') as f:
+            f.write(json.dumps(log_entry, ensure_ascii=False) + '\n')
+    except Exception as e:
+        logger.error(f"Error logging result: {e}")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -105,6 +144,9 @@ async def ask_simple(request: QueryRequest):
     try:
         logger.info(f"📝 Question: {request.question}")
         
+        # ✅ LOG QUESTION TO FILE (Thu thập câu hỏi)
+        log_question(request.question, request.dongHoId)
+        
         # Generate SQL
         result = sql_generator.generate_sql(request.question)
         sql = result["sql"]
@@ -123,6 +165,9 @@ async def ask_simple(request: QueryRequest):
                 data = exec_result["data"]
                 logger.info(f"✅ Results: {len(data)} rows")
                 
+                # ✅ LOG SUCCESS (Thu thập kết quả thành công)
+                log_query_result(request.question, sql, True, len(data))
+                
                 # Format response
                 return {
                     "success": True,
@@ -134,6 +179,9 @@ async def ask_simple(request: QueryRequest):
                     "message": f"Tìm thấy {len(data)} kết quả"
                 }
             else:
+                # ✅ LOG ERROR (Thu thập lỗi)
+                log_query_result(request.question, sql, False, 0, exec_result["error"])
+                
                 return {
                     "success": False,
                     "question": request.question,
@@ -151,6 +199,137 @@ async def ask_simple(request: QueryRequest):
             
     except Exception as e:
         logger.error(f"❌ Error: {str(e)}")
+        # ✅ LOG EXCEPTION
+        log_query_result(request.question if 'request' in locals() else "unknown", "", False, 0, str(e))
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/logs/questions")
+async def get_collected_questions():
+    """
+    Lấy danh sách câu hỏi đã thu thập
+    """
+    try:
+        ensure_logs_dir()
+        
+        if not os.path.exists('logs/questions.txt'):
+            return {
+                "success": True,
+                "total": 0,
+                "questions": [],
+                "message": "Chưa có câu hỏi nào được thu thập"
+            }
+        
+        questions = []
+        with open('logs/questions.txt', 'r', encoding='utf-8') as f:
+            for line in f:
+                parts = line.strip().split('|')
+                if len(parts) >= 3:
+                    questions.append({
+                        "timestamp": parts[0],
+                        "dongHoId": parts[1],
+                        "question": parts[2]
+                    })
+        
+        return {
+            "success": True,
+            "total": len(questions),
+            "questions": questions[-100:],  # Lấy 100 câu mới nhất
+            "message": f"Đã thu thập {len(questions)} câu hỏi"
+        }
+        
+    except Exception as e:
+        logger.error(f"Error reading questions: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/logs/results")
+async def get_query_results():
+    """
+    Lấy kết quả các query đã chạy
+    """
+    try:
+        ensure_logs_dir()
+        
+        if not os.path.exists('logs/query_results.jsonl'):
+            return {
+                "success": True,
+                "total": 0,
+                "results": [],
+                "message": "Chưa có kết quả nào"
+            }
+        
+        results = []
+        with open('logs/query_results.jsonl', 'r', encoding='utf-8') as f:
+            for line in f:
+                try:
+                    results.append(json.loads(line))
+                except:
+                    pass
+        
+        # Statistics
+        total = len(results)
+        success_count = sum(1 for r in results if r.get('success', False))
+        error_count = total - success_count
+        
+        return {
+            "success": True,
+            "total": total,
+            "success_count": success_count,
+            "error_count": error_count,
+            "accuracy": f"{(success_count / total * 100):.1f}%" if total > 0 else "0%",
+            "results": results[-50:],  # Lấy 50 kết quả mới nhất
+            "message": f"Đã thu thập {total} kết quả"
+        }
+        
+    except Exception as e:
+        logger.error(f"Error reading results: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/dataset/export")
+async def export_dataset():
+    """
+    Export dataset để fine-tune
+    Format: questions.json
+    """
+    try:
+        ensure_logs_dir()
+        
+        if not os.path.exists('logs/query_results.jsonl'):
+            raise HTTPException(status_code=404, detail="Chưa có dữ liệu để export")
+        
+        # Đọc kết quả thành công
+        dataset = []
+        with open('logs/query_results.jsonl', 'r', encoding='utf-8') as f:
+            for line in f:
+                try:
+                    result = json.loads(line)
+                    if result.get('success', False) and result.get('sql'):
+                        dataset.append({
+                            "id": len(dataset) + 1,
+                            "question": result['question'],
+                            "sql": result['sql'],
+                            "category": "collected",
+                            "verified": False,
+                            "notes": f"Auto-collected on {result['timestamp']}"
+                        })
+                except:
+                    pass
+        
+        # Save to dataset folder
+        os.makedirs('dataset', exist_ok=True)
+        output_file = f'dataset/collected_questions_{datetime.now().strftime("%Y%m%d_%H%M%S")}.json'
+        
+        with open(output_file, 'w', encoding='utf-8') as f:
+            json.dump(dataset, f, ensure_ascii=False, indent=2)
+        
+        return {
+            "success": True,
+            "total": len(dataset),
+            "file": output_file,
+            "message": f"Đã export {len(dataset)} câu hỏi vào {output_file}"
+        }
+        
+    except Exception as e:
+        logger.error(f"Error exporting dataset: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":

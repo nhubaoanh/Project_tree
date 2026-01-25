@@ -43,7 +43,6 @@ import {
 // Routes
 import router from "./routes/index";
 import core_router from "./core/routes";
-import aiRouter from "./routes/aiRouter";
 import { errorHandler } from "./errors/errorHandle";
 
 const app = express();
@@ -157,7 +156,6 @@ app.get("/health", (req: Request, res: Response) => {
 // ============================================================================
 app.use("/api-core", core_router);
 app.use("/api-core", router);
-app.use("/api-core/ai", aiRouter);
 
 // ============================================================================
 // ERROR HANDLING

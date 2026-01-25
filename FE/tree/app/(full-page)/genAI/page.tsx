@@ -1,46 +1,61 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
-import { Send, Bot, User, Sparkles, Loader2, Info, Zap, Cloud } from "lucide-react";
-import { chatWithAI } from "@/service/ai.service";
-import { chatWithOllama, checkOllamaHealth } from "@/service/ollama.service";
+import { Send, Bot, User, Sparkles, Loader2, Info, Download } from "lucide-react";
+import { askQuestion, checkAIHealth, getCollectedQuestions, exportDataset } from "@/service/aiQuery.service";
 import { getDongHoById } from "@/service/dongho.service";
 import storage from "@/utils/storage";
 
 interface ChatMessage {
   role: "user" | "model";
   text: string;
+  sql?: string;
+  confidence?: string;
+  results?: any[];
 }
-
-type AIEngine = "trợ lý AI" | "thư ký";
 
 export default function GenealogyChatPage() {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       role: "model",
-      text: '🚀 Chào bạn! Tôi là trợ lý AI tra cứu gia phả (BFS Algorithm + Ollama).\n\nHãy hỏi tôi về quan hệ huyết thống:\n- "Nguyễn Văn A là con ai?"\n- "Con của Trần Thị B là ai?"\n- "Nguyễn Văn C có vợ/chồng là ai?"\n- "Anh chị em của Lê Văn D"\n\n💡 Hệ thống sử dụng thuật toán BFS để tìm quan hệ nhanh và chính xác!',
+      text: '🚀 Chào bạn! Tôi là AI tra cứu gia phả thông minh.\n\nHãy hỏi tôi về gia phả:\n- "Có bao nhiêu người trong gia phả?"\n- "Liệt kê tất cả thành viên"\n- "Tìm người tên Nguyễn Văn A"\n- "Có bao nhiêu người sinh năm 1990?"\n\n📊 Hệ thống đang thu thập câu hỏi để cải thiện AI!',
     },
   ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [dongHoInfo, setDongHoInfo] = useState<any>(null);
   const [selectedDongHo, setSelectedDongHo] = useState<string>("");
-  const [aiEngine, setAiEngine] = useState<AIEngine>("trợ lý AI");
-  const [ollamaStatus, setOllamaStatus] = useState<"checking" | "online" | "offline">("checking");
+  const [aiStatus, setAiStatus] = useState<"checking" | "online" | "offline">("checking");
+  const [totalQuestions, setTotalQuestions] = useState<number>(0);
 
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Kiểm tra Ollama status
+  // Kiểm tra AI status
   useEffect(() => {
-    const checkOllama = async () => {
+    const checkAI = async () => {
       try {
-        const result = await checkOllamaHealth();
-        setOllamaStatus(result.success ? "online" : "offline");
+        const result = await checkAIHealth();
+        setAiStatus(result.success ? "online" : "offline");
       } catch (error) {
-        setOllamaStatus("offline");
+        setAiStatus("offline");
       }
     };
-    checkOllama();
+    checkAI();
   }, []);
+
+  // Load số lượng câu hỏi đã thu thập
+  useEffect(() => {
+    const loadQuestionCount = async () => {
+      try {
+        const result = await getCollectedQuestions();
+        if (result.success && result.total) {
+          setTotalQuestions(result.total);
+        }
+      } catch (error) {
+        console.error("Lỗi load số câu hỏi:", error);
+      }
+    };
+    loadQuestionCount();
+  }, [messages]); // Reload sau mỗi câu hỏi mới
 
   // Load thông tin dòng họ của user hiện tại
   useEffect(() => {
@@ -56,7 +71,7 @@ export default function GenealogyChatPage() {
             setDongHoInfo(res.data);
             setMessages([{
               role: "model",
-              text: `🚀 Chào bạn! Tôi là trợ lý AI tra cứu gia phả dòng họ "${res.data.tenDongHo}".\n\nHãy hỏi tôi về quan hệ huyết thống:\n- "Nguyễn Văn A là con ai?"\n- "Con của Trần Thị B là ai?"\n- "Nguyễn Văn C có vợ/chồng là ai?"\n- "Anh chị em của Lê Văn D"\n\n💡 Hệ thống sử dụng thuật toán BFS để tìm quan hệ nhanh và chính xác!`
+              text: `🚀 Chào bạn! Tôi là AI tra cứu gia phả dòng họ "${res.data.tenDongHo}".\n\nHãy hỏi tôi về gia phả:\n- "Có bao nhiêu người trong gia phả?"\n- "Liệt kê tất cả thành viên"\n- "Tìm người tên Nguyễn Văn A"\n\n📊 Hệ thống đang thu thập câu hỏi để cải thiện AI!`
             }]);
           }
         }
@@ -90,21 +105,51 @@ export default function GenealogyChatPage() {
     setIsLoading(true);
 
     try {
-      let response;
+      const response = await askQuestion(userMsg, selectedDongHo);
       
-      // Chọn AI engine
-      if (aiEngine === "thư ký") {
-        response = await chatWithOllama(userMsg, selectedDongHo);
-      } else {
-        response = await chatWithAI(userMsg, selectedDongHo);
-      }
-
-      if (response.success && response.data) {
-        setMessages((prev) => [...prev, { role: "model", text: response.data! }]);
+      if (response.success && response.sql) {
+        // Format kết quả đẹp
+        let resultText = `✅ **Câu trả lời:**\n\n`;
+        
+        if (response.results && response.results.length > 0) {
+          // Hiển thị kết quả
+          const firstResult = response.results[0];
+          const keys = Object.keys(firstResult);
+          
+          if (keys.length === 1 && typeof firstResult[keys[0]] === 'number') {
+            // Trường hợp COUNT, SUM, AVG...
+            resultText += `📊 ${firstResult[keys[0]]}\n\n`;
+          } else {
+            // Trường hợp nhiều cột
+            response.results.forEach((row, idx) => {
+              resultText += `${idx + 1}. `;
+              keys.forEach(key => {
+                resultText += `${key}: ${row[key]} | `;
+              });
+              resultText = resultText.slice(0, -3) + '\n';
+            });
+            resultText += `\n`;
+          }
+          
+          resultText += `📈 Tổng: ${response.total_rows} kết quả\n`;
+        } else {
+          resultText += `Không tìm thấy kết quả nào.\n\n`;
+        }
+        
+        // resultText += `\n🔍 **SQL:** \`${response.sql}\`\n`;
+        resultText += `💯 **Độ tin cậy:** ${response.confidence}`;
+        
+        setMessages((prev) => [...prev, { 
+          role: "model", 
+          text: resultText,
+          sql: response.sql,
+          confidence: response.confidence,
+          results: response.results
+        }]);
       } else {
         setMessages((prev) => [
           ...prev,
-          { role: "model", text: response.message || "Xin lỗi, tôi không thể trả lời lúc này." },
+          { role: "model", text: response.message || response.error || "Xin lỗi, tôi không thể trả lời lúc này." },
         ]);
       }
     } catch (error: any) {
@@ -118,25 +163,35 @@ export default function GenealogyChatPage() {
     }
   };
 
-  const handleEngineChange = (engine: AIEngine) => {
-    if (engine === "thư ký" && ollamaStatus === "offline") {
+  const handleExportDataset = async () => {
+    try {
       setMessages((prev) => [
         ...prev,
-        { 
-          role: "model", 
-          text: "⚠️ AI chưa chạy. Vui lòng chạy lệnh: ollama serve" 
-        },
+        { role: "model", text: "📦 Đang export dataset..." },
       ]);
-      return;
+      
+      const result = await exportDataset();
+      
+      if (result.success) {
+        setMessages((prev) => [
+          ...prev,
+          { 
+            role: "model", 
+            text: `✅ Export thành công!\n\n📊 Tổng: ${result.total_samples} câu hỏi\n📁 File: ${result.dataset_path}\n\n💡 Bạn có thể dùng file này để fine-tune model!` 
+          },
+        ]);
+      } else {
+        setMessages((prev) => [
+          ...prev,
+          { role: "model", text: `❌ Lỗi: ${result.message}` },
+        ]);
+      }
+    } catch (error: any) {
+      setMessages((prev) => [
+        ...prev,
+        { role: "model", text: `❌ Lỗi: ${error.message}` },
+      ]);
     }
-    setAiEngine(engine);
-    setMessages((prev) => [
-      ...prev,
-      { 
-        role: "model", 
-        text: `✅ Đã chuyển sang ${engine === "thư ký" ? "Thư ký (BFS + Local AI)" : "Trợ lý AI (Cloud AI)"}\n\n${engine === "thư ký" ? "💡 Sử dụng thuật toán BFS để tìm quan hệ, Thư ký chỉ diễn giải kết quả!" : ""}` 
-      },
-    ]);
   };
 
   return (
@@ -148,52 +203,45 @@ export default function GenealogyChatPage() {
         </div>
         <div className="flex-1">
           <h3 className="font-bold text-[#5d4037] text-lg">Tra Cứu Gia Phả AI</h3>
-          <p className="text-xs text-green-600">Sẵn sàng hỗ trợ</p>
+          <p className="text-xs text-green-600">
+            {aiStatus === "online" ? "Sẵn sàng hỗ trợ" : aiStatus === "offline" ? "AI chưa khởi động" : "Đang kiểm tra..."}
+          </p>
         </div>
-        
-        {/* AI Engine Selector */}
-        <div className="flex gap-2">
+
+        {/* Export Dataset Button */}
+        {totalQuestions >= 10 && (
           <button
-            onClick={() => handleEngineChange("trợ lý AI")}
-            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
-              aiEngine === "trợ lý AI"
-                ? "bg-blue-600 text-white shadow-md"
-                : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-            }`}
-            title="Trợ lý AI - Cloud AI (Tiếng Việt tốt)"
+            onClick={handleExportDataset}
+            className="flex items-center gap-2 px-3 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 transition-all shadow-md"
+            title={`Export ${totalQuestions} câu hỏi để fine-tune`}
           >
-            <Cloud size={16} />
-            Trợ lý AI
+            <Download size={16} />
+            Export ({totalQuestions})
           </button>
-          <button
-            onClick={() => handleEngineChange("thư ký")}
-            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
-              aiEngine === "thư ký"
-                ? "bg-purple-600 text-white shadow-md"
-                : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-            }`}
-            title="Thư ký - Local AI (Miễn phí, bảo mật)"
-            disabled={ollamaStatus === "offline"}
-          >
-            <Zap size={16} />
-            Thư ký
-            {ollamaStatus === "offline" && (
-              <span className="w-2 h-2 bg-red-500 rounded-full"></span>
-            )}
-            {ollamaStatus === "online" && (
-              <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-            )}
-          </button>
-        </div>
+        )}
 
         {/* Hiển thị tên dòng họ */}
         <div className="px-3 py-2 bg-gray-50 border border-[#d4af37]/50 rounded-lg text-sm text-[#5d4037] font-medium">
           {dongHoInfo?.tenDongHo || "Đang tải..."}
         </div>
 
+        {/* AI Status Indicator */}
+        <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 border border-[#d4af37]/50 rounded-lg">
+          <span className={`w-2 h-2 rounded-full ${
+            aiStatus === "online" ? "bg-green-500" : 
+            aiStatus === "offline" ? "bg-red-500" : 
+            "bg-yellow-500 animate-pulse"
+          }`}></span>
+          <span className="text-xs text-[#5d4037] font-medium">
+            {aiStatus === "online" ? "AI Online" : 
+             aiStatus === "offline" ? "AI Offline" : 
+             "Checking..."}
+          </span>
+        </div>
+
         <div
           className="text-stone-400 hover:text-[#b91c1c] cursor-pointer"
-          title="AI tra cứu quan hệ gia đình dựa trên dữ liệu dòng họ"
+          title="AI tra cứu gia phả bằng SQL"
         >
           <Info size={20} />
         </div>
@@ -234,7 +282,7 @@ export default function GenealogyChatPage() {
             <div className="bg-white p-3 rounded-2xl rounded-tl-none border border-[#eaddcf] flex items-center gap-2">
               <Loader2 className="animate-spin text-[#d4af37]" size={16} />
               <span className="text-xs text-stone-500">
-                {aiEngine === "thư ký" ? "Thư ký đang suy nghĩ..." : "Đang tra cứu..."}
+                Đang phân tích câu hỏi và tạo SQL...
               </span>
             </div>
           </div>
@@ -246,9 +294,9 @@ export default function GenealogyChatPage() {
       <div className="bg-[#fdfbf7] px-4 pb-2 border-x border-[#d4af37]/30">
         <div className="flex gap-2 flex-wrap">
           {[
-            "Nguyễn Văn A là con ai?", 
-            "Con của Trần Thị B", 
-            "Anh chị em của Lê Văn C"
+            "Có bao nhiêu người trong gia phả?",
+            "Liệt kê tất cả thành viên",
+            "Có bao nhiêu người sinh năm 1990?"
           ].map((q) => (
             <button
               key={q}
@@ -268,7 +316,7 @@ export default function GenealogyChatPage() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             disabled={isLoading || !selectedDongHo}
-            placeholder={selectedDongHo ? "Hỏi về quan hệ gia đình, ví dụ: Con của ông A là ai?" : "Đang tải thông tin dòng họ..."}
+            placeholder={selectedDongHo ? "Hỏi về gia phả, ví dụ: Có bao nhiêu người trong gia phả?" : "Đang tải thông tin dòng họ..."}
             className="flex-1 pl-4 pr-12 py-3 bg-[#f9f9f9] border border-[#d4af37]/30 rounded-full focus:outline-none focus:border-[#b91c1c] focus:ring-1 focus:ring-[#b91c1c] transition-all disabled:opacity-50"
           />
           <button
