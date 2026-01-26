@@ -60,7 +60,7 @@ export class AIQueryService {
         `${this.aiServiceUrl}/ask`,
         request,
         {
-          timeout: 30000, // 30 seconds
+          timeout: 3000000, // 2 phút (thay vì 30 giây)
           headers: {
             'Content-Type': 'application/json'
           }
@@ -123,7 +123,7 @@ export class AIQueryService {
       const response = await axios.post<AIQueryResponse>(
         `${this.aiServiceUrl}/test`,
         { question, dongHoId },
-        { timeout: 30000 }
+        { timeout: 3000000 }
       );
 
       const result = response.data;

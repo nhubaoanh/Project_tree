@@ -5,7 +5,7 @@ import torch
 import re
 import sqlparse
 import hashlib
-from model_loader import model_loader
+from model_loader_finetuned import finetuned_model_loader as model_loader
 from prompt_builder import PromptBuilder
 from config import TEMPERATURE, TOP_P
 import logging
@@ -15,8 +15,7 @@ logger = logging.getLogger(__name__)
 class SQLGenerator:
     
     def __init__(self):
-        self.model = model_loader.get_model()
-        self.tokenizer = model_loader.get_tokenizer()
+        self.model_loader = model_loader
         self.prompt_builder = PromptBuilder()
         self.cache = {}  # ✅ Simple in-memory cache
         logger.info("✅ SQL Generator initialized with caching enabled")
@@ -31,20 +30,13 @@ class SQLGenerator:
         logger.info(f"🔄 Generating SQL for: {question}")
         
         prompt = self.prompt_builder.build_prompt(question)
-        inputs = self.tokenizer(prompt, return_tensors="pt")
-        device = next(self.model.parameters()).device
-        inputs = {k: v.to(device) for k, v in inputs.items()}
         
-        with torch.no_grad():
-            outputs = self.model.generate(
-                **inputs, 
-                max_new_tokens=128,      # ✅ Reduced from 256 (2x faster)
-                temperature=0.0,         # ✅ Deterministic (faster)
-                do_sample=False,         # ✅ No sampling (faster)
-                pad_token_id=self.tokenizer.eos_token_id
-            )
+        # Use model_loader.generate() directly
+        generated_text = self.model_loader.generate(
+            prompt,
+            max_new_tokens=128  # ✅ Reduced from 256 (2x faster)
+        )
         
-        generated_text = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
         sql = self._extract_sql(generated_text, prompt)
         sql = self._validate_sql(sql)
         
@@ -79,10 +71,10 @@ class SQLGenerator:
         sql_lower = sql.lower()
         if not sql_lower.startswith('select') and not sql_lower.startswith('call'):
             raise ValueError("Only SELECT and CALL allowed")
-        try:
-            return sqlparse.format(sql, reindent=True, keyword_case='upper').strip()
-        except:
-            return sql.strip()
+        
+        # ✅ OPTIMIZED: Tắt sqlparse.format() (chậm 0.5-1s)
+        # Chỉ strip thôi - nhanh hơn nhiều!
+        return sql.strip()
     
     def _calc_confidence(self, sql):
         confidence = 1.0

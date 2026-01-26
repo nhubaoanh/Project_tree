@@ -11,7 +11,7 @@ import os
 import json
 
 from config import API_HOST, API_PORT
-from model_loader import model_loader
+from model_loader_finetuned import finetuned_model_loader as model_loader
 from sql_generator import sql_generator
 from query_executor import query_executor
 
