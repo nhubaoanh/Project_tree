@@ -60,6 +60,12 @@ async def lifespan(app: FastAPI):
     logger.info("Starting AI Service...")
     model_loader.load_model()
     logger.info("Model loaded!")
+    
+    # ✅ Load knowledge cache
+    logger.info("Loading knowledge cache...")
+    sql_generator.load_knowledge_cache()
+    logger.info("Knowledge cache loaded!")
+    
     yield
     # Shutdown
     logger.info("Shutting down AI Service...")
