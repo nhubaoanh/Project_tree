@@ -202,9 +202,15 @@ export default function GenealogyChatPage() {
           <Sparkles size={20} />
         </div>
         <div className="flex-1">
-          <h3 className="font-bold text-[#5d4037] text-lg">Tra Cứu Gia Phả AI</h3>
+          <h3 className="font-bold text-[#5d4037] text-lg">
+            Tra Cứu Gia Phả AI
+          </h3>
           <p className="text-xs text-green-600">
-            {aiStatus === "online" ? "Sẵn sàng hỗ trợ" : aiStatus === "offline" ? "AI chưa khởi động" : "Đang kiểm tra..."}
+            {aiStatus === "online"
+              ? "Sẵn sàng hỗ trợ"
+              : aiStatus === "offline"
+                ? "AI chưa khởi động"
+                : "Đang kiểm tra..."}
           </p>
         </div>
 
@@ -227,15 +233,21 @@ export default function GenealogyChatPage() {
 
         {/* AI Status Indicator */}
         <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 border border-[#d4af37]/50 rounded-lg">
-          <span className={`w-2 h-2 rounded-full ${
-            aiStatus === "online" ? "bg-green-500" : 
-            aiStatus === "offline" ? "bg-red-500" : 
-            "bg-yellow-500 animate-pulse"
-          }`}></span>
+          <span
+            className={`w-2 h-2 rounded-full ${
+              aiStatus === "online"
+                ? "bg-green-500"
+                : aiStatus === "offline"
+                  ? "bg-red-500"
+                  : "bg-yellow-500 animate-pulse"
+            }`}
+          ></span>
           <span className="text-xs text-[#5d4037] font-medium">
-            {aiStatus === "online" ? "AI Online" : 
-             aiStatus === "offline" ? "AI Offline" : 
-             "Checking..."}
+            {aiStatus === "online"
+              ? "AI Online"
+              : aiStatus === "offline"
+                ? "AI Offline"
+                : "Checking..."}
           </span>
         </div>
 
@@ -294,9 +306,11 @@ export default function GenealogyChatPage() {
       <div className="bg-[#fdfbf7] px-4 pb-2 border-x border-[#d4af37]/30">
         <div className="flex gap-2 flex-wrap">
           {[
-            "Có bao nhiêu người trong gia phả?",
+            "Nguyễn Văn Quyết có bao nhiêu con?",
             "Liệt kê tất cả thành viên",
-            "Có bao nhiêu người sinh năm 1990?"
+            "Có bao nhiêu người sinh là nông dân?",
+            "cha của Nguyễn Văn Quyết là ai?",
+            "Đời nào đông người nhất?",
           ].map((q) => (
             <button
               key={q}
@@ -316,7 +330,11 @@ export default function GenealogyChatPage() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             disabled={isLoading || !selectedDongHo}
-            placeholder={selectedDongHo ? "Hỏi về gia phả, ví dụ: Có bao nhiêu người trong gia phả?" : "Đang tải thông tin dòng họ..."}
+            placeholder={
+              selectedDongHo
+                ? "Hỏi về gia phả, ví dụ: Có bao nhiêu người trong gia phả?"
+                : "Đang tải thông tin dòng họ..."
+            }
             className="flex-1 pl-4 pr-12 py-3 bg-[#f9f9f9] border border-[#d4af37]/30 rounded-full focus:outline-none focus:border-[#b91c1c] focus:ring-1 focus:ring-[#b91c1c] transition-all disabled:opacity-50"
           />
           <button

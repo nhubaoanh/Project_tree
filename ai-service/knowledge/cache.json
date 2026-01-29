@@ -1,9 +1,9 @@
 {
   "version": "1.0",
   "model_version": "qwen-1.5b-finetuned",
-  "created_at": "2026-01-28T10:51:57.727748",
-  "updated_at": "2026-01-28T10:51:57.727760",
-  "total_entries": 54,
+  "created_at": "2026-01-29T15:41:41.406874",
+  "updated_at": "2026-01-29T15:41:41.406889",
+  "total_entries": 56,
   "cache": [
     {
       "id": 1,
@@ -15,12 +15,12 @@
       "pattern": "pre_generated",
       "category": "trained",
       "verified": true,
-      "hit_count": 1,
+      "hit_count": 2,
       "correct_count": 0,
       "incorrect_count": 0,
       "avg_response_time": 0.05,
       "created_at": "2026-01-28T03:21:54.216044",
-      "last_used_at": "2026-01-28T10:33:15.751600"
+      "last_used_at": "2026-01-29T15:29:20.019684"
     },
     {
       "id": 2,
@@ -355,12 +355,12 @@
       "pattern": "pre_generated",
       "category": "trained",
       "verified": true,
-      "hit_count": 1,
+      "hit_count": 2,
       "correct_count": 0,
       "incorrect_count": 0,
       "avg_response_time": 0.05,
       "created_at": "2026-01-28T03:21:54.216225",
-      "last_used_at": "2026-01-28T10:33:39.156197"
+      "last_used_at": "2026-01-29T15:37:02.714983"
     },
     {
       "id": 22,
@@ -406,12 +406,12 @@
       "pattern": "pre_generated",
       "category": "trained",
       "verified": true,
-      "hit_count": 0,
+      "hit_count": 1,
       "correct_count": 0,
       "incorrect_count": 0,
       "avg_response_time": 0.05,
       "created_at": "2026-01-28T03:21:54.216246",
-      "last_used_at": "2026-01-28T03:21:54.216248"
+      "last_used_at": "2026-01-29T15:38:01.270195"
     },
     {
       "id": 25,
@@ -875,9 +875,9 @@
     {
       "id": 52,
       "question": "Nguyễn Thị Loan là con ai",
-      "question_normalized": "nguyễn thị loan là con ai",
+      "question_normalized": "nguyễn thị kim loan là con ai",
       "question_hash": "db37da26ea1188d5c7bcb463eb37fb91",
-      "sql": "SELECT hoTen FROM thanhvien WHERE (chaId = (SELECT thanhVienId FROM thanhvien WHERE hoTen = 'Nguyễn Văn Quyết' AND dongHoId = ? AND active_flag = 1) OR meId = (SELECT thanhVienId FROM thanhvien WHERE hoTen = 'Nguyễn Văn Quyết' AND dongHoId = ? AND active_flag = 1)) AND dongHoId = ? AND active_flag = 1",
+      "sql": "SELECT hoTen FROM thanhvien WHERE (chaId = (SELECT thanhVienId FROM thanhvien WHERE hoTen = 'Nguyễn Thị Kim Loan' AND dongHoId = ? AND active_flag = 1) OR meId = (SELECT thanhVienId FROM thanhvien WHERE hoTen = 'Nguyễn Thị Kim Loan' AND dongHoId = ? AND active_flag = 1)) AND dongHoId = ? AND active_flag = 1",
       "confidence": 1.0,
       "pattern": "runtime",
       "category": "runtime",
@@ -922,11 +922,45 @@
       "avg_response_time": 0.0,
       "created_at": "2026-01-28T10:51:57.716634",
       "last_used_at": "2026-01-28T10:51:57.718181"
+    },
+    {
+      "id": 55,
+      "question": "Liệt kê tất cả thành viên",
+      "question_normalized": "liệt kê tất cả thành viên",
+      "question_hash": "6e57754e066e2bae9f8ef9f361510e2d",
+      "sql": "SELECT hoTen FROM thanhvien WHERE dongHoId = ? AND active_flag = 1 ORDER BY hoTen ASC",
+      "confidence": 1.0,
+      "pattern": "runtime",
+      "category": "runtime",
+      "verified": false,
+      "hit_count": 1,
+      "correct_count": 0,
+      "incorrect_count": 0,
+      "avg_response_time": 0.0,
+      "created_at": "2026-01-29T15:35:29.311816",
+      "last_used_at": "2026-01-29T15:37:15.767070"
+    },
+    {
+      "id": 56,
+      "question": "con của nguyễn văn quyết là ai",
+      "question_normalized": "con của nguyễn văn quyết là ai",
+      "question_hash": "cc4389d077e45b7b7f8a43bb89d9cda1",
+      "sql": "SELECT hoTen FROM thanhvien WHERE (chaId = (SELECT thanhVienId FROM thanhvien WHERE hoTen = 'Nguyễn Văn Quyết' AND dongHoId = ? AND active_flag = 1) OR meId = (SELECT thanhVienId FROM thanhvien WHERE hoTen = 'Nguyễn Văn Quyết' AND dongHoId = ? AND active_flag = 1)) AND dongHoId = ? AND active_flag = 1",
+      "confidence": 1.0,
+      "pattern": "runtime",
+      "category": "runtime",
+      "verified": false,
+      "hit_count": 0,
+      "correct_count": 0,
+      "incorrect_count": 0,
+      "avg_response_time": 0.0,
+      "created_at": "2026-01-29T15:41:41.398056",
+      "last_used_at": "2026-01-29T15:41:41.399255"
     }
   ],
   "stats": {
-    "total_queries": 5,
-    "cache_hits": 5,
+    "total_queries": 9,
+    "cache_hits": 9,
     "cache_misses": 0,
     "hit_rate": 1.0,
     "avg_response_time": 0.05,
