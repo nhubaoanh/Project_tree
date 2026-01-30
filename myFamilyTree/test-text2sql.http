@@ -1,0 +1,86 @@
+### Text-to-SQL API Testing
+### Sử dụng REST Client extension trong VS Code
+
+@baseUrl = http://localhost:6001/api-core
+@token = YOUR_JWT_TOKEN_HERE
+
+### 1. Health Check (không cần token)
+GET {{baseUrl}}/text2sql/health
+
+### 2. Lấy danh sách câu hỏi mẫu
+GET {{baseUrl}}/text2sql/examples
+Authorization: Bearer {{token}}
+
+### 3. Query: Đếm số người
+POST {{baseUrl}}/text2sql/query
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "question": "Có bao nhiêu người trong gia phả?",
+  "dongHoId": "DH001"
+}
+
+### 4. Query: Đếm nam giới
+POST {{baseUrl}}/text2sql/query
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "question": "Gia phả có bao nhiêu nam giới?",
+  "dongHoId": "DH001"
+}
+
+### 5. Query: Danh sách người còn sống
+POST {{baseUrl}}/text2sql/query
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "question": "Danh sách người còn sống",
+  "dongHoId": "DH001"
+}
+
+### 6. Query: Đời thứ 3
+POST {{baseUrl}}/text2sql/query
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "question": "Đời thứ 3 có bao nhiêu người?",
+  "dongHoId": "DH001"
+}
+
+### 7. Query: Tìm cha
+POST {{baseUrl}}/text2sql/query
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "question": "Cha của Nguyễn Văn A là ai?",
+  "dongHoId": "DH001"
+}
+
+### 8. Query: Đếm người đã kết hôn
+POST {{baseUrl}}/text2sql/query
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "question": "Có bao nhiêu người đã kết hôn?",
+  "dongHoId": "DH001"
+}
+
+### 9. Query: Đời đông người nhất
+POST {{baseUrl}}/text2sql/query
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "question": "Đời nào đông người nhất?",
+  "dongHoId": "DH001"
+}
+
+### 10. Reload examples
+POST {{baseUrl}}/text2sql/reload-examples
+Authorization: Bearer {{token}}

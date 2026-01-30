@@ -17,6 +17,11 @@ apiEndpoints:
       - '/api-core/users/checkuser'
       - '/api-firework/dongho/get-all'
   
+  # Text2SQL API - cần user auth (PHẢI đặt TRƯỚC api_core)
+  api_text2sql:
+    paths:
+      - '/api-core/text2sql/*'
+  
   # Core API - cần admin auth  
   api_core:    
     paths:
@@ -25,7 +30,7 @@ apiEndpoints:
   # Firework API - cần user auth
   api_firework:   
     paths:
-      - '/api-firework/*'    
+      - '/api-firework/*'
 
 serviceEndpoints:   
   coreService:
@@ -75,6 +80,27 @@ pipelines:
       - log:
           - action:
               message: "[PUBLIC] ${req.method} ${req.originalUrl}"
+      - proxy:
+          - action:
+              serviceEndpoint: coreService
+              prependPath: false
+              ignorePath: false
+
+  # Text2SQL API pipeline - cần user auth (PHẢI đặt TRƯỚC coreServicePipeline)
+  text2sqlPipeline:
+    apiEndpoints:
+      - api_text2sql
+    policies:
+      - cors:
+          - action:
+              origin: true
+              methods: "GET, POST, PUT, DELETE, OPTIONS"
+              allowedHeaders: "Content-Type, Authorization, Accept, Origin, X-Requested-With"
+              credentials: true
+      - log:
+          - action:
+              message: "[TEXT2SQL] ${req.method} ${req.originalUrl}"
+      - verifySelfAuth-token:
       - proxy:
           - action:
               serviceEndpoint: coreService

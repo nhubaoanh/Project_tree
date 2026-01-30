@@ -12,6 +12,7 @@ import tinTucRouter from "./tinTucRouter";
 import taiLieuRouter from "./taiLieuRouter";
 import relationshipRouter from "./relationshipRouter";
 import aiQueryRouter from "./aiQueryRouter";
+import text2sqlRouter from "./text2sqlRoutes";
 
 const router = Router();
 router.use('/users', nguoiDungRouter);
@@ -27,5 +28,6 @@ router.use("/tintuc", tinTucRouter);
 router.use("/tailieu", taiLieuRouter);
 router.use("/relationships", relationshipRouter);
 router.use("/ai", aiQueryRouter);
+router.use("/text2sql", text2sqlRouter);
 
 export default router;

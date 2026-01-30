@@ -1,0 +1,206 @@
+[
+    {
+        "question": "Có bao nhiêu người trong gia phả?",
+        "sql": "SELECT COUNT(*) FROM thanhvien WHERE dongHoId = ? AND active_flag = 1"
+    },
+    {
+        "question": "Có bao nhiêu người họ Nguyễn?",
+        "sql": "SELECT COUNT(*) FROM thanhvien WHERE dongHoId = ? AND hoTen LIKE 'Nguyễn%' AND active_flag = 1"
+    },
+    {
+        "question": "Gia phả có bao nhiêu nam giới?",
+        "sql": "SELECT COUNT(*) FROM thanhvien WHERE dongHoId = ? AND gioiTinh = 1 AND active_flag = 1"
+    },
+    {
+        "question": "Gia phả có bao nhiêu nữ giới?",
+        "sql": "SELECT COUNT(*) FROM thanhvien WHERE dongHoId = ? AND gioiTinh = 0 AND active_flag = 1"
+    },
+    {
+        "question": "Có bao nhiêu người còn sống?",
+        "sql": "SELECT COUNT(*) FROM thanhvien WHERE dongHoId = ? AND ngayMat IS NULL AND active_flag = 1"
+    },
+    {
+        "question": "Có bao nhiêu người đã mất?",
+        "sql": "SELECT COUNT(*) FROM thanhvien WHERE dongHoId = ? AND ngayMat IS NOT NULL AND active_flag = 1"
+    },
+    {
+        "question": "Gia phả có bao nhiêu đời?",
+        "sql": "SELECT MAX(doiThuoc) - MIN(doiThuoc) + 1 FROM thanhvien WHERE dongHoId = ?"
+    },
+    {
+        "question": "Đời thứ 1 có bao nhiêu người?",
+        "sql": "SELECT COUNT(*) FROM thanhvien WHERE dongHoId = ? AND doiThuoc = 1"
+    },
+    {
+        "question": "Đời thứ 2 có bao nhiêu người?",
+        "sql": "SELECT COUNT(*) FROM thanhvien WHERE dongHoId = ? AND doiThuoc = 2"
+    },
+    {
+        "question": "Đời thứ 3 có bao nhiêu người?",
+        "sql": "SELECT COUNT(*) FROM thanhvien WHERE dongHoId = ? AND doiThuoc = 3"
+    },
+    {
+        "question": "Danh sách tất cả thành viên",
+        "sql": "SELECT thanhVienId, hoTen FROM thanhvien WHERE dongHoId = ? AND active_flag = 1"
+    },
+    {
+        "question": "Danh sách nam giới trong gia phả",
+        "sql": "SELECT hoTen FROM thanhvien WHERE dongHoId = ? AND gioiTinh = 1"
+    },
+    {
+        "question": "Danh sách nữ giới trong gia phả",
+        "sql": "SELECT hoTen FROM thanhvien WHERE dongHoId = ? AND gioiTinh = 0"
+    },
+    {
+        "question": "Danh sách người đã mất",
+        "sql": "SELECT hoTen, ngayMat FROM thanhvien WHERE dongHoId = ? AND ngayMat IS NOT NULL"
+    },
+    {
+        "question": "Danh sách người còn sống",
+        "sql": "SELECT hoTen FROM thanhvien WHERE dongHoId = ? AND ngayMat IS NULL"
+    },
+    {
+        "question": "Danh sách người sinh ra tại Hà Nội",
+        "sql": "SELECT hoTen FROM thanhvien WHERE dongHoId = ? AND noiSinh LIKE '%Hà Nội%'"
+    },
+    {
+        "question": "Danh sách người làm nông nghiệp",
+        "sql": "SELECT hoTen FROM thanhvien WHERE dongHoId = ? AND ngheNghiep LIKE '%nông%'"
+    },
+    {
+        "question": "Danh sách người có trình độ đại học",
+        "sql": "SELECT hoTen FROM thanhvien WHERE dongHoId = ? AND trinhDoHocVan LIKE '%Đại học%'"
+    },
+    {
+        "question": "Danh sách người có số điện thoại",
+        "sql": "SELECT hoTen, soDienThoai FROM thanhvien WHERE dongHoId = ? AND soDienThoai IS NOT NULL"
+    },
+    {
+        "question": "Danh sách người chưa có tiểu sử",
+        "sql": "SELECT hoTen FROM thanhvien WHERE dongHoId = ? AND tieuSu IS NULL"
+    },
+    {
+        "question": "Cha của Nguyễn Văn Quyết là ai?",
+        "sql": "SELECT c.hoTen FROM thanhvien t JOIN thanhvien c ON t.chaId = c.thanhVienId AND t.dongHoId = c.dongHoId WHERE t.hoTen = 'Nguyễn Văn Quyết' AND t.dongHoId = ?"
+    },
+    {
+        "question": "Mẹ của Nguyễn Văn Quyết là ai?",
+        "sql": "SELECT m.hoTen FROM thanhvien t JOIN thanhvien m ON t.meId = m.thanhVienId AND t.dongHoId = m.dongHoId WHERE t.hoTen = 'Nguyễn Văn Quyết' AND t.dongHoId = ?"
+    },
+    {
+        "question": "Nguyễn Văn Quyết thuộc đời thứ mấy?",
+        "sql": "SELECT doiThuoc FROM thanhvien WHERE hoTen = 'Nguyễn Văn Quyết' AND dongHoId = ?"
+    },
+    {
+        "question": "Nguyễn Văn Quyết có bao nhiêu con?",
+        "sql": "SELECT COUNT(*) FROM thanhvien WHERE dongHoId = ? AND chaId = (SELECT thanhVienId FROM thanhvien WHERE hoTen = 'Nguyễn Văn Quyết' AND dongHoId = ?)"
+    },
+    {
+        "question": "Danh sách con của Nguyễn Văn Quyết",
+        "sql": "SELECT hoTen FROM thanhvien WHERE dongHoId = ? AND chaId = (SELECT thanhVienId FROM thanhvien WHERE hoTen = 'Nguyễn Văn Quyết' AND dongHoId = ?)"
+    },
+    {
+        "question": "Nguyễn Văn Quyết có vợ không?",
+        "sql": "SELECT voId FROM thanhvien WHERE hoTen = 'Nguyễn Văn Quyết' AND dongHoId = ?"
+    },
+    {
+        "question": "Nguyễn Văn Quyết có chồng không?",
+        "sql": "SELECT chongId FROM thanhvien WHERE hoTen = 'Nguyễn Văn Quyết' AND dongHoId = ?"
+    },
+    {
+        "question": "Danh sách anh chị em của Nguyễn Văn Quyết",
+        "sql": "SELECT hoTen FROM thanhvien WHERE dongHoId = ? AND chaId = (SELECT chaId FROM thanhvien WHERE hoTen = 'Nguyễn Văn Quyết' AND dongHoId = ?) AND hoTen <> 'Nguyễn Văn Quyết'"
+    },
+    {
+        "question": "Nguyễn Văn Quyết có mẹ không?",
+        "sql": "SELECT meId FROM thanhvien WHERE hoTen = 'Nguyễn Văn Quyết' AND dongHoId = ?"
+    },
+    {
+        "question": "Nguyễn Văn Quyết có cha không?",
+        "sql": "SELECT chaId FROM thanhvien WHERE hoTen = 'Nguyễn Văn Quyết' AND dongHoId = ?"
+    },
+    {
+        "question": "Có bao nhiêu người có cha?",
+        "sql": "SELECT COUNT(*) FROM thanhvien WHERE dongHoId = ? AND chaId IS NOT NULL"
+    },
+    {
+        "question": "Có bao nhiêu người có mẹ?",
+        "sql": "SELECT COUNT(*) FROM thanhvien WHERE dongHoId = ? AND meId IS NOT NULL"
+    },
+    {
+        "question": "Có bao nhiêu người mồ côi cha?",
+        "sql": "SELECT COUNT(*) FROM thanhvien WHERE dongHoId = ? AND chaId IS NULL"
+    },
+    {
+        "question": "Có bao nhiêu người mồ côi mẹ?",
+        "sql": "SELECT COUNT(*) FROM thanhvien WHERE dongHoId = ? AND meId IS NULL"
+    },
+    {
+        "question": "Có bao nhiêu người có cả cha và mẹ?",
+        "sql": "SELECT COUNT(*) FROM thanhvien WHERE dongHoId = ? AND chaId IS NOT NULL AND meId IS NOT NULL"
+    },
+    {
+        "question": "Có bao nhiêu người đã kết hôn?",
+        "sql": "SELECT COUNT(*) FROM thanhvien WHERE dongHoId = ? AND (voId IS NOT NULL OR chongId IS NOT NULL)"
+    },
+    {
+        "question": "Có bao nhiêu người chưa kết hôn?",
+        "sql": "SELECT COUNT(*) FROM thanhvien WHERE dongHoId = ? AND voId IS NULL AND chongId IS NULL"
+    },
+    {
+        "question": "Danh sách người có vợ",
+        "sql": "SELECT hoTen FROM thanhvien WHERE dongHoId = ? AND voId IS NOT NULL"
+    },
+    {
+        "question": "Danh sách người có chồng",
+        "sql": "SELECT hoTen FROM thanhvien WHERE dongHoId = ? AND chongId IS NOT NULL"
+    },
+    {
+        "question": "Đời nào đông người nhất?",
+        "sql": "SELECT doiThuoc, COUNT(*) AS soLuong FROM thanhvien WHERE dongHoId = ? GROUP BY doiThuoc ORDER BY soLuong DESC LIMIT 1"
+    },
+    {
+        "question": "Đời nào ít người nhất?",
+        "sql": "SELECT doiThuoc, COUNT(*) AS soLuong FROM thanhvien WHERE dongHoId = ? GROUP BY doiThuoc ORDER BY soLuong ASC LIMIT 1"
+    },
+    {
+        "question": "Trung bình mỗi đời có bao nhiêu người?",
+        "sql": "SELECT COUNT(*) / COUNT(DISTINCT doiThuoc) FROM thanhvien WHERE dongHoId = ?"
+    },
+    {
+        "question": "Đời thứ mấy có nhiều nam giới nhất?",
+        "sql": "SELECT doiThuoc FROM thanhvien WHERE dongHoId = ? AND gioiTinh = 1 GROUP BY doiThuoc ORDER BY COUNT(*) DESC LIMIT 1"
+    },
+    {
+        "question": "Đời thứ mấy có nhiều nữ giới nhất?",
+        "sql": "SELECT doiThuoc FROM thanhvien WHERE dongHoId = ? AND gioiTinh = 0 GROUP BY doiThuoc ORDER BY COUNT(*) DESC LIMIT 1"
+    },
+    {
+        "question": "Danh sách người không có con",
+        "sql": "SELECT hoTen FROM thanhvien t WHERE dongHoId = ? AND NOT EXISTS (SELECT 1 FROM thanhvien c WHERE c.chaId = t.thanhVienId)"
+    },
+    {
+        "question": "Danh sách người có ít nhất một con",
+        "sql": "SELECT DISTINCT t.hoTen FROM thanhvien t JOIN thanhvien c ON c.chaId = t.thanhVienId WHERE t.dongHoId = ?"
+    },
+    {
+        "question": "Có bao nhiêu người không có con?",
+        "sql": "SELECT COUNT(*) FROM thanhvien t WHERE dongHoId = ? AND NOT EXISTS (SELECT 1 FROM thanhvien c WHERE c.chaId = t.thanhVienId)"
+    },
+    {
+        "question": "Có bao nhiêu quan hệ trong gia phả?",
+        "sql": "SELECT COUNT(*) FROM quanhe"
+    },
+    {
+        "question": "Danh sách các quan hệ hôn nhân",
+        "sql": "SELECT * FROM quanhe WHERE loaiQuanHeId = 'HONNHAN'"
+    },
+    {
+        "question": "Có bao nhiêu quan hệ còn hiệu lực?",
+        "sql": "SELECT COUNT(*) FROM quanhe WHERE active_flag = 1"
+    },
+    {
+        "question": "Danh sách quan hệ đã kết thúc",
+        "sql": "SELECT * FROM quanhe WHERE ngayKetThuc IS NOT NULL"
+    }
+]
