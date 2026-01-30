@@ -200,7 +200,7 @@ export default function Home() {
             </p>
             <div className="mt-10 flex justify-center">
               <img
-                src="https://cdn.balkan.app/shared/f1.png"
+                src="/images/vangoc.jpg"
                 alt="Họa tiết"
                 className="w-48 opacity-60"
               />
@@ -279,7 +279,7 @@ export default function Home() {
                     福
                   </div>
                   <h3 className="text-2xl font-bold uppercase mb-2">
-                    Gia Tộc <br /> Nhữ Văn
+                    Gia Tộc <br /> 
                   </h3>
                   <div className="w-16 h-0.5 bg-[#b91c1c] my-4"></div>
                   <p className="italic text-sm">"Phúc ấm ngàn đời"</p>

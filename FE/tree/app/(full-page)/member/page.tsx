@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useState, useEffect, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { getMemberById, getMembersByDongHo } from "@/service/member.service";
 import storage from "@/utils/storage";
@@ -10,10 +10,10 @@ import { getImageUrl } from "@/utils/imageUtils";
 
 const DEFAULT_AVATAR = "/images/vangoc.jpg";
 
-export default function MemberDetailPage() {
-  const params = useParams();
+function MemberDetailContent() {
+  const searchParams = useSearchParams();
   const router = useRouter();
-  const memberId = Number(params.id);
+  const memberId = Number(searchParams.get('id'));
   const [dongHoId, setDongHoId] = useState<string>("");
 
   useEffect(() => {
@@ -181,5 +181,17 @@ function InfoRow({ icon, label, value }: { icon: React.ReactNode; label: string;
         <p className="text-stone-800">{value}</p>
       </div>
     </div>
+  );
+}
+
+export default function MemberDetailPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-[#ede5b7] flex items-center justify-center">
+        <div className="text-xl text-stone-600">Đang tải...</div>
+      </div>
+    }>
+      <MemberDetailContent />
+    </Suspense>
   );
 }

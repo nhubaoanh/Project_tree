@@ -45,7 +45,7 @@ export function FamilyMemberModal({
   const handleViewDetail = () => {
     const memberId = node.memberId ?? node.id;
     if (memberId) {
-      router.push(`/member/${memberId}`);
+      router.push(`/member?id=${memberId}`);
       onOpenChange(false);
     }
   };

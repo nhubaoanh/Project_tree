@@ -1,9 +1,9 @@
 {
   "version": "1.0",
   "model_version": "qwen-1.5b-finetuned",
-  "created_at": "2026-01-29T15:41:41.406874",
-  "updated_at": "2026-01-29T15:41:41.406889",
-  "total_entries": 56,
+  "created_at": "2026-01-29T22:43:34.537896",
+  "updated_at": "2026-01-29T22:43:34.537909",
+  "total_entries": 58,
   "cache": [
     {
       "id": 1,
@@ -168,12 +168,12 @@
       "pattern": "pre_generated",
       "category": "trained",
       "verified": true,
-      "hit_count": 0,
+      "hit_count": 1,
       "correct_count": 0,
       "incorrect_count": 0,
       "avg_response_time": 0.05,
       "created_at": "2026-01-28T03:21:54.216125",
-      "last_used_at": "2026-01-28T03:21:54.216127"
+      "last_used_at": "2026-01-29T22:35:07.036586"
     },
     {
       "id": 11,
@@ -355,12 +355,12 @@
       "pattern": "pre_generated",
       "category": "trained",
       "verified": true,
-      "hit_count": 2,
+      "hit_count": 3,
       "correct_count": 0,
       "incorrect_count": 0,
       "avg_response_time": 0.05,
       "created_at": "2026-01-28T03:21:54.216225",
-      "last_used_at": "2026-01-29T15:37:02.714983"
+      "last_used_at": "2026-01-29T20:51:40.075901"
     },
     {
       "id": 22,
@@ -406,12 +406,12 @@
       "pattern": "pre_generated",
       "category": "trained",
       "verified": true,
-      "hit_count": 1,
+      "hit_count": 2,
       "correct_count": 0,
       "incorrect_count": 0,
       "avg_response_time": 0.05,
       "created_at": "2026-01-28T03:21:54.216246",
-      "last_used_at": "2026-01-29T15:38:01.270195"
+      "last_used_at": "2026-01-29T20:51:35.464918"
     },
     {
       "id": 25,
@@ -956,11 +956,45 @@
       "avg_response_time": 0.0,
       "created_at": "2026-01-29T15:41:41.398056",
       "last_used_at": "2026-01-29T15:41:41.399255"
+    },
+    {
+      "id": 57,
+      "question": "mẹ của Nguyễn Thị Kim Loan là ai",
+      "question_normalized": "mẹ của nguyễn thị kim loan là ai",
+      "question_hash": "bff9cac060a8914602cdc020683959cd",
+      "sql": "SELECT me.hoTen FROM thanhvien tv JOIN thanhvien me ON tv.meId = me.thanhVienId AND tv.dongHoId = me.dongHoId WHERE tv.hoTen = 'Nguyễn Thị Kim Loan' AND tv.dongHoId = ? AND tv.active_flag = 1 AND me.hoTen IS NOT NULL",
+      "confidence": 1.0,
+      "pattern": "runtime",
+      "category": "runtime",
+      "verified": false,
+      "hit_count": 0,
+      "correct_count": 0,
+      "incorrect_count": 0,
+      "avg_response_time": 0.0,
+      "created_at": "2026-01-29T20:55:48.767256",
+      "last_used_at": "2026-01-29T20:55:48.768582"
+    },
+    {
+      "id": 58,
+      "question": "mẹ của nguyễn văn quyết là ai",
+      "question_normalized": "mẹ của nguyễn văn quyết là ai",
+      "question_hash": "3e0513e1e3dc225a5fcd051317e2d98a",
+      "sql": "SELECT me.hoTen FROM thanhvien tv JOIN thanhvien me ON tv.meId = me.thanhVienId AND tv.dongHoId = me.dongHoId WHERE tv.hoTen = 'Nguyễn Văn Quyết' AND tv.dongHoId = ? AND tv.active_flag = 1",
+      "confidence": 1.0,
+      "pattern": "runtime",
+      "category": "runtime",
+      "verified": false,
+      "hit_count": 0,
+      "correct_count": 0,
+      "incorrect_count": 0,
+      "avg_response_time": 0.0,
+      "created_at": "2026-01-29T22:43:34.528256",
+      "last_used_at": "2026-01-29T22:43:34.529603"
     }
   ],
   "stats": {
-    "total_queries": 9,
-    "cache_hits": 9,
+    "total_queries": 12,
+    "cache_hits": 12,
     "cache_misses": 0,
     "hit_rate": 1.0,
     "avg_response_time": 0.05,

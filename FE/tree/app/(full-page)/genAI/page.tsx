@@ -109,7 +109,7 @@ export default function GenealogyChatPage() {
       
       if (response.success && response.sql) {
         // Format kết quả đẹp
-        let resultText = `✅ **Câu trả lời:**\n\n`;
+        let resultText = `✅ Kết quả hỏi đáp:\n\n`;
         
         if (response.results && response.results.length > 0) {
           // Hiển thị kết quả
@@ -118,7 +118,7 @@ export default function GenealogyChatPage() {
           
           if (keys.length === 1 && typeof firstResult[keys[0]] === 'number') {
             // Trường hợp COUNT, SUM, AVG...
-            resultText += `📊 ${firstResult[keys[0]]}\n\n`;
+            resultText += `📊 Tổng số : ${firstResult[keys[0]]}\n\n`;
           } else {
             // Trường hợp nhiều cột
             response.results.forEach((row, idx) => {
@@ -131,13 +131,13 @@ export default function GenealogyChatPage() {
             resultText += `\n`;
           }
           
-          resultText += `📈 Tổng: ${response.total_rows} kết quả\n`;
+          resultText += `📈 Kết quả: ${response.total_rows}\n`;
         } else {
           resultText += `Không tìm thấy kết quả nào.\n\n`;
         }
         
         // resultText += `\n🔍 **SQL:** \`${response.sql}\`\n`;
-        resultText += `💯 **Độ tin cậy:** ${response.confidence}`;
+        resultText += `Độ chính xác: ${response.confidence}%`;
         
         setMessages((prev) => [...prev, { 
           role: "model", 
@@ -205,7 +205,7 @@ export default function GenealogyChatPage() {
           <h3 className="font-bold text-[#5d4037] text-lg">
             Tra Cứu Gia Phả AI
           </h3>
-          <p className="text-xs text-green-600">
+          <p className="text-xxs text-green-600">
             {aiStatus === "online"
               ? "Sẵn sàng hỗ trợ"
               : aiStatus === "offline"
@@ -227,7 +227,7 @@ export default function GenealogyChatPage() {
         )}
 
         {/* Hiển thị tên dòng họ */}
-        <div className="px-3 py-2 bg-gray-50 border border-[#d4af37]/50 rounded-lg text-sm text-[#5d4037] font-medium">
+        <div className="px-3 py-2 bg-gray-50 border border-[#d4af37]/50 rounded-lg text-xxs text-[#5d4037] font-medium">
           {dongHoInfo?.tenDongHo || "Đang tải..."}
         </div>
 
@@ -242,7 +242,7 @@ export default function GenealogyChatPage() {
                   : "bg-yellow-500 animate-pulse"
             }`}
           ></span>
-          <span className="text-xs text-[#5d4037] font-medium">
+          <span className="text-xxs text-[#5d4037] font-medium">
             {aiStatus === "online"
               ? "AI Online"
               : aiStatus === "offline"
@@ -260,7 +260,7 @@ export default function GenealogyChatPage() {
       </div>
 
       {/* Chat Area */}
-      <div className="flex-1 bg-[#fdfbf7] p-4 overflow-y-auto custom-scrollbar space-y-4 border-x border-[#d4af37]/30">
+      <div className="flex-1 text-xxs bg-[#fdfbf7] p-4 overflow-y-auto custom-scrollbar space-y-4 border-x border-[#d4af37]/30">
         {messages.map((msg, idx) => (
           <div
             key={idx}
@@ -325,7 +325,7 @@ export default function GenealogyChatPage() {
 
       {/* Input Area */}
       <div className="bg-white p-4 border-t border-[#d4af37] rounded-b-lg shadow-lg">
-        <form onSubmit={handleSend} className="flex gap-2 relative">
+        <form onSubmit={handleSend} className="flex gap-2 text-xxs relative">
           <input
             value={input}
             onChange={(e) => setInput(e.target.value)}
@@ -335,7 +335,7 @@ export default function GenealogyChatPage() {
                 ? "Hỏi về gia phả, ví dụ: Có bao nhiêu người trong gia phả?"
                 : "Đang tải thông tin dòng họ..."
             }
-            className="flex-1 pl-4 pr-12 py-3 bg-[#f9f9f9] border border-[#d4af37]/30 rounded-full focus:outline-none focus:border-[#b91c1c] focus:ring-1 focus:ring-[#b91c1c] transition-all disabled:opacity-50"
+            className="flex-1 text-xxs pl-4 pr-12 py-3 bg-[#f9f9f9] border border-[#d4af37]/30 rounded-full focus:outline-none focus:border-[#b91c1c] focus:ring-1 focus:ring-[#b91c1c] transition-all disabled:opacity-50"
           />
           <button
             type="submit"
