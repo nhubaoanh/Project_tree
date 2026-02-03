@@ -273,10 +273,10 @@ export default function Home() {
                 </button>
               ))}
               <Link
-                href="/login"
+                href="/register"
                 className="px-6 py-2.5 bg-gradient-to-r from-[#A20105] to-[#8B0104] text-[#F2EBC6] rounded-xl font-medium hover:shadow-xl hover:scale-105 transition-all"
               >
-                Đăng nhập
+                Đăng ký
               </Link>
             </nav>
           </div>

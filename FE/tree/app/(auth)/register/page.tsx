@@ -324,12 +324,12 @@ export default function RegisterPage() {
             >
               {loading ? "Đang xử lý..." : checkingEmail ? "Đang kiểm tra..." : "Đăng ký"}
             </Button>
-            <p className="text-sm text-gray-600 text-center">
+            {/* <p className="text-sm text-gray-600 text-center">
               Đã có tài khoản?{" "}
               <Link href="/login" className="text-blue-600 hover:underline font-medium">
                 Đăng nhập
               </Link>
-            </p>
+            </p> */}
           </CardFooter>
         </Card>
       </div>
