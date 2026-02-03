@@ -13,10 +13,12 @@ interface LoginProps {
 export const loginService = async (data: LoginProps): Promise<any> => {
   try {
     const res = await apiClient.post(`${prefix}/login`, data);
+    console.log("loginService response:", res);
     return res.data;
   } catch (error: any) {
     const err = parseApiError(error);
-    console.error(`[loginService] ${err.message}`);
+    // console.error(`[loginService] ${err.message}`);
+    console.log("loginService error response:", error.response);
     throw new Error(err.message);
   }
 };
