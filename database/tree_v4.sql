@@ -4735,14 +4735,14 @@ BEGIN
     SET p_error_message = '';
 
     -- Kiểm tra user tồn tại
-    IF NOT EXISTS (SELECT 1 FROM NguoiDung WHERE nguoiDungId = p_userId) THEN
+    IF NOT EXISTS (SELECT 1 FROM nguoidung WHERE nguoiDungId = p_userId) THEN
         SET p_error_code = 1001;
         SET p_error_message = 'Người dùng không tồn tại';
     ELSE
         START TRANSACTION;
 
         -- Update NguoiDung
-        UPDATE NguoiDung
+        UPDATE nguoidung
         SET
             tenDangNhap = COALESCE(NULLIF(p_tenDangNhap, ''), tenDangNhap),
             matKhau = CASE 

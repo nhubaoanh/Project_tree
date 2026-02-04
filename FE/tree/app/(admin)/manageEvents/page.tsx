@@ -36,6 +36,7 @@ export default function QuanLySuKienPage() {
           search_content: params.search_content,
           dongHoId: dongHoId || "",
         };
+        console.log("Searching events with params:", searchParams);
         return searchSuKien(searchParams);
       },
       create: (data) => createSuKien(data as ISuKien),
@@ -50,7 +51,7 @@ export default function QuanLySuKienPage() {
     },
     searchParams: { dongHoId: dongHoId || "" },
     tableConfig: {
-      initialPageSize: 10,
+      initialPageSize: 5,
       enableSelection: true,
       enableSearch: true
     },
@@ -330,7 +331,7 @@ export default function QuanLySuKienPage() {
 
   return (
     <PageLayout
-      title="QUẢN LÝ SỰ KIỆN"
+      title="Quản lý sự kiện"
       subtitle="Danh sách các sự kiện và hoạt động"
       icon={Calendar}
       actions={pageActions}

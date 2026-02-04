@@ -412,7 +412,7 @@ export default function QuanLyThanhVienPage() {
 
   return (
     <PageLayout
-      title={`Quản Lý Thành Viên - ${dongHoInfo?.tenDongHo || "Dòng Họ"}`}
+      title={`Quản lý thành viên - ${dongHoInfo?.tenDongHo || "Dòng Họ"}`}
       subtitle={dongHoInfo?.queQuanGoc ? `Quê quán: ${dongHoInfo.queQuanGoc}` : "Danh sách thành viên trong dòng họ"}
       icon={Users}
       actions={pageActions}
@@ -442,7 +442,7 @@ export default function QuanLyThanhVienPage() {
             value={crud.searchTerm}
             onChange={(e) => crud.handleSearch(e.target.value)}
             placeholder="Tìm kiếm theo họ tên, nghề nghiệp, nơi sinh..."
-            className="w-full p-2 outline-none bg-transparent text-yellow-900 placeholder-stone-400"
+            className="w-full p-1 outline-none bg-transparent text-yellow-900 placeholder-stone-400"
           />
           {crud.searchTerm && (
             <button 

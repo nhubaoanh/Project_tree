@@ -260,7 +260,7 @@ export const UserModal: React.FC<UserModalProps> = ({
       <div className="bg-[#fffdf5] w-full max-w-2xl p-0 rounded-lg shadow-2xl border border-[#d4af37] overflow-hidden flex flex-col max-h-[90vh]">
         {/* HEADER */}
         <div className="bg-[#b91c1c] text-yellow-400 px-6 py-4 flex justify-between items-center">
-          <h3 className="text-xl font-bold uppercase tracking-wider">
+          <h3 className="text-xl font-bold tracking-wider">
             {initialData ? "Chỉnh sửa thành viên" : "Thêm thành viên mới"}
           </h3>
           <button
@@ -292,7 +292,7 @@ export const UserModal: React.FC<UserModalProps> = ({
 
             {/* Dòng họ - Hiển thị thông tin (read-only) */}
             <div className="space-y-2">
-              <label className="text-sm font-bold text-[#8b5e3c] uppercase">
+              <label className="text-xl font-bold text-[#8b5e3c]">
                 Dòng họ <span className="text-red-500">*</span>
               </label>
               <div className="w-full p-3 bg-gray-50 border border-[#d4af37]/50 rounded text-[#5d4037] font-medium">
@@ -304,7 +304,7 @@ export const UserModal: React.FC<UserModalProps> = ({
 
             {/* Tên đăng nhập */}
             <div className="space-y-2">
-              <label className="text-sm font-bold text-[#8b5e3c] uppercase">
+              <label className="text-xl font-bold text-[#8b5e3c]">
                 Tên đăng nhập <span className="text-red-500">*</span>
               </label>
               <div className="relative">
@@ -350,7 +350,7 @@ export const UserModal: React.FC<UserModalProps> = ({
             ) : (
               // Chỉnh sửa: hiển thị nút thay đổi mật khẩu
               <div className="space-y-2">
-                <label className="text-sm font-bold text-[#8b5e3c] uppercase">
+                <label className="text-sm font-bold text-[#8b5e3c]">
                   Mật khẩu
                 </label>
                 {!showPasswordChange ? (
@@ -419,7 +419,7 @@ export const UserModal: React.FC<UserModalProps> = ({
 
             {/* Giới tính */}
             <div className="space-y-2">
-              <label className="text-sm font-bold text-[#8b5e3c] uppercase">
+              <label className="text-xl font-bold text-[#8b5e3c]">
                 Giới tính <span className="text-red-500">*</span>
               </label>
               <div className="flex gap-4 p-3 bg-white border border-[#d4af37]/50 rounded">
@@ -468,7 +468,7 @@ export const UserModal: React.FC<UserModalProps> = ({
 
             {/* Tình trạng hoạt động */}
             <div className="space-y-2">
-              <label className="text-sm font-bold text-[#8b5e3c] uppercase">
+              <label className="text-xl font-bold text-[#8b5e3c]">
                 Tình trạng hoạt động <span className="text-red-500">*</span>
               </label>
               <div className="flex gap-4 p-3 bg-white border border-[#d4af37]/50 rounded">
@@ -561,7 +561,7 @@ const InputField: React.FC<InputFieldProps> = ({
   readOnly,
 }) => (
   <div className="space-y-2">
-    <label className="text-sm font-bold text-[#8b5e3c] uppercase">
+    <label className="text-xl font-bold text-[#8b5e3c]">
       {label} {required && <span className="text-red-500">*</span>}
     </label>
     <input
@@ -609,7 +609,7 @@ const SelectField: React.FC<SelectFieldProps> = ({
   disabled,
 }) => (
   <div className="space-y-2">
-    <label className="text-sm font-bold text-[#8b5e3c] uppercase">
+    <label className="text-xl font-bold text-[#8b5e3c]">
       {label} {required && <span className="text-red-500">*</span>}
     </label>
     <select

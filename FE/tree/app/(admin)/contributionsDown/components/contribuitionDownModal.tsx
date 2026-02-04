@@ -167,7 +167,7 @@ export const ContributionDownModal: React.FC<ContributionUpModalProps> = ({
         
         {/* HEADER */}
         <div className="bg-[#b91c1c] text-yellow-400 px-6 py-4 flex justify-between items-center">
-          <h3 className="text-xl font-bold uppercase flex items-center gap-2">
+          <h3 className="text-xl font-bold flex items-center gap-2">
             <DollarSign size={24} />
             {initialData ? "Sửa khoản chi" : "Thêm khoản chi"}
           </h3>
@@ -193,7 +193,7 @@ export const ContributionDownModal: React.FC<ContributionUpModalProps> = ({
 
           {/* Dòng họ (hiển thị thông tin, không cho chọn) */}
           <div className="space-y-1">
-            <label className="text-sm font-bold text-[#8b5e3c] uppercase">
+            <label className="text-sm font-bold text-[#8b5e3c]">
               Dòng họ <span className="text-red-500">*</span>
             </label>
             <div className="w-full p-3 bg-gray-50 border border-[#d4af37]/50 rounded text-[#5d4037] font-medium">
@@ -297,7 +297,7 @@ export const ContributionDownModal: React.FC<ContributionUpModalProps> = ({
 
 const Field = ({ label, name, type = "text", required, value, onChange, onBlur, error, placeholder }: any) => (
   <div className="space-y-1">
-    <label className="text-sm font-bold text-[#8b5e3c] uppercase">
+    <label className="text-xl font-bold text-[#8b5e3c]">
       {label} {required && <span className="text-red-500">*</span>}
     </label>
     <input
@@ -317,7 +317,7 @@ const Field = ({ label, name, type = "text", required, value, onChange, onBlur, 
 
 const Select = ({ label, name, required, value, onChange, onBlur, options, optionLabel, optionValue, error }: any) => (
   <div className="space-y-1">
-    <label className="text-sm font-bold text-[#8b5e3c] uppercase">
+    <label className="text-xl font-bold text-[#8b5e3c]">
       {label} {required && <span className="text-red-500">*</span>}
     </label>
     <select
@@ -342,7 +342,7 @@ const Select = ({ label, name, required, value, onChange, onBlur, options, optio
 
 const TextArea = ({ label, name, required, value, onChange, onBlur, error, placeholder, rows = 3 }: any) => (
   <div className="space-y-1">
-    <label className="text-sm font-bold text-[#8b5e3c] uppercase">
+    <label className="text-xl font-bold text-[#8b5e3c]">
       {label} {required && <span className="text-red-500">*</span>}
     </label>
     <textarea

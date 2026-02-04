@@ -317,7 +317,7 @@ export default function QuanLyTaiChinhChiPage() {
 
   return (
     <PageLayout
-      title="QUẢN LÝ TÀI CHÍNH CHI"
+      title="Quản lý tài chính chi"
       subtitle="Danh sách các khoản chi tài chính"
       icon={DollarSign}
       actions={pageActions}

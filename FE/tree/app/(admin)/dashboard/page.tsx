@@ -15,16 +15,23 @@ import {
 import { getDongHoById } from "@/service/dongho.service";
 import storage from "@/utils/storage";
 
-const KPICard = ({ title, value, ratio, percentage, icon: Icon, bgColor }: any) => (
-  <div className={`${bgColor} rounded-2xl p-5 shadow-lg`}>
+const KPICard = ({
+  title,
+  value,
+  ratio,
+  percentage,
+  icon: Icon,
+  bgColor,
+}: any) => (
+  <div className={`${bgColor} rounded-2xl p-3 shadow-lg`}>
     <div className="flex items-start justify-between">
       <div>
-        <p className="text-white/80 text-xs font-medium mb-1">{title}</p>
+        <p className="text-white/80 text-xxs font-medium mb-1">{title}</p>
         <p className="text-white text-2xl font-bold">{value}</p>
         {ratio && percentage && (
           <div className="flex items-center gap-2 mt-2">
             <span className="text-white/70 text-sm">{ratio}</span>
-            <span className="text-white/70 text-sm">•</span>
+            <span className="text-white/70 text-sm">|</span>
             <span className="text-white/70 text-sm">{percentage}</span>
           </div>
         )}
@@ -125,18 +132,15 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen p-2">
       {/* Header với bộ lọc */}
-      <div className="flex flex-col gap-4 mb-6">
+      <div className="flex flex-col gap-4 mb-4">
         {/* Tiêu đề */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-[#1e3a5f]">
-              Tổng Quan Gia Phả
-            </h1>
-            <p className="text-sm text-gray-500">
-              Dòng họ: {selectedDongHo?.tenDongHo || ""}
-            </p>
+            <h3 className="text-xl font-bold text-[#1e3a5f]">
+              Tổng Quan Gia Phả - {selectedDongHo?.tenDongHo ? `${selectedDongHo.tenDongHo}` : ""}
+            </h3>
           </div>
         </div>
       </div>
@@ -148,7 +152,7 @@ export default function Dashboard() {
       ) : (
         <>
           {/* KPI Cards */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
             <KPICard
               title="Tổng Thành Viên"
               value={stats?.tongThanhVien || 0}
@@ -184,10 +188,10 @@ export default function Dashboard() {
           </div>
 
           {/* Main Content Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-5">
             {/* Bar Chart - Thống kê theo đời - 2 cột BÊN TRÁI */}
-            <div className="lg:col-span-2 bg-white rounded-2xl p-5 shadow-lg border border-gray-100">
-              <div className="flex items-center justify-between mb-4">
+            <div className="lg:col-span-2 bg-white rounded-2xl p-4 shadow-lg border border-gray-100">
+              <div className="flex items-center justify-between mb-2">
                 <h3 className="font-bold text-[#1e3a5f]">Thống Kê Theo Đời</h3>
                 <div className="flex gap-4 text-xs">
                   <span className="flex items-center gap-1">
@@ -254,7 +258,7 @@ export default function Dashboard() {
 
             {/* Quick Stats - 1 cột BÊN PHẢI */}
             <div className="bg-white rounded-2xl p-5 shadow-lg border border-gray-100">
-              <h2 className="font-bold text-[#1e3a5f] mb-3 text-sm">
+              <h2 className="font-bold text-[#1e3a5f] mb-3 text-xxs">
                 Sự Kiện Sắp Tới
               </h2>
               {suKienSapToi.length > 0 ? (

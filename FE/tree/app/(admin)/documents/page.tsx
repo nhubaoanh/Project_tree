@@ -273,7 +273,7 @@ export default function QuanLyTaiLieuPage() {
 
   return (
     <PageLayout
-      title="QUẢN LÝ TÀI LIỆU"
+      title="Quản lý tài liệu"
       subtitle="Danh sách tài liệu và file đính kèm"
       icon={FileText}
       actions={pageActions}

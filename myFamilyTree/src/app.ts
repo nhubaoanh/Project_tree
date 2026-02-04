@@ -43,6 +43,8 @@ import {
 // Routes
 import router from "./routes/index";
 import core_router from "./core/routes";
+import uploadRouter from "./core/routes/uploadRouter";
+import uploadmultiRouter from "./core/routes/upload-multiRouter";
 import { errorHandler } from "./errors/errorHandle";
 
 const app = express();
@@ -154,6 +156,10 @@ app.get("/health", (req: Request, res: Response) => {
 // ============================================================================
 // 8. ROUTES
 // ============================================================================
+// Upload routes trực tiếp (không qua api-core)
+app.use("/upload", core_router);
+app.use("/upload-multiple", core_router);
+
 app.use("/api-core", core_router);
 app.use("/api-core", router);
 

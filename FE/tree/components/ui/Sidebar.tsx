@@ -193,7 +193,7 @@ export default function Sidebar() {
         </div>
 
         {/* Footer decoration */}
-        <div className="relative mt-4 w-full h-32 overflow-visible">
+        <div className="relative mt-4 w-full h-32 overflow-visible z-30">
           <Image
             src="/images/phuong.png"
             width={isSidebarOpen ? 180 : 100}

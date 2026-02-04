@@ -14,7 +14,7 @@ uploadRouter.post('/', uploadService.multerUpload, (req: Request, res: Response)
     const filePath = req.file.path.replace(/\\/g, '/'); // Chuẩn hóa path cho Windows
     
     // Build full URL using BASE_URL from environment (gateway URL, not backend URL)
-    const baseUrl = process.env.BASE_URL || 'http://localhost:8080';
+    const baseUrl = process.env.BASE_URL;
     const fullUrl = `${baseUrl}/${filePath}`;
     
     res.json({ 

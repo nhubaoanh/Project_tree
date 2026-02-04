@@ -153,7 +153,7 @@ export function TaiLieuModal({
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm">
       <div className="bg-[#fffdf5] rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-xl border border-[#d4af37]">
         <div className="bg-[#b91c1c] text-yellow-400 px-6 py-4 flex justify-between items-center">
-          <h3 className="text-xl font-bold text-[#5d4037]">
+          <h3 className="text-xl font-bold text-yellow-400">
             {initialData ? "Chỉnh sửa tài liệu" : "Thêm tài liệu mới"}
           </h3>
           <button onClick={onClose} className="p-1 hover:bg-white/50 rounded">
@@ -163,7 +163,7 @@ export function TaiLieuModal({
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div>
-            <label className="block text-sm font-medium text-[#5d4037] mb-1">
+            <label className="block text-xl font-medium text-[#5d4037] mb-1">
               Tên tài liệu <span className="text-red-500">*</span>
             </label>
             <input
@@ -179,7 +179,7 @@ export function TaiLieuModal({
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-[#5d4037] mb-1">
+              <label className="block text-xl font-medium text-[#5d4037] mb-1">
                 Loại tài liệu
               </label>
               <select
@@ -198,7 +198,7 @@ export function TaiLieuModal({
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-[#5d4037] mb-1">
+              <label className="block text-xl font-medium text-[#5d4037] mb-1">
                 Năm sáng tác
               </label>
               <input
@@ -220,7 +220,7 @@ export function TaiLieuModal({
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-[#5d4037] mb-1">
+              <label className="block text-xl font-medium text-[#5d4037] mb-1">
                 Tác giả
               </label>
               <input
@@ -234,7 +234,7 @@ export function TaiLieuModal({
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-[#5d4037] mb-1">
+              <label className="block text-xl font-medium text-[#5d4037] mb-1">
                 Nguồn gốc
               </label>
               <input
@@ -250,7 +250,7 @@ export function TaiLieuModal({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-[#5d4037] mb-1">
+            <label className="block text-xl font-medium text-[#5d4037] mb-1">
               Mô tả
             </label>
             <textarea
@@ -265,10 +265,10 @@ export function TaiLieuModal({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-[#5d4037] mb-2">
+            <label className="block text-xl font-medium text-[#5d4037] mb-2">
               Tài liệu / File đính kèm
             </label>
-            
+
             {/* Upload Button */}
             <div className="space-y-3">
               <input
@@ -278,7 +278,7 @@ export function TaiLieuModal({
                 onChange={handleFileUpload}
                 className="hidden"
               />
-              
+
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
@@ -293,9 +293,11 @@ export function TaiLieuModal({
               {formData.duongDan && (
                 <div className="space-y-2">
                   <div className="flex items-center gap-3 p-3 bg-[#fdf6e3] border border-[#d4af37] rounded">
-                    <span className="text-2xl">{getFileIcon(uploadedFileName)}</span>
+                    <span className="text-2xl">
+                      {getFileIcon(uploadedFileName)}
+                    </span>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-[#5d4037] truncate">
+                      <p className="text-xl font-medium text-[#5d4037] truncate">
                         {uploadedFileName || "File đã tải lên"}
                       </p>
                       <a
@@ -316,16 +318,26 @@ export function TaiLieuModal({
                       <Trash2 size={16} />
                     </button>
                   </div>
-                  
+
                   {/* Compression info */}
                   {compressionInfo?.compressed && (
                     <div className="flex items-start gap-2 p-2 bg-green-50 border border-green-200 rounded text-xs">
-                      <Info size={14} className="text-green-600 mt-0.5 flex-shrink-0" />
+                      <Info
+                        size={14}
+                        className="text-green-600 mt-0.5 flex-shrink-0"
+                      />
                       <div className="text-green-700">
                         <p className="font-medium">Đã tự động nén file</p>
                         <p>
-                          {formatFileSize(compressionInfo.originalSize)} → {formatFileSize(compressionInfo.newSize)}
-                          {' '}(Tiết kiệm {((compressionInfo.originalSize - compressionInfo.newSize) / compressionInfo.originalSize * 100).toFixed(1)}%)
+                          {formatFileSize(compressionInfo.originalSize)} →{" "}
+                          {formatFileSize(compressionInfo.newSize)} (Tiết kiệm{" "}
+                          {(
+                            ((compressionInfo.originalSize -
+                              compressionInfo.newSize) /
+                              compressionInfo.originalSize) *
+                            100
+                          ).toFixed(1)}
+                          %)
                         </p>
                       </div>
                     </div>
@@ -344,18 +356,27 @@ export function TaiLieuModal({
                   onChange={(e) =>
                     setFormData({ ...formData, duongDan: e.target.value })
                   }
-                  className="w-full px-3 py-2 border border-[#d4af37] rounded focus:outline-none focus:ring-2 focus:ring-[#d4af37]/50 text-sm"
+                  className="w-full px-3 py-2 border border-[#d4af37] rounded focus:outline-none focus:ring-2 focus:ring-[#d4af37]/50 text-xl"
                   placeholder="https://example.com/file.pdf"
                 />
               </div>
 
               <div className="flex items-start gap-2 p-2 bg-blue-50 border border-blue-200 rounded text-xs">
-                <Info size={14} className="text-blue-600 mt-0.5 flex-shrink-0" />
+                <Info
+                  size={14}
+                  className="text-blue-600 mt-0.5 flex-shrink-0"
+                />
                 <div className="text-blue-700">
                   <p className="font-medium mb-1">Giới hạn kích thước:</p>
                   <ul className="space-y-0.5">
-                    <li>• Hình ảnh: tối đa {FILE_SIZE_LIMITS.IMAGE}MB (tự động nén)</li>
-                    <li>• Tài liệu (PDF, Word, Excel): tối đa {FILE_SIZE_LIMITS.DOCUMENT}MB</li>
+                    <li>
+                      • Hình ảnh: tối đa {FILE_SIZE_LIMITS.IMAGE}MB (tự động
+                      nén)
+                    </li>
+                    <li>
+                      • Tài liệu (PDF, Word, Excel): tối đa{" "}
+                      {FILE_SIZE_LIMITS.DOCUMENT}MB
+                    </li>
                     <li>• File khác: tối đa {FILE_SIZE_LIMITS.MAX}MB</li>
                   </ul>
                 </div>
@@ -364,7 +385,7 @@ export function TaiLieuModal({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-[#5d4037] mb-1">
+            <label className="block text-xl font-medium text-[#5d4037] mb-1">
               Ghi chú
             </label>
             <textarea
@@ -395,8 +416,8 @@ export function TaiLieuModal({
               {isLoading
                 ? "Đang lưu..."
                 : initialData
-                ? "Cập nhật"
-                : "Thêm mới"}
+                  ? "Cập nhật"
+                  : "Thêm mới"}
             </button>
           </div>
         </form>

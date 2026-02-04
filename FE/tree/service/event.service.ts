@@ -9,8 +9,10 @@ export const searchEvent = async (data: IsearchEvent): Promise<any> => {
   try {
     const res = await apiClient.post(`${prefix}/search`, data);
 
+    console.log("searchEvent -> res:", res);
     return res?.data;
   } catch (error: any) {
+    console.log("searchEvent -> error:", error);
     throw error;
   }
 };

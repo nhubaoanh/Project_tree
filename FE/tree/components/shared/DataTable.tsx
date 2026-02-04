@@ -65,7 +65,7 @@ export function DataTable<T = any>({
                         value={searchValue}
                         onChange={(e) => onSearchChange(e.target.value)}
                         placeholder={searchPlaceholder}
-                        className="w-full p-2 outline-none bg-transparent text-yellow-900 placeholder-stone-400"
+                        className="w-full p-1 outline-none bg-transparent text-yellow-900 placeholder-stone-400"
                     />
                     {searchValue && (
                         <button onClick={() => onSearchChange("")} className="p-2 text-stone-400 hover:text-red-700">
@@ -89,9 +89,9 @@ export function DataTable<T = any>({
                 <div className="overflow-x-auto flex-1">
                     <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="bg-yellow-50 border-b-2 border-yellow-600 text-yellow-800 text-sm uppercase font-bold">
+                            <tr className="bg-yellow-50 border-b-2 border-yellow-600 text-yellow-800 text-xl font-bold">
                                 {enableSelection && (
-                                    <th className="p-4 w-12 text-center">
+                                    <th className="p-2 w-12 text-center">
                                         <input
                                             type="checkbox"
                                             checked={allSelected}
@@ -103,20 +103,20 @@ export function DataTable<T = any>({
                                         />
                                     </th>
                                 )}
-                                <th className="p-4 w-12 text-center">#</th>
+                                <th className="p-2 w-12 text-center">#</th>
                                 {columns.map((col) => {
                                     const alignClass = col.align === "left" ? "text-left" : col.align === "right" ? "text-right" : "text-center";
                                     return (
                                         <th
                                             key={col.key}
-                                            className={`p-4 whitespace-nowrap ${alignClass} ${col.className || ""}`}
+                                            className={`p-2 whitespace-nowrap ${alignClass} ${col.className || ""}`}
                                         >
                                             {col.label}
                                         </th>
                                     );
                                 })}
                                 {(onViewDetail || customActions.length > 0) && (
-                                    <th className="p-4 text-center">Hành động</th>
+                                    <th className="p-2 text-center">Hành động</th>
                                 )}
                             </tr>
                         </thead>

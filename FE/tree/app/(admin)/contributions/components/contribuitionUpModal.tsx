@@ -143,21 +143,27 @@ export const ContributionUpModal: React.FC<ContributionUpModalProps> = ({
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm">
       <div className="bg-[#fffdf5] w-full max-w-xl rounded-lg shadow-2xl border border-[#d4af37] overflow-hidden flex flex-col max-h-[90vh]">
-        
         {/* HEADER */}
         <div className="bg-[#b91c1c] text-yellow-400 px-6 py-4 flex justify-between items-center">
-          <h3 className="text-xl font-bold uppercase flex items-center gap-2">
+          <h3 className="text-xl font-bold flex items-center gap-2">
             <DollarSign size={24} />
             {initialData ? "Sửa khoản thu" : "Thêm khoản thu"}
           </h3>
-          <button onClick={onClose} disabled={isLoading} className="hover:text-white">
+          <button
+            onClick={onClose}
+            disabled={isLoading}
+            className="hover:text-white"
+          >
             <X size={24} />
           </button>
         </div>
 
         {/* FORM */}
-        <form id="contributionForm" onSubmit={handleSubmit} className="p-6 overflow-y-auto space-y-4">
-          
+        <form
+          id="contributionForm"
+          onSubmit={handleSubmit}
+          className="p-6 overflow-y-auto space-y-4"
+        >
           {/* Họ tên người đóng */}
           <Field
             label="Họ tên người đóng"
@@ -172,7 +178,7 @@ export const ContributionUpModal: React.FC<ContributionUpModalProps> = ({
 
           {/* Dòng họ (hiển thị thông tin, không cho chọn) */}
           <div className="space-y-1">
-            <label className="text-sm font-bold text-[#8b5e3c] uppercase">
+            <label className="text-xl font-bold text-[#8b5e3c]">
               Dòng họ <span className="text-red-500">*</span>
             </label>
             <div className="w-full p-3 bg-gray-50 border border-[#d4af37]/50 rounded text-[#5d4037] font-medium">
@@ -274,7 +280,11 @@ export const ContributionUpModal: React.FC<ContributionUpModalProps> = ({
             disabled={isLoading}
             className="px-6 py-2 bg-[#b91c1c] text-white font-bold rounded hover:bg-[#991b1b] flex items-center gap-2 disabled:opacity-50"
           >
-            {isLoading ? <Loader2 className="animate-spin" size={18} /> : <Check size={18} />}
+            {isLoading ? (
+              <Loader2 className="animate-spin" size={18} />
+            ) : (
+              <Check size={18} />
+            )}
             {isLoading ? "Đang lưu..." : "Lưu"}
           </button>
         </div>
@@ -287,7 +297,7 @@ export const ContributionUpModal: React.FC<ContributionUpModalProps> = ({
 
 const Field = ({ label, name, type = "text", required, value, onChange, onBlur, error, placeholder }: any) => (
   <div className="space-y-1">
-    <label className="text-sm font-bold text-[#8b5e3c] uppercase">
+    <label className="text-xl font-bold text-[#8b5e3c]">
       {label} {required && <span className="text-red-500">*</span>}
     </label>
     <input
@@ -307,7 +317,7 @@ const Field = ({ label, name, type = "text", required, value, onChange, onBlur, 
 
 const Select = ({ label, name, required, value, onChange, onBlur, options, optionLabel, optionValue, error }: any) => (
   <div className="space-y-1">
-    <label className="text-sm font-bold text-[#8b5e3c] uppercase">
+    <label className="text-xl font-bold text-[#8b5e3c] ">
       {label} {required && <span className="text-red-500">*</span>}
     </label>
     <select
@@ -332,7 +342,7 @@ const Select = ({ label, name, required, value, onChange, onBlur, options, optio
 
 const TextArea = ({ label, name, required, value, onChange, onBlur, error, placeholder, rows = 3 }: any) => (
   <div className="space-y-1">
-    <label className="text-sm font-bold text-[#8b5e3c] uppercase">
+    <label className="text-xl font-bold text-[#8b5e3c] ">
       {label} {required && <span className="text-red-500">*</span>}
     </label>
     <textarea

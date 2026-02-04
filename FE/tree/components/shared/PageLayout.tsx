@@ -64,7 +64,7 @@ export function PageLayout({
       <div className="flex flex-col md:flex-row justify-between items-end md:items-center mb-8 gap-4 border-b border-[#d4af37] pb-4">
         <div className="flex items-center gap-3">
           <div>
-            <h2 className="text-3xl font-display font-bold text-[#b91c1c] uppercase drop-shadow-sm">
+            <h2 className="text-3xl font-display font-bold text-[#b91c1c] drop-shadow-sm">
               {title}
             </h2>
             {subtitle && (

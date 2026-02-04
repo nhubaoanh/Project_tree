@@ -14,7 +14,7 @@ uploadmultiRouter.post('/', uploadMultiService.multerMultiUpload, (req: Request,
     const uploadedFiles = req.files as Express.Multer.File[];
     
     // Build full URLs using BASE_URL from environment (gateway URL)
-    const baseUrl = process.env.BASE_URL || 'http://localhost:8080';
+    const baseUrl = process.env.BASE_URL;
     const paths = uploadedFiles.map(file => {
         const filePath = file.path.replace(/\\/g, '/');
         return `${baseUrl}/${filePath}`;

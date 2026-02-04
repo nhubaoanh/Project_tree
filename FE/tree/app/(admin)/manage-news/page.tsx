@@ -246,7 +246,7 @@ export default function QuanLyTinTucPage() {
 
   return (
     <PageLayout
-      title="QUẢN LÝ TIN TỨC"
+      title="Quản lý tin tức"
       subtitle="Danh sách tin tức và bài viết"
       icon={Newspaper}
       actions={pageActions}

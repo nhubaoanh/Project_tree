@@ -102,7 +102,7 @@ export function TinTucModal({
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-fadeIn">
       <div className="bg-[#fffdf5] rounded-lg w-full max-w-2xl max-h-[90vh] overflow-hidden shadow-2xl border border-[#d4af37] flex flex-col">
         <div className="bg-[#b91c1c] text-yellow-400 px-6 py-4 flex justify-between items-center">
-          <h3 className="text-xl font-bold uppercase tracking-wider">
+          <h3 className="text-xl font-bold tracking-wider">
             {initialData ? "Chỉnh sửa tin tức" : "Thêm tin tức mới"}
           </h3>
           <button onClick={onClose} className="hover:text-white transition-colors">
@@ -112,7 +112,7 @@ export function TinTucModal({
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4 overflow-y-auto">
           <div>
-            <label className="block text-sm font-bold text-[#8b5e3c] uppercase mb-1">
+            <label className="block text-xl font-bold text-[#8b5e3c] mb-1">
               Tiêu đề <span className="text-red-500">*</span>
             </label>
             <input
@@ -132,7 +132,7 @@ export function TinTucModal({
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-[#8b5e3c] uppercase mb-1">Tóm tắt</label>
+            <label className="block text-xl font-bold text-[#8b5e3c] mb-1">Tóm tắt</label>
             <textarea
               name="tomTat"
               value={formData.tomTat || ""}
@@ -150,7 +150,7 @@ export function TinTucModal({
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-[#8b5e3c] uppercase mb-1">Nội dung</label>
+            <label className="block text-xl font-bold text-[#8b5e3c] mb-1">Nội dung</label>
             <textarea
               name="noiDung"
               value={formData.noiDung || ""}
@@ -169,7 +169,7 @@ export function TinTucModal({
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-bold text-[#8b5e3c] uppercase mb-1">Tác giả</label>
+              <label className="block text-xl font-bold text-[#8b5e3c] mb-1">Tác giả</label>
               <input
                 type="text"
                 name="tacGia"
@@ -186,7 +186,7 @@ export function TinTucModal({
               )}
             </div>
             <div>
-              <label className="block text-sm font-bold text-[#8b5e3c] uppercase mb-1">Ảnh đại diện</label>
+              <label className="block text-xl font-bold text-[#8b5e3c] mb-1">Ảnh đại diện</label>
               <input
                 type="text"
                 name="anhDaiDien"
@@ -212,7 +212,7 @@ export function TinTucModal({
               onChange={(e) => setFormData({ ...formData, ghim: e.target.checked ? 1 : 0 })}
               className="w-4 h-4 text-[#b91c1c] border-[#d4af37] rounded focus:ring-[#b91c1c]"
             />
-            <label htmlFor="ghim" className="text-sm text-[#5d4037]">
+            <label htmlFor="ghim" className="text-xl text-[#5d4037]">
               Ghim tin tức này lên đầu
             </label>
           </div>
