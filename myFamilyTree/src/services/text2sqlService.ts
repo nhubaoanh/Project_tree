@@ -288,24 +288,11 @@ export class Text2SQLService {
     try {
       // 1. Build prompt
       const prompt = buildPrompt(question, dongHoId);
-      console.log("📝 Prompt built for question:", question);
-
       let generatedSQL = "";
       let usedAPI = "";
 
       // 2. Gọi AI API (ưu tiên GROQ, fallback Gemini)
       try {
-        if (this.groq) {
-          console.log("🤖 Calling GROQ API...");
-          generatedSQL = await this.callGroqAPI(prompt);
-          usedAPI = "GROQ";
-          console.log("✅ GROQ response:", generatedSQL);
-        } else {
-          throw new Error("GROQ not available");
-        }
-      } catch (groqError: any) {
-        console.warn("⚠️ GROQ API failed:", groqError.message);
-        
         if (this.geminiModel) {
           console.log("🔄 Falling back to Gemini API...");
           generatedSQL = await this.callGeminiAPI(prompt);
@@ -314,6 +301,18 @@ export class Text2SQLService {
         } else {
           throw new Error("Both GROQ and Gemini APIs failed");
         }
+      } catch (groqError: any) {
+        console.warn("⚠️ Gemini API failed:", groqError.message);
+
+        if (this.groq) {
+          console.log("🤖 Calling GROQ API...");
+          generatedSQL = await this.callGroqAPI(prompt);
+          usedAPI = "GROQ";
+          console.log("✅ GROQ response:", generatedSQL);
+        } else {
+          throw new Error("GROQ not available");
+        }
+        
       }
 
       // 3. Parse SQL
@@ -343,7 +342,6 @@ export class Text2SQLService {
         timestamp: new Date().toISOString(),
       };
     } catch (error: any) {
-      console.error("❌ Error in Text2SQL service:", error);
       throw new Error(`Text2SQL Error: ${error.message}`);
     }
   }
