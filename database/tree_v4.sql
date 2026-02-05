@@ -2962,10 +2962,10 @@ BEGIN
             sk.lu_user_id,
             lsk.tenLoaiSuKien,
             sk.uuTien
-        FROM SuKien sk
-        LEFT JOIN LoaiSuKien lsk ON sk.loaiSuKien = lsk.loaiSuKien
+        FROM sukien sk
+        LEFT JOIN loaisukien lsk ON sk.loaiSuKien = lsk.loaiSuKien
         LEFT JOIN user_profile up ON sk.nguoiTaoId  = up.userId
-		LEFT JOIN NguoiDung nd ON sk.nguoiTaoId = nd.nguoiDungId
+		LEFT JOIN nguoidung nd ON sk.nguoiTaoId = nd.nguoiDungId
         CROSS JOIN (SELECT @row_number := 0) r
         WHERE sk.active_flag = 1
           AND (p_dongHoId IS NULL OR p_dongHoId = '' OR sk.dongHoId = p_dongHoId)
@@ -3016,9 +3016,9 @@ BEGIN
             sk.lu_user_id,
             lsk.tenLoaiSuKien,
             sk.uuTien
-        FROM SuKien sk
-        INNER JOIN LoaiSuKien lsk ON sk.loaiSuKien = lsk.loaiSuKien
-        INNER JOIN NguoiDung nd ON sk.nguoiTaoId = nd.nguoiDungId
+        FROM sukien sk
+        INNER JOIN loaisukien lsk ON sk.loaiSuKien = lsk.loaiSuKien
+        INNER JOIN nguoidung nd ON sk.nguoiTaoId = nd.nguoiDungId
         CROSS JOIN (SELECT @row_number := 0) r
         WHERE sk.active_flag = 1
           AND (p_dongHoId IS NULL OR p_dongHoId = '' OR sk.dongHoId = p_dongHoId)
