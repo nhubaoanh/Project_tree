@@ -46,14 +46,14 @@ export default function AdminLayout({
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <RouteGuard>
+        {/* <RouteGuard> */}
           <SidebarProvider>
             <div className="flex h-screen w-full bg-[#FCF9E3]">
               <Sidebar />
               <MainContent>{children}</MainContent>
             </div>
           </SidebarProvider>
-        </RouteGuard>
+        {/* </RouteGuard> */}
       </AuthProvider>
     </QueryClientProvider>
   );

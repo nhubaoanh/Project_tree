@@ -740,9 +740,9 @@ export default function Home() {
               className="bg-[#F2EBC6] text-[#A20105] hover:bg-white px-12 py-8 text-xl rounded-2xl shadow-2xl"
               asChild
             >
-              <Link href="/register">
+              <Link href="/login">
                 <Sparkles className="w-6 h-6 mr-2" />
-                Đăng ký miễn phí
+                Đăng nhập miễn phí
                 <ArrowRight className="w-6 h-6 ml-2" />
               </Link>
             </Button>

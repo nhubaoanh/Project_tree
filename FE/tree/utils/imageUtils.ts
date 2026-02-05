@@ -1,7 +1,7 @@
 import { BASE_URL, API_DOWNLOAD } from "@/constant/config";
 
 const DEFAULT_AVATAR = "/images/vangoc.jpg";
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 /**
  * Helper function để xử lý URL ảnh/file

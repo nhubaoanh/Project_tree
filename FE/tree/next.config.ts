@@ -1,8 +1,11 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Output export cho static deployment
+  // Bật lại static export cho hosting
   output: "export",
+  
+  // Thêm trailing slash để fix routing issues
+  trailingSlash: true,
   
   // Tắt image optimization cho static export
   images: {
