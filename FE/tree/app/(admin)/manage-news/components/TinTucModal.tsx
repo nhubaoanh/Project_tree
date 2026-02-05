@@ -1,6 +1,6 @@
 "use client";
-import React, { useState, useEffect } from "react";
-import { X, Loader2 } from "lucide-react";
+import React, { useState, useEffect, useRef } from "react";
+import { X, Loader2, Bold, Italic, Underline, List, ListOrdered, Link, Image } from "lucide-react";
 import { ITinTuc } from "@/service/tintuc.service";
 import { FormRules, validateForm, validateField } from "@/lib/validator";
 import { useToast } from "@/service/useToas";
@@ -30,6 +30,7 @@ export function TinTucModal({
   isLoading,
 }: TinTucModalProps) {
   const { showError } = useToast();
+  const editorRef = useRef<HTMLDivElement>(null);
   
   const [formData, setFormData] = useState<Partial<ITinTuc>>({
     tieuDe: "",
@@ -54,6 +55,11 @@ export function TinTucModal({
       });
       setErrors({});
       setTouched({});
+      
+      // Set editor content
+      if (editorRef.current) {
+        editorRef.current.innerHTML = initialData?.noiDung || "";
+      }
     }
   }, [initialData, isOpen]);
 
@@ -79,6 +85,33 @@ export function TinTucModal({
     setTouched((prev) => ({ ...prev, [name]: true }));
     const error = validateField(name, value, tinTucRules, formData);
     setErrors((prev) => ({ ...prev, [name]: error }));
+  };
+
+  // Rich text editor functions
+  const execCommand = (command: string, value?: string) => {
+    document.execCommand(command, false, value);
+    editorRef.current?.focus();
+  };
+
+  const handleEditorInput = () => {
+    if (editorRef.current) {
+      const content = editorRef.current.innerHTML;
+      setFormData((prev) => ({ ...prev, noiDung: content }));
+      
+      if (touched.noiDung) {
+        const error = validateField("noiDung", content, tinTucRules, formData);
+        setErrors((prev) => ({ ...prev, noiDung: error }));
+      }
+    }
+  };
+
+  const handleEditorBlur = () => {
+    setTouched((prev) => ({ ...prev, noiDung: true }));
+    if (editorRef.current) {
+      const content = editorRef.current.innerHTML;
+      const error = validateField("noiDung", content, tinTucRules, formData);
+      setErrors((prev) => ({ ...prev, noiDung: error }));
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -151,20 +184,122 @@ export function TinTucModal({
 
           <div>
             <label className="block text-xl font-bold text-[#8b5e3c] mb-1">Nội dung</label>
-            <textarea
-              name="noiDung"
-              value={formData.noiDung || ""}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              rows={6}
-              className={`w-full px-3 py-2.5 bg-white border rounded shadow-inner focus:outline-none resize-none transition-colors ${
+            
+            {/* Rich Text Editor Toolbar */}
+            <div className="border border-[#d4af37]/50 rounded-t bg-gray-50 p-2 flex gap-1 flex-wrap">
+              <button
+                type="button"
+                onClick={() => execCommand('bold')}
+                className="p-2 hover:bg-gray-200 rounded transition-colors"
+                title="Đậm"
+              >
+                <Bold size={16} />
+              </button>
+              <button
+                type="button"
+                onClick={() => execCommand('italic')}
+                className="p-2 hover:bg-gray-200 rounded transition-colors"
+                title="Nghiêng"
+              >
+                <Italic size={16} />
+              </button>
+              <button
+                type="button"
+                onClick={() => execCommand('underline')}
+                className="p-2 hover:bg-gray-200 rounded transition-colors"
+                title="Gạch chân"
+              >
+                <Underline size={16} />
+              </button>
+              <div className="w-px bg-gray-300 mx-1"></div>
+              <button
+                type="button"
+                onClick={() => execCommand('insertUnorderedList')}
+                className="p-2 hover:bg-gray-200 rounded transition-colors"
+                title="Danh sách"
+              >
+                <List size={16} />
+              </button>
+              <button
+                type="button"
+                onClick={() => execCommand('insertOrderedList')}
+                className="p-2 hover:bg-gray-200 rounded transition-colors"
+                title="Danh sách số"
+              >
+                <ListOrdered size={16} />
+              </button>
+              <div className="w-px bg-gray-300 mx-1"></div>
+              <button
+                type="button"
+                onClick={() => {
+                  const url = prompt('Nhập URL:');
+                  if (url) execCommand('createLink', url);
+                }}
+                className="p-2 hover:bg-gray-200 rounded transition-colors"
+                title="Chèn link"
+              >
+                <Link size={16} />
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  const url = prompt('Nhập URL ảnh:');
+                  if (url) execCommand('insertImage', url);
+                }}
+                className="p-2 hover:bg-gray-200 rounded transition-colors"
+                title="Chèn ảnh"
+              >
+                <Image size={16} />
+              </button>
+            </div>
+            
+            {/* Rich Text Editor Content */}
+            <div
+              ref={editorRef}
+              contentEditable
+              onInput={handleEditorInput}
+              onBlur={handleEditorBlur}
+              className={`w-full min-h-[200px] px-3 py-2.5 bg-white border border-t-0 rounded-b shadow-inner focus:outline-none transition-colors ${
                 touched.noiDung && errors.noiDung ? "border-red-500" : "border-[#d4af37]/50 focus:border-[#b91c1c]"
               }`}
-              placeholder="Nội dung chi tiết của tin tức"
+              style={{ 
+                maxHeight: '300px', 
+                overflowY: 'auto',
+                lineHeight: '1.5'
+              }}
+              data-placeholder="Nhập nội dung chi tiết của tin tức..."
             />
+            
             {touched.noiDung && errors.noiDung && (
               <p className="text-red-500 text-xs mt-1">{errors.noiDung}</p>
             )}
+            
+            <style jsx>{`
+              [contenteditable]:empty:before {
+                content: attr(data-placeholder);
+                color: #9ca3af;
+                font-style: italic;
+              }
+              [contenteditable] {
+                outline: none;
+              }
+              [contenteditable] p {
+                margin: 0.5em 0;
+              }
+              [contenteditable] ul, [contenteditable] ol {
+                margin: 0.5em 0;
+                padding-left: 1.5em;
+              }
+              [contenteditable] a {
+                color: #3b82f6;
+                text-decoration: underline;
+              }
+              [contenteditable] img {
+                max-width: 100%;
+                height: auto;
+                border-radius: 4px;
+              }
+            `}</style>
           </div>
 
           <div className="grid grid-cols-2 gap-4">

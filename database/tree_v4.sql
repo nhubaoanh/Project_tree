@@ -734,7 +734,7 @@ BEGIN
 	SET p_error_code = 0;
     SET p_error_message = '';
     START TRANSACTION;
-    SELECT roleId, roleCode, roleName, createDate, nguoiTaoId, lu_updated, lu_user_id from Role;
+    SELECT roleId, roleCode, roleName, createDate, nguoiTaoId, lu_updated, lu_user_id from role;
     
 END$$
 DELIMITER ;
@@ -3166,9 +3166,9 @@ BEGIN
                 rl.roleCode, rl.roleName, nd.ngayTao, up.avatar,
                 COALESCE(nd.online_flag, 0) AS online_flag,
                 nd.active_flag, nd.lu_updated, nd.lu_user_id
-            FROM NguoiDung nd
+            FROM nguoidung nd
             LEFT JOIN user_profile up ON nd.nguoiDungId = up.userId
-            LEFT JOIN DongHo dh ON nd.dongHoId = dh.dongHoId
+            LEFT JOIN dongho dh ON nd.dongHoId = dh.dongHoId
             LEFT JOIN role rl ON nd.roleId = rl.roleId
             WHERE nd.active_flag = 1
               AND (p_dongHoId IS NULL OR p_dongHoId = '' OR nd.dongHoId = p_dongHoId)
@@ -3211,9 +3211,9 @@ BEGIN
                 rl.roleCode, rl.roleName, nd.ngayTao,
                 COALESCE(nd.online_flag, 0) AS online_flag,
                 nd.active_flag, nd.lu_updated, nd.lu_user_id
-            FROM NguoiDung nd
+            FROM nguoidung nd
             LEFT JOIN user_profile up ON nd.nguoiDungId = up.userId
-            LEFT JOIN DongHo dh ON nd.dongHoId = dh.dongHoId
+            LEFT JOIN dongho dh ON nd.dongHoId = dh.dongHoId
             LEFT JOIN role rl ON nd.roleId = rl.roleId
             WHERE nd.active_flag = 1
               AND (p_dongHoId IS NULL OR p_dongHoId = '' OR nd.dongHoId = p_dongHoId)

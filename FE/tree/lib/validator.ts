@@ -11,9 +11,16 @@ export const v = {
       ? `${label} không được để trống`
       : null,
 
-  // Email
-  email: (val: string, label = "Email") =>
-    val && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val) ? `${label} không đúng định dạng` : null,
+  // Email - chặt chẽ hơn
+  email: (val: string, label = "Email") => {
+    if (!val) return null;
+    // Regex chặt chẽ hơn cho email
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!emailRegex.test(val)) return `${label} không đúng định dạng (VD: user@gmail.com)`;
+    // Kiểm tra độ dài
+    if (val.length > 254) return `${label} quá dài (tối đa 254 ký tự)`;
+    return null;
+  },
 
   // Số điện thoại VN
   phone: (val: string, label = "SĐT") =>
@@ -72,12 +79,11 @@ export const v = {
     return d < today ? `${label} không được là quá khứ` : null;
   },
 
-  // Mật khẩu (6+ ký tự, có chữ thường + số)
+  // Mật khẩu - đơn giản hơn
   password: (val: string, label = "Mật khẩu") => {
     if (!val) return null;
     if (val.length < 6) return `${label} tối thiểu 6 ký tự`;
-    if (!/[a-z]/.test(val)) return `${label} cần có chữ thường`;
-    if (!/[0-9]/.test(val)) return `${label} cần có số`;
+    if (val.length > 10) return `${label} tối đa 50 ký tự`;
     return null;
   },
 
@@ -187,6 +193,60 @@ export const v = {
     return null;
   },
 
+  // Ngày sinh hợp lệ (không quá 150 tuổi, không tương lai)
+  birthDate: (val: string, label = "Ngày sinh") => {
+    if (!val) return null;
+    const date = new Date(val);
+    if (isNaN(date.getTime())) return `${label} không hợp lệ`;
+    
+    const today = new Date();
+    const age = today.getFullYear() - date.getFullYear();
+    const monthDiff = today.getMonth() - date.getMonth();
+    const dayDiff = today.getDate() - date.getDate();
+    
+    // Kiểm tra tương lai
+    if (date > today) return `${label} không được là tương lai`;
+    
+    // Kiểm tra quá 150 tuổi
+    if (age > 150 || (age === 150 && (monthDiff > 0 || (monthDiff === 0 && dayDiff > 0)))) {
+      return `${label} không hợp lệ (quá 150 tuổi)`;
+    }
+    
+    return null;
+  },
+
+  // Ngày mất hợp lệ (sau ngày sinh, không tương lai)
+  deathDate: (val: string, birthDate: string, label = "Ngày mất") => {
+    if (!val) return null;
+    const date = new Date(val);
+    if (isNaN(date.getTime())) return `${label} không hợp lệ`;
+    
+    const today = new Date();
+    // Kiểm tra tương lai
+    if (date > today) return `${label} không được là tương lai`;
+    
+    // Kiểm tra so với ngày sinh
+    if (birthDate) {
+      const birth = new Date(birthDate);
+      if (!isNaN(birth.getTime()) && date <= birth) {
+        return `${label} phải sau ngày sinh`;
+      }
+    }
+    
+    return null;
+  },
+
+  // Năm sáng tác (không quá năm hiện tại)
+  creationYear: (val: any, label = "Năm sáng tác") => {
+    if (val === "" || val === null || val === undefined) return null;
+    const n = Number(val);
+    const currentYear = new Date().getFullYear();
+    if (isNaN(n)) return `${label} phải là số`;
+    if (!Number.isInteger(n)) return `${label} phải là số nguyên`;
+    if (n < 1000 || n > currentYear) return `${label} phải từ 1000 đến ${currentYear}`;
+    return null;
+  },
+
   // Số CMND/CCCD (9 hoặc 12 số)
   idCard: (val: string, label = "CMND/CCCD") => {
     if (!val) return null;
@@ -194,6 +254,22 @@ export const v = {
     if (!/^\d{9}$|^\d{12}$/.test(cleaned)) return `${label} phải có 9 hoặc 12 số`;
     return null;
   },
+
+
+  // Ngày đóng (không quá ngày hiện tại)
+  closingDate: (val: string, label = "Ngày đóng") => {
+    if (!val) return null;
+    const date = new Date(val);
+    if (isNaN(date.getTime())) return `${label} không hợp lệ`;
+    
+    const today = new Date();
+    today.setHours(23, 59, 59, 999); // Cho phép đóng trong ngày hiện tại
+    
+    if (date > today) return `${label} không được quá ngày hiện tại`;
+    return null;
+  },
+
+
 };
 
 // ==================== TYPES ====================
@@ -221,10 +297,14 @@ export type Rule =
   | "age"
   | "year"
   | "idCard"
+  | "birthDate"
+  | "creationYear"
+  | "closingDate"
   | { min: number }
   | { max: number }
   | { range: [number, number] }
   | { match: string }
+  | { deathDate: string }
   | { pattern: RegExp; msg: string }
   | { custom: (val: any, data?: any) => boolean; msg: string };
 
@@ -276,12 +356,16 @@ export function validateField(
         case "age": error = v.age(value, label); break;
         case "year": error = v.year(value, label); break;
         case "idCard": error = v.idCard(value, label); break;
+        case "birthDate": error = v.birthDate(value, label); break;
+        case "creationYear": error = v.creationYear(value, label); break;
+        case "closingDate": error = v.closingDate(value, label); break;
       }
     } else {
       if ("min" in rule) error = v.min(value, rule.min, label);
       else if ("max" in rule) error = v.max(value, rule.max, label);
       else if ("range" in rule) error = v.range(value, rule.range[0], rule.range[1], label);
       else if ("match" in rule) error = v.match(value, formData?.[rule.match], label);
+      else if ("deathDate" in rule) error = v.deathDate(value, formData?.[rule.deathDate], label);
       else if ("pattern" in rule) error = v.pattern(value, rule.pattern, rule.msg);
       else if ("custom" in rule) error = v.custom(value, (val) => rule.custom(val, formData), rule.msg);
     }

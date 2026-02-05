@@ -14,8 +14,13 @@ export const getImageUrl = (img: string | null | undefined): string => {
     // Decode URL nếu bị encode
     let decodedImg = decodeURIComponent(img);
 
-    // Nếu đã là URL đầy đủ (http/https), return luôn
+    // Nếu đã là URL đầy đủ, kiểm tra và sửa domain nếu cần
     if (decodedImg.startsWith("http://") || decodedImg.startsWith("https://")) {
+      // Fix domain từ giaphaso.vn về api.giaphaso.vn
+      if (decodedImg.includes("giaphaso.vn/uploads/")) {
+        decodedImg = decodedImg.replace("https://giaphaso.vn/", `${API_BASE_URL}/`);
+        decodedImg = decodedImg.replace("http://giaphaso.vn/", `${API_BASE_URL}/`);
+      }
       return decodedImg;
     }
 
@@ -28,6 +33,11 @@ export const getImageUrl = (img: string | null | undefined): string => {
     // Fallback: xử lý như path tương đối
     let fallbackImg = img;
     if (fallbackImg.startsWith("http://") || fallbackImg.startsWith("https://")) {
+      // Fix domain cho fallback cũng
+      if (fallbackImg.includes("giaphaso.vn/uploads/")) {
+        fallbackImg = fallbackImg.replace("https://giaphaso.vn/", `${API_BASE_URL}/`);
+        fallbackImg = fallbackImg.replace("http://giaphaso.vn/", `${API_BASE_URL}/`);
+      }
       return fallbackImg;
     }
     const path = fallbackImg.startsWith("uploads/")
@@ -52,8 +62,13 @@ export const getFileUrl = (filePath: string | null | undefined): string => {
     // Decode URL nếu bị encode
     let decodedPath = decodeURIComponent(filePath);
 
-    // Nếu đã là URL đầy đủ (http/https), return luôn
+    // Nếu đã là URL đầy đủ, kiểm tra và sửa domain nếu cần
     if (decodedPath.startsWith("http://") || decodedPath.startsWith("https://")) {
+      // Fix domain từ giaphaso.vn về api.giaphaso.vn
+      if (decodedPath.includes("giaphaso.vn/uploads/")) {
+        decodedPath = decodedPath.replace("https://giaphaso.vn/", `${API_BASE_URL}/`);
+        decodedPath = decodedPath.replace("http://giaphaso.vn/", `${API_BASE_URL}/`);
+      }
       return decodedPath;
     }
 
@@ -66,6 +81,11 @@ export const getFileUrl = (filePath: string | null | undefined): string => {
     // Fallback: xử lý như path tương đối
     let fallbackPath = filePath;
     if (fallbackPath.startsWith("http://") || fallbackPath.startsWith("https://")) {
+      // Fix domain cho fallback cũng
+      if (fallbackPath.includes("giaphaso.vn/uploads/")) {
+        fallbackPath = fallbackPath.replace("https://giaphaso.vn/", `${API_BASE_URL}/`);
+        fallbackPath = fallbackPath.replace("http://giaphaso.vn/", `${API_BASE_URL}/`);
+      }
       return fallbackPath;
     }
     const path = fallbackPath.startsWith("uploads/")

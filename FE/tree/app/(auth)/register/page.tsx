@@ -4,6 +4,7 @@ import { useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
+import { Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -47,15 +48,15 @@ const registerRules: FormRules = {
   },
   tenDongHo: {
     label: "Tên dòng họ",
-    rules: ["required", { min: 2 }, { max: 100 }, "noNumber"],
+    rules: ["required", { min: 2 }, { max: 100 }, "noNumber", "noSpecial"],
   },
   queQuanGoc: {
     label: "Quê quán gốc",
-    rules: [{ max: 200 }],
+    rules: [{ max: 200 }, "noSpecial"],
   },
   ngayThanhLap: {
     label: "Ngày thành lập",
-    rules: ["date"],
+    rules: ["date", "notFuture"],
   },
 };
 
@@ -67,6 +68,8 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const [checkingEmail, setCheckingEmail] = useState(false);
   const [emailExists, setEmailExists] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const checkEmailTimeout = useRef<NodeJS.Timeout | null>(null);
 
   // Sử dụng custom hook
@@ -208,7 +211,8 @@ export default function RegisterPage() {
               <div className="relative">
                 <Input
                   type="text"
-                  placeholder="Nhập email"
+                  placeholder="Nhập email (VD: user@gmail.com)"
+                  maxLength={254}
                   className={`h-12 text-base bg-white/90 ${
                     form.hasError("tenDangNhap") || emailExists ? "border-red-500" : ""
                   } ${checkingEmail ? "pr-10" : ""}`}
@@ -235,13 +239,27 @@ export default function RegisterPage() {
             {/* Mật khẩu */}
             <div className="grid gap-2">
               <label className="text-sm font-medium">Mật khẩu</label>
-              <Input
-                type="password"
-                placeholder="Nhập mật khẩu"
-                className={`h-12 text-base bg-white/90 ${form.hasError("matKhau") ? "border-red-500" : ""}`}
-                {...form.getFieldProps("matKhau")}
-                onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
-              />
+              <div className="relative">
+                <Input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Nhập mật khẩu"
+                  maxLength={50}
+                  className={`h-12 text-base bg-white/90 pr-12 ${form.hasError("matKhau") ? "border-red-500" : ""}`}
+                  {...form.getFieldProps("matKhau")}
+                  onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors"
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-5 w-5" />
+                  ) : (
+                    <Eye className="h-5 w-5" />
+                  )}
+                </button>
+              </div>
               {form.getError("matKhau") && (
                 <p className="text-sm text-red-500">{form.getError("matKhau")}</p>
               )}
@@ -250,13 +268,26 @@ export default function RegisterPage() {
             {/* Nhập lại mật khẩu */}
             <div className="grid gap-2">
               <label className="text-sm font-medium">Nhập lại mật khẩu</label>
-              <Input
-                type="password"
-                placeholder="Nhập lại mật khẩu"
-                className={`h-12 text-base bg-white/90 ${form.hasError("nhapLaiMatKhau") ? "border-red-500" : ""}`}
-                {...form.getFieldProps("nhapLaiMatKhau")}
-                onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
-              />
+              <div className="relative">
+                <Input
+                  type={showConfirmPassword ? "text" : "password"}
+                  placeholder="Nhập lại mật khẩu"
+                  className={`h-12 text-base bg-white/90 pr-12 ${form.hasError("nhapLaiMatKhau") ? "border-red-500" : ""}`}
+                  {...form.getFieldProps("nhapLaiMatKhau")}
+                  onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors"
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff className="h-5 w-5" />
+                  ) : (
+                    <Eye className="h-5 w-5" />
+                  )}
+                </button>
+              </div>
               {form.getError("nhapLaiMatKhau") && (
                 <p className="text-sm text-red-500">{form.getError("nhapLaiMatKhau")}</p>
               )}

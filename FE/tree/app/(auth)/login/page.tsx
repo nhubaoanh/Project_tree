@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
+import { Eye, EyeOff } from "lucide-react";
 import storage from "@/utils/storage";
 import { useToast } from "@/service/useToas";
 import { useFormValidation } from "@/lib/useFormValidation";
@@ -42,6 +43,7 @@ export default function LoginPage() {
   const router = useRouter();
   const { showError, showSuccess } = useToast();
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     storage.clearToken()
@@ -174,13 +176,27 @@ export default function LoginPage() {
                   Quên mật khẩu?
                 </Link>
               </div>
-              <Input
-                type="password"
-                placeholder="Nhập mật khẩu"
-                className={`h-12 text-base bg-white/90 ${form.hasError("matKhau") ? "border-red-500" : ""}`}
-                {...form.getFieldProps("matKhau")}
-                onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
-              />
+              <div className="relative">
+                <Input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Nhập mật khẩu"
+                  maxLength={50}
+                  className={`h-12 text-base bg-white/90 pr-12 ${form.hasError("matKhau") ? "border-red-500" : ""}`}
+                  {...form.getFieldProps("matKhau")}
+                  onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors"
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-5 w-5" />
+                  ) : (
+                    <Eye className="h-5 w-5" />
+                  )}
+                </button>
+              </div>
               {form.getError("matKhau") && (
                 <p className="text-sm text-red-500">{form.getError("matKhau")}</p>
               )}
